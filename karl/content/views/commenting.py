@@ -23,6 +23,7 @@ from zope.component.event import objectEventNotify
 
 from zope.component import getMultiAdapter
 from zope.component import queryUtility
+from zope.component import getUtility
 
 from schemaish.type import File as SchemaFile
 import schemaish
@@ -43,6 +44,7 @@ from karl.utilities.interfaces import IAlerts
 from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import support_attachments
+from karl.utils import find_profiles
 
 from repoze.lemonade.content import create_content
 from karl.models.interfaces import IComment
@@ -56,6 +58,12 @@ from karl.content.views.interfaces import IBylineInfo
 from karl.views.forms.filestore import get_filestore
 from karl.views.forms import widgets as karlwidgets
 from karl.content.views.utils import fetch_attachments
+from karl.utilities.image import thumb_url
+from karl.views.people import PROFILE_THUMB_SIZE
+from karl.utilities.interfaces import IKarlDates
+
+from pyramid_formish import Form
+from pyramid_formish.zcml import FormAction
 
 
 def redirect_comments_view(context, request):
@@ -75,6 +83,7 @@ def redirect_comments_view(context, request):
     location = url+msg
     location = location.encode('utf-8')
     return HTTPFound(location=location)
+
 
 def show_comment_view(context, request):
 
@@ -124,9 +133,10 @@ add_comment_field = schemaish.String(
     description='Enter your comments below.')
 sendalert_field = schemaish.Boolean(
     title='Email alert')
-attachments_field = schemaish.Sequence(schemaish.File(),
-    title='Attachments',
-    )
+attachments_field = schemaish.Sequence(
+    schemaish.File(),
+    title='Attachments')
+
 
 class AddCommentFormController(object):
     def __init__(self, context, request):
@@ -170,7 +180,6 @@ class AddCommentFormController(object):
                                 anchor=add_comment)
         return HTTPFound(location=location)
 
-
     def handle_cancel(self):
         location = resource_url(self.context.__parent__, self.request)
         return HTTPFound(location=location)
@@ -211,6 +220,7 @@ class AddCommentFormController(object):
         self.filestore.clear()
         return HTTPFound(location=location)
 
+
 class EditCommentFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -250,8 +260,8 @@ class EditCommentFormController(object):
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
         api.karl_client_data['text'] = dict(
-                enable_imagedrawer_upload = True,
-                )
+            enable_imagedrawer_upload=True,
+            )
         return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
@@ -261,7 +271,7 @@ class EditCommentFormController(object):
     def handle_submit(self, converted):
         context = self.context
         request = self.request
-        workflow =  get_workflow(IComment, 'security', context)
+        workflow = get_workflow(IComment, 'security', context)
 
         objectEventNotify(ObjectWillBeModifiedEvent(context))
         if workflow is not None:
@@ -279,3 +289,81 @@ class EditCommentFormController(object):
         location = resource_url(context, request)
         self.filestore.clear()
         return HTTPFound(location=location)
+
+
+def get_comment_data(context, comments_folder, api, request):
+    # get comment data to be used to render comments
+    profiles = find_profiles(comments_folder)
+    karldates = getUtility(IKarlDates)
+    comments = []
+    for comment in comments_folder.values():
+        profile = profiles.get(comment.creator)
+        author_name = profile.title
+        author_url = resource_url(profile, request)
+
+        newc = {}
+        newc['id'] = comment.__name__
+        if has_permission('edit', comment, request):
+            newc['edit_url'] = resource_url(comment, request, 'edit.html')
+        else:
+            newc['edit_url'] = None
+
+        if has_permission('delete', comment, request):
+            newc['delete_url'] = resource_url(comment, request, 'delete.html')
+        else:
+            newc['delete_url'] = None
+
+        if has_permission('administer', comment, request):
+            newc['advanced_url'] = resource_url(comment, request, 'advanced.html')
+        else:
+            newc['advanced_url'] = None
+
+        # Display portrait
+        photo = profile.get('photo')
+        if photo is not None:
+            photo_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
+        else:
+            photo_url = api.static_url + "/images/defaultUser.gif"
+        newc["portrait_url"] = photo_url
+
+        newc['author_url'] = author_url
+        newc['author_name'] = author_name
+
+        newc['date'] = karldates(comment.created, 'longform')
+        newc['timestamp'] = comment.created
+        newc['text'] = comment.text
+
+        # Fetch the attachments info
+        newc['attachments'] = fetch_attachments(comment, request)
+        comments.append(newc)
+    comments.sort(key=lambda c: c['timestamp'])
+    return comments
+
+
+def get_comment_form(context, comments_folder, api, request):
+    # manually construct formish comment form
+    controller = AddCommentFormController(comments_folder, request)
+    form_schema = schemaish.Structure()
+    form_fields = controller.form_fields()
+    for fieldname, field in form_fields:
+        form_schema.add(fieldname, field)
+    form_action_url = '%sadd_comment.html' % resource_url(context['comments'], request)
+    comment_form = Form(form_schema, add_default_action=False, name='save',
+                        action_url=form_action_url)
+    form_defaults = controller.form_defaults()
+    comment_form.defaults = form_defaults
+    request.form_defaults = form_defaults
+
+    form_actions = [FormAction('submit', 'submit'),
+                    FormAction('cancel', 'cancel', validate=False)]
+    for action in form_actions:
+        comment_form.add_action(action.name, action.title)
+
+    widgets = controller.form_widgets(form_fields)
+    for name, widget in widgets.items():
+        comment_form[name].widget = widget
+
+    # this is for enable imagedrawer for adding blog comments
+    api.karl_client_data['text'] = dict(
+        enable_imagedrawer_upload=True)
+    return comment_form

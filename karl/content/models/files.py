@@ -40,6 +40,7 @@ from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import IToolFactory
 from karl.models.tool import ToolFactory
+from karl.content.models.commenting import CommentsFolder
 
 
 class CommunityRootFolder(Folder):
@@ -81,7 +82,7 @@ class CommunityFolderObjectVersion(object):
             'creator',
             'modified_by',
         ])
-        self.klass = folder.__class__ # repozitory can't detect we are a shim
+        self.klass = folder.__class__  # repozitory can't detect we are a shim
         self.user = folder.modified_by
         if self.user is None:
             self.user = folder.creator
@@ -98,7 +99,7 @@ class CommunityFolderContainerVersion(object):
         self.ns_map = {}
 
 
-class CommunityFile(Persistent):
+class CommunityFile(Folder):
     implements(ICommunityFile)
     modified_by = None  # Sorry, persistence
     is_image = False    # Sorry, persistence
@@ -109,12 +110,14 @@ class CommunityFile(Persistent):
                  mimetype=u'',
                  filename=u'',
                  creator=u''):
+        super(CommunityFile, self).__init__()
         self.title = unicode(title)
         self.mimetype = mimetype
         self.filename = filename
         self.creator = unicode(creator)
         self.modified_by = self.creator
         self.blobfile = Blob()
+        self['comments'] = CommentsFolder()
         if stream is not None:
             self.upload(stream)
 
@@ -140,7 +143,7 @@ class CommunityFile(Persistent):
     def get_default_tiff_thumbnail(self):
         here = os.path.dirname(__file__)
         path = os.path.join(here, '..', '..', 'views', 'static',
-                'images', 'tiff.png')
+                            'images', 'tiff.png')
         tiff = PIL.Image.open(path)
         return tiff
 
@@ -195,7 +198,7 @@ class CommunityFile(Persistent):
 def upload_stream(stream, file):
     size = 0
     while 1:
-        data = stream.read(1<<21)
+        data = stream.read(1 << 21)
         if not data:
             break
         size += len(data)
@@ -259,7 +262,7 @@ class CommunityFileVersion(object):
             'creator',
         ])
         self.blobs = {'blob': file.blobfile.open()}
-        self.klass = file.__class__ # repozitory can't detect we are a shim
+        self.klass = file.__class__  # repozitory can't detect we are a shim
         self.user = file.modified_by
         if self.user is None:
             self.user = file.creator

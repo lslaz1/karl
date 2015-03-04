@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-import transaction
 
 from zope.interface import implements
 
@@ -34,9 +33,11 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.models.commenting import CommentsFolder
 from karl.content.models.attachments import AttachmentsFolder
 
+
 class Blog(Folder):
     implements(IBlog)
     title = u'Blog'
+
 
 class BlogEntry(Folder):
     implements(IBlogEntry)
@@ -58,6 +59,7 @@ class BlogEntry(Folder):
 
     def get_attachments(self):
         return self['attachments']
+
 
 class BlogToolFactory(ToolFactory):
     implements(IToolFactory)
@@ -97,5 +99,3 @@ class MailinTraceBlog(Folder):
                 os.makedirs(folder)
             open(path, 'w').close()
         os.utime(path, None)
-
-

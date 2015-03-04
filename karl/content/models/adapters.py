@@ -37,6 +37,7 @@ from karl.utilities.converters.stripogram import html2text
 import logging
 log = logging.getLogger(__name__)
 
+
 class FlexibleTextIndexData(object):
 
     implements(ITextIndexData)
@@ -65,10 +66,12 @@ class FlexibleTextIndexData(object):
             del parts[0]
         return tuple(parts)
 
+
 def makeFlexibleTextIndexData(attr_weights):
     class Derived(FlexibleTextIndexData):
         weighted_attrs_cleaners = attr_weights
     return Derived
+
 
 def extract_text_from_html(text):
     if not isinstance(text, unicode):
@@ -76,14 +79,13 @@ def extract_text_from_html(text):
     return convert_entities(html2text(convert_entities(text))).strip()
 
 TitleAndDescriptionIndexData = makeFlexibleTextIndexData(
-                                [('title', None),
-                                 ('description', None),
-                                ])
+    [('title', None),
+     ('description', None)])
 
 TitleAndTextIndexData = makeFlexibleTextIndexData(
-                                [('title', None),
-                                 ('text', extract_text_from_html),
-                                ])
+    [('title', None),
+     ('text', extract_text_from_html)])
+
 
 class _CachedData(Persistent):
     encoding = None
@@ -100,7 +102,8 @@ class _CachedData(Persistent):
             data = data.decode('utf8')
         return data
 
-_MAX_CACHE_SIZE = 1<<18 # 256kb
+_MAX_CACHE_SIZE = 1 << 18  # 256kb
+
 
 def _extract_and_cache_file_data(context):
     cached_data = getattr(context, '_extracted_data', None)
@@ -119,6 +122,7 @@ def _extract_and_cache_file_data(context):
     if data and len(data) <= _MAX_CACHE_SIZE:
         context._extracted_data = cached_data = _CachedData(data)
     return data
+
 
 def _extract_file_data(context):
     converter = queryUtility(IConverter, context.mimetype)
@@ -145,12 +149,12 @@ def _extract_file_data(context):
     try:
         stream, encoding = converter.convert(filename, encoding=None,
                                              mimetype=context.mimetype)
-    except Exception, e:
+    except Exception:
         # Just won't get indexed
         log.exception("Error converting file %s" % filename)
         return ''
 
-    datum = stream.read(1<<21) # XXX dont read too much into RAM
+    datum = stream.read(1 << 21)  # XXX dont read too much into RAM
     if encoding is not None:
         try:
             datum = datum.decode(encoding)
@@ -164,12 +168,14 @@ def _extract_file_data(context):
 
     return datum
 
+
 FileTextIndexData = makeFlexibleTextIndexData(
-                                [('title', None),
-                                 (_extract_and_cache_file_data, None),
-                                ])
+    [('title', None),
+     (_extract_and_cache_file_data, None)])
+
 
 WIKILINK_RE = re.compile('\(\((.+)\)\)')
+
 
 class WikiTextIndexData(TitleAndTextIndexData):
 
@@ -190,4 +196,3 @@ class CalendarEventCategoryData(object):
             calendar = find_interface(self.context, ICalendar)
             category = resource_path(calendar)
         return category
-

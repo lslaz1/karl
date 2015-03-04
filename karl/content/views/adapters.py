@@ -54,6 +54,7 @@ from karl.utilities.interfaces import IKarlDates
 from karl.utilities.interfaces import IMimeInfo
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
+from karl.models.interfaces import ICommentsFolder
 
 from karl.utils import docid_to_hex
 from karl.utils import get_setting
@@ -425,11 +426,39 @@ class BlogEntryAlert(BlogAlert):
         return "[%s] %s" % (self._community.title, self._blogentry.title)
 
 
-class BlogCommentAlert(BlogAlert):
+class BaseCommentAlert(object):
+
+    @property
+    def comment_folder(self):
+        return find_interface(self.context, ICommentsFolder)
+
+    @property
+    def parent(self):
+        return self.comment_folder.__parent__
+
+    @property
+    def _history(self):
+        """ See abstract base class, BlogAlert, above."""
+        if self.digest:
+            return ([], 0)
+
+        comment_folder = find_interface(self.context, ICommentsFolder)
+        parent = comment_folder.__parent__
+        comments = list(comment_folder.values())
+        comments = [comment for comment in comments
+                    if comment is not self.context]
+        comments.sort(key=lambda x: x.created)
+
+        messages = [parent] + comments
+        n = len(comments) + 1
+        return messages, n
+
+
+class CommentBlogEntryAlert(BaseCommentAlert, BlogAlert):
     _template = "templates/email_blog_comment_alert.pt"
 
     def __init__(self, context, profile, request):
-        super(BlogCommentAlert, self).__init__(context, profile, request)
+        BlogAlert.__init__(self, context, profile, request)
         assert IComment.providedBy(context)
 
     @property
@@ -440,21 +469,25 @@ class BlogCommentAlert(BlogAlert):
     def _attachments_folder(self):
         return self.context
 
+
+class CommentAlert(Alert):
+
+    def __init__(self, context, profile, request):
+        super(CommentAlert, self).__init__(context, profile, request)
+        assert IComment.providedBy(context)
+        self.alert = None
+        if find_interface(self.context, IBlogEntry) or find_interface(context, IForumTopic):  # noqa
+            # it is a blog alert
+            self.alert = CommentBlogEntryAlert(self.context, self.profile, self.request)
+        else:
+            if find_interface(self.context, ICommunityFile):
+                self.alert = CommunityFileCommentAlert(self.context, self.profile,
+                                                       self.request)
+
     @property
-    def _history(self):
-        """ See abstract base class, BlogAlert, above."""
-        if self.digest:
-            return ([], 0)
-
-        blogentry = self._blogentry
-        comments = list(self._blogentry['comments'].values())
-        comments = [comment for comment in comments
-                    if comment is not self.context]
-        comments.sort(key=lambda x: x.created)
-
-        messages = [blogentry] + comments
-        n = len(comments) + 1
-        return messages, n
+    def message(self):
+        if self.alert:
+            return self.alert.message
 
 
 class NonBlogAlert(Alert):
@@ -526,6 +559,8 @@ class NonBlogAlert(Alert):
             content_type=self._content_type_name,
             digest=self.digest,
             alert=self,
+            resource_url=resource_url,
+            request=request
         )
 
         if self.digest:
@@ -562,6 +597,15 @@ class CommunityFileAlert(NonBlogAlert):
     _template = "templates/email_community_file_alert.pt"
     _interface = ICommunityFile
     _content_type_name = 'File'
+
+
+class CommunityFileCommentAlert(BaseCommentAlert, CommunityFileAlert):
+    _template = "templates/email_community_file_comment_alert.pt"
+    _interface = IComment
+
+    @property
+    def _subject(self):
+        return "[%s] Re: %s" % (self._community.title, self.parent.title)
 
 
 class CalendarEventAlert(NonBlogAlert):

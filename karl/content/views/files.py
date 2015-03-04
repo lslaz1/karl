@@ -103,6 +103,9 @@ from karl.views.batch import get_container_batch
 from karl.views.utils import check_upload_size
 from karl.views.utils import copy_stream_to_tmpfile_and_iter
 
+from karl.content.views.commenting import get_comment_data
+from karl.content.views.commenting import get_comment_form
+
 from karl.views.forms.filestore import get_filestore
 
 log = logging.getLogger(__name__)
@@ -526,6 +529,12 @@ def show_file_view(context, request):
     filename = context.filename
     if isinstance(filename, unicode):
         filename = filename.encode('UTF-8')
+
+    # file comments
+    comments_folder = context['comments']
+    comments = get_comment_data(context, comments_folder, api, request)
+    comment_form = get_comment_form(context, comments_folder, api, request)
+
     return render_to_response(
         'templates/show_file.pt',
         dict(api=api,
@@ -537,6 +546,8 @@ def show_file_view(context, request):
              next_entry=next,
              layout=layout,
              filename=quote_plus(filename),
+             comments=comments,
+             comment_form=comment_form,
              ),
         request=request,
         )

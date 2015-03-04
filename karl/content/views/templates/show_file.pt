@@ -3,6 +3,12 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="layout">
 
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <!-- This page adds the fields manually, therefore formish + tinymce both needed to be added manually -->
+    <div metal:use-macro="api.snippets.macros['js_formish_resources']"/>
+    <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
+  </span>
+
   <div metal:fill-slot="content">
 
     <div class="contentbar-wrapper view-show-file-actions">
@@ -23,6 +29,10 @@
       <div metal:use-macro="api.snippets.macros['download_file']"/>
 
     </div>
+
+    <div metal:use-macro="api.snippets.macros['show_comments']"/>
+    <a name="addcomment"></a>
+    <span tal:content="structure comment_form()" tal:omit-tag=""/>
 
     <div metal:use-macro="api.snippets.macros['previous_next']"/>
 

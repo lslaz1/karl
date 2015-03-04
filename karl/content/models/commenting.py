@@ -23,6 +23,7 @@ from repoze.folder import Folder
 from karl.models.interfaces import ICommentsFolder
 from karl.models.interfaces import IComment
 
+
 class CommentsFolder(Folder):
     implements(ICommentsFolder)
     title = u'Comments Folder'
@@ -36,6 +37,7 @@ class CommentsFolder(Folder):
             # no members
             return u'001'
         return u"%03d" % (int(maxkey) + 1)
+
 
 class Comment(Folder):
     """ A comment can contain attachments """

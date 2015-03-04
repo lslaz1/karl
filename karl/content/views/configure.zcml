@@ -1011,7 +1011,7 @@
            karl.models.interfaces.IProfile
            pyramid.interfaces.IRequest"
       provides="karl.utilities.interfaces.IAlert"
-      factory=".adapters.BlogCommentAlert"
+      factory=".adapters.CommentAlert"
       />
 
   <adapter
