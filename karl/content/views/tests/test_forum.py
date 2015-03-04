@@ -30,6 +30,7 @@ from karl.testing import registerLayoutProvider
 
 import karl.testing
 
+
 class TestShowForumsView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -50,7 +51,6 @@ class TestShowForumsView(unittest.TestCase):
         karl.testing.registerUtility(dummy, IKarlDates)
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                      ITagQuery)
-
 
     def test_it_empty(self):
         self._register()
@@ -80,6 +80,7 @@ class TestShowForumsView(unittest.TestCase):
         self.assertEqual(actions[0][0], 'Add Forum')
         self.assertEqual(len(renderer.forum_data), 1)
 
+
 class TestShowForumView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -105,7 +106,9 @@ class TestShowForumView(unittest.TestCase):
         from karl.content.interfaces import IForumsFolder
         karl.testing.registerAdapter(DummySearchAdapter, (Interface),
                                      ICatalogSearch)
+        parent = testing.DummyModel(title='abc')
         context = testing.DummyModel(title='abc')
+        context.__parent__ = parent
         alsoProvides(context, IForumsFolder)
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
@@ -129,8 +132,8 @@ class TestAddForumFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title': 'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title': 'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -159,7 +162,7 @@ class TestAddForumFormController(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('title' in widgets)
 
@@ -186,9 +189,9 @@ class TestAddForumFormController(unittest.TestCase):
                 title=title, description=desc, creator=creator)
         registerContentFactory(factory, IForum)
         converted = {
-            'title':'title',
-            'description':'desc',
-            'security_state':'public'}
+            'title': 'title',
+            'description': 'desc',
+            'security_state': 'public'}
 
         context = testing.DummyModel()
         request = testing.DummyRequest()
@@ -200,6 +203,7 @@ class TestAddForumFormController(unittest.TestCase):
         self.assertEqual(context['title'].description, 'desc')
         self.assertEqual(context['title'].creator, None)
         self.assertEqual(workflow.initialized, True)
+
 
 class TestAddForumTopicFormController(unittest.TestCase):
     def setUp(self):
@@ -226,8 +230,8 @@ class TestAddForumTopicFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -257,7 +261,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('attachments.*' in widgets)
 
@@ -288,7 +292,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
                 title=title, text=text, creator=creator)
             topic['comments'] = testing.DummyModel()
             topic['attachments'] = testing.DummyModel()
-            topic.get_attachments = lambda : None
+            topic.get_attachments = lambda: None
             return topic
         registerContentFactory(factory, IForumTopic)
         registerContentFactory(DummyFile, ICommunityFile)
@@ -297,11 +301,11 @@ class TestAddForumTopicFormController(unittest.TestCase):
         attachment2 = DummyUpload(filename=r"C:\My Documents\Ha Ha\test2.txt")
 
         converted = {
-            'title':'title',
-            'text':'abc',
+            'title': 'title',
+            'text': 'abc',
             'tags': 'thetesttag',
-            'security_state':'public',
-            'attachments':[attachment1, attachment2],
+            'security_state': 'public',
+            'attachments': [attachment1, attachment2],
             }
 
         context = self._makeContext()
@@ -317,6 +321,7 @@ class TestAddForumTopicFormController(unittest.TestCase):
         self.assertEqual(context['title'].creator, None)
         self.assertEqual(workflow.initialized, True)
         self.assertEqual(len(context['title']['attachments']), 2)
+
 
 class ShowForumTopicViewTests(unittest.TestCase):
     def setUp(self):
@@ -380,7 +385,6 @@ class ShowForumTopicViewTests(unittest.TestCase):
         self.assertEqual(c0['author_name'], 'Dummy Profile')
         self.assertEqual(renderer.comments[0]['edit_url'],
                          'http://example.com/comments/1/edit.html')
-
 
     def test_with_security_policy(self):
         self._register()
@@ -478,8 +482,8 @@ class TestEditForumFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -511,7 +515,7 @@ class TestEditForumFormController(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('title' in widgets)
 
@@ -533,8 +537,8 @@ class TestEditForumFormController(unittest.TestCase):
 
     def test_handle_submit(self):
         converted = {
-            'title':'newtitle',
-            'description':'newdescription',
+            'title': 'newtitle',
+            'description': 'newdescription',
             }
         context = testing.DummyModel(
             title='oldtitle', description='olddescription')
@@ -553,6 +557,7 @@ class TestEditForumFormController(unittest.TestCase):
         self.assertEqual(context.title, 'newtitle')
         self.assertEqual(context.description, 'newdescription')
         self.assertEqual(context.modified_by, 'testeditor')
+
 
 class EditForumTopicFormController(unittest.TestCase):
     def setUp(self):
@@ -579,8 +584,8 @@ class EditForumTopicFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -599,7 +604,7 @@ class EditForumTopicFormController(unittest.TestCase):
         self.assertEqual(defaults['title'], 'title')
         self.assertEqual(defaults['tags'], [])
         self.assertEqual(defaults['text'], 'text')
-        self.assertEqual(len(defaults['attachments']),1)
+        self.assertEqual(len(defaults['attachments']), 1)
         self.assertEqual(defaults['security_state'], 'public')
 
     def test_form_fields(self):
@@ -620,7 +625,7 @@ class EditForumTopicFormController(unittest.TestCase):
         controller = self._makeOne(context, request)
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                      ITagQuery)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('attachments.*' in widgets)
 
@@ -651,11 +656,11 @@ class EditForumTopicFormController(unittest.TestCase):
         DummyUpload(filename='test.txt')
 
         converted = {
-            'title':'newtitle',
-            'text':'newtext',
-            'tags':[],
-            'security_state':'public',
-            'attachments':[DummyUpload()],
+            'title': 'newtitle',
+            'text': 'newtext',
+            'tags': [],
+            'security_state': 'public',
+            'attachments': [DummyUpload()],
             }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
@@ -674,7 +679,8 @@ class EditForumTopicFormController(unittest.TestCase):
         request.environ['repoze.browserid'] = '1'
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
-        self.assertEqual(response.location,
+        self.assertEqual(
+            response.location,
             'http://example.com/?status_message=Forum+Topic+Edited')
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
@@ -686,13 +692,13 @@ class EditForumTopicFormController(unittest.TestCase):
             context['attachments']['test.txt'].mimetype, 'text/plain')
 
 
-
-class dictall(dict):
+class dictall(dict):  # noqa
     def getall(self, name):
         result = self.get(name)
         if result is None:
             return []
         return [result]
+
 
 class DummySearchAdapter:
     def __init__(self, context):
@@ -701,22 +707,25 @@ class DummySearchAdapter:
     def __call__(self, **kw):
         return 0, [], None
 
+
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
+
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
+
 
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
     def __init__(self, state_info=[
-        {'name':'public', 'transitions':['private']},
-        {'name':'private', 'transitions':['public']},
-        ]):
+            {'name': 'public', 'transitions': ['private']},
+            {'name': 'private', 'transitions': ['public']},
+            ]):
         self.transitioned = []
         self._state_info = state_info
 
@@ -725,9 +734,9 @@ class DummyWorkflow:
 
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
-        self.transitioned.append({'to_state':to_state, 'content':content,
-                                  'request':request, 'guards':guards,
-                                  'context':context, 'skip_same':skip_same})
+        self.transitioned.append({'to_state': to_state, 'content': content,
+                                  'request': request, 'guards': guards,
+                                  'context': context, 'skip_same': skip_same})
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
@@ -735,10 +744,12 @@ class DummyWorkflow:
     def initialize(self, context):
         self.initialized = True
 
+
 class DummyFile:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         self.size = 0
+
 
 class DummySessions(dict):
     def get(self, name, default=None):

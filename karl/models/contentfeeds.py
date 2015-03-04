@@ -49,6 +49,7 @@ from karl.utils import find_tags
 APPENDSTACK_MAX_LAYERS = 20
 APPENDSTACK_MAX_LENGTH = 250
 
+
 class SiteEvents(Persistent):
     implements(ISiteEvents)
 
@@ -97,21 +98,20 @@ class SiteEvents(Persistent):
                 yield gen, index, mapping
         # TODO:  iterate archive?
 
-
     def push(self, **kw):
         """ See ISiteEvents.
         """
-        self._stack.push(PersistentMapping(kw),
-                        # TODO:  pruner=???
-                        )
+        # TODO:  pruner=???
+        self._stack.push(PersistentMapping(kw))
 
 #
 #   Event subscribers
 #
 MEMBER_PREFIX = 'group.community:'
 
+
 def _getInfo(profile, content):
-    community = context = find_community(content)
+    context = find_community(content)
     if context is None:
         # try for content inside a profile
         context = find_interface(content, IProfile)
@@ -150,12 +150,12 @@ def _getInfo(profile, content):
             'allowed':
                 principals_allowed_by_permission(content, 'view'),
             'comment_count': comment_count,
-            'tags': tags,                 #XXX
+            'tags': tags,  # XXX
             'author': profile.title,
             'profile_url': '/profiles/%s' % profile.__name__,
             'thumbnail': '/profiles/%s/profile_thumbnail' % profile.__name__,
-            'timestamp': _NOW(),
-           }
+            'timestamp': _NOW()}
+
 
 def user_joined_community(event):
     if IUserAddedGroup.providedBy(event):

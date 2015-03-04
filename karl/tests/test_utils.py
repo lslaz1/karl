@@ -20,6 +20,7 @@ import unittest
 from pyramid import testing
 import karl.testing
 
+
 class TestUtilFunctions(unittest.TestCase):
     def test_find_users(self):
         from karl.utils import find_users
@@ -134,6 +135,7 @@ class TestUtilFunctions(unittest.TestCase):
         context.repo = '1'
         self.assertEqual(find_repo(context), '1')
 
+
 class TestDebugSearch(unittest.TestCase):
     def setUp(self):
         from zope.testing.cleanup import cleanUp
@@ -157,6 +159,7 @@ class TestDebugSearch(unittest.TestCase):
         context = testing.DummyModel()
         result = self._callFUT(context)
         self.assertEqual(result, (1, [None]))
+
 
 class TestGetContentTypeNameAndIcon(unittest.TestCase):
     def setUp(self):
@@ -240,6 +243,7 @@ class TestGetContentTypeNameAndIcon(unittest.TestCase):
         self.assertEqual(self._callFUT(context),
                          ('Community', 'building.png'))
 
+
 class TestGetSession(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.utils import get_session
@@ -251,9 +255,10 @@ class TestGetSession(unittest.TestCase):
         context.sessions = testing.DummyModel()
         foo = testing.DummyModel()
         context.sessions['foo'] = foo
-        request.environ = {'repoze.browserid':'foo'}
+        request.environ = {'repoze.browserid': 'foo'}
         result = self._callFUT(context, request)
         self.assertEqual(result, foo)
+
 
 class TestPersistentBBB(unittest.TestCase):
     def _makeOne(self, *arg):
@@ -267,7 +272,7 @@ class TestPersistentBBB(unittest.TestCase):
         d = Dummy()
         self.assertEqual(d.__dict__, {})
         self.assertEqual(d.attr, [])
-        self.assertEqual(d.__dict__, {'attr':[]})
+        self.assertEqual(d.__dict__, {'attr': []})
 
     def test_default_copied(self):
         from persistent import Persistent

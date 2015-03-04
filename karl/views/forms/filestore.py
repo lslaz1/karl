@@ -2,6 +2,7 @@ from ZODB.blob import Blob
 from persistent.mapping import PersistentMapping
 from karl.utils import get_session
 
+
 class ZODBFileStore(object):
     """ Tempfile store for formish upload widgets """
     def __init__(self, persistent_map):
@@ -23,7 +24,7 @@ class ZODBFileStore(object):
         f = blobfile.open('w')
         size = 0
         while 1:
-            data = src.read(1<<21)
+            data = src.read(1 << 21)
             if not data:
                 break
             size += len(data)
@@ -36,6 +37,7 @@ class ZODBFileStore(object):
     def clear(self):
         self.persistent_map.clear()
 
+
 def get_filestore(context, request, form_id):
     session = get_session(context, request)
     mapping = session.get(form_id)
@@ -44,4 +46,3 @@ def get_filestore(context, request, form_id):
         mapping = session[form_id]
     filestore = ZODBFileStore(mapping)
     return filestore
-

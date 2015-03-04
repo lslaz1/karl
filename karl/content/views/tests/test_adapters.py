@@ -162,7 +162,7 @@ class TestBylineInfo(unittest.TestCase):
         from karl.utilities.interfaces import IKarlDates
         context = DummyContext()
         request = testing.DummyRequest()
-        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        dummy = mock.Mock(return_value=mock.sentinel.SOMEDATE)
         karltesting.registerUtility(dummy, IKarlDates)
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date, mock.sentinel.SOMEDATE)
@@ -175,7 +175,7 @@ class TestBylineInfo(unittest.TestCase):
         from karl.utilities.interfaces import IKarlDates
         context = DummyContext()
         request = testing.DummyRequest()
-        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        dummy = mock.Mock(return_value=mock.sentinel.SOMEDATE)
         karltesting.registerUtility(dummy, IKarlDates)
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.posted_date_compact, mock.sentinel.SOMEDATE)
@@ -192,7 +192,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         from karl.content.interfaces import IBlogEntry
 
         config = cleanUp()
-        config.setup_registry() # this is not a unit test
+        config.setup_registry()  # this is not a unit test
 
         karltesting.registerSettings()
 
@@ -241,8 +241,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
         self.assertEqual(alert.message['Precedence'], 'bulk')
 
     def test_digest(self):
@@ -254,10 +253,9 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.assertEqual("member@x.org", alert.mto[0])
 
         self.failUnless(isinstance(alert.message, Message))
-        self.assertEqual( alert.message["reply-to"],
+        self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
 
     def test_digest_malformed_text(self):
         from repoze.postoffice.message import Message
@@ -271,8 +269,7 @@ class TestBlogEntryAlert(unittest.TestCase):
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
 
 
 class TestBlogCommentAlert(unittest.TestCase):
@@ -281,6 +278,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         import datetime
         from zope.interface import directlyProvides
         from karl.content.interfaces import IBlogEntry
+        from karl.models.interfaces import ICommentsFolder
 
         cleanUp()
         karltesting.registerSettings()
@@ -295,18 +293,24 @@ class TestBlogCommentAlert(unittest.TestCase):
         profiles["creator"] = karltesting.DummyProfile()
 
         community["blog"] = testing.DummyModel()
+        community["blog"].__parent__ = community
 
         blogentry = testing.DummyModel(text="This is a test")
         blogentry.created = datetime.datetime(2010, 5, 12, 2, 42)
         blogentry.creator = 'member'
         community["blog"]["blogentry"] = blogentry
+        blogentry.__parent__ = community['blog']
         blogentry["attachments"] = testing.DummyModel()
+        blogentry["attachments"].__parent__ = blogentry
         blogentry.title = "Blog Entry"
         blogentry.docid = 0
         directlyProvides(blogentry, IBlogEntry)
         self.blogentry = blogentry
 
         blogentry["comments"] = testing.DummyModel()
+        blogentry["comments"].__parent__ = self.blogentry
+        directlyProvides(blogentry['comments'], ICommentsFolder)
+
         self.comment = self._add_comment(blogentry)
 
     def tearDown(self):
@@ -324,11 +328,12 @@ class TestBlogCommentAlert(unittest.TestCase):
         comment.text = text
         comment.creator = creator
         comment.created = len(comments)
+        comment.__parent__ = comments
         return comment
 
     def _getTargetClass(self):
-        from karl.content.views.adapters import BlogCommentAlert
-        return BlogCommentAlert
+        from karl.content.views.adapters import CommentAlert
+        return CommentAlert
 
     def _makeOne(self, context, profile, request):
         return self._getTargetClass()(context, profile, request)
@@ -342,19 +347,26 @@ class TestBlogCommentAlert(unittest.TestCase):
         # LP #615370:  comment alerts need to work against forum topics, too.
         from zope.interface import directlyProvides
         from karl.content.interfaces import IForumTopic
+        from karl.models.interfaces import ICommentsFolder
         topic = testing.DummyModel(text="This is a test")
         community = self.blogentry.__parent__.__parent__
         community["forum"] = testing.DummyModel()
         community["forum"]["topic"] = topic
+        topic.__parent__ = community["forum"]
         topic["attachments"] = testing.DummyModel()
+        topic["attachments"].__parent__ = topic
+
         topic["comments"] = testing.DummyModel()
+        topic["comments"].__parent__ = topic
+        directlyProvides(topic['comments'], ICommentsFolder)
+
         topic.title = "Forum Post"
         topic.docid = 0
         directlyProvides(topic, IForumTopic)
         comment = self._add_comment(topic)
         request = testing.DummyRequest()
         alert = self._makeOne(comment, self.profile, request)
-        self.failUnless(alert._blogentry is topic)
+        self.failUnless(alert.alert._blogentry is topic)
 
     def test_alert(self):
         from repoze.postoffice.message import Message
@@ -362,14 +374,13 @@ class TestBlogCommentAlert(unittest.TestCase):
             'templates/email_blog_comment_alert.pt')
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
-        self.assertEqual(1, len(alert.mto))
-        self.assertEqual("member@x.org", alert.mto[0])
+        self.assertEqual(1, len(alert.alert.mto))
+        self.assertEqual("member@x.org", alert.alert.mto[0])
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
         self.assertEqual(alert.message['Precedence'], 'bulk')
 
         messages, n = renderer.history
@@ -390,15 +401,14 @@ class TestBlogCommentAlert(unittest.TestCase):
 
         request = testing.DummyRequest()
         alert = self._makeOne(self.comment, self.profile, request)
-        alert.digest = True
+        alert.alert.digest = True
         self.assertEqual(1, len(alert.mto))
         self.assertEqual("member@x.org", alert.mto[0])
 
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
         self.assertEqual(renderer.history, ([], 0))
 
     def test_long_history(self):
@@ -418,8 +428,7 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.failUnless(isinstance(alert.message, Message))
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
-                          '@karl3.example.com>'
-                        )
+                         u'@karl3.example.com>')
 
         messages, n = renderer.history
         self.assertEqual(n, 7)
@@ -440,7 +449,7 @@ class TestCalendarEventAlert(unittest.TestCase):
         from karl.content.interfaces import ICalendarEvent
 
         config = cleanUp()
-        config.setup_registry() # this is not a unit test
+        config.setup_registry()  # this is not a unit test
 
         karltesting.registerSettings()
         karltesting.registerKarlDates()
@@ -535,7 +544,7 @@ class TestCommunityFileAlert(unittest.TestCase):
         from karl.content.interfaces import ICommunityFile
 
         config = cleanUp()
-        config.setup_registry() # this is not a unit test
+        config.setup_registry()  # this is not a unit test
 
         karltesting.registerSettings()
 
@@ -622,7 +631,7 @@ class DummySearchAdapter:
 
 
 class DummyContext(testing.DummyModel):
-    creator=u'dummy'
+    creator = u'dummy'
     created_timestamp = 1233149520.9288571
     posted_date = 'Wednesday, January 28, 2009 08:32 AM'
 

@@ -27,6 +27,7 @@ from pyramid.threadlocal import get_current_registry
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
 
+
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     """ Register a ZCA adapter component.
 
@@ -53,6 +54,7 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     reg.registerAdapter(impl, for_, provides, name=name)
     return impl
 
+
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a ZCA utility component.
 
@@ -69,6 +71,7 @@ def registerUtility(impl, iface=Interface, name=''):
     reg = get_current_registry()
     reg.registerUtility(impl, iface, name=name)
     return impl
+
 
 def registerSubscriber(subscriber, iface=Interface):
     """ Register a ZCA subscriber component.
@@ -91,6 +94,7 @@ def registerSubscriber(subscriber, iface=Interface):
     config.commit()
     return result
 
+
 def registerDummyRenderer(path, renderer=None):
     """ Register a template renderer at ``path`` (usually a relative
     filename ala ``templates/foo.pt``) and return the renderer object.
@@ -106,6 +110,7 @@ def registerDummyRenderer(path, renderer=None):
     result = config.testing_add_template(path, renderer)
     config.commit()
     return result
+
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """ Registers a pair of faux :app:`Pyramid` security policies:
@@ -141,6 +146,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     config.commit()
     return result
 
+
 def registerEventListener(event_iface=None):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
     listening for events of the type ``event_iface``.  This method
@@ -164,6 +170,7 @@ def registerEventListener(event_iface=None):
     result = config.testing_add_subscriber(event_iface)
     config.commit()
     return result
+
 
 def registerModels(resources):
     """ Registers a dictionary of :term:`resource` objects that can be
@@ -212,6 +219,7 @@ class DummyCatalog(dict):
         result = sorted(result.keys())
         return len(result), result
 
+
 class DummyDocumentMap:
     def __init__(self, *maps):
         self.added = []
@@ -245,6 +253,7 @@ class DummyDocumentMap:
     def remove_docid(self, docid):
         self.removed.append(docid)
 
+
 class DummyAccumulator(object):
     def __init__(self):
         self._list = []
@@ -255,6 +264,7 @@ class DummyAccumulator(object):
     def consume(self):
         result, self._list = self._list, []
         return result
+
 
 class DummyProfile(DummyModel):
     implements(IProfile)
@@ -288,15 +298,15 @@ class DummyProfile(DummyModel):
 
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
-            IProfile.ALERT_IMMEDIATELY,
-            IProfile.ALERT_DAILY_DIGEST,
-            IProfile.ALERT_NEVER,
-            IProfile.ALERT_WEEKLY_DIGEST,
-            IProfile.ALERT_BIWEEKLY_DIGEST,
-            ):
+                IProfile.ALERT_IMMEDIATELY,
+                IProfile.ALERT_DAILY_DIGEST,
+                IProfile.ALERT_NEVER,
+                IProfile.ALERT_WEEKLY_DIGEST,
+                IProfile.ALERT_BIWEEKLY_DIGEST):
             raise ValueError("Invalid preference.")
 
         self._alert_prefs[community_name] = preference
+
 
 class DummyRoot(DummyModel):
     def __init__(self):
@@ -310,6 +320,7 @@ class DummyRoot(DummyModel):
         for dummy in dummies:
             self[u'profiles'][dummy[0]] = DummyModel(title=dummy[1])
         self[u'communities'] = DummyModel()
+
 
 class DummySettings(dict):
     reload_templates = True
@@ -334,10 +345,12 @@ class DummySettings(dict):
         except KeyError:
             raise AttributeError(name)
 
+
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+
 
 class DummyCommunity(DummyModel):
     implements(ICommunity)
@@ -348,6 +361,7 @@ class DummyCommunity(DummyModel):
         DummyModel.__init__(self)
         root = DummyRoot()
         root["communities"]["community"] = self
+
 
 class DummyMailer(list):
     class DummyMessage(object):
@@ -361,16 +375,19 @@ class DummyMailer(list):
     def send(self, mto, msg):
         self.append(self.DummyMessage(mto, msg))
 
+
 def registerDummyMailer():
     from repoze.sendmail.interfaces import IMailDelivery
     mailer = DummyMailer()
     registerUtility(mailer, IMailDelivery)
     return mailer
 
+
 class DummyFile:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         self.size = 0
+
 
 class DummyUsers:
     def __init__(self, community=None, encrypt=None):
@@ -398,8 +415,8 @@ class DummyUsers:
         self._by_id[userid] = userinfo
 
         if (self.community is not None and
-            hasattr(self.community, "moderators_group_name") and
-            hasattr(self.community, "members_group_name")):
+                hasattr(self.community, "moderators_group_name") and
+                hasattr(self.community, "members_group_name")):
             for group_name in groups:
                 if group_name == self.community.moderators_group_name:
                     self.community.moderator_names.add(userid)
@@ -412,8 +429,8 @@ class DummyUsers:
     def add_user_to_group(self, userid, group_name):
         self.added_groups.append((userid, group_name))
         if (self.community is not None and
-            hasattr(self.community, "moderators_group_name") and
-            hasattr(self.community, "members_group_name")):
+                hasattr(self.community, "moderators_group_name") and
+                hasattr(self.community, "members_group_name")):
             if group_name == self.community.moderators_group_name:
                 self.community.moderator_names.add(userid)
             elif group_name == self.community.members_group_name:
@@ -424,8 +441,8 @@ class DummyUsers:
         self.removed_groups.append((userid, group_name))
 
         if (self.community is not None and
-            hasattr(self.community, "moderators_group_name") and
-            hasattr(self.community, "members_group_name")):
+                hasattr(self.community, "moderators_group_name") and
+                hasattr(self.community, "members_group_name")):
             if group_name == self.community.moderators_group_name:
                 self.community.moderator_names.remove(userid)
             elif group_name == self.community.members_group_name:
@@ -434,12 +451,12 @@ class DummyUsers:
     remove_group = remove_user_from_group
 
     def get_by_id(self, userid):
-        if self._by_id.has_key(userid):
+        if userid in self._by_id:
             return self._by_id[userid]
         return None
 
     def get_by_login(self, login):
-        if self._by_login.has_key(login):
+        if login in self._by_login:
             return self._by_login[login]
         return None
 
@@ -455,7 +472,7 @@ class DummyUsers:
 
     def change_login(self, userid, new_login):
         if new_login == 'raise_value_error':
-            raise ValueError, 'This is the error message.'
+            raise ValueError('This is the error message.')
         user = self._by_id[userid]
         del self._by_login[user['login']]
         self._by_login[new_login] = user
@@ -469,18 +486,19 @@ class DummyUsers:
     def users_in_group(self, group):
         return [id for id in self._by_id if group in self._by_id[id]['groups']]
 
+
 class DummyUpload(object):
     """Simulates an HTTP upload.  Suitable for assigning as the value to
     to a dummy request form parameter.
     """
-    def __init__(self, filename="test.txt",
-                       mimetype="text/plain",
-                       data="This is a test."):
+    def __init__(self, filename="test.txt", mimetype="text/plain",
+                 data="This is a test."):
         self.filename = filename
         self.type = mimetype
         self.mimetype = mimetype
         self.data = data
         self.file = StringIO(data)
+
 
 class DummySearchAdapter:
     def __init__(self, context):
@@ -497,13 +515,16 @@ class DummySearchAdapter:
             return 1, [1], [profile]
         return 0, [], None
 
+
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
 
+
 class DummyTags:
     def update(self, *args, **kw):
         self._called_with = (args, kw)
+
 
 class DummyFolderAddables(DummyAdapter):
     def __init__(self, context, request):
@@ -515,15 +536,18 @@ class DummyFolderAddables(DummyAdapter):
             ('Add File', 'add_file.html'),
             ]
 
+
 class DummyFolderCustomizer(DummyAdapter):
     markers = []
+
 
 class DummyLayoutProvider(DummyAdapter):
     template_fn = 'karl.views:templates/community_layout.fn'
 
-    def __call__(self, default):
+    def __call__(self, default=None):
         renderer = registerDummyRenderer(self.template_fn)
         return renderer
+
 
 class DummyOrdering:
     _items = []
@@ -552,6 +576,7 @@ class DummyOrdering:
     def next_name(self, name):
         return u'next1'
 
+
 class DummySecurityWorkflow:
     def __init__(self, context):
         self.context = context
@@ -571,11 +596,13 @@ class DummySecurityWorkflow:
     def execute(self, request, transition_id):
         self.context.transition_id = transition_id
 
+
 class DummySessions(dict):
     def get(self, name, default=None):
         if name not in self:
             self[name] = {}
         return self[name]
+
 
 def registerLayoutProvider():
     from karl.views.interfaces import ILayoutProvider
@@ -583,15 +610,18 @@ def registerLayoutProvider():
                     (Interface, Interface),
                     ILayoutProvider)
 
+
 def registerTagbox():
     from karl.models.interfaces import ITagQuery
     registerAdapter(DummyTagQuery, (Interface, Interface),
                     ITagQuery)
 
+
 def registerAddables():
     from karl.views.interfaces import IFolderAddables
     registerAdapter(DummyFolderAddables, (Interface, Interface),
                     IFolderAddables)
+
 
 def registerKarlDates():
     d1 = 'Wednesday, January 28, 2009 08:32 AM'
@@ -600,6 +630,7 @@ def registerKarlDates():
     from karl.utilities.interfaces import IKarlDates
     registerUtility(dummy, IKarlDates)
 
+
 def registerCatalogSearch():
     from karl.models.interfaces import ICatalogSearch
     registerAdapter(DummySearchAdapter, (Interface, Interface),
@@ -607,9 +638,11 @@ def registerCatalogSearch():
     registerAdapter(DummySearchAdapter, (Interface,),
                     ICatalogSearch)
 
+
 def registerSecurityWorkflow():
     from repoze.workflow.testing import registerDummyWorkflow
     return registerDummyWorkflow('security')
+
 
 def registerSettings(**kw):
     registry = get_current_registry()

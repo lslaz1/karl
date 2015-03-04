@@ -710,7 +710,7 @@ class DefaultLayoutProvider(object):
         # A series of tests, in order of precedence.
         layout = None
         if default is not None:
-            layout = getattr(self, default+'_layout')
+            layout = getattr(self, default + '_layout')
         elif not find_interface(self.context, ICommunity):
             layout = self.generic_layout
 

@@ -77,8 +77,10 @@ from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import upload_attachments
 from karl.content.views.utils import fetch_attachments
 
+
 def titlesort(one, two):
     return cmp(one.title, two.title)
+
 
 class ShowForumsView(object):
     _admin_actions = [
@@ -137,12 +139,14 @@ class ShowForumsView(object):
             'templates/show_forums.pt',
             dict(api=api,
                  actions=actions,
-                 forum_data = forum_data),
+                 forum_data=forum_data),
             request=request,
             )
 
+
 def show_forums_view(context, request):
     return ShowForumsView(context, request)()
+
 
 def show_forum_view(context, request):
 
@@ -188,11 +192,11 @@ def show_forum_view(context, request):
 
     return render_to_response(
         'templates/show_forum.pt',
-        dict(api = api,
-             actions = actions,
-             title = context.title,
-             topics = topics,
-             batch_info = topic_batch,
+        dict(api=api,
+             actions=actions,
+             title=context.title,
+             topics=topics,
+             batch_info=topic_batch,
              backto=backto,
              layout=layout),
         request=request,
@@ -204,8 +208,7 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 attachments_field = schemaish.Sequence(schemaish.File(),
-    title='Attachments',
-    )
+                                       title='Attachments')
 
 title_field = schemaish.String(
     validator=validator.All(
@@ -220,6 +223,7 @@ description_field = schemaish.String(
                  "limit your description to 100 words or less.")
     )
 
+
 class AddForumFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -231,8 +235,8 @@ class AddForumFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':'',
-            'description':''}
+            'title': '',
+            'description': ''}
 
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
@@ -249,22 +253,22 @@ class AddForumFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'title':formish.Input(empty=''),
-            'description':formish.TextArea(cols=60, rows=10, empty=''),
+            'title': formish.Input(empty=''),
+            'description': formish.TextArea(cols=60, rows=10, empty=''),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
     def __call__(self):
         page_title = 'Add Forum'
         api = TemplateAPI(self.context, self.request, page_title)
-        return {'api':api, 'actions':()}
+        return {'api': api, 'actions': ()}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -274,7 +278,8 @@ class AddForumFormController(object):
         context = self.context
         workflow = self.workflow
 
-        forum = create_content(IForum,
+        forum = create_content(
+            IForum,
             converted['title'],
             converted['description'],
             authenticated_userid(request),
@@ -293,6 +298,7 @@ class AddForumFormController(object):
         location = resource_url(forum, request)
         return HTTPFound(location=location)
 
+
 class EditForumFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -304,8 +310,8 @@ class EditForumFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':self.context.title,
-            'description':self.context.description}
+            'title': self.context.title,
+            'description': self.context.description}
 
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(self.context)
@@ -322,22 +328,22 @@ class EditForumFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'title':formish.Input(empty=''),
-            'description':formish.TextArea(cols=60, rows=10, empty=''),
+            'title': formish.Input(empty=''),
+            'description': formish.TextArea(cols=60, rows=10, empty=''),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
     def __call__(self):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
-        return {'api':api, 'actions':()}
+        return {'api': api, 'actions': ()}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -361,8 +367,9 @@ class EditForumFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         location = resource_url(context, request,
-                             query={'status_message':'Forum Edited'})
+                                query={'status_message': 'Forum Edited'})
         return HTTPFound(location=location)
+
 
 def show_forum_topic_view(context, request):
     post_url = resource_url(context, request, "comments", "add_comment.html")
@@ -436,7 +443,7 @@ def show_forum_topic_view(context, request):
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
+        tagbox=get_tags_client_data(context, request),
         )
 
     # Get a layout
@@ -455,7 +462,7 @@ def show_forum_topic_view(context, request):
     for fieldname, field in form_fields:
         form_schema.add(fieldname, field)
     form_action_url = '%sadd_comment.html' % resource_url(context['comments'],
-                                                       request)
+                                                          request)
     comment_form = Form(form_schema, add_default_action=False, name='save',
                         action_url=form_action_url)
     form_defaults = controller.form_defaults()
@@ -473,8 +480,7 @@ def show_forum_topic_view(context, request):
 
     # enable imagedrawer for adding forum replies (comments)
     api.karl_client_data['text'] = dict(
-            enable_imagedrawer_upload = True,
-            )
+        enable_imagedrawer_upload=True)
     return render_to_response(
         'templates/show_forum_topic.pt',
         dict(api=api,
@@ -504,10 +510,10 @@ class AddForumTopicFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':'',
-            'tags':[],
-            'text':'',
-            'attachments':[],
+            'title': '',
+            'tags': [],
+            'text': '',
+            'attachments': [],
             }
 
         if self.workflow is not None:
@@ -533,19 +539,19 @@ class AddForumTopicFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsAddWidget(),
-            'text':karlwidgets.RichTextWidget(empty=''),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsAddWidget(),
+            'text': karlwidgets.RichTextWidget(empty=''),
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
-            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -554,8 +560,7 @@ class AddForumTopicFormController(object):
         layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
         api.karl_client_data['text'] = dict(
-                enable_imagedrawer_upload = True,
-                )
+            enable_imagedrawer_upload=True)
         return {
             'api': api,
             'layout': layout,
@@ -572,7 +577,8 @@ class AddForumTopicFormController(object):
         name = make_unique_name(context, converted['title'])
         creator = authenticated_userid(request)
 
-        topic = create_content(IForumTopic,
+        topic = create_content(
+            IForumTopic,
             converted['title'],
             converted['text'],
             creator,
@@ -600,6 +606,7 @@ class AddForumTopicFormController(object):
         location = resource_url(topic, request)
         return HTTPFound(location=location)
 
+
 class EditForumTopicFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -614,10 +621,10 @@ class EditForumTopicFormController(object):
         attachments = [SchemaFile(None, x.__name__, x.mimetype)
                        for x in self.context['attachments'].values()]
         defaults = {
-            'title':self.context.title,
-            'tags':[], # initial values supplied by widget
-            'text':self.context.text,
-            'attachments':attachments,
+            'title': self.context.title,
+            'tags': [],  # initial values supplied by widget
+            'text': self.context.text,
+            'attachments': attachments,
             }
 
         if self.workflow is not None:
@@ -644,19 +651,19 @@ class EditForumTopicFormController(object):
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
-            'text':karlwidgets.RichTextWidget(empty=''),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text': karlwidgets.RichTextWidget(empty=''),
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
-            'attachments.*':karlwidgets.FileUpload2(filestore=self.filestore),
+            'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -666,8 +673,7 @@ class EditForumTopicFormController(object):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         api.karl_client_data['text'] = dict(
-                enable_imagedrawer_upload = True,
-                )
+            enable_imagedrawer_upload=True)
         return {
             'api': api,
             'layout': layout,
@@ -706,11 +712,13 @@ class EditForumTopicFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         location = resource_url(context, request,
-                             query={'status_message':'Forum Topic Edited'})
+                                query={'status_message': 'Forum Topic Edited'})
         return HTTPFound(location=location)
+
 
 def number_of_topics(forum):
     return len(forum)
+
 
 def number_of_comments(forum, request):
     searcher = ICatalogSearch(forum)
@@ -721,11 +729,12 @@ def number_of_comments(forum, request):
         )
     return total
 
+
 def latest_object(forum, request):
     searcher = ICatalogSearch(forum)
     total, docids, resolver = searcher(
         sort_index='modified_date',
-        interfaces={'query': [IForumTopic, IComment], 'operator':'or'},
+        interfaces={'query': [IForumTopic, IComment], 'operator': 'or'},
         path={'query': resource_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         reverse=True)
@@ -736,10 +745,10 @@ def latest_object(forum, request):
     else:
         return None
 
+
 def get_topic_batch(forum, request):
     return get_catalog_batch_grid(
         forum, request, interfaces=[IForumTopic], reverse=True,
         path={'query': resource_path(forum)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
         )
-

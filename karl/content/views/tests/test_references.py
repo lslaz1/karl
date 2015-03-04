@@ -19,6 +19,7 @@ import unittest
 
 import karl.testing
 
+
 class TestBase:
 
     def setUp(self):
@@ -132,7 +133,7 @@ class FileHTMLTests(unittest.TestCase):
         self.failUnless(renderer.fileinfo is fileinfo)
 
 
-class Test_getTree(TestBase, unittest.TestCase):
+class Test_getTree(TestBase, unittest.TestCase):  # noqa
 
     def _callFUT(self, context, request=None, api=None):
         from pyramid.testing import DummyRequest
@@ -184,8 +185,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'href': 'http://example.com/aaa/',
                                     'html': '<p>Unknown type</p>',
                                     'subpath': '|aaa',
-                                    'items': [],
-                                   })
+                                    'items': []})
 
     def test_w_child_w_html_adapter(self):
         self._registerAdapter('<h1>FOOBAR</h1>')
@@ -198,8 +198,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'href': 'http://example.com/aaa/',
                                     'html': '<h1>FOOBAR</h1>',
                                     'subpath': '|aaa',
-                                    'items': [],
-                                   })
+                                    'items': []})
 
     def test_w_child_leaf(self):
         root = self._makeItem()
@@ -215,8 +214,7 @@ class Test_getTree(TestBase, unittest.TestCase):
                                     'href': 'http://example.com/aaa/',
                                     'html': '<p>Unknown type</p>',
                                     'subpath': '|aaa',
-                                    'items': (),
-                                   })
+                                    'items': ()})
 
     def test_w_nested(self):
         root = self._makeItem()
@@ -239,13 +237,10 @@ class Test_getTree(TestBase, unittest.TestCase):
                                      'href': 'http://example.com/aaa/bbb/',
                                      'html': '<p>Unknown type</p>',
                                      'subpath': '|aaa|bbb',
-                                     'items': (),
-                                    },
-                          ]
-                         })
+                                     'items': ()}]})
 
 
-class Test_move_subpath(unittest.TestCase):
+class Test_move_subpath(unittest.TestCase):  # noqa
 
     def _callFUT(self, context, subpath, direction):
         from karl.content.views.references import move_subpath
@@ -357,13 +352,11 @@ class ShowTestBase(TestBase):
         from karl.testing import DummyCatalog
         from karl.testing import DummyOrdering
         parent = DummyModel(title='dummyparent',
-                            ordering = DummyOrdering(),
-                            catalog = DummyCatalog(),
-                           )
+                            ordering=DummyOrdering(),
+                            catalog=DummyCatalog())
         context = DummyModel(title='dummytitle',
                              text='dummytext',
-                             ordering = DummyOrdering(),
-                            )
+                             ordering=DummyOrdering())
         context['attachments'] = DummyModel()
         parent['child'] = context
         return parent, context
@@ -503,16 +496,15 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         from karl.testing import DummyTags
-        context = DummyModel(tags = DummyTags(),
-                             catalog = DummyCatalog(),
-                            )
+        context = DummyModel(tags=DummyTags(),
+                             catalog=DummyCatalog())
+        controller = self._makeOne(context=context)
+        self._registerFactory(controller)
         converted = {'title': u'Ref Manual Title',
                      'tags': [u'foo', u'bar'],
                      'description': u'ref manual description',
                      }
-        controller = self._makeOne(context=context)
-        self._registerFactory(controller)
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
 
         self.failUnless(u'ref-manual-title' in context)
         manual = context[u'ref-manual-title']
@@ -526,17 +518,16 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         from karl.testing import DummyCatalog
         from karl.testing import DummyOrdering
         from karl.testing import DummyTags
-        context = DummyModel(tags = DummyTags(),
-                             catalog = DummyCatalog(),
-                             ordering = DummyOrdering(),
-                            )
+        context = DummyModel(tags=DummyTags(),
+                             catalog=DummyCatalog(),
+                             ordering=DummyOrdering())
+        controller = self._makeOne(context=context)
+        self._registerFactory(controller)
         converted = {'title': u'Ref Manual Title',
                      'tags': [u'foo', u'bar'],
                      'description': u'ref manual description',
                      }
-        controller = self._makeOne(context=context)
-        self._registerFactory(controller)
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
 
         self.failUnless(u'ref-manual-title' in context)
         manual = context[u'ref-manual-title']
@@ -544,6 +535,7 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         self.assertEqual(manual.description, u'ref manual description')
         self.assertEqual(context.tags._called_with[1]['tags'],
                          [u'foo', u'bar'])
+
 
 class AddReferenceManualFormControllerTests(unittest.TestCase):
 
@@ -575,7 +567,7 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
         if request is None:
             request = DummyRequest()
             request.environ['repoze.browserid'] = '1'
-        base =  EditReferenceFCBase(context, request)
+        base = EditReferenceFCBase(context, request)
         base.success_msg = 'BASE'
         return base
 
@@ -583,11 +575,9 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
         from pyramid.testing import DummyModel
         from karl.testing import DummyCatalog
         parent = DummyModel(title='dummyparent',
-                            catalog=DummyCatalog(),
-                           )
+                            catalog=DummyCatalog())
         context = DummyModel(title='dummytitle',
-                             description='dummydescription',
-                            )
+                             description='dummydescription')
         parent['dummytitle'] = context
         return parent, context
 
@@ -650,7 +640,7 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
         # XXX test reseponse type, location?
 
         self.assertEqual(response.location,
-                        'http://example.com/dummytitle/?status_message=BASE')
+                         'http://example.com/dummytitle/?status_message=BASE')
         self.assertEqual(context.title, u'New Title')
         self.assertEqual(context.description, u'new description')
         self.assertEqual(parent.tags._called_with[1]['tags'],

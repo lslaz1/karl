@@ -23,6 +23,7 @@ from zope.interface import taggedValue
 from pyramid.testing import cleanUp
 
 from pyramid import testing
+from karl import testing as karltesting
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyFolderCustomizer
@@ -31,6 +32,7 @@ from karl.testing import DummyTagQuery
 from karl.testing import registerLayoutProvider
 
 import karl.testing
+
 
 class TestShowFolderView(unittest.TestCase):
     def setUp(self):
@@ -70,7 +72,7 @@ class TestShowFolderView(unittest.TestCase):
         # (the folder view needs it for the reorganize widget)
         from karl.models.interfaces import ICatalogSearch
         karl.testing.registerAdapter(DummySearch, (Interface, ),
-                                ICatalogSearch)
+                                     ICatalogSearch)
 
         # factorize a fake community
         from karl.models.interfaces import ICommunity
@@ -119,7 +121,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context: ('view',),})
+        self._register({context: ('view',)})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -130,7 +132,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context: ('view', 'edit'),})
+        self._register({context: ('view', 'edit')})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -145,7 +147,7 @@ class TestShowFolderView(unittest.TestCase):
         root.repo = object()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context: ('view', 'edit'),})
+        self._register({context: ('view', 'edit')})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -159,7 +161,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context.__parent__: ('view', 'delete'),})
+        self._register({context.__parent__: ('view', 'delete')})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -172,7 +174,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context: ('view', 'delete'),})
+        self._register({context: ('view', 'delete')})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -183,7 +185,7 @@ class TestShowFolderView(unittest.TestCase):
         root = self._make_community()
         root['files'] = context = testing.DummyModel(title='thetitle')
         root['profiles'] = testing.DummyModel()
-        self._register({context: ('view', 'create'),})
+        self._register({context: ('view', 'create')})
         request = testing.DummyRequest()
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
@@ -193,7 +195,7 @@ class TestShowFolderView(unittest.TestCase):
             ('Multi Upload', '')])
 
 
-class Test_redirect_to_add_form(unittest.TestCase):
+class Test_redirect_to_add_form(unittest.TestCase):  # noqa
 
     def _callFUT(self, context, request):
         from karl.content.views.files import redirect_to_add_form
@@ -208,6 +210,7 @@ class Test_redirect_to_add_form(unittest.TestCase):
         self.assertEqual(response.location,
                          'http://example.com/add_file.html')
 
+
 class TestAddFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -219,7 +222,7 @@ class TestAddFolderFormController(unittest.TestCase):
     def _register(self):
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+                                     ITagQuery)
 
         # Register dummy IFolderCustomizer
         from karl.content.views.interfaces import IFolderCustomizer
@@ -234,8 +237,8 @@ class TestAddFolderFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title': 'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title': 'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -264,7 +267,7 @@ class TestAddFolderFormController(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('title' in widgets)
 
@@ -292,15 +295,15 @@ class TestAddFolderFormController(unittest.TestCase):
         context.catalog = DummyCatalog()
         context.tags = DummyTagEngine()
         converted = {
-            'title':'a title',
+            'title': 'a title',
             'security_state': 'private',
             'tags': ['thetesttag'],
             }
         from karl.content.interfaces import ICommunityFolder
         from repoze.lemonade.interfaces import IContentFactory
         karl.testing.registerAdapter(lambda *arg: DummyCommunityFolder,
-                                (ICommunityFolder,),
-                                IContentFactory)
+                                     (ICommunityFolder,),
+                                     IContentFactory)
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_submit(converted)
@@ -308,7 +311,8 @@ class TestAddFolderFormController(unittest.TestCase):
         self.assertEqual(context['a-title'].title, u'a title')
         self.assertEqual(context['a-title'].userid, 'userid')
         self.assertEqual(context.tags.updated,
-            [(None, 'userid', ['thetesttag'])])
+                         [(None, 'userid', ['thetesttag'])])
+
 
 class TestDeleteFolderView(unittest.TestCase):
     def setUp(self):
@@ -333,6 +337,7 @@ class TestDeleteFolderView(unittest.TestCase):
 
         self._callFUT(context, request, dummy_delete_resource_view)
         self.assertEqual(dummy_calls, [(context, request, 2)])
+
 
 class TestAddFileFormController(unittest.TestCase):
     def setUp(self):
@@ -375,8 +380,8 @@ class TestAddFileFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -410,8 +415,7 @@ class TestAddFileFormController(unittest.TestCase):
         community = DummyCommunity()
         community.sendalert_default = False
         context = community['testing'] = self._makeContext()
-        community.__parent__.__parent__.sessions = context.__dict__.pop(
-                                                        'sessions')
+        community.__parent__.__parent__.sessions = context.__dict__.pop('sessions')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         defaults = controller.form_defaults()
@@ -440,8 +444,8 @@ class TestAddFileFormController(unittest.TestCase):
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True,
-                                           'sendalert':True})
+        widgets = controller.form_widgets({'security_state': True,
+                                           'sendalert': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('file' in widgets)
         self.failUnless('title' in widgets)
@@ -483,7 +487,7 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': '0',
             'security_state': 'private',
-            'tags':[],
+            'tags': [],
             }
         registerContentFactory(DummyCommunityFile, ICommunityFile)
         controller = self._makeOne(context, request)
@@ -504,7 +508,7 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': False,
             'security_state': 'public',
-            'tags':['thetesttag'],
+            'tags': ['thetesttag'],
             }
         request = self._makeRequest()
         registerContentFactory(DummyCommunityFile, ICommunityFile)
@@ -543,7 +547,7 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': '0',
             'security_state': 'private',
-            'tags':[],
+            'tags': [],
             }
         registerContentFactory(DummyCommunityFile, ICommunityFile)
         controller = self._makeOne(context, request)
@@ -565,7 +569,7 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': False,
             'security_state': 'public',
-            'tags':['thetesttag'],
+            'tags': ['thetesttag'],
             }
         request = self._makeRequest()
         registerContentFactory(DummyCommunityFile, ICommunityFile)
@@ -586,7 +590,6 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(context['filename-1'].stream, 'abc')
         self.assertEqual(context['filename-1'].mimetype, 'x/foo')
         self.assertEqual(context['filename-1'].filename, 'filename')
-
 
     def test_handle_submit_valid_alert(self):
         self._register()
@@ -616,7 +619,7 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': True,
             'security_state': 'public',
-            'tags':[],
+            'tags': [],
             }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
@@ -653,13 +656,14 @@ class TestAddFileFormController(unittest.TestCase):
             'title': 'a title',
             'sendalert': False,
             'security_state': 'public',
-            'tags':[],
+            'tags': [],
             }
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
         registerContentFactory(DummyCommunityFile, ICommunityFile)
         controller = self._makeOne(context, request, check_upload_size)
         self.assertRaises(ValidationError, controller.handle_submit, converted)
+
 
 class TestShowFileView(unittest.TestCase):
     def setUp(self):
@@ -680,26 +684,46 @@ class TestShowFileView(unittest.TestCase):
         community = testing.DummyModel(title='thecommunity')
         directlyProvides(community, ICommunity)
         community.catalog = MyDummyCatalog()
+        community.sessions = {
+            '1': {}
+        }
         return community
+
+    def _get_request(self):
+        request = testing.DummyRequest()
+        request.environ['repoze.browserid'] = '1'
+        return request
+
+    def _get_context(self):
+        from karl.content.models.commenting import CommentsFolder
+        from karl.utilities.interfaces import IKarlDates
+        dummy = mock.Mock(return_value=mock.sentinel.SOMEDATE)
+        karltesting.registerUtility(dummy, IKarlDates)
+        root = self._make_community()
+        root.repo = object()
+        parent = root['files'] = testing.DummyModel(title='parent')
+        context = parent['child'] = testing.DummyModel(title='thetitle')
+        context.filename = 'thefilename'
+        context['comments'] = CommentsFolder()
+        context['comments'].__parent__ = context
+        return context
 
     def test_editable_wo_repo(self):
         from karl.content.views.interfaces import IFileInfo
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                      ITagQuery)
-        root = self._make_community()
-        parent = root['files'] = testing.DummyModel(title='parent')
-        context = parent['child'] = testing.DummyModel(title='thetitle')
+        request = self._get_request()
+        context = self._get_context()
         context.filename = 'thefilename'
-        request = testing.DummyRequest()
-        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
-                                IFileInfo)
+                                     IFileInfo)
 
         self._callFUT(context, request)
         actions = renderer.actions
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1][-9:], 'edit.html')
         self.assertEqual(actions[1][1][-11:], 'delete.html')
         self.assertEqual(actions[2][1][-13:], 'advanced.html')
@@ -709,19 +733,18 @@ class TestShowFileView(unittest.TestCase):
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                      ITagQuery)
-        root = self._make_community()
-        parent = root['files'] = testing.DummyModel(title='parent')
-        context = parent['child'] = testing.DummyModel(title='thetitle')
+
+        request = self._get_request()
+        context = self._get_context()
         context.filename = u'Bases T\xe9cnicas y anexos.pdf'
-        request = testing.DummyRequest()
-        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
-                                IFileInfo)
+                                     IFileInfo)
 
         self._callFUT(context, request)
         actions = renderer.actions
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1][-9:], 'edit.html')
         self.assertEqual(actions[1][1][-11:], 'delete.html')
         self.assertEqual(actions[2][1][-13:], 'advanced.html')
@@ -731,12 +754,9 @@ class TestShowFileView(unittest.TestCase):
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                      ITagQuery)
-        root = self._make_community()
-        root.repo = object()
-        parent = root['files'] = testing.DummyModel(title='parent')
-        context = parent['child'] = testing.DummyModel(title='thetitle')
-        context.filename = 'thefilename'
-        request = testing.DummyRequest()
+
+        request = self._get_request()
+        context = self._get_context()
         renderer = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
@@ -764,7 +784,8 @@ class TestPreviewFile(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest({'version_num': '2'})
         response = preview_file(context, request)
-        self.assertEqual(response,
+        self.assertEqual(
+            response,
             {'url': 'http://example.com/download_preview?version_num=2'})
 
 
@@ -883,6 +904,7 @@ class TestDownloadFileView(unittest.TestCase):
                           'attachment; filename=the file name'))
         self.assertEqual(response.app_iter, blobfile)
 
+
 class TestThumbnailView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -933,6 +955,7 @@ class TestThumbnailView(unittest.TestCase):
         from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, self._callFUT, context, request)
 
+
 class TestEditFolderFormController(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -944,12 +967,12 @@ class TestEditFolderFormController(unittest.TestCase):
     def _register(self):
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+                                     ITagQuery)
 
         # Register dummy IFolderCustomizer
         from karl.content.views.interfaces import IFolderCustomizer
         karl.testing.registerAdapter(DummyFolderCustomizer, (Interface, Interface),
-                                IFolderCustomizer)
+                                     IFolderCustomizer)
 
     def _makeOne(self, *arg, **kw):
         from karl.content.views.files import EditFolderFormController
@@ -958,8 +981,8 @@ class TestEditFolderFormController(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -991,7 +1014,7 @@ class TestEditFolderFormController(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True})
+        widgets = controller.form_widgets({'security_state': True})
         self.failUnless('security_state' in widgets)
         self.failUnless('title' in widgets)
 
@@ -1019,7 +1042,7 @@ class TestEditFolderFormController(unittest.TestCase):
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
         converted = {
-            'title':'new title',
+            'title': 'new title',
             'security_state': 'private',
             'tags': ['thetesttag'],
             }
@@ -1034,6 +1057,7 @@ class TestEditFolderFormController(unittest.TestCase):
         self.assertEqual(L[0], context)
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.modified_by, 'testeditor')
+
 
 class TestEditFileFormController(unittest.TestCase):
     def setUp(self):
@@ -1075,8 +1099,8 @@ class TestEditFileFormController(unittest.TestCase):
         # Register security workflow
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -1117,8 +1141,8 @@ class TestEditFileFormController(unittest.TestCase):
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        widgets = controller.form_widgets({'security_state':True,
-                                           'sendalert':True})
+        widgets = controller.form_widgets({'security_state': True,
+                                           'sendalert': True})
         self.failUnless('title' in widgets)
         self.failUnless('tags' in widgets)
         self.failUnless('security_state' in widgets)
@@ -1213,8 +1237,8 @@ class TestEditFileFormController(unittest.TestCase):
             'tags': ['thetesttag'],
             }
         karl.testing.registerAdapter(lambda *arg: DummyCommunityFile,
-                                (ICommunityFile,),
-                                IContentFactory)
+                                     (ICommunityFile,),
+                                     IContentFactory)
         L = karl.testing.registerEventListener(
             (Interface, IObjectModifiedEvent))
         karl.testing.registerDummySecurityPolicy('testeditor')
@@ -1254,17 +1278,18 @@ class TestEditFileFormController(unittest.TestCase):
         directlyProvides(context, ISite)
         converted = {
             'title': 'new title',
-            'file': SchemaFile(None, None, None, metadata={'remove':True}),
+            'file': SchemaFile(None, None, None, metadata={'remove': True}),
             'security_state': 'public',
             'tags': ['thetesttag'],
             }
         karl.testing.registerAdapter(lambda *arg: DummyCommunityFile,
-                                (ICommunityFile,),
-                                IContentFactory)
+                                     (ICommunityFile,),
+                                     IContentFactory)
         karl.testing.registerDummySecurityPolicy('testeditor')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         self.assertRaises(ValidationError, controller.handle_submit, converted)
+
 
 class TestAdvancedFolderView(unittest.TestCase):
     def setUp(self):
@@ -1515,7 +1540,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def _make_context(self):
         context = testing.DummyModel()
-        ###context.get_attachments = lambda: context
+        #  context.get_attachments = lambda: context
         return context
 
     def _call_fut(self, context, request):
@@ -1535,11 +1560,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
-            })
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
+        })
 
         file = context['testfile.txt']
         self.assertEqual(file.title, 'testfile.txt')
@@ -1548,7 +1573,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file.creator, 'chris')
         self.assertEqual(file.size, 1000)
         self.assertEqual(len(file.blobfile.open().read()), 1000)
-        self.assertEqual(self.workflow.initialized_list, [file,])
+        self.assertEqual(self.workflow.initialized_list, [file])
 
     def test_image_ok(self):
         # An image is somewhat special, so it's worth to test it.
@@ -1562,11 +1587,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'test.jpg',
-            })
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'test.jpg'})
 
         file = context['test.jpg']
         self.assertEqual(file.title, 'test.jpg')
@@ -1575,22 +1599,21 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file.creator, 'chris')
         self.assertEqual(file.size, 244)
         self.assertEqual(len(file.blobfile.open().read()), 244)
-        self.assertEqual(self.workflow.initialized_list, [file ,])
+        self.assertEqual(self.workflow.initialized_list, [file])
 
     def test_mandatory_parameters_missing_file(self):
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
             params={
-                ## NO 'file': DummyUpload(),
+                # NO 'file': DummyUpload(),
                 'client_id': 'ABCDEF',
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'',
-             u'error':
-                u'Wrong parameters, `file` and `client_id` are mandatory'})
+        self.assertEqual(data, {
+            u'client_id': u'',
+            u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
 
     def test_mandatory_parameters_missing_client_id(self):
@@ -1600,14 +1623,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
         request = testing.DummyRequest(
             params={
                 'file': DummyUpload(),
-                ## NO 'client_id': 'ABCDEF',
+                # NO 'client_id': 'ABCDEF',
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'',
-             u'error':
-                u'Wrong parameters, `file` and `client_id` are mandatory'})
+        self.assertEqual(data, {
+            u'client_id': u'',
+            u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
 
     def test_multiple(self):
@@ -1663,11 +1685,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'f3.txt',
-            })
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'f3.txt'})
 
         self.assertEqual(context['f1.txt'], file1)
 
@@ -1702,10 +1723,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f1.txt',
-            })
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f1.txt'})
         self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
 
         # this batch is now doomed and client retries - with the same id.
@@ -1731,10 +1751,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f1.txt',
-            })
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f1.txt'})
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
 
@@ -1750,10 +1769,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'',
-             u'error': u'Inconsistent client file id',
-            })
+        self.assertEqual(data, {
+            u'client_id': u'',
+            u'error': u'Inconsistent client file id'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
@@ -1765,10 +1783,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f3.txt',
-            })
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f3.txt'})
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF3']
 
@@ -1784,9 +1801,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'ABCDEF3',
-             u'error': u'Inconsistent batch transaction',
+        self.assertEqual(data, {
+            u'client_id': u'ABCDEF3',
+            u'error': u'Inconsistent batch transaction',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -1799,9 +1816,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f5.txt',
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f5.txt',
             })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF5']
@@ -1817,9 +1834,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'ABCDEF5',
-             u'error': u'Inconsistent ownership',
+        self.assertEqual(data, {
+            u'client_id': u'ABCDEF5',
+            u'error': u'Inconsistent ownership',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -1837,10 +1854,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file = context['testfile.txt']
@@ -1850,7 +1867,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file.creator, 'chris')
         self.assertEqual(file.size, 1000)
         self.assertEqual(len(file.blobfile.open().read()), 1000)
-        self.assertEqual(self.workflow.initialized_list, [file,])
+        self.assertEqual(self.workflow.initialized_list, [file])
 
     def test_chunks(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -1864,9 +1881,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF']
@@ -1891,9 +1908,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
         )
 
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         self.assertEqual(file1.size, 2000)
@@ -1913,10 +1930,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         self.assertEqual(context['testfile.txt'], file1)
@@ -1941,9 +1958,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'',
-             u'error': u'Chunking inconsistency, `chunk` out of range',
+        self.assertEqual(data, {
+            u'client_id': u'',
+            u'error': u'Chunking inconsistency, `chunk` out of range',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -1957,9 +1974,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'',
-             u'error': u'Chunking inconsistency, `chunk` out of range',
+        self.assertEqual(data, {
+            u'client_id': u'',
+            u'error': u'Chunking inconsistency, `chunk` out of range',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -1976,9 +1993,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f1.txt',
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f1.txt',
             })
 
         request = testing.DummyRequest(
@@ -1990,9 +2007,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'client_id': u'ABCDEF1',
-             u'error': u'Chunking inconsistency, wrong chunk order',
+        self.assertEqual(data, {
+            u'client_id': u'ABCDEF1',
+            u'error': u'Chunking inconsistency, wrong chunk order',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
@@ -2007,12 +2024,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'result': u'OK',
-             u'filename': u'f1.txt',
+        self.assertEqual(data, {
+            u'result': u'OK',
+            u'filename': u'f1.txt',
             })
 
-        #file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
+        # file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
         # now the file is lost somehow:
         del context['TEMP']['PLUPLOAD-ABCDEF1']
 
@@ -2024,10 +2041,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {'client_id': 'ABCDEF1',
-             'error': "Inconsistent transaction, lost a file "
-                      "(temp_id='PLUPLOAD-ABCDEF1') "})
+        self.assertEqual(data, {
+            'client_id': 'ABCDEF1',
+            'error': "Inconsistent transaction, lost a file "
+                     "(temp_id='PLUPLOAD-ABCDEF1') "})
 
     def test_unique_filenames(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2040,10 +2057,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file = context['testfile.txt']
@@ -2054,7 +2071,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file.size, 1000)
         self.assertEqual(len(file.blobfile.open().read()), 1000)
 
-
         # another one, same filename
         request = testing.DummyRequest(
             params={
@@ -2064,10 +2080,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file2 = context['testfile-1.txt']
@@ -2087,10 +2103,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file3 = context['testfile-2.txt']
@@ -2098,7 +2114,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file3.filename, 'testfile-2.txt')
         self.assertEqual(file3.size, 3000)
         self.assertEqual(len(file3.blobfile.open().read()), 3000)
-
 
         # another one, same filename
         request = testing.DummyRequest(
@@ -2109,10 +2124,10 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
         data = self._call_fut(context, request)
-        self.assertEqual(data,
-            {u'batch_completed': True,
-             u'result': u'OK',
-             u'filename': u'testfile.txt',
+        self.assertEqual(data, {
+            u'batch_completed': True,
+            u'result': u'OK',
+            u'filename': u'testfile.txt',
             })
 
         file4 = context['testfile-3.txt']
@@ -2130,6 +2145,7 @@ class FakeParams(dict):
     def getall(self, key):
         return self.get(key)
 
+
 class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
     "Grid reorganize - delete"
     def setUp(self):
@@ -2144,7 +2160,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
 
     def _make_context(self):
         context = testing.DummyModel()
-        ###context.get_attachments = lambda: context
+        # context.get_attachments = lambda: context
         return context
 
     def test_delete_one(self):
@@ -2175,7 +2191,6 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
         self.assertEqual(data, {u'deleted': 0, u'result': u'OK'})
         self.assertEqual(context.keys(), [])
 
-
     def test_delete_multiple(self):
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
@@ -2193,7 +2208,6 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
         data = self._call_fut(context, request)
         self.assertEqual(data, {u'deleted': 3, u'result': u'OK'})
         self.assertEqual(context.keys(), ['f4.txt'])
-
 
     def test_tolerates_missing(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2244,9 +2258,10 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
         folder = testing.DummyModel(title='parent')
         community['files'] = folder
+        community['files'].__parent__ = community
+        community.sessions = {}
 
         return community
-
 
     def test_move_one(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2264,17 +2279,16 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 1,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(folder2.keys(), ['f1.txt'])
-
 
     def test_move_zero(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2292,17 +2306,16 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 0,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 0,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
         self.assertEqual(folder2.keys(), [])
-
 
     def test_move_multiple(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2322,18 +2335,17 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 3,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 3,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(set(folder2.keys()),
                          set(['f1.txt', 'f2.txt', 'f3.txt']))
-
 
     def test_mandatory_parameters(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2347,18 +2359,17 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         request = testing.DummyRequest(
             params=FakeParams({
                 'file[]': ['f1.txt'],
-                ## NO 'target_folder': '/folder2',
+                # NO 'target_folder': '/folder2',
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'error': u'Wrong parameters, `target_folder` is mandatory',
-             u'result': u'ERROR',
-             u'filename': u'*',
+        self.assertEqual(data, {
+            u'error': u'Wrong parameters, `target_folder` is mandatory',
+            u'result': u'ERROR',
+            u'filename': u'*',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_missing_file(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2376,15 +2387,13 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'error':
-              u"File f2.txt not found in source folder (KeyError('f2.txt',))",
-             u'result': u'ERROR',
-             u'filename': u'f2.txt',
+        self.assertEqual(data, {
+            u'error': u"File f2.txt not found in source folder (KeyError('f2.txt',))",
+            u'result': u'ERROR',
+            u'filename': u'f2.txt',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_cant_delete_file(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2408,16 +2417,14 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'error':
-                u"Unable to delete file f1.txt from source folder "
-                u"(KeyError('f1.txt',))",
-             u'result': u'ERROR',
-             u'filename': u'f1.txt',
+        self.assertEqual(data, {
+            u'error': u"Unable to delete file f1.txt from source folder "
+                      u"(KeyError('f1.txt',))",
+            u'result': u'ERROR',
+            u'filename': u'f1.txt',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_cant_add_file(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2429,8 +2436,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 raise KeyError(name)
 
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        rootfolder['folder2'] = DummyModelThatFailsSetitem(
-                                                            title='a folder')
+        rootfolder['folder2'] = DummyModelThatFailsSetitem(title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
 
@@ -2441,17 +2447,16 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'error':
+        self.assertEqual(data, {
+            u'error':
                 u"Cannot move to target folder "
                 u"<a href=\"http://example.com/files/folder2/\">/folder2</a> "
                 u"(KeyError('f1.txt',))",
-             u'result': u'ERROR',
-             u'filename': u'f1.txt',
+            u'result': u'ERROR',
+            u'filename': u'f1.txt',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_same_target(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2471,17 +2476,16 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         data = self._call_fut(folder1, request)
 
         # This actually works.
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder1/',
-             u'moved': 1,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder1',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder1/',
+            u'moved': 1,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder1',
             })
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
         self.assertEqual(folder2.keys(), [])
-
 
     def test_move_folder(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2500,18 +2504,17 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 1,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(folder2.keys(), ['folder1a'])
         self.assertEqual(folder2['folder1a'].keys(), ['f1.txt'])
-
 
     def test_move_folder_to_itself(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2530,14 +2533,13 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         )
         data = self._call_fut(folder1, request)
 
-        self.assertEqual(data,
-            {u'error': u'Cannot move a folder into itself',
-             u'result': u'ERROR',
-             u'filename': u'folder1a',
+        self.assertEqual(data, {
+            u'error': u'Cannot move a folder into itself',
+            u'result': u'ERROR',
+            u'filename': u'folder1a',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_move_folder_to_itself_deeply(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2557,14 +2559,13 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         )
         data = self._call_fut(folder1, request)
 
-        self.assertEqual(data,
-            {u'error': u'Cannot move a folder into itself',
-             u'result': u'ERROR',
-             u'filename': u'folder1a',
+        self.assertEqual(data, {
+            u'error': u'Cannot move a folder into itself',
+            u'result': u'ERROR',
+            u'filename': u'folder1a',
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
     def test_canonical_names(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2582,18 +2583,17 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 1,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 1,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
         # filename canonized. (eg small caps...)
         self.assertEqual(folder2.keys(), ['name.txt'])
-
 
     def test_unique_names(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2619,12 +2619,12 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 3,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 3,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
@@ -2636,7 +2636,6 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         self.assertEqual(file2, folder2['f2-1.txt'])
         self.assertEqual(file3, folder2['f3.txt'])
 
-
     def test_unique_names_changes_properties(self):
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
@@ -2645,10 +2644,9 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         file1 = folder1['f1.txt'] = testing.DummyModel(
-                                            title='f1.txt', filename='f1.txt')
+            title='f1.txt', filename='f1.txt')
         file2 = folder1['f2.txt'] = testing.DummyModel(
-                                            title='SOMEONE CHANGED ME',
-                                            filename='f2.txt')
+            title='SOMEONE CHANGED ME', filename='f2.txt')
 
         # ... but some files exist already in the target
         folder2['f1.txt'] = testing.DummyModel(title='a file')
@@ -2661,17 +2659,18 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
             })
         )
         data = self._call_fut(folder1, request)
-        self.assertEqual(data,
-            {u'targetFolderUrl': u'http://example.com/files/folder2/',
-             u'moved': 2,
-             u'result': u'OK',
-             u'targetFolderTitle': u'a folder',
-             u'targetFolder': u'/folder2',
+        self.assertEqual(data, {
+            u'targetFolderUrl': u'http://example.com/files/folder2/',
+            u'moved': 2,
+            u'result': u'OK',
+            u'targetFolderTitle': u'a folder',
+            u'targetFolder': u'/folder2',
             })
 
         self.assertEqual(folder1.keys(), [])
-        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt',
-                'f2.txt', 'f2-1.txt']))
+        self.assertEqual(
+            set(folder2.keys()), set(['f1.txt', 'f1-1.txt',
+                                      'f2.txt', 'f2-1.txt']))
         self.assertEqual(file1, folder2['f1-1.txt'])
         self.assertEqual(file2, folder2['f2-1.txt'])
 
@@ -2685,19 +2684,19 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         self.assertEqual(file2.filename, 'f2-1.txt')
 
 
-
 # An 1x1px png (should be jpeg, in fact)
 import binascii
 IMAGE_DATA = binascii.unhexlify(
-            '89504e470d0a1a0a0000000d49484452000000010000000108060000001f' +
-            '15c4890000000467414d410000b18f0bfc610500000006624b474400ff00' +
-            'ff00ffa0bda793000000097048597300000b1200000b1201d2dd7efc0000' +
-            '000976704167000000010000000100c7955fed0000000d4944415408d763' +
-            'd8b861db7d00072402f7f7d926c80000002574455874646174653a637265' +
-            '61746500323031302d30352d31385432303a30343a34322b30323a3030e1' +
-            '1f35f60000002574455874646174653a6d6f6469667900323031302d3035' +
-            '2d31385432303a30343a34322b30323a303090428d4a0000000049454e44' +
-            'ae426082')
+    '89504e470d0a1a0a0000000d49484452000000010000000108060000001f' +
+    '15c4890000000467414d410000b18f0bfc610500000006624b474400ff00' +
+    'ff00ffa0bda793000000097048597300000b1200000b1201d2dd7efc0000' +
+    '000976704167000000010000000100c7955fed0000000d4944415408d763' +
+    'd8b861db7d00072402f7f7d926c80000002574455874646174653a637265' +
+    '61746500323031302d30352d31385432303a30343a34322b30323a3030e1' +
+    '1f35f60000002574455874646174653a6d6f6469667900323031302d3035' +
+    '2d31385432303a30343a34322b30323a303090428d4a0000000049454e44' +
+    'ae426082')
+
 
 class DummyUpload(object):
     filename = 'testfile.txt'
@@ -2713,10 +2712,12 @@ class DummyUpload(object):
     def file(self):
         return self._file
 
+
 class DummyImageUpload(DummyUpload):
     filename = 'test.jpg'
     type = 'image/jpeg'
     IMAGE_DATA = IMAGE_DATA
+
 
 class DummyTransactionModule(object):
     doomed = False
@@ -2727,24 +2728,31 @@ class DummyTransactionModule(object):
 
 from zope.interface import implements
 
+
 class DummyBlobFile:
     def open(self):
         return self
+
 
 class DummyCommunityFolder:
     def __init__(self, title, userid):
         self.title = title
         self.userid = userid
 
+
 from karl.content.interfaces import ICommunityFile
+
+
 class DummyCommunityFile(testing.DummyModel):
     implements(ICommunityFile)
     size = 3
+
 
 class DummyFile(testing.DummyModel):
     size = 3
     def upload(self, stream):
         self.stream = stream
+
 
 class DummyFileInfo(object):
     def __init__(self, item, request):
@@ -2755,9 +2763,11 @@ class DummyFileInfo(object):
         self.modified_by_title = 'user name'
         self.modified_by_url = '/profiles/user'
 
+
 class DummyModifiedDateIndex:
     def discriminator(self, obj, default):
         return obj.modified
+
 
 class DummyTagEngine:
     def __init__(self):
@@ -2765,13 +2775,14 @@ class DummyTagEngine:
     def update(self, item, user, tags):
         self.updated.append((item, user, tags))
 
+
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
     def __init__(self, state_info=[
-        {'name':'public', 'transitions':['private']},
-        {'name':'private', 'transitions':['public']},
-        ]):
+            {'name': 'public', 'transitions': ['private']},
+            {'name': 'private', 'transitions': ['public']},
+            ]):
         self.transitioned = []
         self._state_info = state_info
         self.initialized_list = []
@@ -2785,18 +2796,20 @@ class DummyWorkflow:
 
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
-        self.transitioned.append({'to_state':to_state, 'content':content,
-                                  'request':request, 'guards':guards,
-                                  'context':context, 'skip_same':skip_same})
+        self.transitioned.append({'to_state': to_state, 'content': content,
+                                  'request': request, 'guards': guards,
+                                  'context': context, 'skip_same': skip_same})
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
+
 
 class DummySessions(dict):
     def get(self, name, default=None):
         if name not in self:
             self[name] = {}
         return self[name]
+
 
 class DummyShowSendalert(object):
     def __init__(self, context, request):
@@ -2805,6 +2818,7 @@ class DummyShowSendalert(object):
 
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
+
 
 class DummySecurityPolicy:
     """ A standin for both an IAuthentication and IAuthorization policy """
@@ -2843,17 +2857,20 @@ class DummySecurityPolicy:
 class IDummyContent(Interface):
     taggedValue('name', 'dummy')
 
+
 class DummyContent(testing.DummyModel):
     implements(IDummyContent)
     title = 'THE TITLE'
 
 dummycontent = DummyContent()
 
+
 class DummySearch:
     def __init__(self, context):
         pass
     def __call__(self, **kw):
         return 1, [1], lambda x: dummycontent
+
 
 class MyDummyCatalog(dict):
     def __init__(self):

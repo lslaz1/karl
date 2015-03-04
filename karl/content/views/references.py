@@ -157,6 +157,65 @@ def move_subpath(context, subpath, direction):
     return 'Moved subpath %s %s' % (subpath, direction)
 
 
+def reference_outline_view(context, request):
+
+    # Look for moveUp or moveDown in QUERY_STRING, telling us to
+    # reorder something
+    status_message = None
+    subpath = request.params.get('subpath')
+
+    backto = {
+        'href': resource_url(context.__parent__, request),
+        'title': context.__parent__.title,
+        }
+
+    user_can_edit = False
+    actions = []
+    if has_permission('create', context, request):
+        addables = get_folder_addables(context, request)
+        if addables is not None:
+            actions.extend(addables())
+    if has_permission('edit', context, request):
+        user_can_edit = True
+        actions.append(('Edit', 'edit.html'))
+        if subpath:
+            direction = request.params['direction']
+            status_message = move_subpath(context, subpath, direction)
+    if has_permission('delete', context, request):
+        actions.append(('Delete', 'delete.html'))
+    if has_permission('administer', context, request):
+        actions.append(('Advanced', 'advanced.html'))
+
+    page_title = context.title
+    api = TemplateAPI(context, request, page_title)
+
+    # Get a layout
+    layout_provider = get_layout_provider(context, request)
+    layout = layout_provider()
+
+    # provide client data for rendering current tags in the tagbox
+    client_json_data = dict(
+        tagbox=get_tags_client_data(context, request),
+        )
+
+    previous, next = get_previous_next(context, request)
+
+    api.status_message = status_message
+    return render_to_response(
+        'templates/show_referencemanual.pt',
+        dict(api=api,
+             actions=actions,
+             user_can_edit=user_can_edit,
+             head_data=convert_to_script(client_json_data),
+             tree=getTree(context, request, api),
+             backto=backto,
+             layout=layout,
+             previous_entry=previous,
+             next_entry=next),
+        request=request,
+        )
+
+
 def reference_viewall_view(context, request):
 
     backto = {
@@ -181,7 +240,7 @@ def reference_viewall_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
+    layout = layout_provider()
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
@@ -251,7 +310,7 @@ class AddReferenceFCBase(object):
         api = TemplateAPI(context, request, self.page_title)
 
         layout_provider = get_layout_provider(context, request)
-        layout = layout_provider('intranet')
+        layout = layout_provider()
         return {
             'api': api,
             'layout': layout,
@@ -336,7 +395,7 @@ class EditReferenceFCBase(object):
         api = TemplateAPI(context, request, page_title)
 
         layout_provider = get_layout_provider(context, request)
-        layout = layout_provider('intranet')
+        layout = layout_provider()
         return {
             'api': api,
             'layout': layout,

@@ -2,6 +2,7 @@ import unittest
 
 from karl.testing import registerUtility
 
+
 class SiteEventsTests(unittest.TestCase):
 
     def _getTargetClass(self):
@@ -121,8 +122,7 @@ class SiteEventsTests(unittest.TestCase):
                           'baz': 'qux',
                           'content_type': 'Community',
                           'userid': 'phred',
-                          'allowed': ['phred'],
-                         })
+                          'allowed': ['phred']})
 
     def test_newer_hit(self):
         stack = self._makeOne()
@@ -179,7 +179,7 @@ class SiteEventsTests(unittest.TestCase):
         stack.push(foo='qux', allowed=['phred'])
 
         found = [dict(x)
-                    for g, i, x in stack.newer(0, 0, ['phred', 'bharney'])]
+                 for g, i, x in stack.newer(0, 0, ['phred', 'bharney'])]
 
         self.assertEqual(found[0],
                          {'foo': 'qux', 'allowed': ['phred']})
@@ -196,8 +196,7 @@ class SiteEventsTests(unittest.TestCase):
                    content_type='Blog Entry')
 
         found = [dict(x)
-                    for g, i, x in stack.newer(0, 0, ['phred', 'bharney'],
-                                               'phred')]
+                 for g, i, x in stack.newer(0, 0, ['phred', 'bharney'], 'phred')]
 
         self.assertEqual(found[0],
                          {'foo': 'qux', 'allowed': ['phred'],
@@ -218,8 +217,7 @@ class SiteEventsTests(unittest.TestCase):
                    content_type='Blog Entry')
 
         found = [dict(x)
-                    for g, i, x in stack.newer(0, 0, ['phred', 'bharney'],
-                                               'phred')]
+                 for g, i, x in stack.newer(0, 0, ['phred', 'bharney'], 'phred')]
 
         self.assertEqual(found[0],
                          {'foo': 'qux', 'allowed': ['phred'],
@@ -269,8 +267,7 @@ class SiteEventsTests(unittest.TestCase):
                           'baz': 'qux',
                           'content_type': 'Community',
                           'userid': 'phred',
-                          'allowed': ['phred'],
-                         })
+                          'allowed': ['phred']})
 
     def test_older_hit(self):
         stack = self._makeOne()
@@ -327,7 +324,7 @@ class SiteEventsTests(unittest.TestCase):
         stack.push(foo='qux', allowed=['phred'])
 
         found = [dict(x)
-                    for g, i, x in stack.older(0, 2, ['phred', 'bharney'])]
+                 for g, i, x in stack.older(0, 2, ['phred', 'bharney'])]
 
         self.assertEqual(len(found), 2)
         self.assertEqual(found[0],
@@ -345,8 +342,7 @@ class SiteEventsTests(unittest.TestCase):
                    content_type='Blog Entry')
 
         found = [dict(x)
-                    for g, i, x in stack.older(0, 2, ['phred', 'bharney'],
-                                               'phred')]
+                 for g, i, x in stack.older(0, 2, ['phred', 'bharney'], 'phred')]
 
         self.assertEqual(len(found), 1)
         self.assertEqual(found[0],
@@ -363,8 +359,7 @@ class SiteEventsTests(unittest.TestCase):
                    content_type='Blog Entry')
 
         found = [dict(x)
-                    for g, i, x in stack.older(0, 2, ['phred', 'bharney'],
-                                               'phred')]
+                 for g, i, x in stack.older(0, 2, ['phred', 'bharney'], 'phred')]
 
         self.assertEqual(len(found), 1)
         self.assertEqual(found[0],
@@ -422,24 +417,21 @@ class _EventSubscriberTestsBase:
         from karl.models.interfaces import IProfile
         registerContentFactory(DummyModel, ICommunity)
         registerContentFactory(DummyModel, IProfile)
-        site = DummyModel() # no events
+        site = DummyModel()  # no events
         site.catalog = DummyCatalog()
         site.events = DummyEvents()
         site.tags = DummyTags()
         site['communities'] = DummyModel()
         c = create_content(ICommunity,
                            title="Testing",
-                           description='blah blah blah' * 256,
-                          )
+                           description='blah blah blah' * 256)
         directlyProvides(c, ICommunity)
         site['communities']['testing'] = c
         c.docid = 123
         c.__acl__ = [('Allow', 'group:KarlAdmin', ('view',)),
-                     ('Allow',
-                        'group.community:testing:moderators', ('view',)),
+                     ('Allow', 'group.community:testing:moderators', ('view',)),
                      ('Allow', 'group.community:testing:members', ('view',)),
-                     DENY_ALL,
-                    ]
+                     DENY_ALL]
         site['profiles'] = DummyModel()
         p = create_content(IProfile,
                            title="J. Phred Bloggs")
@@ -463,10 +455,10 @@ class _EventSubscriberTestsBase:
         dummy = community[name] = create_content(IDummy, **kw)
         dummy.docid = 789
         directlyProvides(dummy, IDummy)
-        return dummy # __acl__ is missing to imply acquired.
+        return dummy  # __acl__ is missing to imply acquired.
 
 
-class Test_user_joined_community(_EventSubscriberTestsBase,
+class Test_user_joined_community(_EventSubscriberTestsBase,  # noqa
                                  unittest.TestCase):
 
     def _callFUT(self, event):
@@ -512,8 +504,7 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
                                 login='phred@example.com',
                                 groups=set(
                                     ['a',
-                                     'group.community:nonesuch:members',
-                                    ]),
+                                     'group.community:nonesuch:members']),
                                 old_groups=set(['a']))
 
         self._callFUT(event)
@@ -533,8 +524,7 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
                                 groups=set(
                                     ['a',
                                      'group.community:testing:members',
-                                     'group.community:testing:moderators',
-                                    ]),
+                                     'group.community:testing:moderators']),
                                 old_groups=set(['a']))
 
         self._callFUT(event)
@@ -564,11 +554,10 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
 
-class Test_user_left_community(_EventSubscriberTestsBase,
+class Test_user_left_community(_EventSubscriberTestsBase,  # noqa
                                unittest.TestCase):
 
     def _callFUT(self, event):
@@ -599,8 +588,7 @@ class Test_user_left_community(_EventSubscriberTestsBase,
                                 id='phred',
                                 login='phred@example.com',
                                 groups=set(['a']),
-                                old_groups=set(['a', 'b']),
-                               )
+                                old_groups=set(['a', 'b']))
 
         self._callFUT(event)
 
@@ -616,9 +604,7 @@ class Test_user_left_community(_EventSubscriberTestsBase,
                                 groups=set(['a']),
                                 old_groups=set(
                                     ['a',
-                                     'group.community:nonesuch:members',
-                                    ]),
-                               )
+                                     'group.community:nonesuch:members']))
 
         self._callFUT(event)
 
@@ -638,9 +624,7 @@ class Test_user_left_community(_EventSubscriberTestsBase,
                                 old_groups=set(
                                     ['a',
                                      'group.community:testing:members',
-                                     'group.community:testing:moderators',
-                                    ]),
-                               )
+                                     'group.community:testing:moderators']))
 
         self._callFUT(event)
 
@@ -669,11 +653,10 @@ class Test_user_left_community(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
 
-class Test_user_added_content(_EventSubscriberTestsBase,
+class Test_user_added_content(_EventSubscriberTestsBase,  # noqa
                               unittest.TestCase):
 
     def _callFUT(self, context, event):
@@ -736,8 +719,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_added_profile(self):
         from datetime import datetime
@@ -775,8 +757,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_added_content_inside_profile(self):
         from datetime import datetime
@@ -786,10 +767,10 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(profile, 'photo',
-                                    creator = 'phred',
-                                    modified_by = 'phred',
+                                    creator='phred',
+                                    modified_by='phred',
                                     title='Phred @ Beach',
-                                    description = 'DESC')
+                                    description='DESC')
         event = self._makeEvent(object=content)
 
         self._callFUT(content, event)
@@ -819,8 +800,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_added_non_community_non_comment(self):
         from datetime import datetime
@@ -832,16 +812,16 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(community, 'content',
-                                    creator = 'phred',
+                                    creator='phred',
                                     title='TITLE',
-                                    description = 'DESC',
-                                    base_interface = IPosts,
-                                   )
+                                    description='DESC',
+                                    base_interface=IPosts)
         comments = content['comments'] = DummyModel()
         comments['one'] = DummyModel()
         comments['two'] = DummyModel()
         event = self._makeEvent(object=content)
 
+        site.events._pushed = []
         self._callFUT(content, event)
 
         self.assertEqual(len(site.events._pushed), 1)
@@ -869,8 +849,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_added_comment(self):
         from datetime import datetime
@@ -883,17 +862,15 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(community, 'content',
-                                    creator = 'bharney',
+                                    creator='phred',
                                     title='TITLE',
-                                    description = 'DESC',
-                                    base_interface = IPosts,
-                                   )
+                                    description='DESC',
+                                    base_interface=IPosts)
         comment = self._makeContent(community, 'comment',
-                                    creator = 'phred',
+                                    creator='phred',
                                     title='TITLE',
-                                    description = 'DESC',
-                                    base_interface = IComment,
-                                   )
+                                    description='DESC',
+                                    base_interface=IComment)
         comments = content['comments'] = DummyModel()
         comments['one'] = comment
         event = self._makeEvent(object=comment)
@@ -909,7 +886,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['context_name'], 'Testing')
         self.assertEqual(info['context_url'], '/communities/testing')
         self.assertEqual(info['content_type'], 'Dummy')
-        self.assertEqual(info['content_creator'], 'bharney')
+        self.assertEqual(info['content_creator'], 'phred')
         self.assertEqual(info['url'],
                          '/communities/testing/content/comments/one')
         self.assertEqual(info['title'], 'TITLE')
@@ -926,11 +903,10 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
 
-class Test_user_modified_content(_EventSubscriberTestsBase,
+class Test_user_modified_content(_EventSubscriberTestsBase,  # noqa
                                  unittest.TestCase):
 
     def _callFUT(self, context, event):
@@ -993,8 +969,7 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_modified_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
@@ -1032,8 +1007,7 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_modified_content_inside_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
@@ -1043,10 +1017,10 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(profile, 'photo',
-                                    creator = 'phred',
-                                    modified_by = 'phred',
+                                    creator='phred',
+                                    modified_by='phred',
                                     title='Phred @ Beach',
-                                    description = 'DESC')
+                                    description='DESC')
         event = self._makeEvent(object=content)
 
         self._callFUT(content, event)
@@ -1076,8 +1050,7 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_modified_non_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
@@ -1087,9 +1060,9 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(community, 'content',
-                                    modified_by = 'phred',
+                                    modified_by='phred',
                                     title='TITLE',
-                                    description = 'DESC')
+                                    description='DESC')
         event = self._makeEvent(object=content)
 
         self._callFUT(content, event)
@@ -1119,12 +1092,11 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
 
-class Test_user_tagged_content(_EventSubscriberTestsBase,
-                                 unittest.TestCase):
+class Test_user_tagged_content(_EventSubscriberTestsBase,  # noqa
+                               unittest.TestCase):
 
     def _callFUT(self, event):
         from karl.models.contentfeeds import user_tagged_content
@@ -1157,15 +1129,13 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self._setNow(lambda: NOW)
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
-        site.catalog.document_map._map[community.docid
-                                      ] = '/communities/testing'
+        site.catalog.document_map._map[community.docid] = '/communities/testing'
         # WAAA:  set up thread-locals
         manager.push({'request': DummyRequest(context=community),
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=community.docid,
                                 user=profile.__name__,
-                                name='youreit',
-                               )
+                                name='youreit')
 
         self._callFUT(event)
 
@@ -1196,8 +1166,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_tagged_profile(self):
         from pyramid.interfaces import IAuthorizationPolicy
@@ -1214,8 +1183,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=profile.docid,
                                 user=profile.__name__,
-                                name='youreit',
-                               )
+                                name='youreit')
 
         self._callFUT(event)
 
@@ -1245,8 +1213,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
 
     def test_tagged_non_community(self):
         from pyramid.interfaces import IAuthorizationPolicy
@@ -1258,19 +1225,17 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         registerUtility(DummyACLPolicy(), IAuthorizationPolicy)
         site, community, profile = self._makeSite()
         content = self._makeContent(community, 'content',
-                                    modified_by = 'phred',
+                                    modified_by='phred',
                                     title='TITLE',
-                                    description = 'DESC',
+                                    description='DESC',
                                     docid=31415)
-        site.catalog.document_map._map[content.docid
-                                      ] = '/communities/testing/content'
+        site.catalog.document_map._map[content.docid] = '/communities/testing/content'
         # WAAA:  set up thread-locals
         manager.push({'request': DummyRequest(context=content),
                       'registry': manager.get()['registry']})
         event = self._makeEvent(item=content.docid,
                                 user=profile.__name__,
-                                name='youreit',
-                               )
+                                name='youreit')
 
         self._callFUT(event)
 
@@ -1300,8 +1265,8 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(sorted(info['allowed']),
                          ['group.KarlAdmin',
                           'group.community:testing:members',
-                          'group.community:testing:moderators',
-                         ])
+                          'group.community:testing:moderators'])
+
 
 class DummyACLPolicy:
 
@@ -1311,8 +1276,7 @@ class DummyACLPolicy:
     def principals_allowed_by_permission(self, context, permission):
         return ['group.KarlAdmin',
                 'group.community:%s:members' % self._community_name,
-                'group.community:%s:moderators' % self._community_name,
-               ]
+                'group.community:%s:moderators' % self._community_name]
 
 
 class DummyEvents:
@@ -1344,5 +1308,4 @@ class DummyTags:
         return set([('north_america', 3),
                     ('africa', 5),
                     ('europe', 1),
-                    ('australia', 7),
-                   ])
+                    ('australia', 7)])

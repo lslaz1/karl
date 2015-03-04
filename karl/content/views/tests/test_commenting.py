@@ -34,6 +34,7 @@ from karl.testing import registerLayoutProvider
 
 import karl.testing
 
+
 class AddCommentFormControllerTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -46,10 +47,12 @@ class AddCommentFormControllerTests(unittest.TestCase):
         # Register BlogCommentAlert adapter
         from karl.models.interfaces import IProfile
         from karl.models.interfaces import IComment
-        from karl.content.views.adapters import BlogCommentAlert
+        from karl.content.views.adapters import CommentAlert
+        from karl.models.interfaces import ICommentsFolder
         from karl.utilities.interfaces import IAlert
         from pyramid.interfaces import IRequest
-        karl.testing.registerAdapter(BlogCommentAlert,
+        from zope.interface import directlyProvides
+        karl.testing.registerAdapter(CommentAlert,
                                      (IComment, IProfile, IRequest),
                                      IAlert)
 
@@ -74,12 +77,14 @@ class AddCommentFormControllerTests(unittest.TestCase):
         profiles["a"] = DummyProfile()
         profiles["b"] = DummyProfile()
         profiles["c"] = DummyProfile()
-        community.member_names = set(["b", "c",])
-        community.moderator_names = set(["a",])
+        community.member_names = set(["b", "c"])
+        community.moderator_names = set(["a"])
         blog = testing.DummyModel()
         community["blog"] = blog
         blogentry = blog["foo"] = DummyBlogEntry()
         self.context = blogentry["comments"]
+        blogentry["comments"].__parent__ = blogentry
+        directlyProvides(blogentry["comments"], ICommentsFolder)
 
         # Create dummy request
         request = testing.DummyRequest()
@@ -327,6 +332,7 @@ class EditCommentFormControllerTests(unittest.TestCase):
         self.failUnless(transition['content'] is context)
         self.assertEqual(transition['to_state'], 'public')
 
+
 class ShowCommentViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -377,10 +383,11 @@ class RedirectCommentsTests(unittest.TestCase):
     def test_redirect_with_status_message(self):
         context = testing.DummyModel()
         context.title = 'The comment'
-        request = testing.DummyRequest({'status_message':'The status'})
+        request = testing.DummyRequest({'status_message': 'The status'})
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
                          'http://example.com/?status_message=The status')
+
 
 class DummyCommentsFolder(testing.DummyModel):
 
@@ -403,6 +410,7 @@ class DummyBlogEntry(testing.DummyModel):
         self.arg = arg
         self.kw = kw
 
+
 class DummyComment(testing.DummyModel):
     implements(IComment)
 
@@ -411,11 +419,8 @@ class DummyComment(testing.DummyModel):
     creator = u'a'
 
     def __init__(self, title, text, description, creator):
-        testing.DummyModel.__init__(self,
-            title=title,
-            text=text,
-            description=description,
-            )
+        testing.DummyModel.__init__(self, title=title, text=text,
+                                    description=description)
 
     def get_attachments(self):
         return self
