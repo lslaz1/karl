@@ -46,15 +46,18 @@ class DefaultToolAddables(object):
 
     @property
     def exclude_tools(self):
+        return []
+        # XXX Do not exclude any possible features!
+
         # Find out if we are adding this community from somewhere
         # inside the "intranets" side
-        intranets = find_interface(self.context, IIntranets)
-        site = ISite.providedBy(self.context)
+        # intranets = find_interface(self.context, IIntranets)
+        # site = ISite.providedBy(self.context)
 
-        if intranets or site:
-            return ['wiki', 'blog']
+        # if intranets or site:
+        #    return ['wiki', 'blog']
 
-        return ['intranets', 'forums']
+        # return ['intranets', 'forums']
 
 
 class DefaultFooter(object):
