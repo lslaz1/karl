@@ -73,8 +73,6 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import ICommunityFolder
 from karl.content.interfaces import ICommunityRootFolder
 from karl.content.interfaces import IImage
-from karl.content.interfaces import IIntranetRootFolder
-from karl.content.interfaces import IIntranets
 
 from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IFolderCustomizer
@@ -87,9 +85,6 @@ from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
 from karl.utils import find_repo
 
-# This import is BBB for karl.evolve.zodb.evolve15
-from karl.content.views.utils import ie_types
-
 from karl.content.views.utils import get_upload_mimetype
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import get_show_sendalert
@@ -98,7 +93,6 @@ from karl.content.views.utils import sendalert_default
 from karl.security.workflow import get_security_states
 
 from karl.utils import find_community
-from karl.utils import find_intranet
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 from karl.utils import find_tempfolder
@@ -131,8 +125,7 @@ def show_folder_view(context, request):
         if addables is not None:
             actions.extend(addables())
 
-    if not (ICommunityRootFolder.providedBy(context) or
-        IIntranetRootFolder.providedBy(context)):
+    if not ICommunityRootFolder.providedBy(context):
         # Root folders for the tools aren't editable or deletable
         if has_permission('edit', context, request):
             actions.append(('Edit', url(context, 'edit.html')))
@@ -146,11 +139,10 @@ def show_folder_view(context, request):
             }
 
     trash_url = None
-    if not find_interface(context, IIntranets):
-        repo = find_repo(context)
-        if repo is not None and has_permission('edit', context, request):
-            tool = find_interface(context, ICommunityRootFolder)
-            trash_url = url(tool, 'trash')
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
+        tool = find_interface(context, ICommunityRootFolder)
+        trash_url = url(tool, 'trash')
 
     if has_permission('create', context, request):
         # Multi Upload requires same permission as the folder_addables mesh.
@@ -167,18 +159,16 @@ def show_folder_view(context, request):
     _pre_fetch = 50
 
     filegrid_data = get_filegrid_client_data(context, request,
-                                            start = 0,
-                                            limit = _pre_fetch,
-                                            sort_on = 'modified_date',
-                                            reverse = True,
-                                            )
+                                             start=0,
+                                             limit=_pre_fetch,
+                                             sort_on='modified_date',
+                                             reverse=True)
     filegrid_data['records'] = filegrid_data['records'][:10]
 
     # Folder and tag data for Ajax
     client_json_data = dict(
-        filegrid = filegrid_data,
-        tagbox = get_tags_client_data(context, request),
-        )
+        filegrid=filegrid_data,
+        tagbox=get_tags_client_data(context, request))
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
@@ -198,7 +188,7 @@ def show_folder_view(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=resource_url(context, request, 'add_file.html'))
+        location=resource_url(context, request, 'add_file.html'))
 
 title_field = schemaish.String(
     validator=validator.All(
@@ -218,6 +208,7 @@ file_field = schemaish.File(
     description='You can replace the file by clicking "remove"',
     )
 
+
 class AddFolderFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -229,8 +220,8 @@ class AddFolderFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':'',
-            'tags':[],
+            'title': '',
+            'tags': [],
             }
 
         if self.workflow is not None:
@@ -248,15 +239,15 @@ class AddFolderFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsAddWidget(),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsAddWidget(),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -268,9 +259,9 @@ class AddFolderFormController(object):
         else:
             layout = layout_provider('community')
         return {
-            'api':api,
-            'actions':(),
-            'layout':layout
+            'api': api,
+            'actions': (),
+            'layout': layout
         }
 
     def handle_cancel(self):
@@ -307,10 +298,12 @@ class AddFolderFormController(object):
         location = resource_url(folder, request)
         return HTTPFound(location=location)
 
+
 def delete_folder_view(context, request,
                        delete_resource_view=delete_resource_view):
     # delete_resource_view is passed as hook for unit testing
     return delete_resource_view(context, request, len(context))
+
 
 def advanced_folder_view(context, request):
 
@@ -336,8 +329,8 @@ def advanced_folder_view(context, request):
             noLongerProvides(context, INetworkNewsMarker)
 
         if marker:
-            location = resource_url(context, request, query=
-                                 {'status_message': 'Marker changed'})
+            location = resource_url(context, request, query={
+                'status_message': 'Marker changed'})
             return HTTPFound(location=location)
 
     # Get a layout
@@ -362,8 +355,7 @@ def advanced_folder_view(context, request):
              layout=layout,
              fielderrors={},
              selected=selected),
-        request = request,
-        )
+        request=request)
 
 
 class AddFileFormController(object):
@@ -373,16 +365,16 @@ class AddFileFormController(object):
         self.workflow = get_workflow(ICommunityFile, 'security', context)
         self.filestore = get_filestore(context, request, 'add-file')
         self.show_sendalert = get_show_sendalert(self.context, self.request)
-        self.check_upload_size = check_upload_size # for testing
+        self.check_upload_size = check_upload_size  # for testing
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
 
     def form_defaults(self):
         defaults = {
-            'title':'',
-            'tags':[],
-            'file':None,
+            'title': '',
+            'tags': [],
+            'file': None,
             }
         if self.show_sendalert:
             defaults['sendalert'] = sendalert_default(self.context,
@@ -418,7 +410,7 @@ class AddFileFormController(object):
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -429,9 +421,9 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api': api,
+                'actions': (),
+                'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -486,14 +478,14 @@ class AddFileFormController(object):
         location = resource_url(file, request)
         return HTTPFound(location=location)
 
+
 def show_file_view(context, request):
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
     url = request.resource_url
 
     client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
+        tagbox=get_tags_client_data(context, request))
 
     actions = []
     if has_permission('edit', context, request):
@@ -528,10 +520,9 @@ def show_file_view(context, request):
     else:
         layout = layout_provider('generic')
 
-    if not find_interface(context, IIntranets):
-        repo = find_repo(context)
-        if repo is not None and has_permission('edit', context, request):
-            actions.append(('History', url(context, 'history.html')))
+    repo = find_repo(context)
+    if repo is not None and has_permission('edit', context, request):
+        actions.append(('History', url(context, 'history.html')))
     filename = context.filename
     if isinstance(filename, unicode):
         filename = filename.encode('UTF-8')
@@ -550,12 +541,14 @@ def show_file_view(context, request):
         request=request,
         )
 
+
 def preview_file(context, request):
     # Just tell the AJAX that we want to do a direct file download rather than
     # an in browser preview.
     url = resource_url(context, request, 'download_preview',
                        query={'version_num': request.params['version_num']})
     return {'url': url}
+
 
 def download_file_preview(context, request):
     version_num = int(request.params['version_num'])
@@ -571,6 +564,7 @@ def download_file_preview(context, request):
         content_type=str(version.attrs['mimetype']),
         content_length=size,
         app_iter=stream)
+
 
 def download_file_view(context, request):
     # To view image-ish files in-line, use thumbnail_view.
@@ -591,6 +585,7 @@ def download_file_view(context, request):
 
     response = Response(headerlist=headers, app_iter=f)
     return response
+
 
 def download_zipped(context, request):
     """
@@ -617,9 +612,8 @@ def download_zipped(context, request):
     tmp.seek(0)
     app_iter = iter(lambda: tmp.read(4096), b'')
 
-    intranet = find_intranet(context)
     community = find_community(context)
-    zip_id = community and community.__name__ or intranet and intranet.__name__
+    zip_id = community and community.__name__
     fname = '%s_files' % zip_id.encode('utf-8')
     headers = [
         ('Content-Type', 'application/zip'),
@@ -627,11 +621,12 @@ def download_zipped(context, request):
     ]
     return Response(headerlist=headers, app_iter=app_iter)
 
+
 def thumbnail_view(context, request):
     assert IImage.providedBy(context), "Context must be an image."
     if not request.subpath:
         raise NotFound
-    filename = request.subpath[0] # <width>x<length>.jpg
+    filename = request.subpath[0]  # <width>x<length>.jpg
     try:
         size = map(int, filename[:-4].split('x'))
     except:
@@ -642,6 +637,7 @@ def thumbnail_view(context, request):
     #     and respecting If-Modified-Since requests with 302 responses.
     data = thumb.blobfile.open().read()
     return Response(body=data, content_type=thumb.mimetype)
+
 
 class EditFolderFormController(object):
     def __init__(self, context, request):
@@ -654,8 +650,8 @@ class EditFolderFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':self.context.title,
-            'tags':[],
+            'title': self.context.title,
+            'tags': [],
             }
 
         if self.workflow is not None:
@@ -674,15 +670,15 @@ class EditFolderFormController(object):
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -694,9 +690,9 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api': api,
+                'actions': (),
+                'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -722,9 +718,10 @@ class EditFolderFormController(object):
         context.modified_by = authenticated_userid(request)
         objectEventNotify(ObjectModifiedEvent(context))
 
-        location = resource_url(context, request, query=
-                             {'status_message':'Folder changed'})
+        location = resource_url(context, request, query={
+            'status_message': 'Folder changed'})
         return HTTPFound(location=location)
+
 
 class EditFileFormController(object):
     def __init__(self, context, request):
@@ -739,9 +736,9 @@ class EditFileFormController(object):
     def form_defaults(self):
         context = self.context
         defaults = {
-            'title':context.title,
-            'tags':[], # initial values supplied by widget
-            'file':SchemaFile(None, context.filename, context.mimetype),
+            'title': context.title,
+            'tags': [],  # initial values supplied by widget
+            'file': SchemaFile(None, context.filename, context.mimetype),
             }
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(context)
@@ -760,18 +757,18 @@ class EditFileFormController(object):
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
             # single=True obligatory here, since we are out of sequence
-            'file':karlwidgets.FileUpload2(filestore=self.filestore,
-                                           single=True),
+            'file': karlwidgets.FileUpload2(filestore=self.filestore,
+                                            single=True),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -783,9 +780,9 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,
-                'actions':(),
-                'layout':layout}
+        return {'api': api,
+                'actions': (),
+                'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -826,8 +823,8 @@ class EditFileFormController(object):
         objectEventNotify(ObjectModifiedEvent(context))
 
         self.filestore.clear()
-        location = resource_url(context, request,
-                             query={'status_message':'File changed'})
+        location = resource_url(context, request, query={
+            'status_message': 'File changed'})
         return HTTPFound(location=location)
 
 grid_folder_columns = [
@@ -853,12 +850,12 @@ def jquery_grid_folder_view(context, request):
     sort_on = request.params.get('sortColumn', 'modified_date')
     reverse = request.params.get('sortDirection') == 'desc'
 
-    payload = get_filegrid_client_data(context, request,
-        start = int(start),
-        limit = int(limit),
-        sort_on = sort_on,
-        reverse = reverse,
-        )
+    payload = get_filegrid_client_data(
+        context, request,
+        start=int(start),
+        limit=int(limit),
+        sort_on=sort_on,
+        reverse=reverse)
     return payload
 
 
@@ -885,7 +882,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
     api = TemplateAPI(context, request, 'any_title')
 
-    ##columns = request.params.get('columns', '').capitalize() == 'True'
+    #  #columns = request.params.get('columns', '').capitalize() == 'True'
 
     # We also send, in each case, the list of possible target folders.
     # They are needed for the grid reorganize (Move To) feature.
@@ -916,17 +913,16 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         folder_columns = grid_folder_columns
         has_selection_column = True
 
-
     # Now get the data that goes with this, then adapt into FileInfo
-    info = get_container_batch(context, request,
+    info = get_container_batch(
+        context, request,
         batch_start=start,
         batch_size=limit,
         sort_index=sort_on,
-        reverse=reverse,
-        )
+        reverse=reverse)
 
     entries = [getMultiAdapter((item, request), IFileInfo)
-        for item in info['entries']]
+               for item in info['entries']]
 
     records = []
     for entry in entries:
@@ -951,14 +947,14 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         records.append(record)
 
     payload = dict(
-        columns = folder_columns,
-        records = records,
-        totalRecords = info['total'],
-        sortColumn = sort_on,
-        sortDirection = reverse and 'desc' or 'asc',
-        targetFolders = target_folders,
-        currentFolder = current_folder,
-        canDelete = can_delete,
+        columns=folder_columns,
+        records=records,
+        totalRecords=info['total'],
+        sortColumn=sort_on,
+        sortDirection=reverse and 'desc' or 'asc',
+        targetFolders=target_folders,
+        currentFolder=current_folder,
+        canDelete=can_delete,
     )
 
     return payload
@@ -994,18 +990,18 @@ def ajax_file_reorganize_delete_view(context, request):
                 else:
                     deleted += 1
         payload = dict(
-            result = 'OK',
-            deleted = deleted,
+            result='OK',
+            deleted=deleted,
         )
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
         payload = dict(
-            result = 'ERROR',
-            error = str(exc),
-            filename = exc.filename,
+            result='ERROR',
+            error=str(exc),
+            filename=exc.filename,
         )
-        log.info('ajax_file_reorganize_delete_view error at filename="%s": %s'
-                    % (exc.filename, str(exc)))
+        log.info('ajax_file_reorganize_delete_view error at filename="%s": %s' % (
+            exc.filename, str(exc)))
         transaction.doom()
 
     return payload
@@ -1016,6 +1012,7 @@ def ajax_file_reorganize_delete_view(context, request):
 def find_root_folder(context):
     community = find_community(context)
     return community['files']
+
 
 def traverse_file_folder(context, folder):
     # Return the context folder specified in the "folder" parameter
@@ -1029,6 +1026,7 @@ def traverse_file_folder(context, folder):
             c = c[segment]
     return c
 
+
 def get_file_folder_path(context):
     # Return the absolute path to the fileobjext in context, relative
     # to the community.
@@ -1037,9 +1035,11 @@ def get_file_folder_path(context):
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
 
+
 def deslugify(txt):
     "a-slugified-name => A Slugified Name"
-    return ' '.join([txt.capitalize() for txt in txt.split('-')])
+    return ' '.join([t.capitalize() for t in txt.split('-')])
+
 
 def get_target_folders(context):
     # Return the target folders for this community.
@@ -1058,19 +1058,14 @@ def get_target_folders(context):
     root_folder = find_root_folder(context)
     root_path = resource_path(root_folder)
 
-    # Check if we are in the files section
-    # for example, we are in /offices/nyc/referencemanuals which is a folder
-    # but not inside the files tool /offices/nyc/files.
-    # In this case we will return None as a value, and the client should
-    # detect this value and disable the reorganize features.
     context_path = resource_path(context)
     if not context_path.startswith(root_path):
         return None
 
     query = ICatalogSearch(context)
     total, docids, resolver = query(
-        path = root_path,
-        interfaces = (ICommunityFolder, ),
+        path=root_path,
+        interfaces=(ICommunityFolder, ),
         )
     target_items = []
     for docid in docids:
@@ -1095,14 +1090,14 @@ def get_target_folders(context):
             # Do _not_ wake up the object for the title,
             # instead use the deslugified name from the path segment.
             # (See LP #1347066)
-             target_item['title'] = deslugify(target_item['path'].split('/')[-1])
+            target_item['title'] = deslugify(target_item['path'].split('/')[-1])
         # docid is not needed in the output
         del target_item['docid']
 
     # always insert the root folder that was not returned by this search
     target_items.insert(0, dict(
-        path = root_path,
-        title = 'Community home',
+        path=root_path,
+        title='Community home',
         ))
 
     # Process all the results
@@ -1117,11 +1112,12 @@ def get_target_folders(context):
         if not target_path:
             target_path = '/'
         target_folders.append(dict(
-            path = target_path,
-            title = item['title'],
+            path=target_path,
+            title=item['title'],
             ))
 
     return target_folders
+
 
 def get_current_folder(context):
     # Calculate the current folder in the same format as the results
@@ -1142,6 +1138,7 @@ def get_current_folder(context):
         current_folder = '/'
 
     return current_folder
+
 
 def make_unique_file_in_folder(context, fileobj, orig_name=None):
     # create a unique name of the -1, -2, ... style
@@ -1186,6 +1183,7 @@ def make_unique_file_in_folder(context, fileobj, orig_name=None):
     # like: context[name] = fileobj
     return name
 
+
 def ajax_file_reorganize_moveto_view(context, request):
 
     try:
@@ -1209,8 +1207,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 fileobj = context[filename]
             except KeyError, e:
-                msg = ('File %s not found in source folder (%r)'
-                        % (filename, e))
+                msg = ('File %s not found in source folder (%r)' % (filename, e))
                 raise ErrorResponse(msg, filename=filename)
 
             file_path = get_file_folder_path(fileobj)
@@ -1221,8 +1218,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 del context[filename]
             except KeyError, e:
-                msg = ('Unable to delete file %s from source folder (%r)'
-                        % (filename, e))
+                msg = ('Unable to delete file %s from source folder (%r)' % (filename, e))
                 raise ErrorResponse(msg, filename=filename)
 
             # create a unique name of the -1, -2, ... style
@@ -1233,27 +1229,27 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 target_context[target_filename] = fileobj
             except KeyError, e:
-                msg = ('Cannot move to target folder <a href="%s">%s</a> (%r)'
-                        % (target_folder_url, target_folder, e))
+                msg = ('Cannot move to target folder <a href="%s">%s</a> (%r)' % (
+                    target_folder_url, target_folder, e))
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
 
         payload = dict(
-            result = 'OK',
-            moved = moved,
-            targetFolder = target_folder,
-            targetFolderUrl = target_folder_url,
-            targetFolderTitle = target_context.title,
+            result='OK',
+            moved=moved,
+            targetFolder=target_folder,
+            targetFolderUrl=target_folder_url,
+            targetFolderTitle=target_context.title,
         )
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
         payload = dict(
-            result = 'ERROR',
-            error = str(exc),
-            filename = exc.filename,
+            result='ERROR',
+            error=str(exc),
+            filename=exc.filename,
         )
-        log.info('ajax_file_reorganize_moveto_view error at filename="%s": %s'
-                   % (exc.filename, str(exc)))
+        log.info('ajax_file_reorganize_moveto_view error at filename="%s": %s' % (
+            exc.filename, str(exc)))
         transaction.doom()
     finally:
         pass
@@ -1264,10 +1260,12 @@ def ajax_file_reorganize_moveto_view(context, request):
 # Multi Upload
 # --
 
+
 def make_temp_id(client_id):
     """Generate a unique tempdir id from the guaranteed unique client id"""
     temp_id = 'PLUPLOAD-' + client_id
     return temp_id
+
 
 def ajax_file_upload_view(context, request):
 
@@ -1315,12 +1313,11 @@ def ajax_file_upload_view(context, request):
             # First chunk. Create the content object.
 
             fileobj = create_content(ICommunityFile,
-                                  title=filename,   # may be overwritten later
-                                  stream=f.file,
-                                  mimetype=get_upload_mimetype(f),
-                                  filename=filename, # may be overwritten later
-                                  creator=creator,
-                                  )
+                                     title=filename,   # may be overwritten later
+                                     stream=f.file,
+                                     mimetype=get_upload_mimetype(f),
+                                     filename=filename,  # may be overwritten later
+                                     creator=creator)
 
             # For file objects, OSI's policy is to store the upload file's
             # filename as the objectid, instead of basing __name__ on the
@@ -1385,8 +1382,8 @@ def ajax_file_upload_view(context, request):
             blobf.close()
 
         payload = dict(
-            result = 'OK',
-            filename = filename,
+            result='OK',
+            filename=filename,
         )
 
         if is_last_chunk and end_batch is not None:
@@ -1406,7 +1403,6 @@ def ajax_file_upload_view(context, request):
                     msg = ("Inconsistent transaction, "
                            "lost a file (temp_id='%s') " % (temp_id, ))
                     raise ErrorResponse(msg, client_id=client_id)
-
 
                 # batch security protection
                 # to avoid attacks or malformed end_batch parameters
@@ -1440,32 +1436,31 @@ def ajax_file_upload_view(context, request):
                 workflow = get_workflow(ICommunityFolder, 'security', context)
                 if workflow is not None:
                     workflow.initialize(fileobj)
-                    #if 'security_state' in XXXconverted:
+                    # if 'security_state' in XXXconverted:
                     #    workflow.transition_to_state(fileobj, request,
                     #                                params['security_state'])
 
                 # Tags, attachments
-                #set_tags(fileobj, request, paramsXXX['tags'])
+                # set_tags(fileobj, request, paramsXXX['tags'])
 
                 # Alerts
-                #if params.get('sendalert'):
+                # if params.get('sendalert'):
                 #    alerts = queryUtility(IAlerts, default=Alerts())
                 #    alerts.emit(fileobj, request)
 
-            payload['batch_completed'] = True;
+            payload['batch_completed'] = True
 
     except ErrorResponse, exc:
         # this error will be sent back and its text displayed on the client.
         payload = dict(
-            error = str(exc),
-            client_id = exc.client_id,
+            error=str(exc),
+            client_id=exc.client_id,
         )
-        log.info('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
-            (client_id, filename, str(exc)))
+        log.info('ajax_file_upload_view at client_id="%s", filename="%s": %s' % (
+            client_id, filename, str(exc)))
         transaction.doom()
     finally:
         tempfolder = find_tempfolder(context)
         tempfolder.cleanup()
 
     return payload
-

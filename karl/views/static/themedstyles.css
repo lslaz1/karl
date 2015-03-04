@@ -807,11 +807,6 @@ input#livesearch-input {
 #center div .sections h2 {
 	margin-left: 0px;
 }
-div.center_intranet {
-  margin: 0 0 15px !important;
-  float: left;
-  width: 399px;
-}
 div.center_boards {
   margin: 0 0 15px !important;
   float: left;
@@ -1606,16 +1601,6 @@ span.sortingArrows a {
 span.sortingArrows a img {
   border:none;
   margin:0;
-}
-
-/** =INTRANETS
------------------------------------------------ */
-.klisting_header {
-  font-size: 16px;
-  font-weight:bold;
-}
-.featureLinks {
-  margin-top: 0em;
 }
 
 /** =TAGS
@@ -2491,25 +2476,6 @@ ul.menu li {
     font-size: 10px;
 }
 
-/* portlet styles within #center (intranet homepage) */
-#center .generic-portlet {
-    width: auto;
-    border: none;
-    border-top: 1px solid #cccccc;
-    padding: 0;
-    margin-top: 1.5em;
-}
-
-#center .generic-portlet h3 {
-  font-weight: normal;
-  letter-spacing: 0px;
-  font-family: Georgia,Palatino,"Times New Roman";
-  color: #639332;
-  font-size: 1.6em;
-  text-align: left;
-  border: none;
-}
-
 .rss-icon {
     padding-top: 20px;
     text-align: right;
@@ -2707,10 +2673,6 @@ body .ui-state-default .karl-icon-loading {
 
 /* layout without tools tab */
 .generic-layout .contentbar-wrapper,
-.intranet-layout .contentbar-wrapper {
-    margin-top: -8px;
-}
-
 
 #karl-wikitoc {
     width: 668px;

@@ -9,7 +9,6 @@ from pyramid.traversal import find_resource
 from zope.component import queryAdapter
 
 from karl.models.interfaces import IContainerVersion
-from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IObjectVersion
 from karl.scripting import create_karl_argparser
 from karl.utils import find_catalog
@@ -66,8 +65,6 @@ def init_history(docid, path, repo, site):
     context = find_resource(site, path)
     if context.__name__ == 'TEMP':
         return
-    if find_interface(context, IIntranets):
-        return
 
     version = queryAdapter(context, IObjectVersion)
     if version is not None:
@@ -88,8 +85,6 @@ def init_container(docid, path, repo, site):
 
     context = find_resource(site, path)
     if context.__name__ == 'TEMP':
-        return
-    if find_interface(context, IIntranets):
         return
 
     container = queryAdapter(context, IContainerVersion)

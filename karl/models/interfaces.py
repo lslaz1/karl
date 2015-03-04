@@ -24,6 +24,7 @@ from zope.component.interfaces import IObjectEvent
 from repoze.folder.interfaces import IFolder
 from repoze.lemonade.interfaces import IContent
 
+
 class ICommunityContent(IContent):
     """ Base interface for content which is within a community.
     """
@@ -31,10 +32,12 @@ class ICommunityContent(IContent):
     modified_by = Attribute(u'ID of user who last modified the object')
     title = Attribute(u'Title of content')
 
+
 class IGroupSearchFactory(Interface):
-    def __call__(context, request, term):
+    def __call__(context, request, term):  # noqa
         """ return an object implementing IGroupSearch or None if
         no IGroupSearch can be found """
+
 
 class IGroupSearch(Interface):
     def __call__():
@@ -43,32 +46,37 @@ class IGroupSearch(Interface):
     def get_batch():
         """ Return a single batch of results (based on request information) """
 
+
 # Interfaces for the LiveSearch grouping
 class IPeople(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'People')
     taggedValue('marker', 'People')
 
+
 class IPosts(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Posts')
     taggedValue('marker', 'Posts')
+
 
 class IPages(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Pages')
     taggedValue('marker', 'Pages')
 
+
 class IFiles(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Files')
     taggedValue('marker', 'Files')
 
+
 class IOthers(Interface):
     """Grouping for LiveSearch and other purposes"""
     taggedValue('name', 'Others')
-
 # --- end LiveSearch grouping
+
 
 class IIndexFactory(Interface):
     """ Register as named utilities to add extra indexes to the catalog.
@@ -79,6 +87,7 @@ class IIndexFactory(Interface):
         The index will be added to the catalog under the name of the utility.
         """
 
+
 class ISite(IFolder):
     """ Karl site """
     taggedValue('name', 'Site')
@@ -87,10 +96,11 @@ class ISite(IFolder):
     def update_indexes():
         """Add and remove catalog indexes to match a fixed schema"""
 
+
 class ITempFolder(IFolder):
     """ A container for temporary storage of documents. """
 
-    def add_document(doc):
+    def add_document(doc):  # noqa
         """
         Adds a document to the temporary folder, assigning a unique identifier.
         """
@@ -100,13 +110,16 @@ class ITempFolder(IFolder):
         Removes 'old' documents from the folder.
         """
 
+
 class ICommunities(IFolder):
     """ Communities folder """
     taggedValue('name', 'Communities')
 
+
 class ICommentsFolder(IFolder):
     """ A container for comments """
     taggedValue('name', 'Comments Folder')
+
 
 class IComment(IFolder, ICommunityContent, IPosts):
     """ A container holding a comment and any attachments """
@@ -114,13 +127,16 @@ class IComment(IFolder, ICommunityContent, IPosts):
     taggedValue('search_option', True)
     taggedValue('icon', 'quill.png')
 
+
 class IAttachmentsFolder(IFolder):
     """ A container for attachments (implemented as File objects) """
     taggedValue('name', 'Attachments Folder')
 
+
 class IMembers(IFolder):
     """ Easy access to community member data, and store invitations"""
     taggedValue('name', 'Members')
+
 
 class IInvitation(Interface):
     """ Persistent object with information for joining KARL """
@@ -129,15 +145,17 @@ class IInvitation(Interface):
     email = Attribute(u'Email address for the person being invited')
     message = Attribute(u'Personal message sent along with the invitation')
 
+
 class IProfiles(IFolder):
     """ Profiles folder """
     taggedValue('name', 'Profiles')
 
-    def getProfileByEmail(email):
+    def getProfileByEmail(email):  # noqa
         """ Return the profile which has the given email address.
 
         o Return None if no match is found.
         """
+
 
 class IProfile(IFolder, IPeople):
     """ User profile """
@@ -183,10 +201,10 @@ class IProfile(IFolder, IPeople):
         u"A dictionary that maps category key to a list of "
         u"category value identifier strings. "
         u"Example: {'departments': ['finance']}. "
-        u"Typical keys: 'entities', 'offices', 'departments', 'other'")
+        u"Typical keys: 'entities', 'departments', 'other'")
 
     preferred_communities = Attribute(u"List of preferred communities. May "
-                          u" be None.")
+                                      u" be None.")
 
     password_reset_key = Attribute(
         u"Key for confirming password reset.  "
@@ -195,7 +213,7 @@ class IProfile(IFolder, IPeople):
         u"Datetime when password reset was requested.  "
         u"Not for display or editing.")
 
-    def get_alerts_preference(community_name):
+    def get_alerts_preference(community_name):  # noqa
         """Returns constant value representing user's alert preference for
         the given community.
 
@@ -209,7 +227,7 @@ class IProfile(IFolder, IPeople):
 
         """
 
-    def set_alerts_preference(community_name, preference):
+    def set_alerts_preference(community_name, preference):  # noqa
         """Sets user's alert preference for the given community.
 
         Possible values are:
@@ -227,10 +245,11 @@ class IProfile(IFolder, IPeople):
 
 IProfile.ALERT_IMMEDIATELY = 0
 IProfile.ALERT_DAILY_DIGEST = 1
-IProfile.ALERT_DIGEST = IProfile.ALERT_DAILY_DIGEST # BBB alias
+IProfile.ALERT_DIGEST = IProfile.ALERT_DAILY_DIGEST  # BBB alias
 IProfile.ALERT_NEVER = 2
 IProfile.ALERT_WEEKLY_DIGEST = 3
 IProfile.ALERT_BIWEEKLY_DIGEST = 4
+
 
 class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """
@@ -245,12 +264,14 @@ class ICommunity(IFolder, IContent, IOthers):
         u'datetime: last modification to any subcontent ')
     sendalert_default = Attribute(u'Default:  send alerts on new content?')
 
+
 class ICreatedModified(Interface):
     """ Interface indicating content that has its created and modified
     attributes managed by an event subscriber (this implies all IContent
     content at the moment). """
     modified = Attribute(u'Datetime indicating modification')
     created = Attribute(u'Datetime indicating creation')
+
 
 class IToolFactory(Interface):
     """ A utility interface """
@@ -276,12 +297,14 @@ class IToolFactory(Interface):
     def tab_url(context, request):
         """ Returns the tab URL for the tool """
 
+
 class ITextIndexData(Interface):
     """ An adapter which returns a string or tuple representing data useable
     for text indexing. Weighted results can be returned as a tuple. If a tuple
     is returned, tuple contains text strings in descending order of weight. """
     def __call__():
         """ Return text data """
+
 
 class IContextualSummarizer(Interface):
     """ An adapter which returns a contextual summary for a document suitable
@@ -292,6 +315,7 @@ class IContextualSummarizer(Interface):
         contextual summarizer will provide a summary which highlights the
         user's search terms. """
 
+
 class IVirtualData(Interface):
     """ An adapter which returns a hashable object representing
     'virtual' data for an object.  It's initial use is for the
@@ -301,6 +325,7 @@ class IVirtualData(Interface):
     content as an extra filter argument."""
     def __call__():
         """ Return hashable data """
+
 
 # XXX Arguably, this is display logic and belongs in views.
 class IGridEntryInfo(Interface):
@@ -316,6 +341,7 @@ class IGridEntryInfo(Interface):
     modified_by_title = Attribute("")
     modified_by_url = Attribute("")
 
+
 class ICommunityInfo(Interface):
     """ An adapter for obtaining information about a single community """
     name = Attribute('The name of the community')
@@ -330,24 +356,30 @@ class ICommunityInfo(Interface):
     member = Attribute("Is the current user a member of the community?")
     moderator = Attribute("Is the current user a moderator of the community?")
 
+
 class ICatalogSearch(Interface):
     """Centralize policies about searching"""
+
 
 class ITagQuery(Interface):
     """Centralize policies about listing tag information"""
 
     tagusers = Attribute("List the taguser information on a resource")
 
+
 class IObjectWillBeModifiedEvent(IObjectEvent):
     """ An event type sent before an object is modified  """
     object = Attribute('The object that will be modified')
+
 
 class IObjectModifiedEvent(IObjectEvent):
     """ An event type sent after an object is modified """
     object = Attribute('The object which was modified')
 
+
 class ILetterManager(Interface):
     """ Adapter to manage community and profile letter box info """
+
 
 class ICatalogSearchCache(Interface):
     """ Utility which provides a cache for catalog searches """
@@ -359,12 +391,14 @@ class ICatalogSearchCache(Interface):
     def __setitem__(key, val):
         """ Set the key to val """
 
+
 class ICatalogQueryEvent(Interface):
     """Notification that a catalog was queried"""
     catalog = Attribute('The catalog that was queried')
     query = Attribute('Keyword parameters passed in the query')
     duration = Attribute('How long the query took, in seconds')
     result = Attribute('The result of the query: (result_count, [docid])')
+
 
 class IUserAdded(Interface):
     """ Event interface for having a new user added to the system.
@@ -374,6 +408,7 @@ class IUserAdded(Interface):
     login = Attribute('The name under which the user logs in.')
     groups = Attribute('The initial set of groups to which the user belongs.')
 
+
 class IUserRemoved(Interface):
     """ Event interface for having a user removed from the system.
     """
@@ -381,6 +416,7 @@ class IUserRemoved(Interface):
     id = Attribute('The unique identifier for the user')
     login = Attribute('The name under which the user logs in.')
     groups = Attribute('The set of groups to which the user belongs.')
+
 
 class IUserAddedGroup(Interface):
     """ Event interface for when a user has just added a new group.
@@ -392,6 +428,7 @@ class IUserAddedGroup(Interface):
     old_groups = Attribute('The set of groups to which the user '
                            'formerly belonged.')
 
+
 class IUserRemovedGroup(Interface):
     """ Event interface for when a user has just removed a group.
     """
@@ -402,9 +439,11 @@ class IUserRemovedGroup(Interface):
     old_groups = Attribute('The set of groups to which the user '
                            'formerly belonged.')
 
+
 class IFeedsContainer(IFolder):
     """ Container for fetched feeds """
     taggedValue('name', 'Feeds')
+
 
 class IFeed(IContent):
     taggedValue('name', 'Feed')
@@ -425,6 +464,7 @@ class IFeed(IContent):
         """Change the content to match a FeedParser result.
         """
 
+
 class IFeedEntry(Interface):
     taggedValue('name', 'Feed Entry')
 
@@ -440,14 +480,6 @@ class IFeedEntry(Interface):
         """Change the content to match a FeedParser entry.
         """
 
-class IIntranets(ICommunity):
-    """ Mark the top of the intranet hierarchy e.g. /osi """
-    taggedValue('name', 'Intranets')
-    feature = Attribute('HTML for the feature portlet')
-
-class IIntranet(IFolder):
-    """ Mark an intranet community to attach views """
-    taggedValue('name', 'Intranet')
 
 class IAttachmentPolicy(Interface):
     """Policy controlling attachments"""
@@ -455,10 +487,12 @@ class IAttachmentPolicy(Interface):
     def support():
         """Return true if the given object should support attachments"""
 
+
 class IOrderedFolder(IFolder):
     """Orderable container
     """
     order = Attribute("Ordered sequence of IDs")
+
 
 class IPeopleDirectory(IOrderedFolder):
     """Searchable directory of profiles.
@@ -468,10 +502,12 @@ class IPeopleDirectory(IOrderedFolder):
     title = Attribute("Directory title")
     catalog = Attribute("Catalog of profiles")
 
+
 class IPeopleCategories(Interface):
     """ Marker for the 'categories' container under a peopledir.
     """
     title = Attribute("Directory title")
+
 
 class IPeopleCategory(Interface):
     """A vocabulary for profile category values.
@@ -488,12 +524,14 @@ class IPeopleCategory(Interface):
     def get(value_id, default=None):
         """Return the specified IPeopleCategoryItem, or None"""
 
+
 class IPeopleCategoryItem(Interface):
     """Metadata about a person category value."""
     title = Attribute(
         "Descriptive name.  Example: 'Human Resources'")
     description = Attribute(
         "An XHTML block that describes the category value")
+
 
 class IPeopleSection(IFolder):
     """Section of the people directory.
@@ -503,38 +541,46 @@ class IPeopleSection(IFolder):
     title = Attribute("Section title")
     tab_title = Attribute("Title to put on the section tab")
 
+
 class IPeopleSectionColumn(Interface):
     """A visual column within a section display
     """
     width = Attribute("Width of a section column")
+
 
 class IPeopleReportGroup(Interface):
     """A group of reports displayed in a section
     """
     title = Attribute("Report group title")
 
+
 class IPeopleReportFilter(Interface):
     """A filter for a report displayed in a section
     """
     values = Attribute("Category values for which the filter applies")
 
+
 class IPeopleReportCategoryFilter(IPeopleReportFilter):
     """A category-based filter for a report displayed in a section
     """
 
+
 class IPeopleReportGroupFilter(IPeopleReportFilter):
     """A group-based filter for a report displayed in a section
     """
+
 
 class IPeopleReportIsStaffFilter(IPeopleReportFilter):
     """A staff filter for a report displayed in a section
     """
     include_staff = Attribute("Include staff in query?")
 
+
 class IPeopleReportMailingList(Interface):
     """Marker object indicating that the parent report enables mailing list.
     """
     short_address = Attribute("Short / pretty e-mail prefix for the list.")
+
 
 class IPeopleReport(Interface):
     """A report about people
@@ -548,13 +594,16 @@ class IPeopleReport(Interface):
         """ Return a catalog query mapping corresponding to our criteria.
         """
 
+
 class IPeopleRedirector(Interface):
     """Redirect to another url"""
     target_url = Attribute("Target URL")
 
+
 class IPeopleDirectorySchemaChanged(Interface):
     """Notification that the schema of the people directory has changed"""
     peopledir = Attribute('The IPeopleDirectory object')
+
 
 class ISiteEvents(Interface):
     """ Site-level 'tool' for tracking user event stream.

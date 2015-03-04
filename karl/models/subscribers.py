@@ -34,7 +34,6 @@ from repoze.lemonade.content import is_content
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IContainerVersion
-from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IObjectVersion
 from karl.models.interfaces import IProfile
@@ -50,8 +49,11 @@ from karl.utils import find_users
 log = logging.getLogger(__name__)
 
 _NOW = None
+
+
 def _now():     # unittests can replace this to get known results
     return _NOW or datetime.now()
+
 
 def postorder(startnode):
     def visit(node):
@@ -61,6 +63,7 @@ def postorder(startnode):
                     yield result
         yield node
     return visit(startnode)
+
 
 def index_content(obj, event):
     """ Index content (an IObjectAddedEvent subscriber) """
@@ -76,6 +79,7 @@ def index_content(obj, event):
                     catalog.document_map.add(path, docid)
                 catalog.index_doc(docid, node)
 
+
 def unindex_content(obj, docids):
     """ Unindex given 'docids'.
     """
@@ -85,6 +89,7 @@ def unindex_content(obj, docids):
             catalog.unindex_doc(docid)
             catalog.document_map.remove_docid(docid)
 
+
 def cleanup_content_tags(obj, docids):
     """ Remove any tags associated with 'docids'.
     """
@@ -92,6 +97,7 @@ def cleanup_content_tags(obj, docids):
     if tags is not None:
         for docid in docids:
             tags.delete(item=docid)
+
 
 def handle_content_removed(obj, event):
     """ IObjectWillBeRemovedEvent subscriber.
@@ -104,6 +110,7 @@ def handle_content_removed(obj, event):
         unindex_content(obj, docids)
         cleanup_content_tags(obj, docids)
 
+
 def reindex_content(obj, event):
     """ Reindex a single piece of content (non-recursive); an
     IObjectModifed event subscriber """
@@ -112,6 +119,7 @@ def reindex_content(obj, event):
         path = resource_path(obj)
         docid = catalog.document_map.docid_for_address(path)
         catalog.reindex_doc(docid, obj)
+
 
 def set_modified(obj, event):
     """ Set the modified date on a single piece of content.
@@ -136,6 +144,7 @@ def set_modified(obj, event):
                 if adapter.comment is None:
                     adapter.comment = 'Content modified.'
 
+
 def set_created(obj, event):
     """ Add modified and created attributes to obj and children.
 
@@ -154,16 +163,13 @@ def set_created(obj, event):
     if parent is not None:
         _modify_community(parent, now)
 
+
 def add_to_repo(obj, event, update_container=True):
     """
     Add a newly created object to the version repository.
 
     Intended use is as an IObjectAddedEvent subscriber.
     """
-    if find_interface(obj, IIntranets):
-        # Exclude /offices from repo
-        return
-
     repo = find_repo(obj)
     if repo is None:
         return
@@ -208,8 +214,10 @@ def add_to_repo(obj, event, update_container=True):
             fake_event.parent = obj
             add_to_repo(child, fake_event)
 
+
 class FakeEvent(object):
     pass
+
 
 def delete_in_repo(obj, event):
     """
@@ -218,10 +226,6 @@ def delete_in_repo(obj, event):
     Intended use is as an IObjectRemovedEvent subscriber.
     """
     container = event.parent
-    if find_interface(container, IIntranets):
-        # Exclude /offices from repo
-        return
-
     repo = find_repo(container)
     if repo is not None:
         adapter = queryAdapter(container, IContainerVersion)
@@ -229,6 +233,7 @@ def delete_in_repo(obj, event):
             request = get_current_request()
             user = authenticated_userid(request)
             repo.archive_container(adapter, user)
+
 
 def _modify_community(obj, when):
     # manage content_modified on community whenever a piece of content
@@ -242,6 +247,7 @@ def _modify_community(obj, when):
             if index is not None:
                 index.index_doc(community.docid, community)
 
+
 def delete_community(obj, event):
     # delete the groups related to the community when a community is
     # deleted
@@ -252,15 +258,18 @@ def delete_community(obj, event):
 
 # manage alphabet ('title startswith') listing: optimization for letter links
 
+
 def alpha_added(obj, event):
     adapter = ILetterManager(obj)
     adapter.delta(1)
+
 
 def alpha_removed(obj, event):
     adapter = ILetterManager(obj)
     adapter.delta(-1)
 
 # Add / remove list aliases from the root 'list_aliases' index.
+
 
 def add_mailinglist(obj, event):
     # When this handler is called while loading a peopleconf configuration,
@@ -274,6 +283,7 @@ def add_mailinglist(obj, event):
     if aliases is not None:
         aliases[obj.short_address] = resource_path(obj.__parent__)
 
+
 def remove_mailinglist(obj, event):
     aliases = find_site(obj).list_aliases
     try:
@@ -283,11 +293,13 @@ def remove_mailinglist(obj, event):
 
 # "Index" profile e-mails into the profiles folder.
 
+
 def _remove_email(parent, name):
     mapping = getattr(parent, 'email_to_name')
     filtered = [x for x in mapping.items() if x[1] != name]
     mapping.clear()
     mapping.update(filtered)
+
 
 def profile_added(obj, event):
     parent = obj.__parent__
@@ -295,10 +307,12 @@ def profile_added(obj, event):
     _remove_email(parent, name)
     parent.email_to_name[obj.email] = name
 
+
 def profile_removed(obj, event):
     parent = obj.__parent__
     name = obj.__name__
     _remove_email(parent, name)
+
 
 def index_profile(obj, event):
     """ Index profile (an IObjectAddedEvent subscriber) """
@@ -313,6 +327,7 @@ def index_profile(obj, event):
                 else:
                     catalog.document_map.add(path, docid)
                 catalog.index_doc(docid, node)
+
 
 def unindex_profile(obj, event):
     """ Unindex profile (an IObjectWillBeRemovedEvent subscriber) """
@@ -330,6 +345,7 @@ def unindex_profile(obj, event):
             catalog.unindex_doc(path_docid)
             catalog.document_map.remove_docid(path_docid)
 
+
 def reindex_profile(obj, event):
     """ Reindex a single piece of profile (non-recursive); an
     IObjectModifed event subscriber """
@@ -339,6 +355,7 @@ def reindex_profile(obj, event):
         docid = catalog.document_map.docid_for_address(path)
         catalog.unindex_doc(docid)
         catalog.index_doc(docid, obj)
+
 
 def reindex_profile_after_group_change(event):
     """ Subscriber for group change events to reindex the profile
@@ -352,6 +369,7 @@ def reindex_profile_after_group_change(event):
             docid = catalog.document_map.docid_for_address(path)
             catalog.unindex_doc(docid)
             catalog.index_doc(docid, profile)
+
 
 def update_peopledirectory_indexes(event):
     """Updates the peopledir catalog schema.

@@ -107,10 +107,6 @@ class TestShowForumView(unittest.TestCase):
                                      ICatalogSearch)
         context = testing.DummyModel(title='abc')
         alsoProvides(context, IForumsFolder)
-        from karl.models.interfaces import IIntranets
-        intranets = testing.DummyModel(title='Intranets')
-        directlyProvides(intranets, IIntranets)
-        intranets['forums'] = context
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum.pt')

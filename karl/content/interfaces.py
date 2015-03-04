@@ -27,15 +27,13 @@ from karl.models.interfaces import IPages
 from karl.models.interfaces import IFiles
 from karl.models.interfaces import ICommunityContent
 
-# IIntranet and IIntranets are here only for b/w compat
-from karl.models.interfaces import IIntranet
-from karl.models.interfaces import IIntranets
 
 class IBlog(IFolder):
     """A folder containing blog entries"""
     taggedValue('name', 'Blog')
 
     title = Attribute(u'Title needed for backlinks')
+
 
 class IBlogEntry(ICommunityContent, IPosts):
     """A folder for a blog entry and its comments
@@ -48,14 +46,17 @@ class IBlogEntry(ICommunityContent, IPosts):
     taggedValue('search_option', True)
     taggedValue('icon', 'blog.png')
 
+
 class IEventContainer(IFolder):
     """A folder that supports storage of calendar events"""
+
 
 class ICalendar(IEventContainer):
     """A folder that holds a community's calendar events"""
     taggedValue('name', 'Calendar')
 
     title = Attribute(u'Title needed for backlinks')
+
 
 class ICalendarEvent(ICommunityContent, IOthers):
     """A folder for a calendar event"""
@@ -75,15 +76,18 @@ class ICalendarEvent(ICommunityContent, IOthers):
     creator = Attribute(u'User id of user that created this event.')
     calendar_category = Attribute("Name of the associated calendar category")
 
+
 class ICalendarLayer(Interface):
     taggedValue('default_name', '_default_layer_')
     title = Attribute(u'Layer title')
     color = Attribute(u'Layer color')
     paths = Attribute(u'Layer paths')
 
+
 class ICalendarCategory(Interface):
     taggedValue('default_name', '_default_category_')
     title = Attribute(u'Calendar title')
+
 
 class INewsItem(ICommunityContent, IFolder):
     """ A news item.
@@ -104,10 +108,12 @@ class IReferenceSection(IFolder, ICommunityContent, IPages):
     taggedValue('name', 'Reference Section')
     description = Attribute(u'Description')
 
+
 class IReferenceManual(IReferenceSection):
     """A reference manual in a community"""
     taggedValue('name', 'Reference Manual')
     description = Attribute(u'Description')
+
 
 class IReferenceManualHTML(Interface):
     """ Adapter interface for getting HTML for an item in a reference manual.
@@ -118,11 +124,13 @@ class IReferenceManualHTML(Interface):
         ``api`` may be used to generate URLs in rendered HTML.
         """
 
+
 class IWiki(IFolder):
     """A folder containing wiki pages"""
     taggedValue('name', 'Wiki')
 
     title = Attribute(u'Title needed for backlinks')
+
 
 class IWikiPage(IFolder, ICommunityContent, IPages):
     """A page using wiki markup
@@ -132,6 +140,7 @@ class IWikiPage(IFolder, ICommunityContent, IPages):
     taggedValue('icon', 'wiki.png')
     text = Attribute(u'Text -- includes wiki markup.')
 
+
 class IPage(ICommunityContent, IPages):
     """A page that isn't in a wiki
     """
@@ -139,10 +148,12 @@ class IPage(ICommunityContent, IPages):
     title = Attribute(u'Title')
     text = Attribute(u'Text')
 
+
 class ICommunityFolder(ICommunityContent, IFolder):
     """A folder in a community"""
     taggedValue('name', 'Folder')
     taggedValue('icon', 'folder.png')
+
 
 class ICommunityRootFolder(IFolder):
     """The root folder under the Files tab in a community"""
@@ -150,23 +161,16 @@ class ICommunityRootFolder(IFolder):
 
     title = Attribute(u'Title needed for backlinks')
 
-class IIntranetRootFolder(IFolder):
-    """The root folder under the Files tab in an intranet"""
-    taggedValue('name', 'Files')
-
-    title = Attribute(u'Title needed for backlinks')
-
-class IIntranetFolder(ICommunityContent, IFolder):
-    """ Marker for an IComunityFolder folder in an intranet"""
-    taggedValue('name', 'Folder')
 
 class INewsFolder(ICommunityContent, IFolder):
     """ Marker for a newsitem folder that needs special layout """
     taggedValue('name', 'Folder')
 
+
 class IEventsFolder(ICommunityContent, IFolder):
     """ Marker for an events folder that needs special layout"""
     taggedValue('name', 'Folder')
+
 
 class IReferencesFolder(ICommunityContent, IFolder):
     """ Marker for a folder containing only reference manuals """
@@ -184,6 +188,7 @@ class ICommunityFile(ICommunityContent, IFiles):
     filename = Attribute(u'Uploaded filename')
     size = Attribute(u'Size in bytes')
 
+
 class IImage(Interface):
     """ An image. """
 
@@ -200,16 +205,20 @@ class IImage(Interface):
         Returns instance of PIL.Image.
         """
 
+
 class IPhoto(IImage):
     """ A photograph. """
+
 
 class IForumsFolder(IFolder):
     """ A folder that contains forums """
     taggedValue('name', 'Forums')
 
+
 class IForum(IFolder, IPosts):
     """ A forum in a community """
     taggedValue('name', 'Forum')
+
 
 class IForumTopic(ICommunityContent, IPosts):
     """ A topic in a forum """
@@ -218,9 +227,6 @@ class IForumTopic(ICommunityContent, IPosts):
 
     text = Attribute(u"Form post content.")
 
-class IIntranetsTool(IFolder):
-    """ Stash data for intranet communities and register views """
-    taggedValue('name', 'Intranets Tool')
 
 class IOrdering(Interface):
     """ Persistent ordering of content in a folder """

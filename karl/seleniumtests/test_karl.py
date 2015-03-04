@@ -5,6 +5,7 @@ from selenium import webdriver
 
 base_url = "http://localhost:6543/pg/"
 
+
 class BlogFunctionalTests(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Remote(
@@ -41,11 +42,3 @@ class BlogFunctionalTests(unittest.TestCase):
         self.assertEqual(
             self._css("#menubar-1 span").text,
             "Add Community")
-
-    def test_office_folder_advanced_view(self):
-        # This is for LP 909119
-        url = urljoin(base_url,
-                      'offices/files/network-news/advanced.html')
-        self.driver.get(url)
-        el = self._css('.kscreentitle')
-        self.assertEqual(el.text, "Advanced Settings for Network News")

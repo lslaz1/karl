@@ -176,8 +176,6 @@ def show_forum_view(context, request):
         D['number_of_comments'] = len(topic['comments'])
         topics.append(D)
 
-    # In the intranet side, the backlinks should go to the show_forums
-    # view (the default)
     forums = context.__parent__
     backto = {
         'href': resource_url(forums, request),

@@ -84,17 +84,22 @@ class UserEvent(object):
         self.groups = groups
         self.old_groups = old_groups
 
+
 class UserAddedEvent(UserEvent):
     implements(IUserAdded)
+
 
 class UserRemovedEvent(UserEvent):
     implements(IUserRemoved)
 
+
 class UserAddedGroupEvent(UserEvent):
     implements(IUserAddedGroup)
 
+
 class UserRemovedGroupEvent(UserEvent):
     implements(IUserRemovedGroup)
+
 
 class KARLUsers(Users):
 
@@ -108,12 +113,12 @@ class KARLUsers(Users):
         notify(UserAddedEvent(self.site, id, login, groups))
 
     def remove(self, id):
-        info = self.byid[id] # XXX should be self.data
+        info = self.byid[id]  # XXX should be self.data
         super(KARLUsers, self).remove(id)
         notify(UserRemovedEvent(self.site, id, info['login'], info['groups']))
 
     def add_group(self, id, group):
-        info = self.byid[id] # XXX should be self.data
+        info = self.byid[id]  # XXX should be self.data
         before = set(info['groups'])
         super(KARLUsers, self).add_group(id, group)
         after = set(info['groups'])
@@ -122,7 +127,7 @@ class KARLUsers(Users):
                                        after, before))
 
     def remove_group(self, id, group):
-        info = self.byid[id] # should be self.data
+        info = self.byid[id]  # should be self.data
         before = set(info['groups'])
         super(KARLUsers, self).remove_group(id, group)
         after = set(info['groups'])
@@ -134,6 +139,7 @@ class KARLUsers(Users):
 def get_acl(object, default):
     return getattr(object, '__acl__', default)
 
+
 def get_title(object, default):
     title = getattr(object, 'title', '')
     if isinstance(title, basestring):
@@ -141,8 +147,10 @@ def get_title(object, default):
         title = title.lower()
     return title
 
+
 def get_name(object, default):
     return getattr(object, '__name__', default)
+
 
 def get_title_firstletter(object, default):
     title = get_title(object, default)
@@ -157,6 +165,7 @@ def get_title_firstletter(object, default):
             return default
     return default
 
+
 def get_interfaces(object, default):
     # we unwind all derived and immediate interfaces using spec.flattened()
     # (providedBy would just give us the immediate interfaces)
@@ -165,14 +174,17 @@ def get_interfaces(object, default):
     ifaces = list(spec.flattened())
     return ifaces
 
+
 def get_containment(object, defaults):
     ifaces = set()
     for ancestor in lineage(object):
         ifaces.update(get_interfaces(ancestor, ()))
     return ifaces
 
+
 def get_path(object, default):
     return resource_path(object)
+
 
 def _get_texts(object, default):
     if IPhoto.providedBy(object):
@@ -181,14 +193,15 @@ def _get_texts(object, default):
     adapter = queryAdapter(object, ITextIndexData)
     if adapter is None:
         if (not IContent.providedBy(object) or
-            ICalendarLayer.providedBy(object) or
-            ICalendarCategory.providedBy(object)):
+                ICalendarLayer.providedBy(object) or
+                ICalendarCategory.providedBy(object)):
             return default
         adapter = FlexibleTextIndexData(object)
     texts = adapter()
     if not texts:
         return default
     return texts
+
 
 def get_textrepr(object, default):
     """ Used for standard repoze.catalog text index. """
@@ -205,11 +218,12 @@ def get_textrepr(object, default):
 
 try:
     from repoze.pgtextindex.interfaces import IWeightedText
-except ImportError: #pragma NO COVERAGE
+except ImportError:  # pragma NO COVERAGE
     WeightedText = None
-else: #pragma NO COVERAGE
+else:  # pragma NO COVERAGE
     class WeightedText(unicode):
         implements(IWeightedText)
+
 
 def get_object_tags(obj):
     path = resource_path(obj)
@@ -217,6 +231,7 @@ def get_object_tags(obj):
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(obj)
     return [tag.name for tag in tags.getTagObjects(items=(docid,))]
+
 
 def is_created_by_staff(obj):
     creator = getattr(obj, 'creator', None)
@@ -226,6 +241,7 @@ def is_created_by_staff(obj):
     return users.member_of_group(creator, 'group.KarlStaff')
 
 _surrogates = re.compile(u'[\uD800-\uDFFF]')
+
 
 def get_weighted_textrepr(obj, default):
     """ Used for repoze.pgtextindex. """
@@ -278,42 +294,42 @@ def get_weighted_textrepr(obj, default):
             weighted.marker.append(marker)
             break
 
-    # Add the Intranet marker to object if it is in a predefined path
-    path = resource_path(obj)
-    registry = get_current_registry()
-    for intranet in registry.settings.get('intranet_search_paths', ()):
-        if path.startswith(intranet):
-            weighted.marker.append('Intranet')
-            break
-
     return weighted
+
 
 def _get_date_or_datetime(object, attr, default):
     d = getattr(object, attr, None)
     if (isinstance(d, datetime.datetime) or
-        isinstance(d, datetime.date)):
+            isinstance(d, datetime.date)):
         return coarse_datetime_repr(d)
     return default
+
 
 def get_creation_date(object, default):
     return _get_date_or_datetime(object, 'created', default)
 
+
 def get_modified_date(object, default):
     return _get_date_or_datetime(object, 'modified', default)
 
+
 def get_content_modified_date(object, default):
     return _get_date_or_datetime(object, 'content_modified', default)
+
 
 def get_start_date(object, default):
     # For monthly browsing of calendar events
     return _get_date_or_datetime(object, 'startDate', default)
 
+
 def get_end_date(object, default):
     # For monthly browsing of calendar events
     return _get_date_or_datetime(object, 'endDate', default)
 
+
 def get_publication_date(object, default):
     return _get_date_or_datetime(object, 'publication_date', default)
+
 
 def get_mimetype(object, default):
     mimetype = getattr(object, 'mimetype', None)
@@ -321,11 +337,13 @@ def get_mimetype(object, default):
         return default
     return mimetype
 
+
 def get_creator(object, default):
     creator = getattr(object, 'creator', None)
     if creator is None:
         return default
     return creator
+
 
 def get_modified_by(object, default):
     userid = getattr(object, 'modified_by', None)
@@ -333,11 +351,13 @@ def get_modified_by(object, default):
         return default
     return userid
 
+
 def get_email(object, default):
     email = getattr(object, 'email', None)
     if email is None:
         return default
     return email.lower()
+
 
 def get_allowed_to_view(object, default):
     principals = principals_allowed_by_permission(object, 'view')
@@ -345,24 +365,28 @@ def get_allowed_to_view(object, default):
         # An empty value tells the catalog to match anything, whereas when
         # there are no principals with permission to view we want for there
         # to be no matches.
-        principals = ['NO ONE no way NO HOW',]
+        principals = ['NO ONE no way NO HOW']
     return principals
+
 
 def get_lastfirst(object, default):
     if not IProfile.providedBy(object):
         return default
     return ('%s, %s' % (object.lastname, object.firstname)).lower()
 
+
 def get_member_name(object, default):
     if not IProfile.providedBy(object):
         return default
     return ('%s %s' % (object.firstname, object.lastname)).lower()
+
 
 def get_virtual(object, default):
     adapter = queryAdapter(object, IVirtualData)
     if adapter is not None:
         return adapter()
     return default
+
 
 class RepozitoryEngineParams(object):
     @property
@@ -428,13 +452,13 @@ class Site(Folder):
         """
         indexes = {
             'name': CatalogFieldIndex(get_name),
-            'title': CatalogFieldIndex(get_title), # used as sort index
+            'title': CatalogFieldIndex(get_title),  # used as sort index
             'titlestartswith': CatalogFieldIndex(get_title_firstletter),
             'interfaces': CatalogKeywordIndex(get_interfaces),
             'containment': CatalogKeywordIndex(get_containment),
             'texts': CatalogTextIndex(get_textrepr),
             'path': CatalogPathIndex2(get_path, attr_discriminator=get_acl),
-            'allowed':CatalogKeywordIndex(get_allowed_to_view),
+            'allowed': CatalogKeywordIndex(get_allowed_to_view),
             'creation_date': GranularIndex(get_creation_date),
             'modified_date': GranularIndex(get_modified_date),
             'content_modified': GranularIndex(get_content_modified_date),
@@ -448,7 +472,7 @@ class Site(Folder):
             'tags': TagIndex(self),
             'lastfirst': CatalogFieldIndex(get_lastfirst),
             'member_name': CatalogTextIndex(get_member_name),
-            'virtual':CatalogFieldIndex(get_virtual),
+            'virtual': CatalogFieldIndex(get_virtual),
         }
 
         for name, utility in getUtilitiesFor(IIndexFactory):

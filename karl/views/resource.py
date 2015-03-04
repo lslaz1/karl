@@ -21,9 +21,9 @@ from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 
 from karl.utils import find_community
-from karl.utils import find_intranet
 from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
+
 
 def delete_resource_view(context, request, num_children=0):
 
@@ -34,7 +34,7 @@ def delete_resource_view(context, request, num_children=0):
     if confirm:
         location = resource_url(
             context.__parent__, request,
-            query=dict(status_message= 'Deleted %s' % context.title)
+            query=dict(status_message='Deleted %s' % context.title)
             )
         del context.__parent__[context.__name__]
         return HTTPFound(location=location)
@@ -42,14 +42,10 @@ def delete_resource_view(context, request, num_children=0):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout_name = 'generic'
-    if find_intranet(context):
-        layout_name = 'intranet'
-    elif find_community(context):
+    if find_community(context):
         layout_name = 'community'
     layout = layout_provider(layout_name)
 
     return {'api': api,
             'layout': layout,
-            'num_children': num_children,
-           }
-
+            'num_children': num_children}

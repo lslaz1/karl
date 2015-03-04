@@ -29,13 +29,6 @@
           </div>
         </div>
         <div class="generic-portlet"
-             tal:condition="api.offices_url and api.can_administer">
-          <h3>Offices</h3>
-          <div class="portlet-item">
-              <a href="${api.offices_url}">Update offices</a>
-          </div>
-        </div>
-        <div class="generic-portlet"
              tal:condition="api.can_administer">
           <h3>Announce</h3>
           <div class="portlet-item">

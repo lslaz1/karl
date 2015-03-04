@@ -44,25 +44,11 @@ class TestAdvancedFormController(unittest.TestCase):
             'weight': 2,
         })
 
-    def test_form_defaults_is_intranet_folder(self):
-        from karl.models.interfaces import IIntranets
-        from karl.content.interfaces import ICommunityFolder
-        context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
-        request = testing.DummyRequest()
-        form = self._make_one(context, request)
-        self.assertEqual(form.form_defaults(), {
-            'marker': '',
-            'keywords': [],
-            'weight': 0,
-        })
-
     def test_form_defaults_is_references_folder(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.interfaces import IReferencesFolder
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder, IReferencesFolder))
+            __provides__=(ICommunityFolder, IReferencesFolder))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_defaults(), {
@@ -72,11 +58,10 @@ class TestAdvancedFormController(unittest.TestCase):
         })
 
     def test_form_defaults_is_network_news(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.interfaces import INetworkNewsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder, INetworkNewsMarker))
+            __provides__=(ICommunityFolder, INetworkNewsMarker))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_defaults(), {
@@ -86,11 +71,10 @@ class TestAdvancedFormController(unittest.TestCase):
         })
 
     def test_form_defaults_is_network_events(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.views.interfaces import INetworkEventsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder, INetworkEventsMarker))
+            __provides__=(ICommunityFolder, INetworkEventsMarker))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_defaults(), {
@@ -110,23 +94,6 @@ class TestAdvancedFormController(unittest.TestCase):
             ('weight', weight_field),
         ])
 
-    def test_form_fields_is_intranet_folder(self):
-        from karl.models.interfaces import IIntranets
-        from karl.content.interfaces import ICommunityFolder
-        from karl.content.views.advanced import marker_field
-        from karl.content.views.advanced import keywords_field
-        from karl.content.views.advanced import weight_field
-
-        context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
-        request = testing.DummyRequest()
-        form = self._make_one(context, request)
-        self.assertEqual(form.form_fields(), [
-            ('marker', marker_field),
-            ('keywords', keywords_field),
-            ('weight', weight_field),
-        ])
-
     def test_form_widgets(self):
         from karl.content.views.advanced import keywords_widget
         from karl.content.views.advanced import weight_widget
@@ -134,22 +101,6 @@ class TestAdvancedFormController(unittest.TestCase):
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         self.assertEqual(form.form_widgets(None), {
-            'keywords': keywords_widget,
-            'weight': weight_widget,
-        })
-
-    def test_form_widgets_is_intranet_folder(self):
-        from karl.models.interfaces import IIntranets
-        from karl.content.interfaces import ICommunityFolder
-        from karl.content.views.advanced import marker_widget
-        from karl.content.views.advanced import keywords_widget
-        from karl.content.views.advanced import weight_widget
-        context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
-        request = testing.DummyRequest()
-        form = self._make_one(context, request)
-        self.assertEqual(form.form_widgets(None), {
-            'marker': marker_widget,
             'keywords': keywords_widget,
             'weight': weight_widget,
         })
@@ -202,13 +153,12 @@ class TestAdvancedFormController(unittest.TestCase):
             'http://example.com/?status_message=Advanced+settings+changed.')
 
     def test_handle_submit_no_marker(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.interfaces import IReferencesFolder
         from karl.content.views.interfaces import INetworkEventsMarker
         from karl.content.views.interfaces import INetworkNewsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
+            __provides__=(ICommunityFolder,))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({})
@@ -220,13 +170,12 @@ class TestAdvancedFormController(unittest.TestCase):
             'http://example.com/?status_message=Advanced+settings+changed.')
 
     def test_handle_submit_set_reference_manual_marker(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.interfaces import IReferencesFolder
         from karl.content.views.interfaces import INetworkEventsMarker
         from karl.content.views.interfaces import INetworkNewsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
+            __provides__=(ICommunityFolder,))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({'marker': 'reference_manual'})
@@ -238,13 +187,12 @@ class TestAdvancedFormController(unittest.TestCase):
             'http://example.com/?status_message=Advanced+settings+changed.')
 
     def test_handle_submit_set_network_events_marker(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.interfaces import IReferencesFolder
         from karl.content.views.interfaces import INetworkEventsMarker
         from karl.content.views.interfaces import INetworkNewsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
+            __provides__=(ICommunityFolder,))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({'marker': 'network_events'})
@@ -256,13 +204,12 @@ class TestAdvancedFormController(unittest.TestCase):
             'http://example.com/?status_message=Advanced+settings+changed.')
 
     def test_handle_submit_set_network_news_marker(self):
-        from karl.models.interfaces import IIntranets
         from karl.content.interfaces import ICommunityFolder
         from karl.content.interfaces import IReferencesFolder
         from karl.content.views.interfaces import INetworkEventsMarker
         from karl.content.views.interfaces import INetworkNewsMarker
         context = testing.DummyModel(
-            __provides__=(IIntranets, ICommunityFolder))
+            __provides__=(ICommunityFolder,))
         request = testing.DummyRequest()
         form = self._make_one(context, request)
         response = form.handle_submit({'marker': 'network_news'})

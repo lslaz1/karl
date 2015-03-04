@@ -9,6 +9,7 @@ from karl.models.interfaces import IToolFactory
 from repoze.lemonade.listitem import get_listitems
 from zope.interface import implements
 
+
 class TestPopulate(unittest.TestCase):
     """
     XXX Integration test.
@@ -88,6 +89,7 @@ class DummyToolFactory:
         self.context = context
         self.request = request
 
+
 class DummySecurityWorkflow:
     initial_state_set = False
 
@@ -96,6 +98,7 @@ class DummySecurityWorkflow:
 
     def setInitialState(self):
         self.initial_state_set = True
+
 
 class DummyConnection:
     def __init__(self, root, connections):
@@ -109,10 +112,12 @@ class DummyConnection:
     def add(self, obj):
         self.added.append(obj)
 
+
 class DummyDummy(dict):
     pass
 
-EXCLUDE_TOOLS = ['intranets',]
+EXCLUDE_TOOLS = []
+
 
 class DummyToolAddables(object):
     implements(IToolAddables)
@@ -126,4 +131,3 @@ class DummyToolAddables(object):
         """
         tools = get_listitems(IToolFactory)
         return [tool for tool in tools if tool['name'] not in EXCLUDE_TOOLS]
-

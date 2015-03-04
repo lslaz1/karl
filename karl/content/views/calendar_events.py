@@ -107,6 +107,7 @@ from karl.content.calendar.utils import is_all_day_event
 
 _NOW = None
 
+
 def _now():
     if _NOW is not None:
         return _NOW
@@ -114,6 +115,7 @@ def _now():
 
 
 KARL_CALENDAR_COOKIE = 'karl.calendar.cookie'
+
 
 def _get_calendar_cookies(context, request):
     now = _now()
@@ -150,9 +152,10 @@ def _get_calendar_cookies(context, request):
         # focus_datetime and now_datetime are provided,
         # because we have them already. Some functions use it.
         # But it will not be updated or written to the cookie.
-        focus_datetime = focus_datetime,
-        now_datetime = now,
+        focus_datetime=focus_datetime,
+        now_datetime=now,
     )
+
 
 def _set_calendar_cookies(response, selection):
     value = ','.join([
@@ -168,22 +171,22 @@ def _set_calendar_cookies(response, selection):
 def _default_dates_requested(context, request):
     try:
         starts = request.GET.get('starts', time.mktime(_now().timetuple()))
-        ends   = request.GET.get('ends',   int(starts) + 3600)
+        ends = request.GET.get('ends',   int(starts) + 3600)
 
         startDate = datetime.datetime.fromtimestamp(int(starts))
-        endDate   = datetime.datetime.fromtimestamp(int(ends))
+        endDate = datetime.datetime.fromtimestamp(int(ends))
     except ValueError:
         startDate = _now()
-        endDate   = startDate + datetime.timedelta(hours=1)
+        endDate = startDate + datetime.timedelta(hours=1)
     return startDate, endDate
 
 
-
 def _iterate_events_in_layer(layer, searcher, search_params,
-        docids_seen, docids_all, first_moment, last_moment, in_list_view=False):
+                             docids_seen, docids_all, first_moment,
+                             last_moment, in_list_view=False):
 
         _total, docids, resolver = searcher(
-            virtual={'query':layer.paths, 'operator':'or'},
+            virtual={'query': layer.paths, 'operator': 'or'},
             **search_params)
 
         for docid in docids:
@@ -243,14 +246,13 @@ def _iterate_events_in_layer(layer, searcher, search_params,
                         day_event._v_layer_title = layer.title
                         day_event._followup = followup
                         new_startdate += plusone
-                        new_startdate =  datetime.datetime.combine(
+                        new_startdate = datetime.datetime.combine(
                             new_startdate.date(), datetime.time())   # force to 0:00
                         followup = True
                         yield day_event
 
                 else:
                     yield event
-
 
 
 def _get_catalog_events(calendar, request,
@@ -287,13 +289,16 @@ def _get_catalog_events(calendar, request,
             this_calendar_layer = layer
             continue
         events.extend(_iterate_events_in_layer(layer, searcher, search_params,
-            docids_seen, docids_all, first_moment, last_moment, in_list_view=in_list_view))
+                                               docids_seen, docids_all, first_moment,
+                                               last_moment, in_list_view=in_list_view))
     # Default layer is always processed last
     # because we do not want to add any event that has already
     # been added in any other layer in the previous cycle.
     if this_calendar_layer is not None:
-        events.extend(_iterate_events_in_layer(this_calendar_layer, searcher, search_params,
-            docids_all, set(), first_moment, last_moment, in_list_view=in_list_view))
+        events.extend(_iterate_events_in_layer(this_calendar_layer, searcher,
+                                               search_params, docids_all, set(),
+                                               first_moment, last_moment,
+                                               in_list_view=in_list_view))
 
     # The result set needs to be sorted by start_date.
     # XXX maybe we can do this directly from the catalog?
@@ -301,19 +306,21 @@ def _get_catalog_events(calendar, request,
 
     return events
 
+
 def _paginate_catalog_events(calendar, request,
                              first_moment, last_moment, layer_name=None,
                              per_page=20, page=1):
 
     all_events = _get_catalog_events(calendar, request,
-                                     first_moment, last_moment, layer_name, in_list_view=True)
+                                     first_moment, last_moment, layer_name,
+                                     in_list_view=True)
 
     offset = (page - 1) * per_page
-    limit  = per_page + 1
+    limit = per_page + 1
 
     events = []
     i = 0
-    prev_start_date = datetime.datetime(1970, 1, 1)   # does not match with any start date.
+    prev_start_date = datetime.datetime(1970, 1, 1)   # does not match with any start date
     for event in all_events:
         if i >= offset:
             # Save the previous event's start date. This will be used in list view
@@ -327,13 +334,15 @@ def _paginate_catalog_events(calendar, request,
         i += 1
 
     has_more = len(events) > per_page
-    events   = events[:per_page]
+    events = events[:per_page]
 
     return events, has_more
+
 
 def _calendar_filter(context, request):
     filt = request.params.get('filter', None)
     return filt
+
 
 def _calendar_setup_url(context, request):
     if has_permission('moderate', context, request):
@@ -341,6 +350,7 @@ def _calendar_setup_url(context, request):
     else:
         setup_url = None
     return setup_url
+
 
 def _make_calendar_presenter_url_func(context, request):
     def url_for(*args, **kargs):
@@ -350,26 +360,15 @@ def _make_calendar_presenter_url_func(context, request):
 
 
 def _select_calendar_layout(context, request):
-    # Check if we are in /offices/calendar.
-    # If yes, we will need to put a css marker class "karl-calendar-wide"
-    # on the outside of the template, and we will also use the generic
-    # layout instead of the community layout.
     # XXX TODO we will also restrict permissions.
-    context_path = resource_path(context)
-    wide_calendar = context_path.startswith('/offices/calendar')
-    if wide_calendar:
-        calendar_format_class = 'karl-calendar-wide'
-        calendar_layout_template = 'generic_layout'
-        section_style = 'none'
-    else:
-        calendar_format_class = 'karl-calendar-narrow'
-        calendar_layout_template = 'community_layout'
-        section_style = 'full'
+    calendar_format_class = 'karl-calendar-narrow'
+    calendar_layout_template = 'community_layout'
+    section_style = 'full'
     return dict(
-        wide_calendar = wide_calendar,
-        calendar_format_class = calendar_format_class,
-        calendar_layout_template = calendar_layout_template,
-        section_style = section_style
+        wide_calendar=False,
+        calendar_format_class=calendar_format_class,
+        calendar_layout_template=calendar_layout_template,
+        section_style=section_style
     )
 
 
@@ -384,9 +383,9 @@ def _get_mailto_create_event_href(context, request):
         return
 
     mailto_info = dict(
-        subject = 'Global Staff Calendar Event Request',
-        to = to_address,
-        body = """\
+        subject='Global Staff Calendar Event Request',
+        to=to_address,
+        body="""\
 Use the form below to submit your Global Staff Calendar event request. Please
 include as much information as possible. Fields marked with the asterisk (*)
 are required.
@@ -414,11 +413,10 @@ Contact Email:
 
 
 def _show_calendar_view(context, request, make_presenter, selection):
-    # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
     focus_datetime = selection['focus_datetime']
-    now_datetime   = selection['now_datetime']
+    now_datetime = selection['now_datetime']
 
     # make the calendar presenter for this view
     url_for = _make_calendar_presenter_url_func(context, request)
@@ -436,7 +434,7 @@ def _show_calendar_view(context, request, make_presenter, selection):
                                  in_list_view=False)
     calendar.paint_events(events)
 
-    layers    = _get_calendar_layers(context)
+    layers = _get_calendar_layers(context)
     setup_url = _calendar_setup_url(context, request)
 
     # render
@@ -468,21 +466,22 @@ def _show_calendar_view(context, request, make_presenter, selection):
     response = render_to_response(
         calendar.template_filename,
         dict(
-            calendar_format_class = calendar_layout['calendar_format_class'],
-            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            calendar_format_class=calendar_layout['calendar_format_class'],
+            calendar_layout_template=calendar_layout['calendar_layout_template'],
             api=api,
             setup_url=setup_url,
             calendar=calendar,
             calendar_object=context,
-            selected_layer = selected_layer, # is the _name_ of the selected layer.
-            layers = layers,
-            quote = quote,
-            may_create = may_create,
+            selected_layer=selected_layer,  # is the _name_ of the selected layer.
+            layers=layers,
+            quote=quote,
+            may_create=may_create,
             mailto_create_event_href=mailto_create_event_href,
             ),
         request=request,
         )
     return response
+
 
 def show_month_view(context, request):
     selection = _get_calendar_cookies(context, request)
@@ -492,6 +491,7 @@ def show_month_view(context, request):
     _set_calendar_cookies(response, selection)
     return response
 
+
 def show_week_view(context, request):
     selection = _get_calendar_cookies(context, request)
     selection['viewtype'] = 'calendar'
@@ -499,6 +499,7 @@ def show_week_view(context, request):
     response = _show_calendar_view(context, request, WeekViewPresenter, selection)
     _set_calendar_cookies(response, selection)
     return response
+
 
 def show_day_view(context, request):
     selection = _get_calendar_cookies(context, request)
@@ -508,16 +509,16 @@ def show_day_view(context, request):
     _set_calendar_cookies(response, selection)
     return response
 
+
 def show_list_view(context, request):
     selection = _get_calendar_cookies(context, request)
     selection['viewtype'] = 'list'
-    # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
     focus_datetime = selection['focus_datetime']
-    now_datetime   = selection['now_datetime']
+    now_datetime = selection['now_datetime']
 
-    page     = int(request.GET.get('page', 1))
+    page = int(request.GET.get('page', 1))
     # LP #1202782, simple way to eliminate pagination
     per_page = int(request.GET.get('per_page', 500))
 
@@ -543,21 +544,21 @@ def show_list_view(context, request):
         'week': WeekEventHorizon,
         'month': MonthEventHorizon,
         }[selection['term']](focus_datetime,
-                                 now_datetime,
-                                 url_for)
+                             now_datetime,
+                             url_for)
 
     # find events and paint them on the calendar
     selected_layer = _calendar_filter(context, request)
 
     events, has_more = _paginate_catalog_events(context, request,
-                                           first_moment=event_horizon.first_moment,
-                                           last_moment=event_horizon.last_moment,
-                                           layer_name=selected_layer,
-                                           per_page=per_page,
-                                           page=page)
+                                                first_moment=event_horizon.first_moment,
+                                                last_moment=event_horizon.last_moment,
+                                                layer_name=selected_layer,
+                                                per_page=per_page,
+                                                page=page)
     calendar.paint_paginated_events(events, has_more, per_page, page)
 
-    layers    = _get_calendar_layers(context)
+    layers = _get_calendar_layers(context)
     setup_url = _calendar_setup_url(context, request)
 
     # render
@@ -571,12 +572,6 @@ def show_list_view(context, request):
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
-    for layer in layers:
-        if layer.__name__ == selected_layer:
-            selected_layer_title = layer.title
-            break
-    else:
-        selected_layer_title = 'All layers'
 
     community = find_community(context)
     community_adapter = getMultiAdapter((community, request), ICommunityInfo)
@@ -595,23 +590,22 @@ def show_list_view(context, request):
     response = render_to_response(
         calendar.template_filename,
         dict(
-            calendar_format_class = calendar_layout['calendar_format_class'],
-            calendar_layout_template = calendar_layout['calendar_layout_template'],
+            calendar_format_class=calendar_layout['calendar_format_class'],
+            calendar_layout_template=calendar_layout['calendar_layout_template'],
             api=api,
             setup_url=setup_url,
             calendar=calendar,
             calendar_object=context,
-            selected_layer = selected_layer,
-            layers = layers,
-            quote = quote,
-            may_create = may_create,
-            mailto_create_event_href = mailto_create_event_href,
+            selected_layer=selected_layer,
+            layers=layers,
+            quote=quote,
+            may_create=may_create,
+            mailto_create_event_href=mailto_create_event_href,
             ),
         request=request,
     )
     _set_calendar_cookies(response, selection)
     return response
-
 
 
 def show_view(context, request):
@@ -636,14 +630,15 @@ def show_view(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=resource_url(context, request, 'add_calendarevent.html'))
+        location=resource_url(context, request, 'add_calendarevent.html'))
 
 
 def _get_calendar_categories(context):
-    return [ x for x in context.values() if ICalendarCategory.providedBy(x) ]
+    return [x for x in context.values() if ICalendarCategory.providedBy(x)]
+
 
 def _get_calendar_layers(context):
-    layers = [ x for x in context.values() if ICalendarLayer.providedBy(x) ]
+    layers = [x for x in context.values() if ICalendarLayer.providedBy(x)]
     for layer in layers:
         layer._v_categories = []
         for path in layer.paths:
@@ -657,6 +652,7 @@ def _get_calendar_layers(context):
                 continue
     return layers
 
+
 def _get_all_calendar_categories(context, request):
     calendar_categories = []
 
@@ -664,7 +660,7 @@ def _get_all_calendar_categories(context, request):
     if searcher is not None:
         _total, docids, resolver = searcher(
             allowed={'query': effective_principals(request), 'operator': 'or'},
-            interfaces={'query':[ICalendarCategory],'operator':'or'},
+            interfaces={'query': [ICalendarCategory], 'operator': 'or'},
             reverse=False,
             )
 
@@ -673,8 +669,8 @@ def _get_all_calendar_categories(context, request):
             path = resource_path(ob)
             folder = path.rsplit('/', 1)[0]
             title = _calendar_category_title(ob)
-            calendar_categories.append({'title':title, 'path':path,
-                                        'folder':folder})
+            calendar_categories.append({'title': title, 'path': path,
+                                        'folder': folder})
 
     calendar_categories.sort(key=lambda x: (x['folder'], x['title']))
     return calendar_categories
@@ -795,8 +791,7 @@ class CalendarEventFormControllerBase(object):
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
         api.karl_client_data['text'] = dict(
-                enable_imagedrawer_upload = True,
-                )
+            enable_imagedrawer_upload=True)
         locale = get_user_date_format(context, request)
         default_locale = 'en-US'
         js_date_format = consts.js_date_formats.get(locale, default_locale)
@@ -845,9 +840,8 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
     def form_defaults(self):
         start_date, end_date = _default_dates_requested(self.context,
                                                         self.request)
-        defaults ={'start_date': start_date,
-                   'end_date': end_date,
-                   }
+        defaults = {'start_date': start_date,
+                    'end_date': end_date}
         if self.show_sendalert:
             defaults['sendalert'] = sendalert_default(self.context,
                                                       self.request)
@@ -938,7 +932,7 @@ def show_calendarevent_view(context, request):
 
     api = TemplateAPI(context, request, page_title)
 
-    container  = context.__parent__
+    container = context.__parent__
     backto = {
         'href': resource_url(container, request),
         'title': container.title,
@@ -975,7 +969,7 @@ def show_calendarevent_view(context, request):
         dict(api=api,
              actions=actions,
              head_data=convert_to_script(dict(
-                 tagbox = get_tags_client_data(context, request),
+                 tagbox=get_tags_client_data(context, request),
                  )),
              title=title,
              text=context.text,
@@ -1038,8 +1032,7 @@ def show_calendarevent_ics_view(context, request):
     calendar.add_component(event)
     return Response(body=calendar.as_string(),
                     content_type='text/calendar',
-                    charset='UTF8',
-                   )
+                    charset='UTF8')
 
 
 class EditCalendarEventFormController(CalendarEventFormControllerBase):
@@ -1064,8 +1057,7 @@ class EditCalendarEventFormController(CalendarEventFormControllerBase):
             contact_name=context.contact_name,
             contact_email=context.contact_email,
             category=context.calendar_category,
-            security_state = security_state,
-            )
+            security_state=security_state)
 
         if defaults['contact_email'] is None:
             defaults['contact_email'] = u''
@@ -1146,6 +1138,7 @@ def _calendar_category_title(ob):
 _COLORS = ("red", "pink", "purple", "blue", "aqua", "green", "mustard",
            "orange", "silver", "olive")
 
+
 def calendar_setup_view(context, request):
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     categories = filter(lambda x: x.__name__ != default_category_name,
@@ -1168,13 +1161,13 @@ def calendar_setup_view(context, request):
              layers_url=resource_url(context, request, 'layers.html'),
              formfields=api.formfields,
              fielderrors=fielderrors,
-             fielderrors_target = fielderrors_target,
+             fielderrors_target=fielderrors_target,
              api=api,
-             editable_categories = categories,
-             editable_layers = layers,
-             all_categories = _get_all_calendar_categories(context, request),
-             colors = _COLORS),
-        request = request,
+             editable_categories=categories,
+             editable_layers=layers,
+             all_categories=_get_all_calendar_categories(context, request),
+             colors=_COLORS),
+        request=request,
         )
 
 
@@ -1183,6 +1176,7 @@ class Invalid(Exception):
         Exception.__init__(self, msg)
         self.msg = msg
         self.error_dict = error_dict
+
 
 def convert_to_unicode(value, field_name, encoding='utf-8'):
     """Stolen from formencode.validators.UnicodeString."""
@@ -1203,6 +1197,7 @@ def convert_to_unicode(value, field_name, encoding='utf-8'):
         msg = 'Invalid type'
         raise Invalid(msg, error_dict={field_name: msg})
 
+
 def calendar_setup_categories_view(context, request):
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     default_category = context[default_category_name]
@@ -1210,7 +1205,7 @@ def calendar_setup_categories_view(context, request):
     categories = _get_calendar_categories(context)
     editable_categories = filter(lambda x: x.__name__ != default_category_name,
                                  categories)
-    category_names = [ x.__name__ for x in categories ]
+    category_names = [x.__name__ for x in categories]
 
     default_layer_name = ICalendarLayer.getTaggedValue('default_name')
     default_layer = context[default_layer_name]
@@ -1234,11 +1229,11 @@ def calendar_setup_categories_view(context, request):
             # category (put them in the default category)
             query = dict(
                 interfaces=[ICalendarEvent],
-                virtual = categ_path,
+                virtual=categ_path,
                 )
             searcher = ICatalogSearch(context)
             _total, docids, resolver = searcher(**query)
-            for event in [ resolver(x) for x in docids ]:
+            for event in [resolver(x) for x in docids]:
                 event.calendar_category = default_category_path
                 objectEventNotify(ObjectModifiedEvent(event))
 
@@ -1248,8 +1243,8 @@ def calendar_setup_categories_view(context, request):
         else:
             message = 'Category is invalid'
 
-        location = resource_url(context, request, 'categories.html',
-                             query={'status_message': message})
+        location = resource_url(
+            context, request, 'categories.html', query={'status_message': message})
         return HTTPFound(location=location)
 
     fielderrors = {}
@@ -1262,14 +1257,14 @@ def calendar_setup_categories_view(context, request):
             location = resource_url(
                 context,
                 request, 'categories.html',
-                query={'status_message':'Cannot edit default category'})
+                query={'status_message': 'Cannot edit default category'})
             return HTTPFound(location=location)
 
-        if not category_name or not category_name in category_names:
+        if not category_name or category_name not in category_names:
             location = resource_url(
                 context,
                 request, 'categories.html',
-                query={'status_message':'Could not find category to edit'})
+                query={'status_message': 'Could not find category to edit'})
             return HTTPFound(location=location)
 
         category = context[category_name]
@@ -1281,7 +1276,7 @@ def calendar_setup_categories_view(context, request):
                 raise Invalid(msg, error_dict={'category_title': msg})
             title = convert_to_unicode(title, 'category_title')
 
-            if title in [ x.title for x in categories]:
+            if title in [x.title for x in categories]:
                 msg = "Name is already used"
                 raise Invalid(msg=msg, error_dict={'category_title': msg})
 
@@ -1290,7 +1285,7 @@ def calendar_setup_categories_view(context, request):
                 location = resource_url(
                     context, request,
                     'categories.html',
-                    query={'status_message':'Calendar category updated'})
+                    query={'status_message': 'Calendar category updated'})
                 return HTTPFound(location=location)
 
         except Invalid, e:
@@ -1306,7 +1301,7 @@ def calendar_setup_categories_view(context, request):
             name = generate_name(context)
             title = convert_to_unicode(title, 'category_title')
 
-            if title in [ x.title for x in categories ]:
+            if title in [x.title for x in categories]:
                 msg = "Name is already used"
                 raise Invalid(msg=msg, error_dict={'category_title': msg})
 
@@ -1318,7 +1313,7 @@ def calendar_setup_categories_view(context, request):
             location = resource_url(
                 context, request,
                 'categories.html',
-                query={'status_message':'Calendar category added'})
+                query={'status_message': 'Calendar category added'})
             return HTTPFound(location=location)
 
         except Invalid, e:
@@ -1335,21 +1330,22 @@ def calendar_setup_categories_view(context, request):
              categories_url=resource_url(context, request, 'categories.html'),
              layers_url=resource_url(context, request, 'layers.html'),
              fielderrors=fielderrors,
-             fielderrors_target = fielderrors_target,
+             fielderrors_target=fielderrors_target,
              api=api,
-             editable_categories = editable_categories,
-             editable_layers = editable_layers,
-             all_categories = _get_all_calendar_categories(context, request),
-             colors = _COLORS),
-        request = request,
+             editable_categories=editable_categories,
+             editable_layers=editable_layers,
+             all_categories=_get_all_calendar_categories(context, request),
+             colors=_COLORS),
+        request=request,
         )
+
 
 def calendar_setup_layers_view(context, request):
     default_layer_name = ICalendarLayer.getTaggedValue('default_name')
     layers = filter(lambda x: x.__name__ != default_layer_name,
                     _get_calendar_layers(context))
-    layer_titles = [ x.title for x in layers]
-    layer_names = [ x.__name__ for x in layers ]
+    layer_titles = [x.title for x in layers]
+    layer_names = [x.__name__ for x in layers]
 
     default_category_name = ICalendarCategory.getTaggedValue('default_name')
     categories = filter(lambda x: x.__name__ != default_category_name,
@@ -1366,8 +1362,8 @@ def calendar_setup_layers_view(context, request):
         else:
             message = 'Layer is invalid'
 
-        location = resource_url(context, request, 'layers.html',
-                             query={'status_message': message})
+        location = resource_url(
+            context, request, 'layers.html', query={'status_message': message})
         return HTTPFound(location=location)
 
     fielderrors_target = None
@@ -1404,7 +1400,7 @@ def calendar_setup_layers_view(context, request):
             location = resource_url(
                 context, request,
                 'layers.html',
-                query={'status_message':'Calendar layer added'})
+                query={'status_message': 'Calendar layer added'})
             return HTTPFound(location=location)
 
         except Invalid, e:
@@ -1418,14 +1414,14 @@ def calendar_setup_layers_view(context, request):
             location = resource_url(
                 context,
                 request, 'layers.html',
-                query={'status_message':'Cannot edit default layer'})
+                query={'status_message': 'Cannot edit default layer'})
             return HTTPFound(location=location)
 
-        if not layer_name or not layer_name in layer_names:
+        if not layer_name or layer_name not in layer_names:
             location = resource_url(
                 context,
                 request, 'layers.html',
-                query={'status_message':'Could not find layer to edit'})
+                query={'status_message': 'Could not find layer to edit'})
             return HTTPFound(location=location)
 
         layer = context[layer_name]
@@ -1460,7 +1456,7 @@ def calendar_setup_layers_view(context, request):
                 location = resource_url(
                     context, request,
                     'layers.html',
-                    query={'status_message':'Calendar layer updated'})
+                    query={'status_message': 'Calendar layer updated'})
                 return HTTPFound(location=location)
 
         except Invalid, e:
@@ -1479,13 +1475,14 @@ def calendar_setup_layers_view(context, request):
              formfields=api.formfields,
              fielderrors=fielderrors,
              fielderrors_target=fielderrors_target,
-             editable_categories = categories,
-             editable_layers = layers,
-             all_categories = _get_all_calendar_categories(context, request),
-             colors = _COLORS,
+             editable_categories=categories,
+             editable_layers=layers,
+             all_categories=_get_all_calendar_categories(context, request),
+             colors=_COLORS,
              api=api),
         request=request,
         )
+
 
 def generate_name(context):
     while True:
@@ -1501,7 +1498,7 @@ def _get_calendar_notes(context):
     order = getattr(context, 'note_order', None)
     if order is not None:
         return [notes[x] for x in order]
-    return reversed(notes.values()) # btree w/ datestrings as keys
+    return reversed(notes.values())  # btree w/ datestrings as keys
 
 
 class CalendarSidebar(object):
@@ -1520,10 +1517,10 @@ class CalendarSidebar(object):
                  notes_url=resource_url(self.context, self.request,
                                         "notes.html"),
                  notes=notes,
-                 calendar_url=resource_url(self.context, self.request),
-                ),
+                 calendar_url=resource_url(self.context, self.request)),
             request=self.request
             )
+
 
 def calendar_notes_view(context, request):
     page_title = 'Calendar Notes'
@@ -1571,7 +1568,7 @@ def calendar_notes_view(context, request):
         note_id = request.POST['form.remove']
         try:
             del c_notes[note_id]
-        except KeyError: # don't inform the error, just re-remnder
+        except KeyError:  # don't inform the error, just re-remnder
             pass
         else:
             order = getattr(context, 'note_order', None)
@@ -1590,7 +1587,7 @@ def calendar_notes_view(context, request):
         else:
             try:
                 del context.note_order
-            except AttributeError: #pragma NO COVER
+            except AttributeError:  # noqa
                 pass
 
     return render_to_response(

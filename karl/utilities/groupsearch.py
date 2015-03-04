@@ -143,27 +143,6 @@ class GroupSearch:
             criteria['path'] = resource_path(self.context)
         return criteria
 
-
-class IntranetGroupSearch(GroupSearch):
-    implements(IGroupSearch, IGroupSearchFactory)
-
-    advanced_search = False
-    livesearch = True
-    livesearch_all = False
-    live_to_advanced = ''
-    icon = 'blue-document.png'
-    interfaces = ()
-    containment = None
-
-    def __init__(self, context, request, term):
-        self.context = context
-        self.request = request
-        self.term = term
-        self.criteria = self._makeCriteria()
-        if term:
-            self.criteria['texts'].marker = 'Intranet'
-
-
 try:
     from repoze.pgtextindex.interfaces import IWeightedQuery
 except ImportError: # pragma NO COVERAGE

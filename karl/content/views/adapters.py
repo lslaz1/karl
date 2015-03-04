@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 from __future__ import with_statement
 
-import datetime
 import math
 
 from email import Encoders
@@ -25,34 +24,21 @@ from repoze.postoffice.message import MIMEMultipart
 from email.mime.multipart import MIMEBase
 from email.mime.text import MIMEText
 
-from lxml.html import fragment_fromstring
-from lxml.html import tostring
-from lxml.etree import SubElement
-
 from lxml import etree
 from lxml.html import document_fromstring
-
-from zope.component import getAdapter
 
 from zope.component import getUtility
 from zope.interface import implements
 
 from pyramid.renderers import get_renderer
-from pyramid.renderers import render
-from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.url import resource_url
 
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
-from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunity
-from karl.models.interfaces import IIntranet
-from karl.models.interfaces import IIntranets
-from karl.content.interfaces import IForum
 from karl.content.interfaces import IForumTopic
-from karl.content.interfaces import INewsItem
 from karl.content.interfaces import IReferencesFolder
 from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
@@ -67,10 +53,8 @@ from karl.utilities.interfaces import IAlert
 from karl.utilities.interfaces import IKarlDates
 from karl.utilities.interfaces import IMimeInfo
 from karl.views.interfaces import IFolderAddables
-from karl.views.interfaces import IIntranetPortlet
 from karl.views.interfaces import ILayoutProvider
 
-from karl.utils import coarse_datetime_repr
 from karl.utils import docid_to_hex
 from karl.utils import get_setting
 from karl.utils import find_community
@@ -80,7 +64,8 @@ from karl.utils import find_profiles
 from karl.views import site
 site = site      # shut up pylint
 
-MAX_ATTACHMENT_SIZE = (1<<20) * 5  # 5 megabytes
+MAX_ATTACHMENT_SIZE = (1 << 20) * 5  # 5 megabytes
+
 
 class FileInfo(object):
     """ Adapter for showing file entry data in views """
@@ -129,8 +114,7 @@ class FileInfo(object):
         if self._modified_by_url is None:
             profile_name = self.context.modified_by or self.context.creator
             profile = self._find_profile(profile_name)
-            self._modified_by_url = profile and resource_url(profile,
-                                                          self.request)
+            self._modified_by_url = profile and resource_url(profile, self.request)
         return self._modified_by_url
 
     @property
@@ -144,11 +128,11 @@ class FileInfo(object):
         if self._mimeinfo is None:
             mimetype = getattr(self.context, 'mimetype', None)
             if mimetype is None:
-                self._mimeinfo = {'small_icon_name':'files_folder_small.png',
-                                  'title':'Folder'}
+                self._mimeinfo = {'small_icon_name': 'files_folder_small.png',
+                                  'title': 'Folder'}
             else:
                 mimeutil = getUtility(IMimeInfo)
-                self._mimeinfo =  mimeutil(mimetype)
+                self._mimeinfo = mimeutil(mimetype)
             self._mimeinfo['small_icon_url'] = self.request.static_url(
                 'karl.views:static/images/%s' %
                 self._mimeinfo['small_icon_name'])
@@ -157,7 +141,7 @@ class FileInfo(object):
     @property
     def size(self):
         if self._size is None:
-            powers = ["bytes", "KB", "MB", "GB", "TB"] # Future proof ;)
+            powers = ["bytes", "KB", "MB", "GB", "TB"]  # Future proof ;)
             size = self.context.size
             if size > 0:
                 power = int(math.log(size, 1000))
@@ -174,6 +158,7 @@ class FileInfo(object):
 
         return self._size
 
+
 class CalendarEventFileInfo(FileInfo):
     @property
     def mimeinfo(self):
@@ -181,6 +166,7 @@ class CalendarEventFileInfo(FileInfo):
             "small_icon_name": "files_event_small.png",
             "title": "Event"
         }
+
 
 class PageFileInfo(FileInfo):
     @property
@@ -190,6 +176,7 @@ class PageFileInfo(FileInfo):
             "title": "Page"
         }
 
+
 class ReferenceManualFileInfo(FileInfo):
     @property
     def mimeinfo(self):
@@ -197,6 +184,7 @@ class ReferenceManualFileInfo(FileInfo):
             "small_icon_name": "files_manual_small.png",
             "title": "Reference Manual"
         }
+
 
 class ReferenceSectionFileInfo(FileInfo):
     @property
@@ -270,7 +258,7 @@ class Alert(object):
 
     @property
     def mto(self):
-        return [self.profile.email,]
+        return [self.profile.email]
 
     @property
     def attachments(self):
@@ -310,6 +298,7 @@ class Alert(object):
 
         return attachments, attachment_links, attachment_hrefs
 
+
 class BlogAlert(Alert):
     """Adapter for generating an email from a blog entry alert.
     """
@@ -333,8 +322,7 @@ class BlogAlert(Alert):
             return self._mfrom
 
         system_email_domain = get_setting(self.context, "system_email_domain")
-        mfrom = "%s@%s" % (self._community.__name__,
-                                   system_email_domain)
+        mfrom = "%s@%s" % (self._community.__name__, system_email_domain)
         self._mfrom = mfrom
         return mfrom
 
@@ -355,9 +343,9 @@ class BlogAlert(Alert):
         system_email_domain = get_setting(self.context, "system_email_domain")
 
         reply_to = '"%s" <%s+blog-%s@%s>' % (community.title,
-                                           community.__name__,
-                                           docid_to_hex(blogentry.docid),
-                                           system_email_domain)
+                                             community.__name__,
+                                             docid_to_hex(blogentry.docid),
+                                             system_email_domain)
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
@@ -391,7 +379,7 @@ class BlogAlert(Alert):
             html = document_fromstring(body_text)
             body_element = html.cssselect('body')[0]
             span = etree.Element("span", nsmap=body_element.nsmap)
-            span[:] = body_element[:] # Copy all body elements to an empty span
+            span[:] = body_element[:]  # Copy all body elements to an empty span
             body_text = etree.tostring(span, pretty_print=True)
 
         if isinstance(body_text, unicode):
@@ -424,6 +412,7 @@ class BlogAlert(Alert):
         """
         return ([], 0)
 
+
 class BlogEntryAlert(BlogAlert):
     _template = "templates/email_blog_entry_alert.pt"
 
@@ -434,6 +423,7 @@ class BlogEntryAlert(BlogAlert):
     @property
     def _subject(self):
         return "[%s] %s" % (self._community.title, self._blogentry.title)
+
 
 class BlogCommentAlert(BlogAlert):
     _template = "templates/email_blog_comment_alert.pt"
@@ -465,6 +455,7 @@ class BlogCommentAlert(BlogAlert):
         messages = [blogentry] + comments
         n = len(comments) + 1
         return messages, n
+
 
 class NonBlogAlert(Alert):
     # XXX Are BlogAlert and NonBlogAlert close enough that they could merged
@@ -542,7 +533,7 @@ class NonBlogAlert(Alert):
             html = document_fromstring(body_text)
             body_element = html.cssselect('body')[0]
             span = etree.Element("span", nsmap=body_element.nsmap)
-            span[:] = body_element[:] # Copy all body elements to an empty span
+            span[:] = body_element[:]  # Copy all body elements to an empty span
             body_text = etree.tostring(span, pretty_print=True)
 
         if isinstance(body_text, unicode):
@@ -560,15 +551,18 @@ class NonBlogAlert(Alert):
         self._message = msg
         return msg
 
+
 class WikiPageAlert(NonBlogAlert):
     _template = "templates/email_wikipage_alert.pt"
     _interface = IWikiPage
     _content_type_name = 'Wiki Page'
 
+
 class CommunityFileAlert(NonBlogAlert):
     _template = "templates/email_community_file_alert.pt"
     _interface = ICommunityFile
     _content_type_name = 'File'
+
 
 class CalendarEventAlert(NonBlogAlert):
     _template = "templates/email_calendar_event_alert.pt"
@@ -602,6 +596,7 @@ class CalendarEventAlert(NonBlogAlert):
     def _attachments_folder(self):
         return self.context.get('attachments')
 
+
 class DefaultFolderAddables(object):
     implements(IFolderAddables)
 
@@ -619,16 +614,6 @@ class DefaultFolderAddables(object):
             ('Add Folder', url(context, 'add_folder.html')),
             ('Add File', url(context, 'add_file.html')),
             ]
-
-        # Intranet folders by default get Add Page
-        intranets = find_interface(self.context, IIntranets)
-        if intranets:
-            _addlist.append(
-                ('Add Event', url(context, 'add_calendarevent.html')),
-                )
-            _addlist.append(
-                ('Add Page', url(context, 'add_page.html')),
-                )
 
         # Override all addables in certain markers
         if IReferencesFolder.providedBy(self.context):
@@ -656,256 +641,6 @@ class DefaultFolderAddables(object):
                 ]
         return _addlist
 
-class AbstractPortlet(object):
-    """  """
-    implements(IIntranetPortlet)
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    @property
-    def title(self):
-        return self.context.title
-
-    @property
-    def href(self):
-        return resource_url(self.context, self.request)
-
-    @property
-    def entries(self):
-        # Use cataloging to spelunk the forum
-
-        resolver, docids = self._query()
-        if docids:
-            # Flatten the results into dicts
-            entries = []
-            for docid in docids[0:5]:
-                doc = resolver(docid)
-                entries.append({
-                        'title': doc.title,
-                        'href': resource_url(doc, self.request),
-                        })
-            return entries
-
-        else:
-            return None
-
-    @property
-    def asHTML(self):
-        """Use lxml to generate a customizable via adapter representation"""
-
-        portlet = fragment_fromstring('<div class="generic-portlet""/>')
-        heading = SubElement(portlet, 'h3')
-        heading.text = self.context.title
-
-        # Now the entries
-        entries = self.entries
-        if entries:
-            for entry in self.entries:
-                item = SubElement(portlet, 'p')
-                item_a = SubElement(item, 'a', href=entry['href'])
-                item_a.text = entry['title']
-        else:
-            msg = SubElement(portlet, 'p')
-            msg.text = "No entries found"
-
-        # Close out with the more link
-        more = SubElement(portlet, 'p')
-        more.set('class', 'more')
-        more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE'
-
-        return tostring(portlet, pretty_print=True)
-
-class ForumPortlet(AbstractPortlet):
-    """Adapter for showing file entry data in views"""
-
-    def _query(self):
-        """The part implemented for each portlet, actually grab data"""
-
-        searcher = getAdapter(self.context, ICatalogSearch)
-        path = {
-            'query':resource_path(self.context),
-            }
-        total, docids, resolver = searcher(
-            path=path,
-            sort_index='modified_date',
-            interfaces=[IForumTopic],
-            reverse=True)
-
-        return resolver, list(docids)
-
-class NetworkNewsPortlet(AbstractPortlet):
-    """Adapter for showing network news in views"""
-
-    def _query(self):
-        """The part implemented for each portlet, actually grab data"""
-
-        searcher = getAdapter(self.context, ICatalogSearch)
-        path = {
-            'query':resource_path(self.context),
-            }
-        total, docids, resolver = searcher(
-            path=path,
-            sort_index='publication_date',
-            interfaces=[INewsItem],
-            reverse=True)
-
-        return resolver, list(docids)
-
-class NetworkEventsPortlet(AbstractPortlet):
-    """Adapter for showing network events in views"""
-
-    def _query(self):
-        """The part implemented for each portlet, actually grab data"""
-
-        searcher = getAdapter(self.context, ICatalogSearch)
-        path = {
-            'query':resource_path(self.context),
-            }
-        # show only upcoming events, the soonest first.
-        now = coarse_datetime_repr(datetime.datetime.now())
-        total, docids, resolver = searcher(
-            path=path,
-            sort_index='start_date',
-            end_date=(now, None),
-            interfaces=[ICalendarEvent],
-            reverse=False,
-            use_cache=False
-            )
-
-        return resolver, list(docids)
-
-    @property
-    def entries(self):
-        # Use cataloging to spelunk the forum
-
-        resolver, docids = self._query()
-        if docids:
-            # Flatten the results into dicts
-            entries = []
-            for docid in docids[0:5]:
-                doc = resolver(docid)
-                entries.append({
-                        'title': doc.title,
-                        'href': resource_url(doc, self.request),
-                        'startDate': doc.startDate,
-                        })
-            return entries
-
-        else:
-            return None
-
-    @property
-    def asHTML(self):
-        # The network events portlet is different.  Everything is different.
-        portlet = fragment_fromstring('<div class="generic-portlet"/>')
-        heading = SubElement(portlet, 'h3')
-        heading.text = self.context.title
-
-        # Now the entries
-        entries = self.entries
-        if entries:
-            ul = SubElement(portlet, 'ul', id='events_portlet')
-            event_style = 'text-decoration:none'
-            date_format = '%m/%d/%Y' #'%A, %B %d, %Y %I:%M %p'
-            for entry in self.entries:
-                li = SubElement(ul, 'li')
-
-                #tr = SubElement(table, 'tr')
-                #td = SubElement(tr, 'td')
-                #td.set('class', 'event_title')
-                span1 = SubElement(li, 'span')
-                span1.text = entry['startDate'].strftime(date_format)
-                span1.set('class', 'globalize-short-date')
-                span2 = SubElement(li, 'span')
-                span2.set('class', 'event_title')
-                a = SubElement(span2, 'a',
-                               href=entry['href'],
-                               style=event_style)
-                a.text = entry['title']
-                #td2 = SubElement(tr, 'td')
-        else:
-            msg = SubElement(portlet, 'p')
-            msg.text = "No entries found"
-
-        # Close out with the more link
-        more = SubElement(portlet, 'p')
-        more.set('class', 'more')
-        more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE'
-
-        return tostring(portlet, pretty_print=True)
-
-
-class CalendarPortlet(NetworkEventsPortlet):
-    """ Adapter for showing calendar events """
-
-    @property
-    def asHTML(self):
-        # The network events portlet is different.  Everything is different.
-        portlet = fragment_fromstring('<div class="generic-portlet"/>')
-        heading = SubElement(portlet, 'h3')
-        heading.text = self.context.title
-        # Today's date is used to avoid display dates in the past.
-        # If a multi-day event started in the past, we still only
-        # want to display it from today.
-        today = datetime.date.today()
-        today_start = datetime.datetime.combine(today, datetime.time())
-
-        # Now the entries
-        entries = self.entries
-        if entries:
-            ul = SubElement(portlet, 'ul', id='calendar_portlet')
-            event_style = 'text-decoration:none'
-            date_format = '%m/%d/%Y' #'%A, %B %d, %Y %I:%M %p'
-            for entry in self.entries:
-                li = SubElement(ul, 'li')
-
-                span1 = SubElement(li, 'span')
-
-                # To show multi-day events starting from today (and not
-                # in the past), we take the minimum date of today and the
-                # event's date.
-                start_date = max(entry['startDate'], today_start)
-
-                span1.text = start_date.strftime(date_format)
-                span1.set('class', 'globalize-short-date')
-
-                span2 = SubElement(li, 'span')
-                span2.set('class', 'event_title')
-                a = SubElement(span2, 'a',
-                               href=entry['href'],
-                               style=event_style)
-                a.text = entry['title']
-        else:
-            msg = SubElement(portlet, 'p')
-            msg.text = "No entries found"
-
-        # Close out with the more link
-        more = SubElement(portlet, 'p')
-        more.set('class', 'more')
-        more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE'
-
-        return tostring(portlet, pretty_print=True)
-
-
-class FeedPortlet(object):
-    implements(IIntranetPortlet)
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    @property
-    def asHTML(self):
-        return render(
-            'templates/feed.pt',
-            dict(feed=self.context),
-            request=self.request,
-            )
 
 class DefaultLayoutProvider(object):
     """ Site policy on which o-wrap to choose from for a context"""
@@ -925,15 +660,6 @@ class DefaultLayoutProvider(object):
         return get_renderer(
             'karl.views:templates/generic_layout.pt').implementation()
 
-    @property
-    def intranet_layout(self):
-        layout = get_renderer(
-            'karl.content.views:templates/intranet_layout.pt').implementation()
-        intranet = find_interface(self.context, IIntranet)
-        if intranet:
-            layout.navigation = intranet.navigation
-        return layout
-
     def __call__(self, default=None):
         # The layouts are by identifier, e.g. layout='community'
 
@@ -941,39 +667,11 @@ class DefaultLayoutProvider(object):
         layout = None
         if default is not None:
             layout = getattr(self, default+'_layout')
-        intranet = find_interface(self.context, IIntranet)
-
-        # Group a series of intranet-oriented decisions
-        if intranet:
-            # First, when under an intranet, OSI wants forums to get
-            # the generic layout.
-            if find_interface(self.context, IForum):
-                layout = getattr(self, 'generic_layout')
-
-            # Now for an intranet.  Everything gets the two-column
-            # view except the intranet home page, which gets the 3
-            # column treatment.
-            else:
-                layout = getattr(self, 'intranet_layout')
-
-        elif find_interface(self.context, IIntranets):
-            if find_interface(self.context, IForum):
-                layout = self.generic_layout
-            elif ICalendarEvent.providedBy(self.context):
-                layout = self.generic_layout
-            elif INetworkNewsMarker.providedBy(self.context):
-                layout = self.generic_layout
-            elif find_interface(self.context, IReferencesFolder):
-                layout = self.generic_layout
-            elif INetworkEventsMarker.providedBy(self.context):
-                layout = self.generic_layout
-
         elif not find_interface(self.context, ICommunity):
-            # If we're not in a community or an intranet we need to use the
-            # generic layout.
             layout = self.generic_layout
 
         return layout
+
 
 class DefaultShowSendalert(object):
     """ Default policies for showing the alert checkbox """
@@ -986,11 +684,5 @@ class DefaultShowSendalert(object):
     @property
     def show_sendalert(self):
         """ Return boolean on whether to suppress this field """
-
-        intranets = find_interface(self.context, IIntranets)
-        # We don't want to send alerts for content created inside an
-        # intranet.
-        if intranets:
-            return False
 
         return True

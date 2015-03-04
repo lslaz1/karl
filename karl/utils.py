@@ -30,13 +30,12 @@ from repoze.lemonade.content import get_content_type
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ISite
-from karl.models.interfaces import IIntranets
-from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IAttachmentPolicy
 from karl.models.interfaces import IPeopleDirectory
 from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
+
 
 def find_site(context):
     site = find_interface(context, ISite)
@@ -45,39 +44,34 @@ def find_site(context):
         site = find_root(context)
     return site
 
+
 def find_users(context):
     return getattr(find_site(context), 'users', None)
+
 
 def find_catalog(context):
     return getattr(find_site(context), 'catalog', None)
 
+
 def find_events(context):
     return getattr(find_site(context), 'events', None)
+
 
 def find_tags(context):
     return getattr(find_site(context), 'tags', None)
 
+
 def find_profiles(context):
     return find_site(context).get('profiles')
+
 
 def find_community(context):
     return find_interface(context, ICommunity)
 
+
 def find_communities(context):
     return find_site(context).get('communities')
 
-def find_intranet(context):
-    # Find the ancestor that has IIntranet, e.g. /osi/someoffice
-    return find_interface(context, IIntranet)
-
-def find_intranets(context):
-    # Find the community in the site with IIntranets
-    site = find_site(context)
-    for v in site.values():
-        if IIntranets.providedBy(v):
-            return v
-
-    return []
 
 def find_peopledirectory(context):
     site = find_site(context)
@@ -87,12 +81,14 @@ def find_peopledirectory(context):
         return None
     return people
 
+
 def find_peopledirectory_catalog(context):
     site = find_site(context)
     people = site.get('people', None)
     if not people:
         return None
     return getattr(people, 'catalog', None)
+
 
 def get_setting(context, setting_name, default=None):
     # Grab a setting from ISettings.  (context is ignored.)
@@ -101,17 +97,21 @@ def get_setting(context, setting_name, default=None):
         return settings.get(setting_name, default)
     return default
 
+
 def get_settings():
     return queryUtility(ISettings)
+
 
 def get_content_type_name(resource):
     content_iface = get_content_type(resource)
     return content_iface.getTaggedValue('name')
 
+
 def get_content_type_name_and_icon(resource):
     content_iface = get_content_type(resource)
     return (content_iface.getTaggedValue('name'),
             content_iface.queryTaggedValue('icon', 'blue-document.png'))
+
 
 def debugsearch(context, **kw):
     searcher = ICatalogSearch(context)
@@ -122,22 +122,28 @@ def debugsearch(context, **kw):
         L.append(resolver(docid))
     return num, L
 
+
 def get_session(context, request):
     site = find_site(context)
     session = site.sessions.get(request.environ['repoze.browserid'])
     return session
 
-_MAX_32BIT_INT = int((1<<31) - 1)
+
+_MAX_32BIT_INT = int((1 << 31) - 1)
+
 
 def docid_to_hex(docid):
     return '%08X' % (_MAX_32BIT_INT + docid)
 
+
 def hex_to_docid(hex):
     return int('%s' % hex, 16) - _MAX_32BIT_INT
+
 
 def asbool(s):
     s = str(s).strip()
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
+
 
 def coarse_datetime_repr(date):
     """Convert a datetime to an integer with 100 second granularity.
@@ -148,6 +154,7 @@ def coarse_datetime_repr(date):
     timetime = calendar.timegm(date.timetuple())
     return int(timetime) // 100
 
+
 def support_attachments(context):
     """Return true if the given object should support attachments"""
     adapter = queryAdapter(context, IAttachmentPolicy)
@@ -156,6 +163,7 @@ def support_attachments(context):
     else:
         # support attachments by default
         return True
+
 
 class PersistentBBB(object):
     """ A descriptor which fixes up old persistent instances with a
@@ -171,21 +179,25 @@ class PersistentBBB(object):
         setattr(inst, self.name, copy.deepcopy(self.val))
         return getattr(inst, self.name)
 
+
 def get_layout_provider(context, request):
     from karl.content.views.adapters import DefaultLayoutProvider
     return queryMultiAdapter((context, request), ILayoutProvider,
-                             default=DefaultLayoutProvider(context,request))
+                             default=DefaultLayoutProvider(context, request))
+
 
 def get_folder_addables(context, request):
     from karl.content.views.adapters import DefaultFolderAddables
     return queryMultiAdapter((context, request), IFolderAddables,
-                             default=DefaultFolderAddables(context,request))
+                             default=DefaultFolderAddables(context, request))
+
 
 def find_tempfolder(context):
     root = find_root(context)
-    if not 'TEMP' in root:
+    if 'TEMP' not in root:
         root['TEMP'] = TempFolder()
     return root['TEMP']
+
 
 def find_repo(context):
     return getattr(find_site(context), 'repo', None)

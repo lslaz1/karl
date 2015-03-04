@@ -1,6 +1,7 @@
 from zope.interface import Interface
 from zope.interface import Attribute
 
+
 class IAtomFeed(Interface):
     """ Flatten contents into data for an Atom feed """
 
@@ -10,12 +11,13 @@ class IAtomFeed(Interface):
     link = Attribute('The atom:link of the feed')
     entries = Attribute('The sequence of feed entries')
 
+
 class IAtomEntry(Interface):
     """ Specification for a single entry in an atom feed.
     """
     title = Attribute("Entry Title")
     uri = Attribute("URI of resource represented by this atom entry.")
-    published = Attribute("Date initially published."+
+    published = Attribute("Date initially published." +
                           "(instance of datetime.datetime)")
     updated = Attribute("Date last modified." +
                         "(instance of datetime.datetime)")
@@ -23,6 +25,7 @@ class IAtomEntry(Interface):
                        "'name', the author's name, and 'uri', which is the " +
                        "uri of the author's profile page in Karl.")
     content = Attribute("Html content of entry.")
+
 
 class ISidebar(Interface):
     """Renders an HTML sidebar.
@@ -36,17 +39,20 @@ class ISidebar(Interface):
         api is an instance of TemplateAPI.
         """
 
+
 class IFolderAddables(Interface):
     """ Policies for what can be added to a container """
 
     def __call__():
         """Return a sequence of what can be added"""
 
+
 class IToolAddables(Interface):
     """ Policies for what tools can be added to a community """
 
     def __call__():
         """Return a sequence of what can be added"""
+
 
 class ILayoutProvider(Interface):
     """ Policy to get the o-wrap in a certain context"""
@@ -72,17 +78,12 @@ class IFooter(Interface):
         o api is an instance of TemplateAPI.
         """
 
-class IIntranetPortlet(Interface):
-    """ Adaptation of various data sources into a portlet """
-    title = Attribute('The title of the portlet')
-    href = Attribute('URL to get to the container being summarized')
-    entries = Attribute('Up to five of the entries')
-
 
 class ILiveSearchEntry(Interface):
     """ Adaptation from a search result to provide a result dictionary
 
     the adaptation itself generates the dictionary"""
+
 
 class IAdvancedSearchResultsDisplay(Interface):
     """ Provides data/macro to use for custom search results display """

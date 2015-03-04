@@ -26,7 +26,6 @@ from zope.component import queryMultiAdapter
 from pyramid.decorator import reify
 from pyramid.url import resource_url
 from pyramid.security import effective_principals
-from pyramid.traversal import quote_path_segment
 
 from pyramid.location import lineage
 from pyramid.traversal import find_resource
@@ -35,15 +34,12 @@ from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.renderers import get_renderer
 
-from repoze.lemonade.content import get_content_type
 from repoze.lemonade.listitem import get_listitems
 
 from karl.application import is_normal_mode
 from karl.consts import countries
 from karl.consts import cultures
 from karl.utils import asbool
-from karl.utils import find_intranet
-from karl.utils import find_intranets
 from karl.utils import find_site
 from karl.utils import get_settings
 from karl.utils import support_attachments
@@ -67,13 +63,12 @@ from pyramid.traversal import find_interface
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
          '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
 
+
 class TemplateAPI(object):
     _community_info = None
     _recent_items = None
     _identity = None
     _isStaff = None
-    _intranets_info = None
-    _current_intranet = None
     _home_url = None
     _snippets = None
     _start_time = int(time.time())
@@ -98,7 +93,8 @@ class TemplateAPI(object):
         self.read_only = not is_normal_mode(request.registry)
         self.static_url = '%s/static/%s' % (
             app_url, request.registry.settings.get('static_rev'))
-        self.browser_upgrade_url = request.registry.settings.get('browser_upgrade_url', '')
+        self.browser_upgrade_url = request.registry.settings.get(
+            'browser_upgrade_url', '')
 
         # this data will be provided for the client javascript
         self.karl_client_data = {}
@@ -135,29 +131,29 @@ class TemplateAPI(object):
 
         if self.settings:
             self.kaltura_info = dict(
-                enabled =  self.settings.get(
+                enabled=self.settings.get(
                     'kaltura_enabled', False) in ('true', 'True'),
-                partner_id = self.settings.get('kaltura_partner_id', ''),
-                sub_partner_id = self.settings.get(
+                partner_id=self.settings.get('kaltura_partner_id', ''),
+                sub_partner_id=self.settings.get(
                     'kaltura_sub_partner_id', ''),
-                admin_secret = self.settings.get('kaltura_admin_secret', ''),
-                user_secret = self.settings.get('kaltura_user_secret', ''),
-                kcw_uiconf_id = self.settings.get(
+                admin_secret=self.settings.get('kaltura_admin_secret', ''),
+                user_secret=self.settings.get('kaltura_user_secret', ''),
+                kcw_uiconf_id=self.settings.get(
                     'kaltura_kcw_uiconf_id', '1000741'),
-                player_uiconf_id = self.settings.get(
+                player_uiconf_id=self.settings.get(
                     'kaltura_player_uiconf_id', ''),
-                player_cache_st = self.settings.get(
+                player_cache_st=self.settings.get(
                     'kaltura_player_cache_st', ''),
-                local_user = self.userid,
+                local_user=self.userid,
             )
             if not self.settings.get(
-                'kaltura_client_session', False) in ('true', 'True'):
-                # Secrets will not be sent to client, instead session is handled on the server.
-                self.kaltura_info['session_url'] = app_url + '/' + 'kaltura_create_session.json'
+                    'kaltura_client_session', False) in ('true', 'True'):
+                # Secrets will not be sent to client, instead session is handled on
+                # the server.
+                self.kaltura_info['session_url'] = app_url + '/' + 'kaltura_create_session.json'  # noqa
         else:
             self.kaltura_info = dict(
-                enabled = False,
-                )
+                enabled=False)
 
         # propagate the head data to the client
         d = self.karl_client_data['kaltura'] = dict(self.kaltura_info)
@@ -212,13 +208,6 @@ class TemplateAPI(object):
                 except KeyError:
                     self._should_show_calendar_tab = False
         return self._should_show_calendar_tab
-
-    @property
-    def current_intranet(self):
-        """The footer needs to know what intranet the curr url is in"""
-        if self._current_intranet is None:
-            self._current_intranet = find_intranet(self.context)
-        return self._current_intranet
 
     def __getitem__(self, key):
         if key == 'form_field_templates':
@@ -289,7 +278,7 @@ class TemplateAPI(object):
         if self._form_field_templates is None:
             # calculate and cache value
             if hasattr(self.request, 'form'):
-                self._form_field_templates =  [
+                self._form_field_templates = [
                     field.widget.template for field in
                     self.request.form.allfields]
             else:
@@ -330,40 +319,6 @@ class TemplateAPI(object):
         """Data for the tagbox display"""
         tagquery = getMultiAdapter((self.context, self.request), ITagQuery)
         return tagquery.tagusers
-
-    @property
-    def intranets_info(self):
-        """Get information for the footer and intranets listing"""
-        if self._intranets_info is None:
-            intranets_info = []
-            intranets = find_intranets(self.context)
-            if not intranets:
-                # Maybe there aren't any intranets defined yet
-                return []
-            request = self.request
-            intranets_url = resource_url(intranets, request)
-            for name, entry in intranets.items():
-                try:
-                    content_iface = get_content_type(entry)
-                except ValueError:
-                    continue
-                if content_iface == ICommunity:
-                    if not has_permission('view', entry, request):
-                        continue
-                    href = '%s%s/' % (intranets_url, quote_path_segment(name))
-                    intranets_info.append({
-                            'title': entry.title,
-                            'intranet_href': href,
-                            'edit_href': href + '/edit_intranet.html',
-                            })
-            # Sort the list
-            def intranet_sort(x, y):
-                if x['title'] > y['title']:
-                    return 1
-                else:
-                    return -1
-            self._intranets_info = sorted(intranets_info, intranet_sort)
-        return self._intranets_info
 
     def actions_to_menu(self, actions):
         """A helper used by the snippets rendering the actions menu.
@@ -416,8 +371,7 @@ class TemplateAPI(object):
             if len(lookahead) > 2:
                 # Convert to submenu
                 # take part after "Add " as title.
-                result.append(('Add', '#',
-                    [(item[0][4:], item[1]) for item in lookahead]))
+                result.append(('Add', '#', [(item[0][4:], item[1]) for item in lookahead]))  # noqa
             else:
                 # add to menu as flat
                 result.extend(lookahead)
@@ -519,13 +473,14 @@ class TemplateAPI(object):
     def livesearch_options(self):
         if self._livesearch_options is None:
             self._livesearch_options = [
-                item for item in get_listitems(IGroupSearchFactory )
+                item for item in get_listitems(IGroupSearchFactory)
                 if item['component'].livesearch]
         return self._livesearch_options
 
     @property
     def is_js_devel_mode(self):
-        return self.js_devel_mode == 'true' or self.js_devel_mode == 'True' or self.js_devel_mode == True
+        return (self.js_devel_mode == 'true' or self.js_devel_mode == 'True' or
+                self.js_devel_mode is True)
 
     @property
     def resources(self):
@@ -539,7 +494,7 @@ class TemplateAPI(object):
         try:
             files = self.resources['js'][name]
         except KeyError:
-            raise RuntimeError, 'JS resource "%s" must be defined as a key in resources.json.'
+            raise RuntimeError('JS resource "%s" must be defined as a key in resources.json.')  # noqa
         if self.is_js_devel_mode:
             result = ['%s/%s' % (self.static_url, n) for n in files]
         else:
@@ -552,7 +507,7 @@ class TemplateAPI(object):
 
     def resource_css(self, name):
         if name not in self.resources['css']:
-            raise RuntimeError, 'CSS resource "%s" must be defined as a key in resources.json.'
+            raise RuntimeError('CSS resource "%s" must be defined as a key in resources.json.')  # noqa
         if name.startswith('tinymce'):
             prefix = 'tinymce/'
         else:

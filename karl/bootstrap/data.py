@@ -5,7 +5,6 @@ from pyramid.security import Allow
 from pyramid.security import Authenticated
 
 from karl.bootstrap.interfaces import IInitialData
-from karl.bootstrap.interfaces import IInitialOfficeData
 
 from karl.security.policy import ADMINISTRATOR_PERMS
 from karl.security.policy import EMAIL
@@ -15,6 +14,7 @@ from karl.security.policy import MODERATOR_PERMS
 
 _marker = object()
 
+
 class DefaultInitialData(object):
     implements(IInitialData)
 
@@ -22,7 +22,6 @@ class DefaultInitialData(object):
     member_principals = ['group.KarlStaff']
     guest_principals = []
     community_tools = ('blog', 'wiki', 'calendar', 'files')
-    intranet_tools = ('forums', 'intranets', 'files')
     admin_user = 'admin'
     admin_groups = ('group.KarlStaff', 'group.KarlAdmin')
 
@@ -50,16 +49,6 @@ class DefaultInitialData(object):
         ]
 
     users_and_groups = [
-        ('admin', 'Ad','Min','admin@example.com',
+        ('admin', 'Ad', 'Min', 'admin@example.com',
          ('group.KarlAdmin', 'group.KarlUserAdmin', 'group.KarlStaff')),
     ]
-
-    _office_data = _marker
-    @property
-    def office_data(self):
-        if self._office_data is _marker:
-            self._office_data = queryUtility(
-                IInitialOfficeData, default=None)
-        return self._office_data
-
-

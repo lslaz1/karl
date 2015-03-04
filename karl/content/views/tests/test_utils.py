@@ -89,18 +89,6 @@ class Test_get_show_sendalert(unittest.TestCase):
         from karl.content.views.utils import get_show_sendalert
         return get_show_sendalert(context, request)
 
-    def test_not_intranet(self):
-        context = testing.DummyModel()
-        self.failUnless(self._call_fut(context, None))
-
-    def test_in_intranet(self):
-        from karl.content.interfaces import IIntranets
-        from zope.interface import directlyProvides
-        intranet = testing.DummyModel()
-        directlyProvides(intranet, IIntranets)
-        intranet['foo'] = context = testing.DummyModel()
-        self.failIf(self._call_fut(context, None))
-
     def test_override_adapter(self):
         class DummyAdapter(object):
             show_sendalert = 'foo'

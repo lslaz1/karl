@@ -85,8 +85,7 @@ class UserSyncTests(unittest.TestCase):
              'office': '000',
              'room_no': '111',
              'biography': 'Born along time ago.',
-             'date_format': 'en_OLD',
-             'home_path': '/offices/bedrock'}
+             'date_format': 'en_OLD'}
         ]}
         testobj = self.make_one()
         testobj.sync(data)
@@ -110,7 +109,6 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(fred.room_no, '111')
         self.assertEqual(fred.biography, 'Born along time ago.')
         self.assertEqual(fred.date_format, 'en_OLD')
-        self.assertEqual(fred.home_path, '/offices/bedrock')
         self.assertIs(fred.usersync_managed, True)
         create_content.assert_called_once_with(IProfile)
         self.assertFalse(hasattr(self.context, 'usersync_timestamp'))

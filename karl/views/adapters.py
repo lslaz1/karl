@@ -13,7 +13,6 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
-from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
 from karl.utilities.image import thumb_url
@@ -49,12 +48,8 @@ class DefaultToolAddables(object):
         return []
         # XXX Do not exclude any possible features!
 
-        # Find out if we are adding this community from somewhere
-        # inside the "intranets" side
-        # intranets = find_interface(self.context, IIntranets)
         # site = ISite.providedBy(self.context)
-
-        # if intranets or site:
+        # if site:
         #    return ['wiki', 'blog']
 
         # return ['intranets', 'forums']
@@ -83,11 +78,10 @@ def _community_title(context):
     """find the title of a community
 
     offices also provide ICommunity, but we don't want to consider those
-    here. offices explicitly provide IIntranets, so we'll discount those that
-    way
+    here.
     """
     obj = find_community(context)
-    if obj is None or IIntranets.providedBy(obj):
+    if obj is None:
         return None
     return obj.title
 
@@ -184,11 +178,12 @@ def forumtopic_livesearch_result(context, request):
         category='forumtopic',
         )
 
+
 @implementer(ILiveSearchEntry)
 def file_livesearch_result(context, request):
     fileinfo = getMultiAdapter((context, request), IFileInfo)
     static_url = get_static_url(request)
-    icon =  "%s/images/%s" % (static_url, fileinfo.mimeinfo['small_icon_name'])
+    icon = "%s/images/%s" % (static_url, fileinfo.mimeinfo['small_icon_name'])
     return livesearch_dict(
         context, request,
         modified_by=context.modified_by,
@@ -198,6 +193,7 @@ def file_livesearch_result(context, request):
         type='file',
         category='file',
         )
+
 
 @implementer(ILiveSearchEntry)
 def community_livesearch_result(context, request):
@@ -209,19 +205,6 @@ def community_livesearch_result(context, request):
         category='community',
         )
 
-@implementer(ILiveSearchEntry)
-def intranet_livesearch_result(context, request):
-    return livesearch_dict(
-        context, request,
-        address=context.address,
-        city=context.city,
-        state=context.state,
-        zipcode=context.zipcode,
-        telephone=context.telephone,
-        country=context.country,
-        type='community',
-        category='office',
-        )
 
 @implementer(ILiveSearchEntry)
 def calendar_livesearch_result(context, request):
@@ -234,6 +217,7 @@ def calendar_livesearch_result(context, request):
         type='calendarevent',
         category='calendarevent',
         )
+
 
 class BaseAdvancedSearchResultsDisplay(object):
     implements(IAdvancedSearchResultsDisplay)

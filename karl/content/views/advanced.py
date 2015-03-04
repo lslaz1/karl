@@ -1,7 +1,6 @@
 import formish
 import schemaish
 
-from pyramid.traversal import find_interface
 from pyramid.url import resource_url
 from pyramid.httpexceptions import HTTPFound
 from zope.component.event import objectEventNotify
@@ -14,7 +13,6 @@ from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
-from karl.models.interfaces import IIntranets
 from karl.utilities import lock
 from karl.utils import get_layout_provider
 from karl.views.api import TemplateAPI
@@ -52,7 +50,7 @@ marker_widget = widgets.VerticalRadioChoice(
 keywords_widget = widgets.SequenceTextAreaWidget(cols=20)
 
 weight_options = [
-    (-1, 'Less important'), # I bet no one ever uses this one.
+    (-1, 'Less important'),  # I bet no one ever uses this one.
     (0, 'Normal'),
     (1, 'More important'),
     (2, 'Much more important'),
@@ -68,9 +66,11 @@ unlock_field = schemaish.Boolean(
     description='This wiki page is currently locked. Force unlock it.',
 )
 
+
 class UnlockWidget(widgets.Checkbox):
     checkbox_label = 'Unlock'
 unlock_widget = UnlockWidget()
+
 
 class AdvancedFormController(object):
 
@@ -78,9 +78,8 @@ class AdvancedFormController(object):
         self.context = context
         self.request = request
 
-        in_intranets = find_interface(context, IIntranets) is not None
         is_folder = ICommunityFolder.providedBy(context)
-        self.use_folder_options = is_folder and in_intranets
+        self.use_folder_options = is_folder
 
         self.use_unlock = lock.is_locked(context)
 
@@ -134,7 +133,7 @@ class AdvancedFormController(object):
         api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        return {'api':api, 'actions':(), 'layout':layout}
+        return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -168,4 +167,4 @@ class AdvancedFormController(object):
 
         objectEventNotify(ObjectModifiedEvent(context))
         return HTTPFound(location=resource_url(self.context, self.request,
-                    query={'status_message': 'Advanced settings changed.'}))
+                         query={'status_message': 'Advanced settings changed.'}))

@@ -164,11 +164,6 @@ atom
 
 - (3) community_files_atom
 
-intranets
-=========
-
-- (4) show_intranets
-
 admin
 =============
 

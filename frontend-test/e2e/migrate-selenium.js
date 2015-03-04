@@ -13,7 +13,7 @@ multiGlob.glob([
   'karl/seleniumtests/community/*.html',
   //'karl/seleniumtests/files/*.html',
   //'karl/seleniumtests/forums/*.html',
-  'karl/seleniumtests/offices/*.html',
+  //'karl/seleniumtests/offices/*.html',
   //'karl/seleniumtests/profiles/*.html',
   'karl/seleniumtests/search/*.html',
   'karl/seleniumtests/tagging/*.html',

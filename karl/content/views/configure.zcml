@@ -543,12 +543,6 @@
 
   <view
     for="karl.content.interfaces.IReferenceSection"
-    view=".references.reference_outline_view"
-    permission="view"
-  />
-
-  <view
-    for="karl.content.interfaces.IReferenceSection"
     view=".references.reference_viewall_view"
     name="view_all.html"
     permission="view"
@@ -1028,75 +1022,6 @@
       factory=".adapters.CommunityFileAlert"
       />
 
-  <view
-    for="karl.content.interfaces.IIntranetsTool"
-    view=".intranets.show_intranets_view"
-    permission="view"
-  />
-
-  <formish:form
-     for="karl.content.interfaces.IIntranetsTool"
-     controller=".intranets.AddIntranetFormController"
-     name="add_intranet.html"
-     permission="administer"
-     renderer="karl.views.forms:templates/layout_formish_form.pt"
-     form_id="save">
-
-    <formish:action
-       name="submit"
-       title="submit"
-       />
-
-    <formish:action
-       name="cancel"
-       title="cancel"
-       validate="false"
-       />
-
-  </formish:form>
-
-  <formish:form
-     for="karl.content.interfaces.IIntranet"
-     controller=".intranets.EditIntranetFormController"
-     name="edit_intranet.html"
-     permission="administer"
-     renderer="karl.views.forms:templates/community_formish_form.pt"
-     form_id="save">
-
-    <formish:action
-       name="submit"
-       title="submit"
-       />
-
-    <formish:action
-       name="cancel"
-       title="cancel"
-       validate="false"
-       />
-
-  </formish:form>
-
-  <formish:form
-     for="karl.content.interfaces.IIntranets"
-     controller=".intranets.EditIntranetRootFormController"
-     name="edit.html"
-     permission="administer"
-     renderer="karl.views.forms:templates/community_formish_form.pt"
-     form_id="save">
-
-    <formish:action
-       name="submit"
-       title="submit"
-       />
-
-    <formish:action
-       name="cancel"
-       title="cancel"
-       validate="false"
-       />
-
-  </formish:form>
-
   <!-- ux1 -->
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
@@ -1126,42 +1051,6 @@
     provides="karl.views.interfaces.ISidebar"
     factory=".calendar_events.CalendarSidebar"
   />
-
-
-  <adapter
-      for="karl.content.interfaces.IForum
-           pyramid.interfaces.IRequest"
-      provides="karl.views.interfaces.IIntranetPortlet"
-      factory=".adapters.ForumPortlet"
-     />
-
-  <adapter
-      for="karl.content.views.interfaces.INetworkEventsMarker
-           pyramid.interfaces.IRequest"
-      provides="karl.views.interfaces.IIntranetPortlet"
-      factory=".adapters.NetworkEventsPortlet"
-     />
-
-  <adapter
-      for="karl.content.views.interfaces.INetworkNewsMarker
-           pyramid.interfaces.IRequest"
-      provides="karl.views.interfaces.IIntranetPortlet"
-      factory=".adapters.NetworkNewsPortlet"
-     />
-
-  <adapter
-      for="karl.models.interfaces.IFeed
-           pyramid.interfaces.IRequest"
-      provides="karl.views.interfaces.IIntranetPortlet"
-      factory=".adapters.FeedPortlet"
-    />
-
-  <adapter
-      for="karl.content.interfaces.ICalendar
-           pyramid.interfaces.IRequest"
-      provides="karl.views.interfaces.IIntranetPortlet"
-      factory=".adapters.CalendarPortlet"
-     />
 
   <view
     for="karl.content.views.interfaces.INetworkNewsMarker"

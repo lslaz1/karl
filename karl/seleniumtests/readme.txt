@@ -75,8 +75,6 @@ forums_search
 forums_add 
 forums_edit 
 forums_delete 
-offices_view 
-offices_search 
 add_tags 
 view_tags 
 profiles_manage_tags_edit 

@@ -55,14 +55,6 @@ var urls = [
   '/communities/default/files/add_file.html',
   '/communities/default/files/advanced.html',
 
-  // Offices
-  '/offices/nyc/', '/offices', '/offices/intranets',
-  '/offices/files/edit_acl.html',
-  '/offices/intranets/add_intranet.html', '/offices/baltimore//edit_intranet.html',
-  '/offices/files', '/offices/files/network-news/', '/offices/files/network-news/add_newsitem.html',
-  '/offices/files/network-events/', '/offices/files/network-events/?past_events=True',
-  '/offices/files/network-events/add_calendarevent.html'
-
 ];
 
 describe('site walkthrough', function () {

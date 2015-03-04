@@ -51,6 +51,7 @@ from karl.views.interfaces import ILiveSearchEntry
 
 log = logging.getLogger(__name__)
 
+
 def _iter_userids(context, request, profile_text):
     """Yield userids given a profile text search string."""
     search = ICatalogSearch(context)
@@ -155,18 +156,22 @@ def get_contextual_summarizer(context):
 
 
 def calendar_searchresults_view(context, request):
-    return _searchresults_view(context, request,
+    return _searchresults_view(
+        context, request,
         page_title='Calendar Search Results',
         calendar_search=True,
         show_search_knobs=False,
         )
 
+
 def searchresults_view(context, request):
-    return _searchresults_view(context, request,
+    return _searchresults_view(
+        context, request,
         page_title='Search Results',
         calendar_search=False,
         show_search_knobs=True,
         )
+
 
 def _author_profile_data(profiles, doc, docattr, request):
     """helper for search results view to return author data"""
@@ -179,18 +184,12 @@ def _author_profile_data(profiles, doc, docattr, request):
                 'url': resource_url(author, request),
                 }
 
+
 def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
 
-    # The layout is decided independently of whether we are a
-    # calendar search or not. What is taken in consideration: if we are
-    # in a community. The /offices section is considered a non-community
-    # and will use the wide layout.
     if ICommunity.providedBy(context):
         if calendar_search:
-            # We are either in /communities, or in /offices. In the first case:
-            # we use the community layout. For offices: we need the wide layout
-            # with the generic layout.
             context_path = resource_path(context)
             wide = context_path.startswith('/offices')
             if wide:
@@ -243,7 +242,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             'title': 'All KARL',
             'description': 'All KARL',
             'icon': None,
-            'url': resource_url(find_root(context), request, request.view_name, query=query),
+            'url': resource_url(find_root(context), request, request.view_name, query=query),  # noqa
             'selected': False,
         })
     else:
@@ -279,8 +278,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             'name': kind,
             'title': o['title'],
             'icon': component.icon,
-            'url': resource_url(context, request, request.view_name,
-                             query=query),
+            'url': resource_url(context, request, request.view_name, query=query),
             'selected': kind == selected_kind,
         })
     query = params.copy()
@@ -304,8 +302,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             query['since'] = id
         elif 'since' in query:
             del query['since']
-        option['url'] = resource_url(context, request, request.view_name,
-                                  query=query)
+        option['url'] = resource_url(context, request, request.view_name, query=query)
         option['selected'] = id == selected_since
         since_knob.append(option)
 
@@ -318,8 +315,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
             query['sort'] = id
         elif 'sort' in query:
             del query['sort']
-        option['url'] = resource_url(context, request, request.view_name,
-                                  query=query)
+        option['url'] = resource_url(context, request, request.view_name, query=query)
         option['selected'] = id == selected_sort
         sort_knob.append(option)
 
@@ -401,6 +397,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         elapsed='%0.2f' % elapsed
         )
 
+
 def jquery_livesearch_view(context, request):
     request.unicode_errors = 'ignore'
     try:
@@ -457,12 +454,10 @@ def jquery_livesearch_view(context, request):
             record = queryMultiAdapter((result, request), ILiveSearchEntry)
             assert record is not None, (
                 "Unexpected livesearch result: " + result.__class__.__name__)
-            if kind == 'intranet':
-                record['type'] = 'Intranet'
             records.append(record)
     end_time = time.time()
-    log.debug('livesearch: %0.3fs for "%s", kind=%s',
-        end_time - start_time, searchterm, kind)
+    log.debug('livesearch: %0.3fs for "%s", kind=%s', end_time - start_time,
+              searchterm, kind)
 
     return records
 

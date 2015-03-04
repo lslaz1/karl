@@ -1,21 +1,6 @@
 import unittest
 from pyramid import testing
 
-class TestIntranetsContainment(unittest.TestCase):
-    def _callFUT(self, ob):
-        from karl.workflow import intranets_containment
-        return intranets_containment(ob)
-
-    def test_true(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IIntranets
-        ob = testing.DummyModel()
-        directlyProvides(ob, IIntranets)
-        self.assertEqual(self._callFUT(ob), True)
-
-    def test_false(self):
-        ob = testing.DummyModel()
-        self.assertEqual(self._callFUT(ob), False)
 
 class TestPrivateCommunityContainment(unittest.TestCase):
     def _callFUT(self, ob):
@@ -34,15 +19,6 @@ class TestPrivateCommunityContainment(unittest.TestCase):
         ob = testing.DummyModel()
         self.assertEqual(self._callFUT(ob), False)
 
-    def test_false_in_intranet(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IIntranets
-        from karl.models.interfaces import ICommunity
-        ob = testing.DummyModel()
-        ob.security_state = 'private'
-        directlyProvides(ob, (IIntranets, ICommunity))
-        self.assertEqual(self._callFUT(ob), False)
-
 class TestPublicCommunityContainment(unittest.TestCase):
     def _callFUT(self, ob):
         from karl.workflow import public_community_containment
@@ -58,15 +34,6 @@ class TestPublicCommunityContainment(unittest.TestCase):
 
     def test_false(self):
         ob = testing.DummyModel()
-        self.assertEqual(self._callFUT(ob), False)
-
-    def test_false_in_intranet(self):
-        from zope.interface import directlyProvides
-        from karl.models.interfaces import IIntranets
-        from karl.models.interfaces import ICommunity
-        ob = testing.DummyModel()
-        ob.security_state = 'public'
-        directlyProvides(ob, (IIntranets, ICommunity))
         self.assertEqual(self._callFUT(ob), False)
 
 class Test_content_to_inherits(unittest.TestCase):
@@ -286,30 +253,6 @@ class Test_forum_to_inherits(unittest.TestCase):
                          (Allow, 'group.KarlStaff', (CREATE,)))
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_intranet_content_to_inherits(unittest.TestCase):
-    def _callFUT(self, ob, transition):
-        from karl.workflow import intranet_content_to_inherits
-        return intranet_content_to_inherits(ob, transition)
-
-    def test_it(self):
-        from zope.interface import directlyProvides
-        from pyramid.security import Allow
-        from pyramid.security import Deny
-        from pyramid.security import Everyone
-        from karl.models.interfaces import ICommunity
-        from karl.security.policy import ADMINISTRATOR_PERMS
-        from karl.security.policy import MEMBER_PERMS
-        ob = testing.DummyModel()
-        ob.__acl__ = []
-        index = DummyIndex()
-        ob.catalog = {'path': index}
-        ob.creator = 'creator'
-        ob.docid = 1234
-        directlyProvides(ob, ICommunity)
-        self._callFUT(ob, None)
-        self.failIf(hasattr(ob, '__acl__'))
-        self.assertEqual(index.indexed, {1234: ob})
-
 class Test_community_to_private(unittest.TestCase):
     def _callFUT(self, ob, transition):
         from karl.workflow import community_to_private
@@ -369,33 +312,6 @@ class Test_community_to_public(unittest.TestCase):
         self.assertEqual(ob.__acl__[3], (Allow, 'group.KarlStaff',
                                          GUEST_PERMS))
         self.assertEqual(ob.__acl__[4], NO_INHERIT)
-        self.assertEqual(index.indexed, {1234: ob})
-
-class Test_community_to_intranet(unittest.TestCase):
-    def _callFUT(self, ob, transition):
-        from karl.workflow import community_to_intranet
-        return community_to_intranet(ob, transition)
-
-    def test_it(self):
-        from zope.interface import directlyProvides
-        from pyramid.security import Allow
-        from karl.models.interfaces import ICommunity
-        from karl.security.policy import ADMINISTRATOR_PERMS
-        from karl.security.policy import MEMBER_PERMS
-        from karl.security.policy import MODERATOR_PERMS
-        ob = testing.DummyModel()
-        ob.__acl__ = []
-        index = DummyIndex()
-        ob.catalog = {'path': index}
-        ob.docid = 1234
-        directlyProvides(ob, ICommunity)
-        ob.moderators_group_name = 'moderators'
-        ob.members_group_name = 'members'
-        self._callFUT(ob, None)
-        self.assertEqual(ob.__acl__[0],
-                         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
-        self.assertEqual(ob.__acl__[1], (Allow, 'moderators', MODERATOR_PERMS))
-        self.assertEqual(ob.__acl__[2], (Allow, 'members', MEMBER_PERMS))
         self.assertEqual(index.indexed, {1234: ob})
 
 

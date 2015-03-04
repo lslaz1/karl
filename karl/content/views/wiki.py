@@ -41,7 +41,6 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICommunity
-from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ITagQuery
 from karl.models.interfaces import ICatalogSearch
 
@@ -87,6 +86,7 @@ security_field = schemaish.String(
     description=('Items marked as private can only be seen by '
                  'members of this community.'))
 
+
 def redirect_to_front_page(context, request):
 
     front_page = context['front_page']
@@ -96,7 +96,7 @@ def redirect_to_front_page(context, request):
 
 def redirect_to_add_form(context, request):
     return HTTPFound(
-            location=resource_url(context, request, 'add_wikipage.html'))
+        location=resource_url(context, request, 'add_wikipage.html'))
 
 
 class AddWikiPageFormController(object):
@@ -110,9 +110,9 @@ class AddWikiPageFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':self.request.params.get('title', ''),
-            'tags':[],
-            'text':'',
+            'title': self.request.params.get('title', ''),
+            'tags': [],
+            'text': '',
             'sendalert': sendalert_default(self.context,
                                            self.request)
             }
@@ -140,17 +140,17 @@ class AddWikiPageFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'title':formish.Hidden(empty=''),
-            'tags':karlwidgets.TagsAddWidget(),
-            'text':karlwidgets.RichTextWidget(empty=''),
-            'sendalert':karlwidgets.SendAlertCheckbox(),
+            'title': formish.Hidden(empty=''),
+            'tags': karlwidgets.TagsAddWidget(),
+            'text': karlwidgets.RichTextWidget(empty=''),
+            'sendalert': karlwidgets.SendAlertCheckbox(),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -158,10 +158,9 @@ class AddWikiPageFormController(object):
         api = TemplateAPI(self.context, self.request,
                           'Add Wiki Page')
         api.karl_client_data['text'] = dict(
-                enable_wiki_plugin = True,
-                enable_imagedrawer_upload = True,
-                )
-        return {'api':api, 'actions':()}
+            enable_wiki_plugin=True,
+            enable_imagedrawer_upload=True)
+        return {'api': api, 'actions': ()}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -206,8 +205,8 @@ def get_wikitoc_data(context, request):
     wikiparent = context.__parent__
     search = getAdapter(context, ICatalogSearch)
     count, docids, resolver = search(
-        path = resource_path(wikiparent),
-        interfaces = [IWikiPage,]
+        path=resource_path(wikiparent),
+        interfaces=[IWikiPage]
     )
     items = []
     profiles = find_profiles(context)
@@ -222,18 +221,18 @@ def get_wikitoc_data(context, request):
         else:
             author_name = author
         items.append(dict(
-            id = "id_" + entry.__name__,
-            name = entry.__name__,
-            title = entry.title,
-            author = author,
-            author_name = author_name,
-            profile_url = profile_url,
-            tags = [tag['tag'] for tag in tags],
-            created = entry.created.isoformat(),
-            modified = entry.modified.isoformat(),
+            id="id_" + entry.__name__,
+            name=entry.__name__,
+            title=entry.title,
+            author=author,
+            author_name=author_name,
+            profile_url=profile_url,
+            tags=[tag['tag'] for tag in tags],
+            created=entry.created.isoformat(),
+            modified=entry.modified.isoformat(),
         ))
     result = dict(
-        items = items,
+        items=items,
         )
     return result
 
@@ -258,18 +257,16 @@ def show_wikipage_view(context, request):
         actions.append(('Delete', resource_url(context, request, 'delete.html')))
     repo = find_repo(context)
     show_trash = False
-    if not find_interface(context, IIntranets):
-        if repo is not None and has_permission('edit', context, request):
-            actions.append(('History', resource_url(context, request, 'history.html')))
-            show_trash = True
+    if repo is not None and has_permission('edit', context, request):
+        actions.append(('History', resource_url(context, request, 'history.html')))
+        show_trash = True
     if has_permission('administer', context, request):
         actions.append(('Advanced', resource_url(context, request, 'advanced.html')))
 
     api = TemplateAPI(context, request, page_title)
 
     client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
+        tagbox=get_tags_client_data(context, request))
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
@@ -342,7 +339,7 @@ def show_wikitoc_view(context, request):
     wikitoc_data = get_wikitoc_data(context, request)
 
     page_data = dict(
-        wikitoc = wikitoc_data,
+        wikitoc=wikitoc_data,
         )
 
     client_json_data = convert_to_script(page_data)
@@ -353,13 +350,13 @@ def show_wikitoc_view(context, request):
     show_trash = repo is not None and has_permission('edit', context, request)
 
     return dict(api=api,
-        actions=actions,
-        head_data=client_json_data,
-        feed_url=feed_url,
-        backto=backto,
-        lock_info=lock.lock_info_for_view(context, request),
-        show_trash=show_trash,
-        )
+                actions=actions,
+                head_data=client_json_data,
+                feed_url=feed_url,
+                backto=backto,
+                lock_info=lock.lock_info_for_view(context, request),
+                show_trash=show_trash,
+                )
 
 
 class EditWikiPageFormController(object):
@@ -374,9 +371,9 @@ class EditWikiPageFormController(object):
 
     def form_defaults(self):
         defaults = {
-            'title':self.context.title,
-            'tags':[],
-            'text':self.context.text,
+            'title': self.context.title,
+            'tags': [],
+            'text': self.context.text,
             }
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.state_of(self.context)
@@ -407,16 +404,16 @@ class EditWikiPageFormController(object):
     def form_widgets(self, fields):
         tagdata = get_tags_client_data(self.context, self.request)
         widgets = {
-            'title':formish.Input(empty=''),
-            'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
-            'text':karlwidgets.RichTextWidget(empty=''),
+            'title': formish.Input(empty=''),
+            'tags': karlwidgets.TagsEditWidget(tagdata=tagdata),
+            'text': karlwidgets.RichTextWidget(empty=''),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
@@ -428,12 +425,12 @@ class EditWikiPageFormController(object):
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
         api.karl_client_data['text'] = dict(
-                enable_wiki_plugin = True,
-                enable_imagedrawer_upload = True,
-                )
-        return {'api':api,
-                'actions':(),
-                'lock_info':lock.lock_info_for_view(self.context, self.request),
+            enable_wiki_plugin=True,
+            enable_imagedrawer_upload=True,
+            )
+        return {'api': api,
+                'actions': (),
+                'lock_info': lock.lock_info_for_view(self.context, self.request),
                 }
 
     def handle_cancel(self):
@@ -471,6 +468,7 @@ class EditWikiPageFormController(object):
         location = resource_url(context, request)
         msg = "?status_message=Wiki%20Page%20edited"
         return HTTPFound(location=location+msg)
+
 
 def unlock_wiki_view(context, request, userid=None):
     if request.method.lower() == 'post':

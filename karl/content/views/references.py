@@ -54,6 +54,7 @@ description_field = schemaish.String(
     description="A summary of the reference manual - subject and scope. "
     "Will be displayed on every page of the manual.")
 
+
 class DescriptionHTML(object):
     """ Adapter for sections.
     """
@@ -122,7 +123,7 @@ def getTree(root, request, api, _subpath_prefix='|'):
             ordering.sync(child.keys())
             items = getTree(child, request, api, subpath + '|')
         else:
-            items = () # tuple signals leaf
+            items = ()  # tuple signals leaf
         html_adapter = queryMultiAdapter((child, request), IReferenceManualHTML)
         html = html_adapter and html_adapter(api) or '<p>Unknown type</p>'
         item = {'name': name,
@@ -130,8 +131,7 @@ def getTree(root, request, api, _subpath_prefix='|'):
                 'href': resource_url(child, request),
                 'html': html,
                 'subpath': subpath,
-                'items': items,
-               }
+                'items': items}
         result.append(item)
     return result
 
@@ -139,7 +139,7 @@ def getTree(root, request, api, _subpath_prefix='|'):
 def move_subpath(context, subpath, direction):
     elements = subpath.split('|')
     container = context
-    assert elements[0] == '' # start at context
+    assert elements[0] == ''  # start at context
     elements.pop(0)
     while elements:
         container.ordering.sync(container.keys())
@@ -155,65 +155,6 @@ def move_subpath(context, subpath, direction):
     else:
         raise ValueError('Unknown direction: %' % direction)
     return 'Moved subpath %s %s' % (subpath, direction)
-
-
-def reference_outline_view(context, request):
-
-    # Look for moveUp or moveDown in QUERY_STRING, telling us to
-    # reorder something
-    status_message = None
-    subpath = request.params.get('subpath')
-
-    backto = {
-        'href': resource_url(context.__parent__, request),
-        'title': context.__parent__.title,
-        }
-
-    user_can_edit = False
-    actions = []
-    if has_permission('create', context, request):
-        addables = get_folder_addables(context, request)
-        if addables is not None:
-            actions.extend(addables())
-    if has_permission('edit', context, request):
-        user_can_edit = True
-        actions.append(('Edit', 'edit.html'))
-        if subpath:
-            direction = request.params['direction']
-            status_message = move_subpath(context, subpath, direction)
-    if has_permission('delete', context, request):
-        actions.append(('Delete', 'delete.html'))
-    if has_permission('administer', context, request):
-        actions.append(('Advanced', 'advanced.html'))
-
-    page_title = context.title
-    api = TemplateAPI(context, request, page_title)
-
-    # Get a layout
-    layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
-
-    # provide client data for rendering current tags in the tagbox
-    client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
-
-    previous, next = get_previous_next(context, request)
-
-    api.status_message = status_message
-    return render_to_response(
-        'templates/show_referencemanual.pt',
-        dict(api=api,
-             actions=actions,
-             user_can_edit=user_can_edit,
-             head_data=convert_to_script(client_json_data),
-             tree=getTree(context, request, api),
-             backto=backto,
-             layout=layout,
-             previous_entry=previous,
-             next_entry=next),
-        request=request,
-        )
 
 
 def reference_viewall_view(context, request):
@@ -244,8 +185,7 @@ def reference_viewall_view(context, request):
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
+        tagbox=get_tags_client_data(context, request))
 
     previous, next = get_previous_next(context, request, 'view_all.html')
 
@@ -273,9 +213,9 @@ def _get_ordered_listing(context, request):
     for name in context.ordering.items():
         child = context.get(name, False)
         entries.append({
-                'title': child.title,
-                'href': resource_url(child, request),
-                })
+            'title': child.title,
+            'href': resource_url(child, request),
+            })
     return entries
 
 
@@ -364,7 +304,7 @@ class EditReferenceFCBase(object):
     def form_defaults(self):
         context = self.context
         defaults = {'title': context.title,
-                    'tags': [], # initial values supplied by widget
+                    'tags': [],  # initial values supplied by widget
                     'description': context.description,
                     }
         return defaults

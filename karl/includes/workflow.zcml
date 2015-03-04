@@ -4,8 +4,7 @@
 
   <workflow type="security"
             name="community"
-            description="WF for communities added outside the intranet"
-            elector="karl.workflow.not_intranets_containment"
+            description="WF for communities"
             content_types="karl.models.interfaces.ICommunity"
             initial_state="public"
             state_attr="security_state"
@@ -27,24 +26,6 @@
       <transition name="private"
                   to_state="private"
                   from_state="public"/>
-
-  </workflow>
-
-  <workflow type="security"
-            name="intranet-community"
-            description="WF for communities added within an intranet"
-            content_types="karl.models.interfaces.ICommunity"
-            elector="karl.workflow.intranets_containment"
-            initial_state="intranet"
-            state_attr="security_state"
-            >
-
-      <state name="intranet" title="Default"
-             callback="karl.workflow.community_to_intranet">
-          <alias name="private"/>  <!-- b/c -->
-          <alias name="inherits"/>  <!-- b/c -->
-      </state>
-
 
   </workflow>
 
@@ -221,22 +202,6 @@
       <transition name="private_to_inherits"
                   to_state="inherits"
                   from_state="private"/>
-
-  </workflow>
-
-  <workflow type="security"
-            name="intranet-content"
-            description="Workflow for content added within an intranet"
-            content_types="karl.models.interfaces.ICommunityContent"
-            elector="karl.workflow.intranets_containment"
-            initial_state="inherits"
-            state_attr="security_state"
-            >
-
-      <state name="inherits" title="Default"
-             callback="karl.workflow.intranet_content_to_inherits">
-          <alias name="private"/>
-      </state>
 
   </workflow>
 

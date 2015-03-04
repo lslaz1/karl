@@ -50,15 +50,6 @@
      sort_key="50"
      />
 
-  <lemonade:listitem
-     component=".intranets.intranets_tool_factory"
-     provides="karl.models.interfaces.IToolFactory"
-     name="intranets"
-     title="Intranets"
-     description="Intranets tool"
-     sort_key="60"
-     />
-
   <!-- default content registrations -->
 
   <lemonade:content
@@ -244,11 +235,6 @@
   <lemonade:content
       factory=".forum.ForumTopic"
       type="karl.content.interfaces.IForumTopic"
-      />
-
-  <lemonade:content
-      factory=".intranets.IntranetsFolder"
-      type="karl.content.interfaces.IIntranetsTool"
       />
 
 </configure>

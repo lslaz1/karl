@@ -138,30 +138,6 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('page', result['type'])
         self.assertEqual('page', result['category'])
 
-    def test_page_adapter_withoffice(self):
-        from datetime import datetime
-        from zope.interface import alsoProvides
-        from karl.models.interfaces import ICommunity
-        from karl.models.interfaces import IIntranets
-        from karl.views.adapters import page_livesearch_result
-        root = testing.DummyModel(title='nice office')
-        alsoProvides(root, ICommunity)
-        alsoProvides(root, IIntranets)
-        context = testing.DummyModel(__name__='foo',
-                                     __parent__=root,
-                                     title='foo',
-                                     modified_by='johnny',
-                                     modified=datetime(1985, 1, 1),
-                                     )
-        request = testing.DummyRequest()
-        result = page_livesearch_result(context, request)
-        self.assertEqual('foo', result['title'])
-        self.assertEqual('johnny', result['modified_by'])
-        self.assertEqual('1985-01-01T00:00:00', result['modified'])
-        self.assertEqual(None, result['community'])
-        self.assertEqual('page', result['type'])
-        self.assertEqual('page', result['category'])
-
     def test_reference_adapter(self):
         from datetime import datetime
         context = testing.DummyModel(title='foo',

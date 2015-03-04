@@ -1,10 +1,8 @@
 from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import Everyone
-from pyramid.traversal import find_interface
 from pyramid.traversal import resource_path
 
-from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemovedGroup
 
@@ -25,16 +23,17 @@ from karl.utils import find_users
 from karl.utils import find_profiles
 from karl.views.communities import get_community_groups
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Helper methods
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 _marker = object()
+
 
 def _reindex(ob, texts=False):
     catalog = find_catalog(ob)
     if catalog is None:
-        return # Will be true for a mailin test trace
+        return  # Will be true for a mailin test trace
 
     # XXX reindexing the 'path' index can be removed once we've
     # removed the last ACLChecker spelled in catalog queries from the
@@ -57,6 +56,7 @@ def _reindex(ob, texts=False):
             if hasattr(node, 'docid'):
                 allowed_index.reindex_doc(node.docid, node)
 
+
 def _reindex_peopledir(profile):
     catalog = find_peopledirectory_catalog(profile)
 
@@ -67,40 +67,33 @@ def _reindex_peopledir(profile):
     docid = catalog.document_map.docid_for_address(path)
     catalog.reindex_doc(docid, profile)
 
+
 def ts(*args):
     return '\t'.join([unicode(x) for x in args])
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Electors
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-def not_intranets_containment(context):
-    return not intranets_containment(context)
-
-def intranets_containment(context):
-    if find_interface(context, IIntranets) is not None:
-        return True
-    return False
 
 def private_community_containment(context):
-    if not_intranets_containment(context):
-        community = find_community(context)
-        if community is None:
-            return False
-        return getattr(community, 'security_state', None) == 'private'
-    return False
+    community = find_community(context)
+    if community is None:
+        return False
+    return getattr(community, 'security_state', None) == 'private'
+
 
 def public_community_containment(context):
-    if not_intranets_containment(context):
-        community = find_community(context)
-        if community is None:
-            return False
-        return getattr(community, 'security_state', None) == 'public'
-    return False
+    community = find_community(context)
+    if community is None:
+        return False
+    return getattr(community, 'security_state', None) == 'public'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Workflow for communities
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+
 def community_to_private(ob, info):
     community = find_community(ob)
     acl = []
@@ -117,6 +110,7 @@ def community_to_private(ob, info):
         msg = ts('community-private', resource_path(community), added, removed)
     _reindex(community)
     return msg
+
 
 def community_to_public(ob, info):
     community = find_community(ob)
@@ -136,30 +130,15 @@ def community_to_public(ob, info):
     _reindex(community)
     return msg
 
-def community_to_intranet(ob, info):
-    community = find_community(ob)
-    acl = []
-    moderators_group_name = community.moderators_group_name
-    members_group_name = community.members_group_name
-    acl.append((Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
-    acl.append((Allow, moderators_group_name, MODERATOR_PERMS))
-    acl.append((Allow, members_group_name, MEMBER_PERMS))
-    # inherit from /offices
-    #acl.append(NO_INHERIT)
-    msg = None
-    added, removed = acl_diff(community, acl)
-    if added or removed:
-        community.__acl__ = acl
-        msg = ts('community-intranet', resource_path(community), added, removed)
-    _reindex(community)
-    return msg
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Special workflow for blog entries.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 """
 o Only the creator and the admin is allowed to edit or delete an entry.
 """
+
+
 def blogentry_to_inherits(ob, info):
     acl = [
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
@@ -174,6 +153,7 @@ def blogentry_to_inherits(ob, info):
         msg = ts('blogentry-inherits', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
+
 
 def blogentry_to_private(ob, info):
     community = find_community(ob)
@@ -192,12 +172,14 @@ def blogentry_to_private(ob, info):
     _reindex(ob)
     return msg
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Special workflow for comments.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 """
 o Only the creator and the admin is allowed to edit or delete a comment.
 """
+
+
 def comment_to_inherits(ob, info):
     acl = [
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
@@ -213,9 +195,10 @@ def comment_to_inherits(ob, info):
     _reindex(ob)
     return msg
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Workflow for forums and forum topics
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 
 def forum_to_inherits(ob, info):
     acl = [(Allow, 'group.KarlStaff', (CREATE,))]
@@ -227,6 +210,7 @@ def forum_to_inherits(ob, info):
         msg = ts('forum-inherited', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
+
 
 def forum_topic_to_inherits(ob, info):
     acl = [
@@ -243,12 +227,13 @@ def forum_topic_to_inherits(ob, info):
     _reindex(ob)
     return msg
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Special workflow for profiles
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 
 def to_profile_active(ob, info):
-    acl  = [
+    acl = [
         (Allow, ob.creator, MEMBER_PERMS + ('view_only',)),
     ]
     acl.append((Allow, 'group.KarlUserAdmin',
@@ -275,8 +260,9 @@ def to_profile_active(ob, info):
     _reindex_peopledir(ob)
     return msg
 
+
 def to_profile_inactive(ob, info):
-    acl  = [
+    acl = [
         (Allow, 'system.Authenticated', ('view_only',)),
         (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
@@ -291,18 +277,20 @@ def to_profile_inactive(ob, info):
     _reindex_peopledir(ob)
     return msg
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #   Workflow for content within a community
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 
 def content_to_inherits(ob, info):
     msg = None
     added, removed = acl_diff(ob, {})
     if hasattr(ob, '__acl__'):
         del ob.__acl__
-        msg =  ts('content-inherited', resource_path(ob), added, removed)
+        msg = ts('content-inherited', resource_path(ob), added, removed)
     _reindex(ob)
     return msg
+
 
 def content_to_private(ob, info):
     community = find_community(ob)
@@ -321,15 +309,6 @@ def content_to_private(ob, info):
     _reindex(ob)
     return msg
 
-#------------------------------------------------------------------------------
-#   Workflow for intranet content
-#
-# This workflow applies to communities and community content in the context
-# of intranet sites.
-#------------------------------------------------------------------------------
-
-intranet_content_to_inherits = content_to_inherits
-
 
 # subscribers
 
@@ -340,7 +319,7 @@ def reset_profile(event):
       by resettings its security workflow
     """
     if (not IUserAddedGroup.providedBy(event) and
-        not IUserRemovedGroup.providedBy(event)):
+            not IUserRemovedGroup.providedBy(event)):
         return
 
     profiles = find_profiles(event.site)

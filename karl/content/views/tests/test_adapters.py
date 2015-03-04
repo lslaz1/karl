@@ -592,58 +592,6 @@ class TestCommunityFileAlert(unittest.TestCase):
         self.assertEqual(alert.message['Precedence'], 'bulk')
 
 
-class TestForumPortlet(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _register(self):
-        from karl.models.interfaces import ICatalogSearch
-        from zope.interface import Interface
-        karltesting.registerAdapter(
-            DummySearchAdapter, Interface, ICatalogSearch)
-
-    def _getTargetClass(self):
-        from karl.content.views.adapters import ForumPortlet
-        return ForumPortlet
-
-    def _makeOne(self, context, request):
-        return self._getTargetClass()(context, request)
-
-    def test_class_conforms_to_IIntranetPortlet(self):
-        from zope.interface.verify import verifyClass
-        from karl.views.interfaces import IIntranetPortlet
-        verifyClass(IIntranetPortlet, self._getTargetClass())
-
-    def test_title(self):
-        context = testing.DummyModel(title='the title')
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.title, 'the title')
-
-    def test_href(self):
-        context = testing.DummyModel(title='the title')
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.href, 'http://example.com/')
-
-    def test_entries(self):
-        self._register()
-        context = testing.DummyModel(title='the title')
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.entries, None)
-
-    def test_asHTML(self):
-        self._register()
-        context = testing.DummyModel(title='the title')
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-        self.assert_(adapter.asHTML.startswith('<div'))
-
-
 class TestDefaultShowSendalert(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -663,18 +611,6 @@ class TestDefaultShowSendalert(unittest.TestCase):
     def _call_fut(self, context, request):
         adapter = self._getTargetClass()(context, request)
         return adapter.show_sendalert
-
-    def test_not_intranet(self):
-        context = testing.DummyModel()
-        self.failUnless(self._call_fut(context, None))
-
-    def test_in_intranet(self):
-        from karl.content.interfaces import IIntranets
-        from zope.interface import directlyProvides
-        intranet = testing.DummyModel()
-        directlyProvides(intranet, IIntranets)
-        intranet['foo'] = context = testing.DummyModel()
-        self.failIf(self._call_fut(context, None))
 
 
 class DummySearchAdapter:

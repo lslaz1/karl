@@ -1697,12 +1697,6 @@
       handler="karl.handlers.add_no_cache_headers"
       />
 
-  <view
-    for="karl.models.interfaces.IIntranet"
-    view=".retail.retail_view"
-    permission="view"
-  />
-
   <!-- Admin UI -->
   <view
     for="karl.models.interfaces.ISite"
@@ -2034,23 +2028,9 @@
     />
 
   <adapter
-    for="karl.content.interfaces.IIntranet
-         pyramid.interfaces.IRequest"
-    provides=".interfaces.ILiveSearchEntry"
-    factory=".adapters.intranet_livesearch_result"
-    />
-
-  <adapter
     for="* pyramid.interfaces.IRequest"
     provides=".interfaces.IAdvancedSearchResultsDisplay"
     factory=".adapters.BaseAdvancedSearchResultsDisplay"
-    />
-
-  <adapter
-    for="karl.content.interfaces.IIntranet
-         pyramid.interfaces.IRequest"
-    provides=".interfaces.IAdvancedSearchResultsDisplay"
-    factory=".adapters.AdvancedSearchResultsDisplayOffice"
     />
 
   <adapter

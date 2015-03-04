@@ -15,8 +15,3 @@ class IInitialData(Interface):
     """
     Provides data used to initialize a Karl site.
     """
-
-class IInitialOfficeData(Interface):
-    """
-    Provides data used to initialize offices.
-    """
