@@ -73,6 +73,7 @@ from karl.security.policy import DELETE_COMMUNITY
 from karl.security.policy import MODERATE
 from karl.security.workflow import get_security_states
 
+
 def get_recent_items_batch(community, request, size=10):
     batch = get_catalog_batch_grid(
         community, request, interfaces=[ICommunityContent],
@@ -81,6 +82,7 @@ def get_recent_items_batch(community, request, size=10):
         allowed={'query': effective_principals(request), 'operator': 'or'},
     )
     return batch
+
 
 def redirect_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
@@ -96,6 +98,7 @@ def redirect_community_view(context, request):
         location = resource_url(context, request, default_tool)
     return HTTPFound(location=location)
 
+
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
 
@@ -107,8 +110,8 @@ def show_community_view(context, request):
     tagquery = getMultiAdapter((context, request), ITagQuery)
     client_json_data = {'tagbox': {'docid': tagquery.docid,
                                    'records': tagquery.tagswithcounts,
-                                  },
-                       }
+                                   },
+                        }
 
     # Filter the actions based on permission
     actions = []
@@ -118,6 +121,8 @@ def show_community_view(context, request):
     # If user has permission to see this view then has permission to join.
     if not(user in context.member_names or user in context.moderator_names):
         actions.append(('Join', 'join.html'))
+    elif user in context.member_names:
+        actions.append(('Leave community', 'leave.html'))
 
     if has_permission(DELETE_COMMUNITY, context, request):
         actions.append(('Delete', 'delete.html'))
@@ -139,7 +144,8 @@ def show_community_view(context, request):
             'batch_info': recent_items_batch,
             'head_data': convert_to_script(client_json_data),
             'feed_url': feed_url
-           }
+            }
+
 
 def community_recent_items_ajax_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
@@ -152,6 +158,7 @@ def community_recent_items_ajax_view(context, request):
 
     return {'items': recent_items}
 
+
 def get_members_batch(community, request, size=10):
     mods = list(community.moderator_names)
     any = list(community.member_names | community.moderator_names)
@@ -163,7 +170,7 @@ def get_members_batch(community, request, size=10):
                                              'operator': 'or'},
                                        allowed={'query': principals,
                                                 'operator': 'or'},
-                                      )
+                                       )
     mod_entries = []
     other_entries = []
 
@@ -205,7 +212,7 @@ def related_communities_ajax_view(context, request):
                                        texts=search,
                                        allowed={'query': principals,
                                                 'operator': 'or'},
-                                      )
+                                       )
     for docid in docids:
         model = resolver(docid)
         if model is not None:
@@ -227,17 +234,17 @@ description_field = schemaish.String(
                  'on the community listing page.  Please limit your '
                  'description to 100 words or less'),
     validator=validator.All(validator.Length(max=500),
-                                    validator.Required())
+                            validator.Required())
     )
 
-text_field =  schemaish.String(
+text_field = schemaish.String(
     description=('This text will appear on the Overview page for this '
                  'community.  You can use this to describe the '
                  'community or to make a special announcement.'))
 
 tools_field = schemaish.Sequence(
     attr=schemaish.String(),
-    description = 'Select which tools to enable on this community.')
+    description='Select which tools to enable on this community.')
 
 default_tool_field = schemaish.String(
     description=(
@@ -247,6 +254,7 @@ default_tool_field = schemaish.String(
 sendalert_default_field = schemaish.Boolean(
     description=('Send alerts by default on content creation?'))
 
+
 def shared_fields():
     return [
         ('tags', tags_field),
@@ -255,13 +263,15 @@ def shared_fields():
         ('tools', tools_field)
         ]
 
+
 def shared_widgets(context):
     return {
-        'title':formish.Input(empty=''),
+        'title': formish.Input(empty=''),
         'description': formish.TextArea(cols=60, rows=10, empty=''),
-        'text':karlwidgets.RichTextWidget(empty=''),
-        'tools':formish.CheckboxMultiChoice(options=context.tools)
+        'text': karlwidgets.RichTextWidget(empty=''),
+        'tools': formish.CheckboxMultiChoice(options=context.tools)
         }
+
 
 def get_available_tools(context, request):
     available_tools = []
@@ -270,25 +280,26 @@ def get_available_tools(context, request):
         default=DefaultToolAddables(context, request))()
     return available_tools
 
+
 class AddCommunityFormController(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
         self.workflow = get_workflow(ICommunity, 'security', context)
         self.available_tools = get_available_tools(context, request)
-        self.tools = [ (x['name'], x['title']) for x in self.available_tools ]
+        self.tools = [(x['name'], x['title']) for x in self.available_tools]
 
     def form_defaults(self):
         defaults = {
-        'title':'',
-        'tags': [],
-        'description':'',
-        'text':'',
-        'tools':[ t[0] for t in self.tools ],
-        'sendalert_default': True,
+            'title': '',
+            'tags': [],
+            'description': '',
+            'text': '',
+            'tools': [t[0] for t in self.tools],
+            'sendalert_default': True,
         }
         if self.workflow is not None:
-            defaults['security_state']  = self.workflow.initial_state
+            defaults['security_state'] = self.workflow.initial_state
         return defaults
 
     def form_fields(self):
@@ -318,13 +329,13 @@ class AddCommunityFormController(object):
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
     def __call__(self):
         api = TemplateAPI(self.context, self.request, 'Add Community')
-        return {'api':api}
+        return {'api': api}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -376,17 +387,20 @@ class AddCommunityFormController(object):
         set_tags(community, request, converted['tags'])
         # Adding a community should take you to the Add Existing
         # User screen, so the moderator can include some users.
-        location = resource_url(community, request,
-                             'members', 'add_existing.html',
-                             query={'status_message':'Community added'})
+        location = resource_url(
+            community, request,
+            'members', 'add_existing.html',
+            query={'status_message': 'Community added'})
         return HTTPFound(location=location)
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
 
-def add_community(context, request): # b/c for start_over
+
+def add_community(context, request):  # b/c for start_over
     form = AddCommunityFormController(context, request)
     return form.handle_submit(request.POST)
+
 
 class EditCommunityFormController(object):
     def __init__(self, context, request):
@@ -394,7 +408,7 @@ class EditCommunityFormController(object):
         self.request = request
         self.workflow = get_workflow(ICommunity, 'security', context)
         self.available_tools = get_available_tools(context, request)
-        self.tools = [ (x['name'], x['title']) for x in self.available_tools ]
+        self.tools = [(x['name'], x['title']) for x in self.available_tools]
         selected_tools = []
         for info in self.available_tools:
             component = info['component']
@@ -406,16 +420,16 @@ class EditCommunityFormController(object):
     def form_defaults(self):
         context = self.context
         defaults = {
-            'title':context.title,
-            'tags': [], # initial values are supplied by widget
-            'description':context.description,
-            'text':context.text,
-            'default_tool':getattr(context, 'default_tool', None),
-            'sendalert_default':getattr(context, 'sendalert_default', True),
-            'tools':[t[0] for t in self.selected_tools],
+            'title': context.title,
+            'tags': [],  # initial values are supplied by widget
+            'description': context.description,
+            'text': context.text,
+            'default_tool': getattr(context, 'default_tool', None),
+            'sendalert_default': getattr(context, 'sendalert_default', True),
+            'tools': [t[0] for t in self.selected_tools],
             }
         if self.workflow is not None:
-            defaults['security_state']  = self.workflow.state_of(context)
+            defaults['security_state'] = self.workflow.state_of(context)
         return defaults
 
     def form_fields(self):
@@ -443,14 +457,14 @@ class EditCommunityFormController(object):
         if 'security_state' in schema:
             security_states = self._get_security_states()
             widgets['security_state'] = formish.RadioChoice(
-                options=[ (s['name'], s['title']) for s in security_states],
+                options=[(s['name'], s['title']) for s in security_states],
                 none_option=None)
         return widgets
 
     def __call__(self):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
-        return {'api':api, 'actions':()}
+        return {'api': api, 'actions': ()}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -496,6 +510,23 @@ class EditCommunityFormController(object):
     def _get_security_states(self):
         return get_security_states(self.workflow, self.context, self.request)
 
+
+def leave_community_view(context, request):
+    """
+    Users can leaver a community they are a member of
+    """
+    assert ICommunity.providedBy(context)
+    profiles = find_profiles(context)
+    user = authenticated_userid(request)
+    profile = profiles[user]
+    community_users = find_users(context)
+    community_users.remove_group(profile.__name__, context.members_group_name)
+    status_message = "You are no longer a member of this community!"
+    community_href = resource_url(context, request,
+                                  query={"status_message": status_message})
+    return HTTPFound(location=community_href)
+
+
 def join_community_view(context, request):
     """ User sends an email to community moderator(s) asking to join
     the community.  Email contains a link to "add_existing" view, in members,
@@ -508,6 +539,16 @@ def join_community_view(context, request):
     profiles = find_profiles(context)
     user = authenticated_userid(request)
     profile = profiles[user]
+
+    # first off, see if the community is public, in that case,
+    # it does not need to be reviewed to join
+    if has_permission('edit', context, request):
+        community_users = find_users(context)
+        community_users.add_group(profile.__name__, context.members_group_name)
+        status_message = "You have joined this community!"
+        community_href = resource_url(context, request,
+                                      query={"status_message": status_message})
+        return HTTPFound(location=community_href)
 
     # Handle form submission
     if "form.submitted" in request.POST:
@@ -523,8 +564,9 @@ def join_community_view(context, request):
         body_template = get_renderer(
             "templates/email_join_community.pt").implementation()
         profile_url = resource_url(profile, request)
-        accept_url=resource_url(context, request, "members", "add_existing.html",
-                             query={"user_id": user})
+        accept_url = resource_url(
+            context, request, "members", "add_existing.html",
+            query={"user_id": user})
         body = body_template(
             message=message,
             community_title=context.title,
@@ -544,19 +586,22 @@ def join_community_view(context, request):
         mailer.send(recipients, mail)
 
         status_message = "Your request has been sent to the moderators."
-        location = resource_url(context, request,
-                             query={"status_message": status_message})
+        location = resource_url(
+            context, request,
+            query={"status_message": status_message})
 
         return HTTPFound(location=location)
 
     # Show form
     page_title = "Join " + context.title
     api = TemplateAPI(context, request, page_title)
-    return dict(api=api,
-             profile=profile,
-             community=context,
-             post_url=resource_url(context, request, "join.html"),
-             formfields=api.formfields)
+    return dict(
+        api=api,
+        profile=profile,
+        community=context,
+        post_url=resource_url(context, request, "join.html"),
+        formfields=api.formfields)
+
 
 def delete_community_view(context, request):
 
@@ -574,9 +619,11 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return dict(api=api,
-             layout=layout,
-             num_children=0,)
+    return dict(
+        api=api,
+        layout=layout,
+        num_children=0,)
+
 
 class CommunitySidebar(object):
     implements(ISidebar)

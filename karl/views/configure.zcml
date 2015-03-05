@@ -868,6 +868,12 @@
     permission="view"
     renderer="templates/join_community.pt"
     />
+  <view
+    for="karl.models.interfaces.ICommunity"
+    name="leave.html"
+    view=".community.leave_community_view"
+    permission="view"
+    />
 
   <adapter
     for="karl.models.interfaces.ICommunity

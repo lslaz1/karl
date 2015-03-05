@@ -73,14 +73,17 @@ PROFILE_THUMB_SIZE = (75, 100)
 
 _MIN_PW_LENGTH = None
 
+
 def min_pw_length():
     global _MIN_PW_LENGTH
     if _MIN_PW_LENGTH is None:
         _MIN_PW_LENGTH = get_setting(None, 'min_pw_length', 8)
     return _MIN_PW_LENGTH
 
+
 def edit_profile_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'edit-profile')
+
 
 def add_user_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'add-user')
@@ -99,11 +102,12 @@ organization_field = schemaish.String()
 location_field = schemaish.String()
 country_field = schemaish.String(validator=validator.Required())
 websites_field = schemaish.Sequence(
-                    schemaish.String(validator=karlvalidators.WebURL()))
+    schemaish.String(validator=karlvalidators.WebURL()))
 languages_field = schemaish.String()
 photo_field = schemaish.File()
 biography_field = schemaish.String()
 date_format_field = schemaish.String(title='Preferred Date Format')
+
 
 class EditProfileFormController(object):
     """
@@ -179,8 +183,8 @@ class EditProfileFormController(object):
                    'location': formish.Input(empty=''),
                    'country': formish.SelectChoice(options=countries),
                    'websites': formish.TextArea(
-                            rows=3,
-                            converter_options={'delimiter':'\n'}),
+                       rows=3,
+                       converter_options={'delimiter': '\n'}),
                    'languages': formish.Input(empty=''),
                    'photo': karlwidgets.PhotoImageWidget(
                        filestore=self.filestore,
@@ -219,8 +223,9 @@ class EditProfileFormController(object):
         _fix_website_validation_errors(self.request.form)
         api = TemplateAPI(self.context, self.request, self.page_title)
         if api.user_is_admin:
-            return HTTPFound(location=resource_url(self.context,
-                self.request, 'admin_edit_profile.html'))
+            return HTTPFound(
+                location=resource_url(self.context,
+                                      self.request, 'admin_edit_profile.html'))
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         if api.user_is_staff:
@@ -229,7 +234,7 @@ class EditProfileFormController(object):
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
         same_user = authenticated_userid(self.request) == self.context.__name__
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api': api, 'actions': (), 'layout': layout,
                 'same_user': same_user, 'form_title': form_title,
                 'include_blurb': True}
 
@@ -261,6 +266,7 @@ class EditProfileFormController(object):
 login_field = schemaish.String(validator=validator.Required())
 groups_field = schemaish.Sequence(schemaish.String(),
                                   title='Group Memberships')
+
 
 class AdminEditProfileFormController(EditProfileFormController):
     """
@@ -306,19 +312,18 @@ class AdminEditProfileFormController(EditProfileFormController):
         return fields
 
     def form_widgets(self, fields):
-        widgets = super(AdminEditProfileFormController, self
-                       ).form_widgets(fields)
+        widgets = super(AdminEditProfileFormController, self).form_widgets(fields)
         if self.user is not None:
             groups_widget = formish.CheckboxMultiChoice(self.group_options)
             widgets.update({'login': formish.Input(empty=''),
                             'groups': groups_widget,
                             'password': karlwidgets.KarlCheckedPassword(),
-                           })
+                            })
         widgets.update({'home_path': formish.Input(empty=''),
                         'websites': formish.TextArea(
                             rows=3,
-                            converter_options={'delimiter':'\n'}),
-                       })
+                            converter_options={'delimiter': '\n'}),
+                        })
         return widgets
 
     def form_defaults(self):
@@ -338,7 +343,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Edit User and Profile Information'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api': api, 'actions': (), 'layout': layout,
                 'form_title': form_title, 'include_blurb': False,
                 'admin_edit': True, 'is_active': self.is_active}
 
@@ -393,6 +398,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         msg = '?status_message=User%20edited'
         return HTTPFound(location=path+msg)
 
+
 def get_group_options(context):
     group_options = []
     for group in get_setting(context, "selectable_groups").split():
@@ -402,6 +408,7 @@ def get_group_options(context):
             title = group
         group_options.append((group, title))
     return group_options
+
 
 class AddUserFormController(EditProfileFormController):
     """
@@ -471,7 +478,7 @@ class AddUserFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Add User'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api': api, 'actions': (), 'layout': layout,
                 'form_title': form_title, 'include_blurb': False,
                 'reactivate_user': self.reactivate_user}
 
@@ -481,7 +488,7 @@ class AddUserFormController(EditProfileFormController):
         userid = converted['login']
         users = self.users
         if (users.get_by_id(userid) is not None or
-            users.get_by_login(userid) is not None):
+                users.get_by_login(userid) is not None):
             msg = "User ID '%s' is already in use" % userid
             raise ValidationError(login=msg)
         profile = context.get(userid)
@@ -491,7 +498,7 @@ class AddUserFormController(EditProfileFormController):
                 self.reactivate_user = dict(userid=userid, url=url)
                 msg = ("User ID '%s' is used by a previously deactivated "
                        "user.  Perhaps you mean to reactivate this user. "
-                       "See link above."%
+                       "See link above." %
                        userid)
             else:
                 msg = "User ID '%s' is already in use" % userid
@@ -505,7 +512,7 @@ class AddUserFormController(EditProfileFormController):
             msg = 'Email address is already in use by another user(s).'
             if count == 1:
                 profile = resolver(docids[0])
-                if profile.security_state ==  'inactive':
+                if profile.security_state == 'inactive':
                     url = resource_url(profile, request, 'reactivate.html')
                     userid = profile.__name__
                     self.reactivate_user = dict(userid=userid, url=url)
@@ -546,6 +553,7 @@ class AddUserFormController(EditProfileFormController):
         location = resource_url(profile, request)
         return HTTPFound(location=location)
 
+
 def _normalize_websites(converted):
     websites = converted.setdefault('websites', [])
     if websites is None:
@@ -555,6 +563,7 @@ def _normalize_websites(converted):
     for i, website in enumerate(websites):
         if website.startswith('www.'):
             websites[i] = 'http://%s' % website
+
 
 def _fix_website_validation_errors(form):
     # The websites field is a sequence but it uses a textarea widget, which
@@ -575,6 +584,7 @@ def _fix_website_validation_errors(form):
     if errors:
         form.errors['websites'] = validatish.Invalid('\n'.join(errors))
 
+
 def get_profile_actions(profile, request):
     profile_url = request.resource_url(profile)
     actions = []
@@ -589,6 +599,7 @@ def get_profile_actions(profile, request):
     if has_permission('administer', profile, request):
         actions.append(('Advanced', '%sadvanced.html' % profile_url))
     return actions
+
 
 def show_profile_view(context, request):
     """Show a profile with actions if the current user"""
@@ -607,7 +618,7 @@ def show_profile_view(context, request):
             profile[name] = None
 
     if 'fax' not in profile:
-        profile['fax'] = '' # BBB
+        profile['fax'] = ''  # BBB
 
     # 'websites' is a property, so the loop above misses it
     profile["websites"] = context.websites
@@ -615,17 +626,17 @@ def show_profile_view(context, request):
     # ditto for 'title'
     profile["title"] = context.title
 
-    if profile.has_key("languages"):
+    if "languages" in profile:
         profile["languages"] = context.languages
 
-    if profile.has_key("department"):
+    if "department" in profile:
         profile["department"] = context.department
 
-    if profile.get("last_login_time"):
+    if "last_login_time" in profile:
         stamp = context.last_login_time.strftime('%Y-%m-%dT%H:%M:%SZ')
         profile["last_login_time"] = stamp
 
-    if profile.has_key("country"):
+    if "country" in profile:
         # translate from country code to country name
         country_code = profile["country"]
         country = countries.as_dict.get(country_code, u'')
@@ -642,8 +653,7 @@ def show_profile_view(context, request):
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
-        tagbox = get_tags_client_data(context, request),
-        )
+        tagbox=get_tags_client_data(context, request))
 
     # Get communities this user is a member of, along with moderator info
     #
@@ -654,8 +664,8 @@ def show_profile_view(context, request):
         for group in user_info["groups"]:
             if group.startswith("group.community:"):
                 unused, community_name, role = group.split(":")
-                if (communities.has_key(community_name) and
-                    role != "moderators"):
+                if (community_name in communities and
+                        role != "moderators"):
                     continue
 
                 community = communities_folder.get(community_name, None)
@@ -670,7 +680,7 @@ def show_profile_view(context, request):
                     }
 
     communities = communities.values()
-    communities.sort(key=lambda x:x["title"])
+    communities.sort(key=lambda x: x["title"])
 
     preferred_communities = []
     my_communities = None
@@ -690,8 +700,7 @@ def show_profile_view(context, request):
         for name, count in sorted(tagger.getFrequency(names,
                                                       user=context.__name__),
                                   key=lambda x: x[1],
-                                  reverse=True,
-                                 )[:10]:
+                                  reverse=True)[:10]:
             tags.append({'name': name, 'count': count})
 
     # List recently added content
@@ -709,7 +718,8 @@ def show_profile_view(context, request):
         recent_items.append(adapted)
     recent_url = request.resource_url(context, 'recent_content.html')
 
-    return dict(api=api,
+    return dict(
+        api=api,
         profile=profile,
         actions=get_profile_actions(context, request),
         photo=photo,
@@ -721,6 +731,7 @@ def show_profile_view(context, request):
         recent_items=recent_items,
         recent_url=recent_url)
 
+
 def profile_thumbnail(context, request):
     api = TemplateAPI(context, request, 'Profile thumbnail redirector')
     photo = context.get('photo')
@@ -730,12 +741,13 @@ def profile_thumbnail(context, request):
         url = api.static_url + "/images/defaultUser.gif"
     return HTTPFound(location=url)
 
+
 def recent_content_view(context, request):
-    batch = get_catalog_batch(context, request,
+    batch = get_catalog_batch(
+        context, request,
         sort_index='creation_date', reverse=True,
         interfaces=[IContent], creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-        )
+        allowed={'query': effective_principals(request), 'operator': 'or'})
 
     recent_items = []
     for item in batch['entries']:
@@ -744,9 +756,11 @@ def recent_content_view(context, request):
 
     page_title = "Content Added Recently by %s" % context.title
     api = TemplateAPI(context, request, page_title)
-    return dict(api=api,
-             batch_info=batch,
-             recent_items=recent_items)
+    return dict(
+        api=api,
+        batch_info=batch,
+        recent_items=recent_items)
+
 
 def may_leave(userid, community):
     # May not leave community if a moderator
@@ -755,6 +769,7 @@ def may_leave(userid, community):
     # Alternatively, may not leave community if *sole* moderator
     # may_leave = len(community.moderator_names) > 1 or \
     #           userid not in community.moderator_names
+
 
 def manage_communities_view(context, request):
     page_title = 'Manage Communities'
@@ -801,32 +816,32 @@ def manage_communities_view(context, request):
     communities = []
     for community in communities_folder.values():
         if (userid in community.member_names or
-            userid in community.moderator_names):
+                userid in community.moderator_names):
             alerts_pref = context.get_alerts_preference(community.__name__)
             display_community = {
                 'name': community.__name__,
                 'title': community.title,
                 'alerts_pref': [
-                    { "value": IProfile.ALERT_IMMEDIATELY,
-                      "label": "Immediately",
-                      "selected": alerts_pref == IProfile.ALERT_IMMEDIATELY,
-                    },
-                    { "value": IProfile.ALERT_DAILY_DIGEST,
-                      "label": "Daily Digest",
-                      "selected": alerts_pref == IProfile.ALERT_DAILY_DIGEST,
-                    },
-                    { "value": IProfile.ALERT_NEVER,
-                      "label": "Never",
-                      "selected": alerts_pref == IProfile.ALERT_NEVER,
-                    },
-                    { "value": IProfile.ALERT_WEEKLY_DIGEST,
-                      "label": "Weekly Digest",
-                      "selected": alerts_pref == IProfile.ALERT_WEEKLY_DIGEST,
-                    },
-                    { "value": IProfile.ALERT_BIWEEKLY_DIGEST,
-                      "label": "Every two weeks Digest",
-                      "selected": alerts_pref == IProfile.ALERT_BIWEEKLY_DIGEST,
-                    },
+                    {"value": IProfile.ALERT_IMMEDIATELY,
+                     "label": "Immediately",
+                     "selected": alerts_pref == IProfile.ALERT_IMMEDIATELY,
+                     },
+                    {"value": IProfile.ALERT_DAILY_DIGEST,
+                     "label": "Daily Digest",
+                     "selected": alerts_pref == IProfile.ALERT_DAILY_DIGEST,
+                     },
+                    {"value": IProfile.ALERT_NEVER,
+                     "label": "Never",
+                     "selected": alerts_pref == IProfile.ALERT_NEVER,
+                     },
+                    {"value": IProfile.ALERT_WEEKLY_DIGEST,
+                     "label": "Weekly Digest",
+                     "selected": alerts_pref == IProfile.ALERT_WEEKLY_DIGEST,
+                     },
+                    {"value": IProfile.ALERT_BIWEEKLY_DIGEST,
+                     "label": "Every two weeks Digest",
+                     "selected": alerts_pref == IProfile.ALERT_BIWEEKLY_DIGEST,
+                     },
                 ],
                 'may_leave': may_leave(userid, community),
             }
@@ -844,6 +859,7 @@ def manage_communities_view(context, request):
              attachments=context.alert_attachments),
         request=request,
     )
+
 
 def show_profiles_view(context, request):
     """
@@ -908,8 +924,8 @@ class ChangePasswordFormController(object):
         new_password_field = schemaish.String(
             title="New Password",
             validator=validator.All(
-                            karlvalidators.PasswordLength(min_pw_length()),
-                            validator.Required())
+                karlvalidators.PasswordLength(min_pw_length()),
+                validator.Required())
             )
         fields = [('old_password', old_password_field),
                   ('password', new_password_field),
@@ -975,6 +991,7 @@ def deactivate_profile_view(context, request):
 
     # Show confirmation page.
     return dict(api=api, myself=myself)
+
 
 def reactivate_profile_view(context, request,
                             reset_password=request_password_reset):
