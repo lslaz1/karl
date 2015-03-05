@@ -408,6 +408,7 @@ class Site(Folder):
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
     list_aliases = None
+    footer_html = 'Edit footer in <a href="/edit_footer.html">admin area</a>.'
     _repo = Uninitialized
 
     def __init__(self):

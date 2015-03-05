@@ -27,6 +27,11 @@ from pyramid.static import static_view
 
 from karl.views.utils import get_user_home
 from karl.views.utils import get_static_url
+from karl.views.api import TemplateAPI
+from karl.views.forms import widgets as karlwidgets
+
+import schemaish
+from validatish import validator
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,6 +41,7 @@ static_view = static_view('static', cache_max_age=157680000, use_subpath=True)
 version_match = re.compile(r'^r-?\d+$').match
 # version number is "r" plus an integer (possibly negative)
 
+
 def versioning_static_view(context, request):
     # if the first element in the subpath is the version number, strip
     # it out of the subpath (see views/api.py static_url)
@@ -44,9 +50,11 @@ def versioning_static_view(context, request):
         request.subpath = subpath[1:]
     return static_view(context, request)
 
+
 def site_view(context, request):
     home, extra_path = get_user_home(context, request)
     return HTTPFound(location=resource_url(home, request, *extra_path))
+
 
 class StaticRootFactory(object):
     def __init__(self, environ):
@@ -56,10 +64,10 @@ class StaticRootFactory(object):
 def expired_static(context, request):
     """Redirect static urls that use an expired revision segment
     to the currently active one. This has the following advantages:
-    
+
     - prevent static links from saved content causing a 404
       (instead they will give a 303 and go to the current version)
-    
+
     - make it easier to find the QUnit tests from a browser.
 
     """
@@ -80,6 +88,45 @@ def expired_static(context, request):
     if first_segment:
         path = path[1:]
     # Do the redirect
-    url = get_static_url(request) + '/' + '/'.join(path);
+    url = get_static_url(request) + '/' + '/'.join(path)
     return HTTPFound(location=url)
 
+
+class EditFooterFormController(object):
+    page_title = 'Edit footer'
+    schema = [
+        ('footer_html', schemaish.String(
+            validator=validator.Required(),
+            description="HTML for footer")),
+    ]
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        return self.schema
+
+    def form_defaults(self):
+        return {
+            'footer_html': self.context.footer_html
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'footer_html': karlwidgets.RichTextWidget(empty=''),
+        }
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request)
+        return {'api': api,
+                'actions': [],
+                'page_title': self.page_title,
+                }
+
+    def handle_submit(self, converted):
+        self.context.footer_html = converted['footer_html']
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)

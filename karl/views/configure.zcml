@@ -226,6 +226,22 @@
     permission="view"
   />
 
+
+  <formish:form
+     controller=".site.EditFooterFormController"
+     name="edit_footer.html"
+     for="karl.models.interfaces.ISite"
+     permission="administer"
+     renderer="karl.views.forms:templates/formish_form.pt"
+     form_id="edit">
+
+     <formish:action
+       name="submit"
+       title="Edit Footer"
+       />
+
+  </formish:form>
+
   <formish:form
      controller=".peopledirectory.AddReportGroupFormController"
      name="add_report_group.html"
