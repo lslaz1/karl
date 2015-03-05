@@ -632,7 +632,7 @@ def show_profile_view(context, request):
     if "department" in profile:
         profile["department"] = context.department
 
-    if "last_login_time" in profile:
+    if "last_login_time" in profile and context.last_login_time:
         stamp = context.last_login_time.strftime('%Y-%m-%dT%H:%M:%SZ')
         profile["last_login_time"] = stamp
 

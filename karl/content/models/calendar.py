@@ -33,15 +33,18 @@ from karl.content.models.attachments import AttachmentsFolder
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
 
+
 class Calendar(Folder):
     implements(ICalendar)
     title = u'Calendar'
+
 
 class CalendarCategory(Persistent):
     implements(ICalendarCategory)
 
     def __init__(self, title):
         self.title = title
+
 
 class CalendarLayer(Persistent):
     implements(ICalendarLayer)
@@ -51,6 +54,7 @@ class CalendarLayer(Persistent):
         self.color = color
         self.paths = paths
 
+
 class CalendarEvent(Folder):
     implements(ICalendarEvent)
     modified_by = None
@@ -58,7 +62,7 @@ class CalendarEvent(Folder):
 
     def __init__(self, title, startDate, endDate, creator,
                  text=u'', location=u'', attendees=[],
-                 contact_name = u'', contact_email = u'',
+                 contact_name=u'', contact_email=u'',
                  calendar_category=u''):
         Folder.__init__(self)
         self.title = unicode(title)
@@ -92,7 +96,7 @@ class CalendarToolFactory(ToolFactory):
         default_category = create_content(ICalendarCategory, 'Default')
         calendar[default_category_name] = default_category
         local_layer = create_content(ICalendarLayer,
-                                     "This Calendar's Events Only",' blue',
+                                     "This Calendar's Events Only", ' blue',
                                      [resource_path(default_category)])
         calendar[default_layer_name] = local_layer
 

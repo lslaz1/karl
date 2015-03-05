@@ -172,7 +172,7 @@ class TemplateAPI(object):
         return self._snippets
 
     def has_staff_acl(self, context):
-        return getattr(context, 'security_state', 'inherits') == 'public'
+        return getattr(context, 'security_state', 'inherits') in ('public', 'restricted')
 
     def is_private_in_public_community(self, context):
         """Return true if the object is private, yet located in a
@@ -184,7 +184,7 @@ class TemplateAPI(object):
         community = self.community_info.context
         if context is community:
             return False
-        if getattr(community, 'security_state', 'inherits') == 'public':
+        if getattr(community, 'security_state', 'inherits') in ('public', 'restricted'):
             return getattr(context, 'security_state', 'inherits') == 'private'
         return False
 
