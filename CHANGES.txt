@@ -4,6 +4,8 @@ karl package Changelog
 5.0 (unreleased)
 ----------------
 
+- update workflow to provide more options/flexibility
+
 - remove all offices stuff
 
 - remove all intranet code, not a good fit here

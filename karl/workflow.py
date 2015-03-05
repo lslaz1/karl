@@ -1,6 +1,7 @@
 from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import Everyone
+from pyramid.security import Authenticated
 from pyramid.traversal import resource_path
 
 from karl.models.interfaces import IUserAddedGroup
@@ -120,7 +121,27 @@ def community_to_public(ob, info):
     acl.append((Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
     acl.append((Allow, moderators_group_name, MODERATOR_PERMS))
     acl.append((Allow, members_group_name, MEMBER_PERMS))
-    acl.append((Allow, 'group.KarlStaff', GUEST_PERMS))
+    acl.append((Allow, Authenticated, MEMBER_PERMS))
+    acl.append(NO_INHERIT)
+    msg = None
+    added, removed = acl_diff(community, acl)
+    if added or removed:
+        community.__acl__ = acl
+        msg = ts('community-public', resource_path(community), added, removed)
+    _reindex(community)
+    return msg
+
+
+def community_to_restricted(ob, info):
+    community = find_community(ob)
+    acl = []
+    moderators_group_name = community.moderators_group_name
+    members_group_name = community.members_group_name
+    acl.append((Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
+    acl.append((Allow, moderators_group_name, MODERATOR_PERMS))
+    acl.append((Allow, members_group_name, MEMBER_PERMS))
+    acl.append((Allow, 'group.KarlStaff', MEMBER_PERMS))
+    acl.append((Allow, Authenticated, GUEST_PERMS))
     acl.append(NO_INHERIT)
     msg = None
     added, removed = acl_diff(community, acl)
