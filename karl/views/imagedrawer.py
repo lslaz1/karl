@@ -325,7 +325,7 @@ def drawer_dialog_view(context, request,
     source = request.params.get('source', None)
     assert source in ('upload', 'myrecent', 'thiscommunity',
                       'allkarl', 'external', None)
-    if source in ('my}ecent', 'thiscommunity', 'allkarl'):
+    if source in ('myrecent', 'thiscommunity', 'allkarl'):
         d['images_info'] = batch_images(context, request)
 
     return d

@@ -21,6 +21,7 @@ from pyramid import testing
 
 from karl import testing as karltesting
 
+
 class RedirectCommunityViewTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -62,6 +63,7 @@ class RedirectCommunityViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/view.html')
 
+
 class ShowCommunityViewTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -96,8 +98,8 @@ class ShowCommunityViewTests(unittest.TestCase):
         community.member_names = community.moderator_names = set()
         directlyProvides(community, ICommunity)
         foo = testing.DummyModel(__name__='foo')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        karltesting.registerModels({'/foo':foo})
+        catalog = karltesting.DummyCatalog({1: '/foo'})
+        karltesting.registerModels({'/foo': foo})
         community.catalog = catalog
         return community
 
@@ -112,7 +114,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Join', 'join.html'),
                           ('Delete', 'delete.html'),
                           ('Advanced', 'advanced.html'),
-                         ])
+                          ])
         self.assertEqual(info['feed_url'],
                          resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
@@ -128,9 +130,10 @@ class ShowCommunityViewTests(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
+                          ('Leave community', 'leave.html'),
                           ('Delete', 'delete.html'),
                           ('Advanced', 'advanced.html'),
-                         ])
+                          ])
 
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
@@ -160,8 +163,8 @@ class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
         community = testing.DummyModel(title='thetitle')
         directlyProvides(community, ICommunity)
         foo = testing.DummyModel(__name__='foo')
-        catalog = karltesting.DummyCatalog({1:'/foo'})
-        karltesting.registerModels({'/foo':foo})
+        catalog = karltesting.DummyCatalog({1: '/foo'})
+        karltesting.registerModels({'/foo': foo})
         community.catalog = catalog
         return community
 
@@ -172,6 +175,7 @@ class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(len(info['items']), 1)
         self.assertEqual(info['items'][0].context.__name__, 'foo')
+
 
 class CommunityMembersAjaxViewTests(unittest.TestCase):
     def setUp(self):
@@ -201,13 +205,13 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
         catalog = karltesting.DummyCatalog({1: '/profiles/phred',
                                             2: '/profiles/bharney',
                                             3: '/profiles/wylma',
-                                           })
+                                            })
         phred = testing.DummyModel(__name__='phred')
         bharney = testing.DummyModel(__name__='bharney')
         wylma = testing.DummyModel(__name__='wylma')
-        karltesting.registerModels({'/profiles/phred':phred,
-                                    '/profiles/bharney':bharney,
-                                    '/profiles/wylma':wylma,
+        karltesting.registerModels({'/profiles/phred': phred,
+                                    '/profiles/bharney': bharney,
+                                    '/profiles/wylma': wylma,
                                     })
         community.catalog = catalog
         community.member_names = set(['phred', 'bharney', 'wylma'])
@@ -224,6 +228,7 @@ class CommunityMembersAjaxViewTests(unittest.TestCase):
         self.assertEqual(info['items'][0].context.__name__, 'bharney')
         self.assertEqual(info['items'][1].context.__name__, 'phred')
         self.assertEqual(info['items'][2].context.__name__, 'wylma')
+
 
 class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
     def setUp(self):
@@ -271,7 +276,8 @@ class RelatedCommunitiesAjaxViewTests(unittest.TestCase):
                            'sort_index': 'modified_date',
                            'texts': 'interests OR align',
                            'allowed': {'query': [], 'operator': 'or'}
-                          }])
+                           }])
+
 
 class FormControllerTestBase(unittest.TestCase):
     def setUp(self):
@@ -283,8 +289,8 @@ class FormControllerTestBase(unittest.TestCase):
     def _registerDummyWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         wf = DummyWorkflow(
-            [{'transitions':['private'],'name': 'public', 'title':'Public'},
-             {'transitions':['public'], 'name': 'private', 'title':'Private'}])
+            [{'transitions': ['private'], 'name': 'public', 'title':'Public'},
+             {'transitions': ['public'], 'name': 'private', 'title':'Private'}])
         workflow = registerDummyWorkflow('security', wf)
         return workflow
 
@@ -307,6 +313,7 @@ class FormControllerTestBase(unittest.TestCase):
             return adapter
         karltesting.registerAdapter(tool_adapter, (Interface, Interface),
                                     IToolAddables)
+
 
 class AddCommunityFormControllerTests(FormControllerTestBase):
     def _makeOne(self, context, request):
@@ -383,15 +390,15 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
                                     (ICommunity,),
                                     IContentFactory)
         dummy_tool_factory = DummyToolFactory()
-        self._registerAddables([{'name':'blog', 'title':'blog',
-                                 'component':dummy_tool_factory}])
+        self._registerAddables([{'name': 'blog', 'title': 'blog',
+                                 'component': dummy_tool_factory}])
         context.users = karltesting.DummyUsers({})
-        context.catalog = karltesting.DummyCatalog({1:'/foo'})
+        context.catalog = karltesting.DummyCatalog({1: '/foo'})
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'title':'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
+        converted = {'title': 'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
                      'tools': ['blog'],
                      'sendalert_default': False,
                      'security_state': 'private',
@@ -411,7 +418,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(community.sendalert_default, False)
         self.assertEqual(
             context.users.added_groups,
-            [('userid', 'moderators'), ('userid', 'members') ]
+            [('userid', 'moderators'), ('userid', 'members')]
         )
         self.assertEqual(dummy_tool_factory.added, True)
         self.assertEqual(len(_tagged), 1)
@@ -426,6 +433,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         result = controller.handle_submit(converted)
         community = context['another-title-yo']
         self.failUnless(community.default_tool is None)
+
 
 class EditCommunityFormControllerTests(FormControllerTestBase):
     def _makeOne(self, context, request):
@@ -442,8 +450,8 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self._registerDummyWorkflow()
         dummy_tool_factory = DummyToolFactory()
         dummy_tool_factory = DummyToolFactory(present=True)
-        self._registerAddables([{'name':'blog', 'title':'blog',
-                                 'component':dummy_tool_factory}])
+        self._registerAddables([{'name': 'blog', 'title': 'blog',
+                                 'component': dummy_tool_factory}])
         context = testing.DummyModel(
             title='title', description='description', text='text',
             default_tool='blog', sendalert_default=False)
@@ -502,15 +510,15 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                                                 IObjectWillBeModifiedEvent))
         self._register()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'public',
-                     'sendalert_default':False,
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'public',
+                     'sendalert_default': False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
-                     'tools':[],
-                      }
+                     'tools': [],
+                     }
         view.handle_submit(converted)
         self.assertEqual(len(L), 2)
         self.assertEqual(len(L2), 2)
@@ -519,19 +527,19 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         karltesting.registerDummySecurityPolicy('user2')
         context = testing.DummyModel(
             title='oldtitle', description='oldescription',
-            default_tool='overview', modified_by = 'user1')
+            default_tool='overview', modified_by='user1')
         request = testing.DummyRequest()
         self._register()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'public',
-                     'sendalert_default':False,
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'public',
+                     'sendalert_default': False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
-                     'tools':[],
-                      }
+                     'tools': [],
+                     }
         view.handle_submit(converted)
         self.assertEqual(context.title, 'Thetitle yo')
         self.assertEqual(context.description, 'thedescription')
@@ -546,15 +554,15 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         request = testing.DummyRequest()
         self._register()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'public',
-                     'sendalert_default':False,
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'public',
+                     'sendalert_default': False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
-                     'tools':[],
-                      }
+                     'tools': [],
+                     }
         response = view.handle_submit(converted)
         self.assertEqual(response.location, 'http://example.com/')
 
@@ -571,15 +579,15 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self._register()
         workflow = self._registerDummyWorkflow()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'public',
-                     'sendalert_default':False,
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'public',
+                     'sendalert_default': False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
-                     'tools':[],
-                      }
+                     'tools': [],
+                     }
         view.handle_submit(converted)
         self.assertEqual(workflow.transitioned[0]['to_state'], 'public')
 
@@ -593,13 +601,13 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self._register()
         workflow = self._registerDummyWorkflow()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'private',
-                     'sendalert_default':False,
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'private',
+                     'sendalert_default': False,
                      'default_tool': 'files',
-                     'tools':[],
+                     'tools': [],
                      }
         view.handle_submit(converted)
         self.assertEqual(workflow.transitioned[0]['to_state'], 'private')
@@ -610,23 +618,24 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         blog_tool_factory = DummyToolFactory(present=True)
         calendar_tool_factory = DummyToolFactory(present=False)
         self._registerAddables([
-            {'name':'blog', 'title':'blog', 'component':blog_tool_factory},
-            {'name':'calendar', 'title':'calendar',
-             'component':calendar_tool_factory}])
+            {'name': 'blog', 'title': 'blog', 'component': blog_tool_factory},
+            {'name': 'calendar', 'title': 'calendar',
+             'component': calendar_tool_factory}])
         self._register()
         view = self._makeOne(context, request)
-        converted = {'title':u'Thetitle yo',
-                     'description':'thedescription',
-                     'text':'thetext',
-                     'security_state':'public',
-                     'sendalert_default':False,
-                     'calendar':'calendar',
+        converted = {'title': u'Thetitle yo',
+                     'description': 'thedescription',
+                     'text': 'thetext',
+                     'security_state': 'public',
+                     'sendalert_default': False,
+                     'calendar': 'calendar',
                      'default_tool': 'overview',
-                     'tools':['calendar'],
+                     'tools': ['calendar'],
                      }
         view.handle_submit(converted)
         self.assertEqual(blog_tool_factory.removed, True)
         self.assertEqual(calendar_tool_factory.added, True)
+
 
 class JoinCommunityViewTests(unittest.TestCase):
     def setUp(self):
@@ -714,7 +723,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         context = testing.DummyModel(title='oldtitle')
-        context.__name__  = 'thename'
+        context.__name__ = 'thename'
         context.catalog = karltesting.DummyCatalog({})
         context.users = karltesting.DummyUsers({})
         karltesting.registerDummyRenderer('templates/delete_resource.pt')
@@ -723,7 +732,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         self.assertTrue(isinstance(response, dict))
 
     def test_confirmed(self):
-        request = testing.DummyRequest({'confirm':'1'})
+        request = testing.DummyRequest({'confirm': '1'})
         context = testing.DummyModel(title='oldtitle')
         parent = DummyParent()
         parent['thename'] = context
@@ -736,6 +745,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(parent.deleted, 'thename')
         self.assertEqual(response.location, 'http://example.com/')
+
 
 class DummyToolFactory:
     def __init__(self, present=False):
@@ -750,31 +760,36 @@ class DummyToolFactory:
     def is_present(self, context, request):
         return self.present
 
+
 class DummyParent(testing.DummyModel):
     def __delitem__(self, name):
         self.deleted = name
+
 
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
+
 class DummyTagQuery(DummyAdapter):
     tagswithcounts = []
     docid = 'ABCDEF01'
+
 
 class DummyGridEntryAdapter(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
+
 class DummyWorkflow:
     state_attr = 'security_state'
     initial_state = 'initial'
     def __init__(self, state_info=[
-        {'name':'public', 'transitions':['private']},
-        {'name':'private', 'transitions':['public']},
-        ]):
+        {'name': 'public', 'transitions': ['private']},
+        {'name': 'private', 'transitions': ['public']},
+    ]):
         self.transitioned = []
         self._state_info = state_info
 
@@ -783,9 +798,9 @@ class DummyWorkflow:
 
     def transition_to_state(self, content, request, to_state, context=None,
                             guards=(), skip_same=True):
-        self.transitioned.append({'to_state':to_state, 'content':content,
-                                  'request':request, 'guards':guards,
-                                  'context':context, 'skip_same':skip_same})
+        self.transitioned.append({'to_state': to_state, 'content': content,
+                                  'request': request, 'guards': guards,
+                                  'context': context, 'skip_same': skip_same})
 
     def state_of(self, content):
         return getattr(content, self.state_attr, None)
@@ -806,9 +821,11 @@ class DummyForm:
         self.widgets[name] = field
         self.allfields.append(field)
 
+
 class DummySchema:
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
 
 class DummyCommunity:
     def __init__(self, title, description, text, creator):

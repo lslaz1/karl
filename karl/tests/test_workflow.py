@@ -19,6 +19,7 @@ class TestPrivateCommunityContainment(unittest.TestCase):
         ob = testing.DummyModel()
         self.assertEqual(self._callFUT(ob), False)
 
+
 class TestPublicCommunityContainment(unittest.TestCase):
     def _callFUT(self, ob):
         from karl.workflow import public_community_containment
@@ -36,7 +37,8 @@ class TestPublicCommunityContainment(unittest.TestCase):
         ob = testing.DummyModel()
         self.assertEqual(self._callFUT(ob), False)
 
-class Test_content_to_inherits(unittest.TestCase):
+
+class Test_content_to_inherits(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import content_to_inherits
         return content_to_inherits(ob, transition)
@@ -50,7 +52,7 @@ class Test_content_to_inherits(unittest.TestCase):
         # doesn't blow up
         self.failIf(hasattr(ob, '__acl__'))
         # reindexes even if it's in the correct state
-        self.assertEqual(index.indexed, {1234:ob})
+        self.assertEqual(index.indexed, {1234: ob})
 
     def test_it_has_acl(self):
         ob = testing.DummyModel()
@@ -62,7 +64,8 @@ class Test_content_to_inherits(unittest.TestCase):
         self.failIf(hasattr(ob, '__acl__'))
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_content_to_private(unittest.TestCase):
+
+class Test_content_to_private(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import content_to_private
         return content_to_private(ob, transition)
@@ -91,7 +94,8 @@ class Test_content_to_private(unittest.TestCase):
         self.assertEqual(ob.__acl__[3], NO_INHERIT)
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_to_profile_active(unittest.TestCase):
+
+class Test_to_profile_active(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import to_profile_active
         return to_profile_active(ob, transition)
@@ -111,7 +115,7 @@ class Test_to_profile_active(unittest.TestCase):
         people.catalog = DummyPeopleCatalog()
         ob.creator = 'creator'
         ob.users = DummyUsers(**{'creator':
-                                 {'groups':['group.community:foo:members']}})
+                                 {'groups': ['group.community:foo:members']}})
         ob.docid = 1234
         directlyProvides(ob, ICommunity)
         self._callFUT(ob, None)
@@ -137,7 +141,8 @@ class Test_to_profile_active(unittest.TestCase):
         self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
         self.assertEqual(people.catalog.reindexed, {12345: ob})
 
-class Test_to_profile_inactive(unittest.TestCase):
+
+class Test_to_profile_inactive(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import to_profile_inactive
         return to_profile_inactive(ob, transition)
@@ -155,7 +160,7 @@ class Test_to_profile_inactive(unittest.TestCase):
         people.catalog = DummyPeopleCatalog()
         ob.creator = 'creator'
         ob.users = DummyUsers(**{'creator':
-                                 {'groups':['group.community:foo:members']}})
+                                 {'groups': ['group.community:foo:members']}})
         ob.docid = 1234
         directlyProvides(ob, ICommunity)
         self._callFUT(ob, None)
@@ -173,7 +178,8 @@ class Test_to_profile_inactive(unittest.TestCase):
         self.assertEqual(ob.catalog['texts'].indexed, {1234: ob})
         self.assertEqual(people.catalog.reindexed, {12345: ob})
 
-class Test_comment_to_inherits(unittest.TestCase):
+
+class Test_comment_to_inherits(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import comment_to_inherits
         return comment_to_inherits(ob, transition)
@@ -202,7 +208,8 @@ class Test_comment_to_inherits(unittest.TestCase):
                          (Deny, Everyone, ('edit', 'delete')))
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_forum_topic_to_inherits(unittest.TestCase):
+
+class Test_forum_topic_to_inherits(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import forum_topic_to_inherits
         return forum_topic_to_inherits(ob, transition)
@@ -231,7 +238,8 @@ class Test_forum_topic_to_inherits(unittest.TestCase):
                          (Deny, Everyone, ('edit', 'delete')))
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_forum_to_inherits(unittest.TestCase):
+
+class Test_forum_to_inherits(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import forum_to_inherits
         return forum_to_inherits(ob, transition)
@@ -253,7 +261,8 @@ class Test_forum_to_inherits(unittest.TestCase):
                          (Allow, 'group.KarlStaff', (CREATE,)))
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_community_to_private(unittest.TestCase):
+
+class Test_community_to_private(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import community_to_private
         return community_to_private(ob, transition)
@@ -282,7 +291,8 @@ class Test_community_to_private(unittest.TestCase):
         self.assertEqual(ob.__acl__[3], NO_INHERIT)
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_community_to_public(unittest.TestCase):
+
+class Test_community_to_public(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import community_to_public
         return community_to_public(ob, transition)
@@ -292,7 +302,6 @@ class Test_community_to_public(unittest.TestCase):
         from pyramid.security import Allow
         from karl.models.interfaces import ICommunity
         from karl.security.policy import ADMINISTRATOR_PERMS
-        from karl.security.policy import GUEST_PERMS
         from karl.security.policy import MEMBER_PERMS
         from karl.security.policy import MODERATOR_PERMS
         from karl.security.policy import NO_INHERIT
@@ -309,13 +318,15 @@ class Test_community_to_public(unittest.TestCase):
                          (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
         self.assertEqual(ob.__acl__[1], (Allow, 'moderators', MODERATOR_PERMS))
         self.assertEqual(ob.__acl__[2], (Allow, 'members', MEMBER_PERMS))
-        self.assertEqual(ob.__acl__[3], (Allow, 'group.KarlStaff',
-                                         GUEST_PERMS))
+        self.assertEqual(ob.__acl__[3], ('Allow',
+                                         'system.Authenticated',
+                                         ('view', 'comment', 'edit',
+                                          'create', 'delete')))
         self.assertEqual(ob.__acl__[4], NO_INHERIT)
         self.assertEqual(index.indexed, {1234: ob})
 
 
-class Test_blogentry_to_inherits(unittest.TestCase):
+class Test_blogentry_to_inherits(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import blogentry_to_inherits
         return blogentry_to_inherits(ob, transition)
@@ -334,7 +345,7 @@ class Test_blogentry_to_inherits(unittest.TestCase):
         self._callFUT(ob, None)
         acl = ob.__acl__
         self.assertEqual(len(acl), 3)
-        self.assertEqual(acl[0], (Allow, 'group.KarlAdmin',ADMINISTRATOR_PERMS))
+        self.assertEqual(acl[0], (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
         self.assertEqual(acl[1], (Allow, 'dummyUser', MEMBER_PERMS))
         self.assertEqual(acl[2], (Deny, Everyone, ('edit', 'delete')))
 
@@ -356,13 +367,14 @@ class Test_blogentry_to_inherits(unittest.TestCase):
 
         acl = ob.__acl__
         self.assertEqual(len(acl), 3)
-        self.assertEqual(acl[0], (Allow, 'group.KarlAdmin',ADMINISTRATOR_PERMS))
+        self.assertEqual(acl[0], (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
         self.assertEqual(acl[1], (Allow, 'dummyUser', MEMBER_PERMS))
         self.assertEqual(acl[2], (Deny, Everyone, ('edit', 'delete')))
 
         self.assertEqual(index.indexed, {1234: ob})
 
-class Test_blogentry_to_private(unittest.TestCase):
+
+class Test_blogentry_to_private(unittest.TestCase):  # noqa
     def _callFUT(self, ob, transition):
         from karl.workflow import blogentry_to_private
         return blogentry_to_private(ob, transition)
@@ -419,7 +431,7 @@ class TestReindex(unittest.TestCase):
         root['two'] = two
         self._callFUT(root)
         self.failUnless(path.indexed.keys(), [0])
-        self.assertEqual(sorted(allowed.indexed.keys()), [0,1,2])
+        self.assertEqual(sorted(allowed.indexed.keys()), [0, 1, 2])
 
     def test_with_allowed_index_missing(self):
         from repoze.folder.interfaces import IFolder
@@ -438,7 +450,8 @@ class TestReindex(unittest.TestCase):
         self._callFUT(root)
         self.failUnless(path.indexed.keys(), [0])
 
-class Test_reset_profile(unittest.TestCase):
+
+class Test_reset_profile(unittest.TestCase):  # noqa
     def tearDown(self):
         testing.cleanUp()
 
@@ -508,8 +521,10 @@ class Test_reset_profile(unittest.TestCase):
         self._callFUT(event)
         self.assertEqual(workflow.resetted, [profile])
 
+
 class DummyContent:
     pass
+
 
 class DummyCatalog(dict):
     def __init__(self):
@@ -519,11 +534,12 @@ class DummyCatalog(dict):
         self['texts'] = DummyIndex()
         self.document_map = self
 
-    def reindex_doc(self, docid, obj): # pragma: no cover
+    def reindex_doc(self, docid, obj):  # pragma: no cover
         assert 0, "don't go here"
 
     def docid_for_address(self, path):
         return 12345
+
 
 class DummyPeopleCatalog(dict):
     def __init__(self):
@@ -531,11 +547,12 @@ class DummyPeopleCatalog(dict):
         self.document_map = self
         self.reindexed = {}
 
-    def reindex_doc(self, docid, obj): # pragma: no cover
+    def reindex_doc(self, docid, obj):  # pragma: no cover
         self.reindexed[docid] = obj
 
     def docid_for_address(self, path):
         return 12345
+
 
 class DummyIndex:
     def __init__(self):
@@ -543,10 +560,10 @@ class DummyIndex:
     def reindex_doc(self, docid, obj):
         self.indexed[docid] = obj
 
+
 class DummyUsers:
     def __init__(self, **mapping):
         self.mapping = mapping
 
     def get_by_id(self, id):
         return self.mapping[id]
-

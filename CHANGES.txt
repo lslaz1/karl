@@ -4,6 +4,8 @@ karl package Changelog
 5.0 (unreleased)
 ----------------
 
+- remove kaltura support. another thing that should be an addon
+
 - update workflow to provide more options/flexibility
 
 - remove all offices stuff

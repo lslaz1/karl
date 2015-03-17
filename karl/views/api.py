@@ -129,40 +129,6 @@ class TemplateAPI(object):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
 
-        if self.settings:
-            self.kaltura_info = dict(
-                enabled=self.settings.get(
-                    'kaltura_enabled', False) in ('true', 'True'),
-                partner_id=self.settings.get('kaltura_partner_id', ''),
-                sub_partner_id=self.settings.get(
-                    'kaltura_sub_partner_id', ''),
-                admin_secret=self.settings.get('kaltura_admin_secret', ''),
-                user_secret=self.settings.get('kaltura_user_secret', ''),
-                kcw_uiconf_id=self.settings.get(
-                    'kaltura_kcw_uiconf_id', '1000741'),
-                player_uiconf_id=self.settings.get(
-                    'kaltura_player_uiconf_id', ''),
-                player_cache_st=self.settings.get(
-                    'kaltura_player_cache_st', ''),
-                local_user=self.userid,
-            )
-            if not self.settings.get(
-                    'kaltura_client_session', False) in ('true', 'True'):
-                # Secrets will not be sent to client, instead session is handled on
-                # the server.
-                self.kaltura_info['session_url'] = app_url + '/' + 'kaltura_create_session.json'  # noqa
-        else:
-            self.kaltura_info = dict(
-                enabled=False)
-
-        # propagate the head data to the client
-        d = self.karl_client_data['kaltura'] = dict(self.kaltura_info)
-        # remove secrets if needed
-        if 'session_url' in d:
-            # server side session management, do not send secrets to client
-            del d['user_secret']
-            del d['admin_secret']
-
     @property
     def snippets(self):
         if self._snippets is None:

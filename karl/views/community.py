@@ -544,11 +544,12 @@ def join_community_view(context, request):
     # it does not need to be reviewed to join
     if has_permission('edit', context, request):
         community_users = find_users(context)
-        community_users.add_group(profile.__name__, context.members_group_name)
-        status_message = "You have joined this community!"
-        community_href = resource_url(context, request,
-                                      query={"status_message": status_message})
-        return HTTPFound(location=community_href)
+        if community_users:
+            community_users.add_group(profile.__name__, context.members_group_name)
+            status_message = "You have joined this community!"
+            community_href = resource_url(context, request,
+                                          query={"status_message": status_message})
+            return HTTPFound(location=community_href)
 
     # Handle form submission
     if "form.submitted" in request.POST:

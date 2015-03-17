@@ -19,6 +19,7 @@ import unittest
 from pyramid import testing
 from karl import testing as karltesting
 
+
 class TemplateAPITests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -38,8 +39,9 @@ class TemplateAPITests(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import ICommunityInfo
         from karl.models.interfaces import ICommunity
-        karltesting.registerAdapter(DummyAdapter,
-                                (Interface, Interface), ICommunityInfo)
+        karltesting.registerAdapter(
+            DummyAdapter,
+            (Interface, Interface), ICommunityInfo)
         context = testing.DummyModel()
         directlyProvides(context, ICommunity)
         request = testing.DummyRequest()
@@ -54,14 +56,15 @@ class TemplateAPITests(unittest.TestCase):
         from karl.models.interfaces import ICatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         karltesting.registerAdapter(DummySearchAdapter, Interface, ICatalogSearch)
-        karltesting.registerAdapter(DummyAdapter,
-                                (Interface, Interface), IGridEntryInfo)
+        karltesting.registerAdapter(
+            DummyAdapter,
+            (Interface, Interface), IGridEntryInfo)
         f = testing.DummyModel()
-        karltesting.registerModels({'/communities/1/file':f})
+        karltesting.registerModels({'/communities/1/file': f})
         context = testing.DummyModel()
         directlyProvides(context, ICommunity)
         context.searchresults = [f]
-        context.catalog = karltesting.DummyCatalog({1:'/communities/1/file'})
+        context.catalog = karltesting.DummyCatalog({1: '/communities/1/file'})
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
         recent_items = api.recent_items
@@ -72,7 +75,7 @@ class TemplateAPITests(unittest.TestCase):
         from karl.models.interfaces import ITagQuery
         from zope.interface import Interface
         karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                ITagQuery)
+                                    ITagQuery)
         context = testing.DummyModel()
         request = testing.DummyRequest()
         api = self._makeOne(context, request)
@@ -86,7 +89,7 @@ class TemplateAPITests(unittest.TestCase):
 
     def test_status_message(self):
         context = testing.DummyModel()
-        request = testing.DummyRequest({'status_message':'abc'})
+        request = testing.DummyRequest({'status_message': 'abc'})
         api = self._makeOne(context, request)
         self.assertEqual(api.status_message, 'abc')
 
@@ -216,82 +219,10 @@ class TemplateAPITests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         from pyramid.interfaces import ISettings
-        settings = {'logo_path':'mylogo.png'}
+        settings = {'logo_path': 'mylogo.png'}
         karltesting.registerUtility(settings, ISettings)
         api = self._makeOne(context, request)
         self.assertEqual(api.logo_url, api.static_url + '/mylogo.png')
-
-    def test_kaltura_info_empty(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info['enabled'],  False)
-
-    def test_kaltura_info(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        from pyramid.interfaces import ISettings
-        # kaltura_client_session missing
-        settings = dict(
-            kaltura_enabled = 'true',
-            kaltura_partner_id = '123456',
-            kaltura_sub_partner_id = '12345600',
-            kaltura_admin_secret = '123456789abcdef123456789abcdef12',
-            kaltura_user_secret = '0123456789abcdef123456789abcdef1',
-            kaltura_kcw_uiconf_id = '9999999',
-            kaltura_player_uiconf_id = '8888888',
-            kaltura_player_cache_st = '77777777',
-            )
-        karltesting.registerUtility(settings, ISettings)
-        api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info, dict(
-            enabled = True,
-            partner_id = '123456',
-            sub_partner_id = '12345600',
-            session_url = 'http://example.com/kaltura_create_session.json',
-            admin_secret = '123456789abcdef123456789abcdef12',
-            user_secret = '0123456789abcdef123456789abcdef1',
-            kcw_uiconf_id = '9999999',
-            player_uiconf_id = '8888888',
-            player_cache_st = '77777777',
-            local_user = None,
-            ))
-        # secrets are not sent to client
-        self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"date_format": "en-US", "kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
-
-        settings['kaltura_client_session'] = 'false'
-        api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info, dict(
-            enabled = True,
-            partner_id = '123456',
-            sub_partner_id = '12345600',
-            session_url = 'http://example.com/kaltura_create_session.json',
-            admin_secret = '123456789abcdef123456789abcdef12',
-            user_secret = '0123456789abcdef123456789abcdef1',
-            kcw_uiconf_id = '9999999',
-            player_uiconf_id = '8888888',
-            player_cache_st = '77777777',
-            local_user = None,
-            ))
-        # secrets are not sent to client
-        self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"date_format": "en-US", "kaltura": {"sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456", "session_url": "http://example.com/kaltura_create_session.json"}};\n</script>')
-
-        settings['kaltura_client_session'] = 'true'
-        api = self._makeOne(context, request)
-        self.assertEqual(api.kaltura_info, dict(
-            enabled = True,
-            partner_id = '123456',
-            sub_partner_id = '12345600',
-            admin_secret = '123456789abcdef123456789abcdef12',
-            user_secret = '0123456789abcdef123456789abcdef1',
-            kcw_uiconf_id = '9999999',
-            player_uiconf_id = '8888888',
-            player_cache_st = '77777777',
-            local_user = None,
-            # no session_url means client side session management
-            ))
-        # secrets are sent to client
-        self.assertEqual(api.render_karl_client_data(), '<script type="text/javascript">\nwindow.karl_client_data = {"date_format": "en-US", "kaltura": {"admin_secret": "123456789abcdef123456789abcdef12", "user_secret": "0123456789abcdef123456789abcdef1", "sub_partner_id": "12345600", "player_uiconf_id": "8888888", "enabled": true, "local_user": null, "player_cache_st": "77777777", "kcw_uiconf_id": "9999999", "partner_id": "123456"}};\n</script>')
 
     def test_calendar_tab(self):
         context = testing.DummyModel()
@@ -331,6 +262,7 @@ class DummyAdapter:
         self.context = context
         self.request = request
 
+
 class DummySearchAdapter:
     def __init__(self, context):
         self.context = context
@@ -342,4 +274,3 @@ class DummySearchAdapter:
                 if thing == x:
                     return thing
         return len(results), results, resolver
-
