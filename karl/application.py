@@ -27,6 +27,7 @@ from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
+from karl import addons
 import karl.includes
 
 try:
@@ -260,13 +261,18 @@ def main(global_config, **settings):
         time.tzset()
 
     # Find package and configuration
-    pkg_name = settings.get('package', None)
-    if pkg_name is not None:
-        __import__(pkg_name)
-        package = sys.modules[pkg_name]
-        configure_overrides = get_imperative_config(package)
-        if not configure_overrides:
-            configure_overrides = configure_karl
+    packages = []
+    configurers = []
+    for pkg_name in settings.get('packages', '').splitlines():
+        try:
+            __import__(pkg_name)
+            package = sys.modules[pkg_name]
+            packages.append(package)
+            configure_overrides = get_imperative_config(package)
+            if not configure_overrides:
+                configurers.append(configure_karl)
+        except ImportError:
+            pass
     else:
         configure_overrides = configure_karl
 
@@ -283,7 +289,12 @@ def main(global_config, **settings):
 
     configure_karl(config)
     config.commit()
-    configure_overrides(config)
+
+    for configurer in configurers:
+        configurer(config)
+        config.commit()
+
+    config.add_renderer('.pt', addons.AddonRendererFactoryFactory(packages))
 
     config.end()
 

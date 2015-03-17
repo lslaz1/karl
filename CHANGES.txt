@@ -4,6 +4,8 @@ karl package Changelog
 5.0 (unreleased)
 ----------------
 
+- be able to provide override packages and easily override templates
+
 - remove kaltura support. another thing that should be an addon
 
 - update workflow to provide more options/flexibility
