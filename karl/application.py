@@ -27,6 +27,7 @@ from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
+import karl.includes
 
 try:
     import pyramid_debugtoolbar
@@ -264,23 +265,13 @@ def main(global_config, **settings):
         __import__(pkg_name)
         package = sys.modules[pkg_name]
         configure_overrides = get_imperative_config(package)
-        if configure_overrides is not None:
-            filename = None
-        else:
-            filename = 'configure.zcml'
-            # BBB Customization packages may be using ZCML style config but
-            # need configuration done imperatively in core Karl.  These
-            # customizaton packages have generally been written before the
-            # introduction of imperative style config.
+        if not configure_overrides:
             configure_overrides = configure_karl
     else:
-        import karl.includes
-        package = karl.includes
         configure_overrides = configure_karl
-        filename = None
 
     config = Configurator(
-        package=package,
+        package=karl.includes,
         settings=settings,
         root_factory=root_factory,
         autocommit=True
@@ -289,14 +280,11 @@ def main(global_config, **settings):
     config.begin()
     config.include('pyramid_tm')
     config.include('pyramid_zodbconn')
-    if filename is not None:
-        if configure_overrides is not None:  # BBB See above
-            configure_overrides(config, load_zcml=False)
-        config.hook_zca()
-        config.include('pyramid_zcml')
-        config.load_zcml(filename)
-    else:
-        configure_karl(config)
+
+    configure_karl(config)
+    config.commit()
+    configure_overrides(config)
+
     config.end()
 
     def closer():
