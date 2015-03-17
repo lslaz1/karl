@@ -2720,3 +2720,8 @@ body .ui-state-default .karl-icon-loading {
 .notehandle:hover {
     cursor: move;
 }
+
+#save-add_comment--field {
+  border-top: 1px solid #DDD;
+  padding-top: 8px;
+}
