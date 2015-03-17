@@ -7,6 +7,7 @@ except ImportError:
     PGTextIndex = object
     postgres = False
 
+
 class KarlPGTextIndex(PGTextIndex):
     """
     Allows connection parameters to be provided at runtime rather than stored

@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
 class Countries(list):
     def __init__(self, l):
         super(Countries, self).__init__()
@@ -89,7 +90,7 @@ countries = Countries([
     ('DJ', 'Djibouti'),
     ('DM', 'Dominica'),
     ('DO', 'Dominican Republic'),
-    ('TP', 'East Timor'), #NOTE: not in ISO-3166
+    ('TP', 'East Timor'),  # NOTE: not in ISO-3166
     ('EC', 'Ecuador'),
     ('EG', 'Egypt'),
     ('SV', 'El Salvador'),
@@ -284,14 +285,13 @@ cultures = Countries([
 
 
 python_datetime_formats = {
-    'en-US' : '%m/%d/%Y %H:%M',
-    'en-GB' : '%d/%m/%Y %H:%M',
+    'en-US': '%m/%d/%Y %H:%M',
+    'en-GB': '%d/%m/%Y %H:%M',
 }
 # We do not have i18n for jquery-ui, so we provide
 # the date format for the ui.datepicker component here.
 # The format definition is different from python, too.
 js_date_formats = {
-    'en-US' : 'mm/dd/yy',
-    'en-GB' : 'dd/mm/yy',
+    'en-US': 'mm/dd/yy',
+    'en-GB': 'dd/mm/yy',
 }
-

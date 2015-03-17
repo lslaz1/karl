@@ -61,7 +61,6 @@ def errorpage(context, request):
                     redislog.log('NOTFOUND', handler.subsystem, str(context))
                     break
 
-
     else:
         error_message = 'General Error'
         error_text = GENERAL_MESSAGE % {'system_name': system_name}
@@ -73,7 +72,6 @@ def errorpage(context, request):
         message.append('Exception when processing %s' % request.url)
         message.append('Referer: %s' % request.referer)
         logging.getLogger('karl').error('\n'.join(message), exc_info=True)
-
 
     return {
         'error_message': error_message,

@@ -17,6 +17,7 @@
     "gulp-uglify": "*",
     "gulp-util": "*",
     "lodash": "*",
+    "lodash._htmlescapes": "*",
     "napa": "^0.4.1",
     "protractor": "*",
     "gulp-protractor": "*",

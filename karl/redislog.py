@@ -10,7 +10,7 @@ import uuid
 
 try:
     import redis
-    redis # stfu pyflakes
+    redis  # stfu pyflakes
 except:
     redis = None
 
@@ -30,14 +30,15 @@ NORECORD = '\0' * 16
 
 HOSTNAME = socket.gethostname()
 
+
 class RedisLog(object):
 
     def __init__(self, host='localhost', port=6379, db=0, prefix='karl',
-                 expires=7, password=None): # days
+                 expires=7, password=None):  # days
         self.redis = redis.StrictRedis(host=host, port=port, db=db,
-                                      password=password)
+                                       password=password)
         self.prefix = prefix
-        self.ttl = expires * 24 * 3600 # seconds
+        self.ttl = expires * 24 * 3600  # seconds
 
     def log(self, level, category, message, exc_info=False, hostname=HOSTNAME):
         prefix = self.prefix
@@ -45,7 +46,7 @@ class RedisLog(object):
         if isinstance(level, int):
             level = log_levels[level]
         if exc_info:
-            tb_info  = traceback.format_exc()
+            tb_info = traceback.format_exc()
         else:
             tb_info = None
 
@@ -61,8 +62,7 @@ class RedisLog(object):
         for key in (head_key,
                     level_key,
                     category_key,
-                    level_category_key,
-                   ):
+                    level_category_key):
             tx.getset(key, id.bytes)
         record = [(key if key else NORECORD) for key in tx.execute()]
         record.append(entry.as_json())

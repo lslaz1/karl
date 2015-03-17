@@ -1,5 +1,6 @@
 from paste.response import has_header
 
+
 def add_no_cache_headers(event):
     """ Add no-cache headers if this response doesnt already have a
     Cache-Control header"""

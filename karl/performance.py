@@ -7,7 +7,8 @@ Instrument the stack to make timing measurements.  This has a major drag on
 performance.  Never, ever use in production.
 """
 
-class timetrace(object):
+
+class timetrace(object):  # noqa
     inner = False
 
     def __init__(self, threshold):
@@ -34,7 +35,7 @@ class timetrace(object):
             assert innerframe is frame
             if event == 'return':
                 self.frame_node = self.frame_node.finish()
-                self.finished= self.frame_node.parent is None
+                self.finished = self.frame_node.parent is None
         return inner_trace
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -49,7 +50,7 @@ class timetrace(object):
             print 'Total elapsed time: %0.3fms' % (root.elapsed * 1000.0)
 
 
-class notrace(object):
+class notrace(object):  # noqa
 
     def __enter__(self):
         self.prev = sys.gettrace()
@@ -100,12 +101,12 @@ class FrameNode(object):
         if parent:
             parent.children.append(self)
             self.depth = parent.depth + 1
-            #print 'ENTER %s%s' % ('  ' * self.depth, frameinfo)
+            # print 'ENTER %s%s' % ('  ' * self.depth, frameinfo)
         else:
             self.depth = 0
 
     def finish(self):
-        #print 'EXIT  %s%s' % ('  ' * self.depth, self.frameinfo)
+        # print 'EXIT  %s%s' % ('  ' * self.depth, self.frameinfo)
         self.elapsed = time.time() - self.starttime
         return self.parent
 

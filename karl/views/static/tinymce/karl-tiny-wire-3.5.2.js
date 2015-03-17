@@ -25,13 +25,9 @@ $(document).ready(function() {
 
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
-    var kaltura_data = window.karl_client_data && karl_client_data.kaltura || {};
     var plugins = 'paste,embedmedia,spellchecker,imagedrawer,advimagescale,advlist,print,table,autosave';
     if (widget_data.enable_wiki_plugin) {
         plugins += ',wicked';
-    }
-    if (kaltura_data.enabled) {
-        plugins += ',kaltura';
     }
 
     // Url that contains the context prefix
@@ -45,7 +41,7 @@ $(document).ready(function() {
 
     // Load our local plugins (needed, because they are not
     // under the tinymce tree)
-    $.each(['advimagescale', 'embedmedia', 'imagedrawer', 'kaltura', 'wicked'], function(index, plugin_name) {
+    $.each(['advimagescale', 'embedmedia', 'imagedrawer', 'wicked'], function(index, plugin_name) {
         tinymce.PluginManager.load(plugin_name, tinymce_plugins_url + '/' + plugin_name + '/');
     });
     tinymce.ThemeManager.load('advanced', tinymce_plugins_url + '/' + 'theme-advanced-3.5.2/editor_template_src.js');
@@ -78,13 +74,13 @@ $(document).ready(function() {
         paste_unindented_list_class : "unindentedList",
         paste_convert_headers_to_strong : true,
         theme_advanced_toolbar_location: 'top',
-        theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, kaltura, |, print',
+        theme_advanced_buttons1: 'bold, italic, underline, |, forecolor, backcolor, removeformat, |, bullist, numlist, |, justifycenter, justifyleft,justifyright, justifyfull, |, indent, outdent, |, image, embedmedia, |, print',
         theme_advanced_buttons2: 'formatselect, fontselect, fontsizeselect, |, blockquote, hr, |, link, addwickedlink, delwickedlink, code, spellchecker, restoredraft',
         theme_advanced_buttons3: '',
         theme_advanced_toolbar_align : "center",
         theme_advanced_statusbar_location : false,
         plugins: plugins,
-        // span[*] important for the kaltura and embedmedia plugins to work properly with
+        // span[*] important for the embedmedia plugins to work properly with
         // newer tinymce versions.
         extended_valid_elements: "span[*],object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         relative_urls : false,
@@ -95,17 +91,7 @@ $(document).ready(function() {
         imagedrawer_dialog_url: here_url + 'drawer_dialog_view.html',
         imagedrawer_upload_url: here_url + 'drawer_upload_view.html',
         imagedrawer_data_url: here_url + 'drawer_data_view.html',
-        imagedrawer_enable_upload: widget_data.enable_imagedrawer_upload,
-        //options for kaltura
-        kaltura_partner_id: kaltura_data.partner_id,
-        kaltura_sub_partner_id: kaltura_data.sub_partner_id,
-        kaltura_local_user: kaltura_data.local_user,
-        kaltura_user_secret: kaltura_data.user_secret,
-        kaltura_admin_secret: kaltura_data.admin_secret,
-        kaltura_kcw_uiconf_id: kaltura_data.kcw_uiconf_id,
-        kaltura_player_uiconf_id: kaltura_data.player_uiconf_id,
-        kaltura_player_cache_st: kaltura_data.player_cache_st,
-        kaltura_session_url: kaltura_data.session_url
+        imagedrawer_enable_upload: widget_data.enable_imagedrawer_upload
     });
 
 });

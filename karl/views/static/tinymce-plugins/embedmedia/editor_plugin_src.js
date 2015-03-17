@@ -2,8 +2,6 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 110, indent: 4 */
 /*jslint sub: true */
 /*globals window navigator document setTimeout tinymce alert $ */
-/*globals KalturaConfiguration KalturaClient KalturaSessionService */
-/*globals KalturaSessionType SWFObject */
 
 
 /**
@@ -193,7 +191,7 @@
                             inside.attr(wmode_key, wmode_value);
                         }
 
-                        // Fix missing params (broken in IE8, kaltura)
+                        // Fix missing params (broken in IE8)
                         var params = ['allowScriptAccess', 'allowNetworking', 'allowFullScreen',
                             'bgcolor', 'movie', 'flashVars'];
                         var to_add = [];

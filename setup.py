@@ -76,7 +76,7 @@ if version < '2.7':
 
 extras_require = {
     'tests': tests_require,
-    'kerberos' : ['kerberos'],
+    'kerberos': ['kerberos'],
     'performance': ['slowlog'],
     'redislog': ['redis'],
     'velruse': ['velruse']
@@ -86,16 +86,16 @@ extras_require = {
 setup(name='karl',
       version=__version__,
       description='karl',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Development Status :: 3 - Alpha",
+          "Intended Audience :: Developers",
+          "Programming Language :: Python",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+          "Topic :: Internet :: WWW/HTTP :: WSGI",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='',
       author_email='',
       url='',
@@ -108,7 +108,7 @@ setup(name='karl',
       tests_require=tests_require,
       extras_require=extras_require,
       test_suite="karl",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = karl.application:main
 

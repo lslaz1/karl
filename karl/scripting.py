@@ -44,15 +44,18 @@ LOCKDIR = '/var/run/karl/'
 _TIME_TIME = None
 _TIME_SLEEP = None
 
+
 def _time_time():
     if _TIME_TIME is not None:
         return _TIME_TIME()
-    return time.time() #pragma NO COVERAGE
+    return time.time()  # pragma NO COVERAGE
+
 
 def _time_sleep(interval):
     if _TIME_SLEEP is not None:
         return _TIME_SLEEP(interval)
-    return time.sleep(interval) #pragma NO COVERAGE
+    return time.sleep(interval)  # pragma NO COVERAGE
+
 
 def get_default_config():
     """Get the default configuration file name.
@@ -68,7 +71,8 @@ def get_default_config():
     config = os.path.join(sandbox, 'etc', 'karl.ini')
     return os.path.abspath(os.path.normpath(config))
 
-def open_root(config, name='karl'): #pragma NO COVERAGE
+
+def open_root(config, name='karl'):  # pragma NO COVERAGE
     """Open the database root object, given a Paste Deploy config file name.
 
     Returns (root, closer).  Call the closer function to close the database
@@ -77,6 +81,7 @@ def open_root(config, name='karl'): #pragma NO COVERAGE
     config = os.path.abspath(os.path.normpath(config))
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
+
 
 def only_one(func, registry, name):
     logger = getLogger('karl')
@@ -104,6 +109,7 @@ def only_one(func, registry, name):
 
     return wrapper
 
+
 def daemonize_function(func, interval):
     logger = getLogger('karl')
     def wrapper(*args):
@@ -119,6 +125,7 @@ def daemonize_function(func, interval):
             logger.info("Exiting.")
     return wrapper
 
+
 def run_daemon(name, func, interval=300,
                retry_period=30*60, retry_interval=60, retryable=None,
                proceed=None):
@@ -127,7 +134,7 @@ def run_daemon(name, func, interval=300,
     if retryable is None:
         retryable = (ConflictError,)
 
-    if proceed == None: #pragma NO COVERAGE
+    if proceed is None:  # pragma NO COVERAGE
         def proceed():
             return True
 
@@ -154,14 +161,15 @@ def run_daemon(name, func, interval=300,
             except:
                 logger.error("Error in daemon process", exc_info=True)
                 break
-        if _debug_object_refs: #pragma NO COVERAGE
+        if _debug_object_refs:  # pragma NO COVERAGE
             _count_object_refs()
         sys.stderr.flush()
         sys.stdout.flush()
         _time_sleep(interval)
 
+
 _ref_counts = None
-def _count_object_refs(): #pragma NO COVERAGE
+def _count_object_refs():  # noqa
     """
     This function is used for debugging leaking references between business
     function calls in the run_daemon function.  It relies on a cPython built
@@ -189,7 +197,7 @@ def _count_object_refs(): #pragma NO COVERAGE
             ref_counts[kind] = dict(kind=kind, count=1, delta=0)
 
     global _ref_counts
-    if _ref_counts == None:
+    if _ref_counts is None:
         # first time
         _ref_counts = ref_counts
         return
@@ -228,13 +236,13 @@ def only_once(progname, config=None):
         print >>sys.stderr, '%s still running' % job_name
         sys.exit(1)
     atexit.register(os.remove, lockfile)
-    open(lockfile, 'w').write('%s running, PID=%d'
-                                  % (progname, os.getpid()))
+    open(lockfile, 'w').write('%s running, PID=%d' % (progname, os.getpid()))
+
 
 def create_karl_argparser(description='', out=None):
     if out is None:
         out = codecs.getwriter('UTF-8')(sys.stdout)
-    parser =  argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         '-C', '--config',
         metavar='FILE',
@@ -247,7 +255,8 @@ def create_karl_argparser(description='', out=None):
         return bootstrap(config_uri)
     parser.set_defaults(out=out, bootstrap=_bootstrap)
     return parser
-    
+
+
 def setup_logging(config_uri, fileConfig=fileConfig,
                   configparser=ConfigParser):
     """
@@ -267,6 +276,7 @@ def setup_logging(config_uri, fileConfig=fileConfig,
             config_file,
             dict(__file__=config_file, here=os.path.dirname(config_file))
             )
+
 
 def _getpathsec(config_uri, name):
     if '#' in config_uri:
