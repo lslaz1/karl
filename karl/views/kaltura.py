@@ -25,7 +25,7 @@ from karl.utilities.kaltura_kcl_py.kaltura_client import KalturaSessionUser
 
 def xmltodict(node):
     'Convert the xml to a python-friendly dict.'
-    #return dict([(key, value._text)
+    # return dict([(key, value._text)
     #   for (key, value) in node._childrenByName.iteritems()])
     result = {}
     for key, value in node._childrenByName.iteritems():

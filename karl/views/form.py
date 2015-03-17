@@ -2,6 +2,7 @@ from pyramid.chameleon_zpt import renderer_factory
 
 from pyramid.response import Response
 
+
 def render_form_to_response(template_path, schema, fieldvalues,
                             form_id='contentform',
                             rendering_method='html', **kw):
@@ -11,7 +12,7 @@ def render_form_to_response(template_path, schema, fieldvalues,
     return a Webob response."""
     renderer = renderer_factory(template_path)
     body = renderer(kw, {})
-    if body: 
+    if body:
         rendered = schema.render(body, fieldvalues, form_id, rendering_method)
     else:
         # for unit testing
@@ -21,4 +22,3 @@ def render_form_to_response(template_path, schema, fieldvalues,
         renderer.form_id = form_id
         renderer.rendering_method = rendering_method
     return Response(rendered)
-    

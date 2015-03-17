@@ -3,6 +3,7 @@ from pyramid.url import resource_url
 from karl.views.api import TemplateAPI
 from karl.utils import find_site
 
+
 def forbidden(context, request):
     site = find_site(context)
     request.session['came_from'] = request.url

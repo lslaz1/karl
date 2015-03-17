@@ -40,7 +40,7 @@ def _get_criteria(request):
     filterby = request.params.get('filter', '')
     # cookie must be set even if param is empty or non-existent, to make
     # the no-filter button sticky.
-    #header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
+    # header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
     request.cookies[_FILTER_COOKIE] = filterby
     request.response.set_cookie(_FILTER_COOKIE, str(filterby), path='/')
 
@@ -60,6 +60,7 @@ def _get_criteria(request):
         created_by = None
 
     return principals, created_by
+
 
 def _update_feed_items(entries, app_url):
     if not app_url.endswith('/'):
@@ -86,6 +87,7 @@ def _update_feed_items(entries, app_url):
         del fi['allowed']
 
     return feed_items
+
 
 def newest_feed_items(context, request):
 
@@ -131,7 +133,7 @@ def older_feed_items(context, request):
     earliest_gen = long(earliest_gen)
     earliest_index = int(earliest_index)
     older = list(islice(events.older(earliest_gen, earliest_index,
-                                principals, created_by), 20))
+                                     principals, created_by), 20))
 
     if not older:
         return (earliest_gen, earliest_index, ())
@@ -150,7 +152,7 @@ def show_feeds_view(context, request):
             'page_title': 'Latest Activity',
             'show_filter': True,
             'sticky_filter': filter_cookie,
-           }
+            }
 
 
 def profile_feed_view(context, request):
@@ -159,7 +161,7 @@ def profile_feed_view(context, request):
             'show_filter': False,
             'page_title': 'Latest Activity',
             'sticky_filter': 'profile:%s' % context.__name__,
-           }
+            }
 
 
 def community_feed_view(context, request):
@@ -168,7 +170,7 @@ def community_feed_view(context, request):
             'show_filter': False,
             'page_title': 'Latest Activity',
             'sticky_filter': 'community:%s' % context.__name__,
-           }
+            }
 
 
 def _CSV_JOIN_ITEMS(x):
@@ -178,33 +180,35 @@ def _CSV_JOIN_ITEMS(x):
         return x
     return ':'.join(x)
 
+
 def _CSV_ENCODE_UTF8(x):
     if isinstance(x, unicode):
         return x.encode('utf-8')
     return x
 
 _CSV_KEYS = (('content_type', None),
-        ('userid', _CSV_ENCODE_UTF8),
-        ('flavor', None),
-        ('operation', None),
-        ('context_name', _CSV_ENCODE_UTF8),
-        ('context_url', _CSV_ENCODE_UTF8),
-        ('content_creator', _CSV_ENCODE_UTF8),
-        ('url', _CSV_ENCODE_UTF8),
-        ('title', _CSV_ENCODE_UTF8),
-        ('description', _CSV_ENCODE_UTF8),
-        ('short_description', _CSV_ENCODE_UTF8),
-        ('allowed', _CSV_JOIN_ITEMS),
-        ('comment_count', None),
-        ('tags', _CSV_JOIN_ITEMS),
-        ('author', _CSV_ENCODE_UTF8),
-        ('profile_url', _CSV_ENCODE_UTF8),
-        ('thumbnail', None),
-        ('timestamp', None),
-        ('tagname', _CSV_ENCODE_UTF8),
-        )
+             ('userid', _CSV_ENCODE_UTF8),
+             ('flavor', None),
+             ('operation', None),
+             ('context_name', _CSV_ENCODE_UTF8),
+             ('context_url', _CSV_ENCODE_UTF8),
+             ('content_creator', _CSV_ENCODE_UTF8),
+             ('url', _CSV_ENCODE_UTF8),
+             ('title', _CSV_ENCODE_UTF8),
+             ('description', _CSV_ENCODE_UTF8),
+             ('short_description', _CSV_ENCODE_UTF8),
+             ('allowed', _CSV_JOIN_ITEMS),
+             ('comment_count', None),
+             ('tags', _CSV_JOIN_ITEMS),
+             ('author', _CSV_ENCODE_UTF8),
+             ('profile_url', _CSV_ENCODE_UTF8),
+             ('thumbnail', None),
+             ('timestamp', None),
+             ('tagname', _CSV_ENCODE_UTF8))
 _CSV_MAP = dict([x for x in _CSV_KEYS if x[1] is not None])
 _CSV_FIELD_NAMES = [x[0] for x in _CSV_KEYS]
+
+
 def feed_dump_csv(context, request):
     buf = StringIO()
     buf.write(','.join(_CSV_FIELD_NAMES) + '\n')

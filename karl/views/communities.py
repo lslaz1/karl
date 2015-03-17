@@ -39,6 +39,8 @@ from karl.views.batch import get_catalog_batch_grid
 
 
 _TODAY = None
+
+
 def _today():
     return _TODAY or datetime.datetime.today()
 
@@ -51,13 +53,11 @@ _VIEWS = [
     ('all',
      'All',
      'All communities',
-     'all_communities.html',
-    ),
+     'all_communities.html'),
     ('active',
      'Active',
      'Communities with activity within the last six months',
-     'active_communities.html',
-    ),
+     'active_communities.html'),
 ]
 _VIEW_URL_LOOKUP = dict([(x[0], x[3]) for x in _VIEWS])
 
@@ -77,11 +77,8 @@ def _set_cookie_via_request(request, value):
     request.cookies[_VIEW_COOKIE] = value
     request.response.set_cookie(_VIEW_COOKIE, value, path='/')
 
-def _show_communities_view_helper(context,
-                                  request,
-                                  prefix='',
-                                  **kw
-                                 ):
+
+def _show_communities_view_helper(context, request, prefix='', **kw):
     # Grab the data for the two listings, main communities and portlet
     communities_path = resource_path(context)
 
@@ -108,7 +105,7 @@ def _show_communities_view_helper(context,
     try:
         batch_info = get_catalog_batch_grid(context, request, **query)
     except ParseError, e:
-        batch_info = { 'entries': [], 'batching_required': False }
+        batch_info = {'entries': [], 'batching_required': False}
         error = 'Error: %s' % e
 
     communities = []
@@ -128,7 +125,7 @@ def _show_communities_view_helper(context,
                         'href': urlname,
                         'url': request.resource_url(context, urlname),
                         'selected': name == view_cookie,
-                       })
+                        })
 
     actions = []
     if has_permission('create', context, request):
@@ -150,8 +147,7 @@ def _show_communities_view_helper(context,
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
             'qualifiers': qualifiers,
-            'error': error,
-           }
+            'error': error}
 
 
 def show_all_communities_view(context, request):
@@ -168,8 +164,7 @@ def show_active_communities_view(context, request):
 
     return _show_communities_view_helper(context,
                                          request, prefix='Active ',
-                                         content_modified=content_modified,
-                                        )
+                                         content_modified=content_modified)
 
 
 def get_my_communities(communities_folder, request, ignore_preferred=False):
@@ -188,7 +183,7 @@ def get_my_communities(communities_folder, request, ignore_preferred=False):
 
     communities = communities.values()
     communities.sort()
-    communities = [ x[1] for x in communities ]
+    communities = [x[1] for x in communities]
     preferred = get_preferred_communities(communities_folder, request)
     # if preferred list is empty show all instead of nothing
     if preferred == []:
@@ -196,8 +191,8 @@ def get_my_communities(communities_folder, request, ignore_preferred=False):
     my_communities = []
     for community in communities:
         adapted = getMultiAdapter((community, request), ICommunityInfo)
-        if not ignore_preferred and preferred is not None \
-            and adapted.title in preferred:
+        if (not ignore_preferred and preferred is not None
+                and adapted.title in preferred):
             my_communities.append(adapted)
         if preferred is None or ignore_preferred:
             my_communities.append(adapted)
@@ -218,11 +213,13 @@ def get_community_groups(principals):
             groups.append((name, role))
     return groups
 
+
 def set_preferred_communities(context, request, communities):
     profiles = find_profiles(context)
     userid = authenticated_userid(request)
     profile = profiles[userid]
     profile.preferred_communities = communities
+
 
 def get_preferred_communities(context, request):
     profiles = find_profiles(context)
@@ -232,42 +229,46 @@ def get_preferred_communities(context, request):
     preferred_communities = getattr(profile, 'preferred_communities', None)
     return preferred_communities
 
+
 def jquery_set_preferred_view(context, request):
     request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = request.params.getall('preferred[]')
     set_preferred_communities(communities_folder, request, communities)
     updated_communities = get_my_communities(communities_folder, request)
-    return { 'api': TemplateAPI(context, request),
-             'my_communities': updated_communities,
-             'preferred': communities,
-             'show_all': False,
-             'profile': None,
-             'status_message': 'Set preferred communities.'}
+    return {'api': TemplateAPI(context, request),
+            'my_communities': updated_communities,
+            'preferred': communities,
+            'show_all': False,
+            'profile': None,
+            'status_message': 'Set preferred communities.'}
+
 
 def jquery_clear_preferred_view(context, request):
     request.response.cache_expires = 0
     communities_folder = find_communities(context)
     set_preferred_communities(communities_folder, request, None)
     updated_communities = get_my_communities(communities_folder, request)
-    return { 'api': TemplateAPI(context, request),
-             'my_communities': updated_communities,
-             'preferred': None,
-             'show_all': False,
-             'profile': None,
-             'status_message': 'Cleared preferred communities.'}
+    return {'api': TemplateAPI(context, request),
+            'my_communities': updated_communities,
+            'preferred': None,
+            'show_all': False,
+            'profile': None,
+            'status_message': 'Cleared preferred communities.'}
+
 
 def jquery_list_preferred_view(context, request):
     request.response.cache_expires = 0
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder, request)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'api': TemplateAPI(context, request),
-             'my_communities': communities,
-             'preferred': preferred,
-             'show_all': False,
-             'profile': None,
-             'status_message': None}
+    return {'api': TemplateAPI(context, request),
+            'my_communities': communities,
+            'preferred': preferred,
+            'show_all': False,
+            'profile': None,
+            'status_message': None}
+
 
 def jquery_edit_preferred_view(context, request):
     request.response.cache_expires = 0
@@ -276,9 +277,10 @@ def jquery_edit_preferred_view(context, request):
                                      request,
                                      ignore_preferred=True)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'api': TemplateAPI(context, request),
-             'my_communities': communities,
-             'preferred': preferred }
+    return {'api': TemplateAPI(context, request),
+            'my_communities': communities,
+            'preferred': preferred}
+
 
 def jquery_list_my_communities_view(context, request):
     request.response.cache_expires = 0
@@ -287,10 +289,9 @@ def jquery_list_my_communities_view(context, request):
                                      request,
                                      ignore_preferred=True)
     preferred = get_preferred_communities(communities_folder, request)
-    return { 'api': TemplateAPI(context, request),
-             'my_communities': communities,
-             'preferred': preferred,
-             'show_all': True,
-             'profile': None,
-             'status_message': None}
-
+    return {'api': TemplateAPI(context, request),
+            'my_communities': communities,
+            'preferred': preferred,
+            'show_all': True,
+            'profile': None,
+            'status_message': None}

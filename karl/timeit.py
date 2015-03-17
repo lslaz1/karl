@@ -29,6 +29,7 @@ try:
 except ImportError:
     statsd_client = lambda: None
 
+
 class TimeitFilter(object):
     """Simple middleware to inject time measurement into response"""
 
@@ -48,7 +49,7 @@ class TimeitFilter(object):
         # print elapsed
         resp = req.get_response(self.app)
         if req.method == "GET" and resp.content_type == "text/html":
-            #elapsed = str(1 / (time.time() - start))[0:5]
+            #  elapsed = str(1 / (time.time() - start))[0:5]
             elapsed_t = time.time() - start
             client = statsd_client()
             if client is not None:
@@ -73,11 +74,10 @@ class TimeitFilter(object):
 
         return resp(environ, start_response)
 
+
 def main(app, global_conf, **local_conf):
     """Middleware to inject elapsed time into a web page"""
 
     hostname = platform.uname()[1]
 
     return TimeitFilter(app, hostname)
-
-

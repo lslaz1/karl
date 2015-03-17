@@ -164,17 +164,17 @@ def get_catalog_batch_grid(context, request, **kw):
         prev = pagemaker(current - 1)
     else:
         prev = empty(None)
-    if current > 2 and not 2 in before:
+    if current > 2 and 2 not in before:
         ellipsis_begin = pagemaker(page=1)
     else:
         ellipsis_begin = empty(None)
-        if current > 1 and not 1 in before:
+        if current > 1 and 1 not in before:
             before.insert(0, 1)
-    if current < last - 1 and not last - 1 in after:
+    if current < last - 1 and last - 1 not in after:
         ellipsis_end = pagemaker(page=last)
     else:
         ellipsis_end = empty(None)
-        if current < last and not last in after:
+        if current < last and last not in after:
             after.append(last)
     if current < last:
         next = pagemaker(current + 1)
@@ -217,15 +217,15 @@ def get_catalog_batch_grid(context, request, **kw):
             % ellipsis_begin)
 
     for item in before:
-        html.append('<a class="ui-state-default" href="%(url)s">%(page)s</a>'
-            % pagemaker(item))
+        html.append('<a class="ui-state-default" href="%(url)s">%(page)s</a>' % (
+            pagemaker(item)))
 
     html.append(
         '<span class="ui-state-active">%(page)s</span>' % empty(current))
 
     for item in after:
-        html.append('<a class="ui-state-default" href="%(url)s">%(page)s</a>'
-            % pagemaker(item))
+        html.append('<a class="ui-state-default" href="%(url)s">%(page)s</a>' % (
+            pagemaker(item)))
 
     if ellipsis_end['url']:
         html.append(
@@ -252,8 +252,8 @@ def get_catalog_batch_grid(context, request, **kw):
 
 
 def get_container_batch(container, request, batch_start=0, batch_size=20,
-        sort_index=None, reverse=False, permission='view',
-        filter_func=None, interfaces=None):
+                        sort_index=None, reverse=False, permission='view',
+                        filter_func=None, interfaces=None):
 
     if 'batch_start' in request.params:
         batch_start = int(request.params['batch_start'])
@@ -303,7 +303,7 @@ def get_container_batch(container, request, batch_start=0, batch_size=20,
     entries.sort()
     if reverse:
         entries.reverse()
-    page_entries = entries[batch_start : batch_start + batch_size]
+    page_entries = entries[batch_start:batch_start + batch_size]
 
     info = {
         'entries': [item for _, _, item in page_entries],
@@ -314,6 +314,7 @@ def get_container_batch(container, request, batch_start=0, batch_size=20,
         }
     _add_link_data(info, container, request)
     return info
+
 
 def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
                        backwards=False, line_filter=None):
@@ -343,7 +344,7 @@ def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
         # line count
         j = j + 1
 
-    page_entries = entries[batch_start : last]
+    page_entries = entries[batch_start:last]
 
     info = {
         'entries': page_entries,
@@ -354,6 +355,7 @@ def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
         }
     _add_link_data(info, context, request)
     return info
+
 
 def backwards_reader(file, BLKSIZE=4096):
     buf = ""

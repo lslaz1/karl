@@ -31,6 +31,7 @@ from karl.views.interfaces import IAtomEntry
 from karl.views.utils import convert_entities
 from karl.models.interfaces import ICommunity
 
+
 def format_datetime(d):
     formatted = d.strftime("%Y-%m-%dT%H:%M:%S")
     if d.tzinfo:
@@ -46,6 +47,7 @@ def format_datetime(d):
 
     return formatted
 
+
 def xml_content(f):
     """
     A decorator for xml content which performs entity conversions from HTML
@@ -54,6 +56,7 @@ def xml_content(f):
     def wrapper(*args, **kw):
         return convert_entities(f(*args, **kw))
     return wrapper
+
 
 class AtomFeed(object):
     """ Atom/xml view.
@@ -116,6 +119,7 @@ class AtomFeed(object):
         raise NotImplementedError(
             "Method must be overridden by concrete subclass.")
 
+
 class AtomEntry(object):
     """ Abstract atom entry class that can adapt most model objects to an
     atom entry, except for the entry content.
@@ -156,6 +160,7 @@ class AtomEntry(object):
         raise NotImplementedError(
             "Method must be overridden by concrete subclass.")
 
+
 class NullContentAtomEntry(AtomEntry):
     """ An adapter for objects that don't really have textual content
     appropriate for including in a feed.
@@ -163,6 +168,7 @@ class NullContentAtomEntry(AtomEntry):
     @property
     def content(self):
         return None
+
 
 class GenericAtomEntry(AtomEntry):
     """ Can adapt any model object with a "text" or "description" attribute,
@@ -177,6 +183,7 @@ class GenericAtomEntry(AtomEntry):
             return self.context.description
         raise ValueError("Cannot adapt %s" % self.context)
 
+
 class CommunityAtomFeed(AtomFeed):
     """ Presents "Recent Activity" for community as an atom feed.
     """
@@ -190,6 +197,7 @@ class CommunityAtomFeed(AtomFeed):
     def _entry_models(self):
         batch = get_recent_items_batch(self.context, self.request, size=20)
         return batch["entries"]
+
 
 def community_atom_view(context, request):
     return CommunityAtomFeed(context, request)()

@@ -13,7 +13,6 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
-from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
@@ -69,10 +68,12 @@ class DefaultFooter(object):
             request=self.request,
             )
 
+
 def _parent_title(context, class_or_interface):
     """helper to find the title of an object in the parent graph"""
     obj = find_interface(context, class_or_interface)
     return obj and obj.title
+
 
 def _community_title(context):
     """find the title of a community
@@ -85,15 +86,18 @@ def _community_title(context):
         return None
     return obj.title
 
+
 def livesearch_dict(context, request, **kwargs):
     """helper to add some common elements to the livesearch result"""
     common_elts = dict(title=getattr(context, 'title', '<No Title>'),
                        url=resource_url(context, request))
     return dict(common_elts, **kwargs)
 
+
 @implementer(ILiveSearchEntry)
 def generic_livesearch_result(context, request):
     return livesearch_dict(context, request)
+
 
 @implementer(ILiveSearchEntry)
 def profile_livesearch_result(context, request):
@@ -101,7 +105,7 @@ def profile_livesearch_result(context, request):
     if photo is None:
         thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     else:
-        thumbnail = thumb_url(photo, request, (85,85))
+        thumbnail = thumb_url(photo, request, (85, 85))
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -111,6 +115,7 @@ def profile_livesearch_result(context, request):
         category='profile',
         thumbnail=thumbnail,
         )
+
 
 @implementer(ILiveSearchEntry)
 def page_livesearch_result(context, request):
@@ -123,6 +128,7 @@ def page_livesearch_result(context, request):
         category='page',
         )
 
+
 @implementer(ILiveSearchEntry)
 def reference_livesearch_result(context, request):
     return livesearch_dict(
@@ -132,6 +138,7 @@ def reference_livesearch_result(context, request):
         type='page',
         category='reference',
         )
+
 
 @implementer(ILiveSearchEntry)
 def blogentry_livesearch_result(context, request):
@@ -143,6 +150,7 @@ def blogentry_livesearch_result(context, request):
         type='post',
         category='blogentry',
         )
+
 
 @implementer(ILiveSearchEntry)
 def comment_livesearch_result(context, request):
@@ -157,6 +165,7 @@ def comment_livesearch_result(context, request):
         category='comment',
         )
 
+
 @implementer(ILiveSearchEntry)
 def forum_livesearch_result(context, request):
     return livesearch_dict(
@@ -166,6 +175,7 @@ def forum_livesearch_result(context, request):
         type='post',
         category='forum',
         )
+
 
 @implementer(ILiveSearchEntry)
 def forumtopic_livesearch_result(context, request):
@@ -229,8 +239,10 @@ class BaseAdvancedSearchResultsDisplay(object):
         self.context = context
         self.request = request
 
+
 class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
     panel = macro = 'searchresults_office'
+
 
 class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
     panel = macro = 'searchresults_people'
@@ -256,12 +268,13 @@ class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
         if photo is None:
             thumbnail = get_static_url(request) + '/images/defaultUser.gif'
         else:
-            thumbnail = thumb_url(photo, request, (50,50))
+            thumbnail = thumb_url(photo, request, (50, 50))
 
         self.display_data = dict(
-            contact_html = ' - '.join(contact_items),
-            thumbnail = thumbnail,
+            contact_html=' - '.join(contact_items),
+            thumbnail=thumbnail,
             )
+
 
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
     panel = macro = 'searchresults_event'
@@ -276,10 +289,10 @@ class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
         location = context.location
 
         self.display_data = dict(
-            startDate = startDate,
-            endDate = endDate,
-            location = location,
-            )
+            startDate=startDate,
+            endDate=endDate,
+            location=location)
+
 
 class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
     panel = macro = 'searchresults_file'
@@ -293,6 +306,6 @@ class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
                 fileinfo.mimeinfo['small_icon_name'])
 
         self.display_data = dict(
-            fileinfo = fileinfo,
-            icon = icon,
+            fileinfo=fileinfo,
+            icon=icon,
             )

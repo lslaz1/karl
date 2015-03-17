@@ -62,13 +62,13 @@ def configure_karl(config, load_zcml=True):
         BasicAuthenticationPolicy()])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
-
     # Static tree revisions routing
     static_rev = settings.get('static_rev')
     if not static_rev:
         static_rev = _guess_static_rev()
         settings['static_rev'] = static_rev
-    config.add_static_view('/static/%s' % static_rev, 'karl.views:static',
+    config.add_static_view(
+        '/static/%s' % static_rev, 'karl.views:static',
         cache_max_age=60 * 60 * 24 * 365)
     # Add a redirecting static view to all _other_ revisions.
     def _expired_static_predicate(info, request):
@@ -76,7 +76,8 @@ def configure_karl(config, load_zcml=True):
         # _except_ if it starts with the active revision segment.
         path = info['match']['path']
         return path and path[0] != static_rev
-    config.add_route('expired-static', '/static/*path',
+    config.add_route(
+        'expired-static', '/static/*path',
         custom_predicates=(_expired_static_predicate, ))
 
     # Need a session if using Velruse
@@ -132,7 +133,7 @@ def group_finder(identity, request):
         user = users.get(identity)
     if user is None:
         return None
-    request.environ['karl.identity'] = user # cache for later
+    request.environ['karl.identity'] = user  # cache for later
     return user['groups']
 
 
@@ -188,15 +189,10 @@ def root_factory(request, name='site'):
             loads = loads_after - loads_before
             stores = stores_after - stores_before
             with open(connstats_file, 'a', 0) as f:
-                f.write('"%s", "%s", "%s", %f, %d, %d\n' %
-                           (now,
-                            request.method,
-                            request.path_url,
-                            elapsed,
-                            loads,
-                            stores,
-                           )
-                       )
+                f.write('"%s", "%s", "%s", %f, %d, %d\n' % (
+                    now, request.method, request.path_url, elapsed,
+                    loads, stores)
+                )
                 f.flush()
 
     # NB: Finished callbacks are executed in the order they've been added
@@ -227,7 +223,7 @@ def root_factory(request, name='site'):
 
     folder = connection.root()
     if name not in folder:
-        from karl.bootstrap.bootstrap import populate # avoid circdep
+        from karl.bootstrap.bootstrap import populate  # avoid circdep
         bootstrapper = queryUtility(IBootstrapper, default=populate)
         bootstrapper(folder, name, request)
 
@@ -241,6 +237,7 @@ def root_factory(request, name='site'):
         transaction.commit()
 
     return folder[name]
+
 
 def main(global_config, **settings):
     var = os.path.abspath(settings['var'])
@@ -293,7 +290,7 @@ def main(global_config, **settings):
     config.include('pyramid_tm')
     config.include('pyramid_zodbconn')
     if filename is not None:
-        if configure_overrides is not None: # BBB See above
+        if configure_overrides is not None:  # BBB See above
             configure_overrides(config, load_zcml=False)
         config.hook_zca()
         config.include('pyramid_zcml')
@@ -316,12 +313,14 @@ def main(global_config, **settings):
 
     return app
 
+
 def get_imperative_config(package):
     resolver = DottedNameResolver(package)
     try:
         return resolver.resolve('.application:configure_karl')
     except ImportError:
         return None
+
 
 def is_normal_mode(registry):
     return registry.settings.get('mode', 'NORMAL').upper() == 'NORMAL'

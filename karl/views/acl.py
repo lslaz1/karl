@@ -34,6 +34,7 @@ from karl.utils import find_catalog
 
 COMMA_WS = re.compile(r'[\s,]+')
 
+
 def get_context_workflow(context):
     """
     If context is content and part of a workflow will return the workflow.
@@ -42,6 +43,7 @@ def get_context_workflow(context):
     if is_content(context):
         content_type = get_content_type(context)
         return get_workflow(content_type, 'security', context)
+
 
 def edit_acl_view(context, request):
 
@@ -76,7 +78,7 @@ def edit_acl_view(context, request):
         verb = request.POST['verb']
         principal = request.POST['principal']
         permissions = tuple(filter(None,
-                              COMMA_WS.split(request.POST['permissions'])))
+                            COMMA_WS.split(request.POST['permissions'])))
         new = acl[:]
         new.append((verb, principal, permissions))
         acl = new
@@ -100,7 +102,7 @@ def edit_acl_view(context, request):
     acl = acl + epilog
 
     if acl != original_acl:
-        context.__custom_acl__ = acl # added so we can find customized obs later
+        context.__custom_acl__ = acl  # added so we can find customized obs later
         context.__acl__ = acl
         catalog = find_catalog(context)
         # Some objects w/ ACLs may not be indexed in the catalog.  E.g.,
@@ -152,7 +154,6 @@ def edit_acl_view(context, request):
             break
         local_acl.append(l_ace)
 
-
     return render_to_response(
         'templates/edit_acl.pt',
         dict(parent_acl=parent_acl or (),
@@ -162,6 +163,7 @@ def edit_acl_view(context, request):
              security_states=security_states),
         request=request,
         )
+
 
 def make_acls(node, request, acls=None, offset=0):
     if acls is None:
@@ -176,8 +178,8 @@ def make_acls(node, request, acls=None, offset=0):
     if folderish:
         has_children = bool(len(node))
     if (folderish and has_children) or acl is not None:
-        acls.append({'offset':offset, 'path':path, 'acl':acl, 'name':name,
-                     'security_state':security_state, 'url':url})
+        acls.append({'offset': offset, 'path': path, 'acl': acl, 'name': name,
+                     'security_state': security_state, 'url': url})
     if folderish:
         children = list(node.items())
         children.sort()
@@ -186,14 +188,10 @@ def make_acls(node, request, acls=None, offset=0):
     node._p_deactivate()
     return acls
 
+
 def acl_tree_view(context, request):
     acls = make_acls(context, request)
     return render_to_response(
         'templates/acl_tree.pt',
-        dict(acls = acls),
+        dict(acls=acls),
         request=request)
-
-
-
-
-

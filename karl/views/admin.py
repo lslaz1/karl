@@ -50,13 +50,14 @@ from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 from karl.views.batch import get_fileline_batch
 
+
 class AdminTemplateAPI(TemplateAPI):
 
     def __init__(self, context, request, page_title=None):
         super(AdminTemplateAPI, self).__init__(context, request, page_title)
         settings = request.registry.settings
         syslog_view = get_setting(context, 'syslog_view', None)
-        self.syslog_view_enabled = syslog_view != None
+        self.syslog_view_enabled = syslog_view is not None
         self.has_logs = not not get_setting(context, 'logs_view', None)
         self.redislog = asbool(settings.get('redislog', 'False'))
         statistics_folder = get_setting(context, 'statistics_folder', None)
@@ -80,9 +81,11 @@ class AdminTemplateAPI(TemplateAPI):
             get_setting(context, 'zodbconn.uri.postoffice') and
             get_setting(context, 'postoffice.queue'))
 
+
 def _menu_macro():
     return get_renderer(
         'templates/admin/menu.pt').implementation().macros['menu']
+
 
 def admin_view(context, request):
     return dict(
@@ -90,16 +93,20 @@ def admin_view(context, request):
         menu=_menu_macro(),
     )
 
+
 def _content_selection_widget():
     return get_renderer(
         'templates/admin/content_select.pt').implementation().macros['widget']
+
 
 def _content_selection_grid():
     return get_renderer(
         'templates/admin/content_select.pt').implementation().macros['grid']
 
+
 def _format_date(d):
     return d.strftime("%m/%d/%Y %H:%M")
+
 
 def _populate_content_selection_widget(context, request):
     """
@@ -126,6 +133,7 @@ def _populate_content_selection_widget(context, request):
         selected_community=request.params.get('community', None),
     )
 
+
 def _grid_item(item, request):
     creator_name, creator_url = 'Unknown', None
     profiles = find_profiles(item)
@@ -144,9 +152,10 @@ def _grid_item(item, request):
         creator_url=creator_url,
     )
 
+
 def _get_filtered_content(context, request, interfaces=None):
     if interfaces is None:
-        interfaces = [ICommunityContent,]
+        interfaces = [ICommunityContent]
     search = ICatalogSearch(context)
     search_terms = dict(
         interfaces={'query': interfaces, 'operator': 'or'},
@@ -170,7 +179,7 @@ def _get_filtered_content(context, request, interfaces=None):
     for docid in docids:
         item = resolver(docid)
         if (title_contains and title_contains not in
-            getattr(item, 'title', '').lower()):
+                getattr(item, 'title', '').lower()):
             continue
         items.append(_grid_item(item, request))
 
@@ -180,6 +189,7 @@ def _get_filtered_content(context, request, interfaces=None):
 
     items.sort(key=lambda x: x['path'])
     return items
+
 
 def delete_content_view(context, request):
     api = AdminTemplateAPI(context, request, 'Admin UI: Delete Content')
@@ -224,8 +234,10 @@ def delete_content_view(context, request):
     parms.update(_populate_content_selection_widget(context, request))
     return parms
 
+
 class _DstNotFound(Exception):
     pass
+
 
 def _find_dst_container(src_obj, dst_community):
     """
@@ -250,6 +262,7 @@ def _find_dst_container(src_obj, dst_community):
                 resource_path(dst_community) + rel_container_path
             )
     return dst_container
+
 
 def move_content_view(context, request):
     """
@@ -306,6 +319,7 @@ def move_content_view(context, request):
     )
     parms.update(_populate_content_selection_widget(context, request))
     return parms
+
 
 def site_announcement_view(context, request):
     """
@@ -406,9 +420,10 @@ class EmailUsersView(object):
         return dict(
             api=api,
             menu=_menu_macro(),
-            to_groups = self.to_groups,
+            to_groups=self.to_groups,
             from_emails=from_emails,
         )
+
 
 def syslog_view(context, request):
     syslog_path = get_setting(context, 'syslog_view')
@@ -448,6 +463,7 @@ def syslog_view(context, request):
         batch_info=batch_info,
     )
 
+
 def logs_view(context, request):
     log_paths = get_setting(context, 'logs_view')
     if len(log_paths) == 1:
@@ -476,6 +492,7 @@ def logs_view(context, request):
         lines=lines,
     )
 
+
 def statistics_view(context, request):
     statistics_folder = get_setting(context, 'statistics_folder')
     csv_files = [fn for fn in os.listdir(statistics_folder)
@@ -485,6 +502,7 @@ def statistics_view(context, request):
         menu=_menu_macro(),
         csv_files=csv_files
     )
+
 
 def statistics_csv_view(request):
     statistics_folder = get_setting(request.context, 'statistics_folder')
@@ -497,6 +515,7 @@ def statistics_csv_view(request):
         raise NotFound()
 
     return request.get_response(FileApp(path).get)
+
 
 class UploadUsersView(object):
     rename_user = rename_user
@@ -562,7 +581,7 @@ class UploadUsersView(object):
                             errors.append("Missing required field: %s" %
                                           required_field)
                     if (not ('password' in fieldnames or
-                        'sha_password' in fieldnames)):
+                             'sha_password' in fieldnames)):
                         errors.append('Must supply either password or '
                                       'sha_password field.')
 
@@ -587,7 +606,7 @@ class UploadUsersView(object):
                         break
                     added_users, row_messages, row_errors = (
                         self._add_user_csv_row(search, profiles, users, row,
-                                          reactivate, i)
+                                               reactivate, i)
                     )
                     n_added += added_users
                     messages += row_messages
@@ -637,7 +656,7 @@ class UploadUsersView(object):
         profile = profiles.get(username)
         skip = False
         if (users.get_by_id(username) is not None or
-            (profile is not None and profile.security_state != 'inactive')):
+                (profile is not None and profile.security_state != 'inactive')):
             messages.append(
                 "Skipping user: %s: User already exists." %
                 username
@@ -733,6 +752,7 @@ class UploadUsersView(object):
 
         return 1, messages, errors
 
+
 def _decode(s):
     """
     Convert to unicode, by hook or crook.
@@ -743,6 +763,7 @@ def _decode(s):
         # Will probably result in some junk characters but it's better than
         # nothing.
         return s.decode('latin-1')
+
 
 def _get_redislog(registry):
     redislog = getattr(registry, 'redislog', None)
@@ -763,12 +784,14 @@ def _get_redislog(registry):
     settings.redislog = redislog = RedisLog(**redisconfig)
     return redislog
 
+
 def error_status_view(context, request):
     redislog = _get_redislog(request.registry)
     if not redislog:
         raise NotFound
     response = 'ERROR' if redislog.alarm() else 'OK'
     return Response(response, content_type='text/plain')
+
 
 def redislog_view(context, request):
     redislog = _get_redislog(request.registry)
@@ -835,7 +858,7 @@ def redislog_view(context, request):
         {'timestamp': time.asctime(time.localtime(entry.timestamp)),
          'level': entry.level,
          'category': entry.category,
-         'hostname': getattr(entry, 'hostname', None), # BBB?
+         'hostname': getattr(entry, 'hostname', None),  # BBB?
          'summary': entry.message.split('\n')[0],
          'details': '%s\n\n%s' % (entry.message, entry.traceback)
                     if entry.traceback else entry.message}
@@ -857,6 +880,7 @@ def redislog_view(context, request):
         'category': category,
         'log': log}
 
+
 def _get_postoffice_queue(context):
     zodb_uri = get_setting(context, 'zodbconn.uri.postoffice')
     queue_name = get_setting(context, 'postoffice.queue')
@@ -864,6 +888,7 @@ def _get_postoffice_queue(context):
         db = context._p_jar.db().databases['postoffice']
         return open_queue(db, queue_name)
     return None, None
+
 
 def postoffice_quarantine_view(request):
     """
@@ -921,6 +946,7 @@ def postoffice_quarantine_view(request):
         messages=messages
     )
 
+
 def postoffice_quarantine_status_view(request):
     """
     Report status of quarantine.  If no messages are in quarantine, status is
@@ -932,6 +958,7 @@ def postoffice_quarantine_status_view(request):
     if queue.count_quarantined_messages() == 0:
         return Response('OK')
     return Response('ERROR')
+
 
 def postoffice_quarantined_message_view(request):
     """
@@ -947,12 +974,13 @@ def postoffice_quarantined_message_view(request):
         raise NotFound
     return Response(body=msg.as_string(), content_type='text/plain')
 
+
 def rename_or_merge_user_view(request, rename_user=rename_user):
     """
     Rename or merge users.
     """
     context = request.context
-    api=AdminTemplateAPI(context, request, 'Admin UI: Rename or Merge Users')
+    api = AdminTemplateAPI(context, request, 'Admin UI: Rename or Merge Users')
     old_username = request.params.get('old_username')
     new_username = request.params.get('new_username')
     if old_username and new_username:
@@ -970,18 +998,19 @@ def rename_or_merge_user_view(request, rename_user=rename_user):
         menu=_menu_macro()
     )
 
+
 def debug_converters(request):
     converters = []
     for name, utility in sorted(request.registry.getUtilitiesFor(IConverter)):
-        command =  getattr(utility, 'depends_on', None) or 'n/a'
+        command = getattr(utility, 'depends_on', None) or 'n/a'
         converters.append({'name': name,
                            'command': command,
                            'available': utility.isAvailable(),
-                          })
+                           })
     api = AdminTemplateAPI(request.context, request,
                            'Admin UI: Debug Converters')
     return {'converters': converters,
             'environ': sorted(os.environ.items()),
             'api': api,
             'menu': _menu_macro(),
-           }
+            }

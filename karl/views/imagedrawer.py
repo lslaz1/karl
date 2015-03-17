@@ -120,7 +120,7 @@ THUMB_SIZE = (85, 85)
 LARGE_THUMB_SIZE = (175, 175)
 
 # a somewhat useful decorator
-class jsonview(object):
+class jsonview(object):  # noqa
     def __init__(self, content_type="application/x-json"):
         self.content_type = content_type
 
@@ -132,6 +132,7 @@ class jsonview(object):
             result = JSONEncoder().encode(payload)
             return Response(result, content_type=self.content_type)
         return wrapped
+
 
 def breadcrumbs(doc, request):
     """
@@ -153,6 +154,7 @@ def breadcrumbs(doc, request):
 
     return list(visit(doc))
 
+
 def get_image_info(image, request, thumb_size=THUMB_SIZE):
     """Return the info about a particular image,
     in the format specified by the client's needs.
@@ -171,25 +173,26 @@ def get_image_info(image, request, thumb_size=THUMB_SIZE):
     image_url = urlparse.urlparse(thumb_url(image, request, DISPLAY_SIZE))
 
     return dict(
-        name = image.__name__,
-        title = image.title,
-        author_name = creator.title,
-        location = breadcrumbs(image, request),
-        image_url = image_url.path,
-        image_width = width,
-        image_height = height,
-        image_size = image.size,
-        thumbnail_url = thumb_url(image, request, thumb_size),
-        last_modified = image.modified.ctime(),  # XXX Format?
+        name=image.__name__,
+        title=image.title,
+        author_name=creator.title,
+        location=breadcrumbs(image, request),
+        image_url=image_url.path,
+        image_width=width,
+        image_height=height,
+        image_size=image.size,
+        thumbnail_url=thumb_url(image, request, thumb_size),
+        last_modified=image.modified.ctime(),  # XXX Format?
     )
 
 # size of minimal batch, if client does not ask for it.
 # only counts at the initial batch.
 MINIMAL_BATCH = 12
 
+
 def batch_images(context, request,
-                 get_image_info=get_image_info, # unittest
-                 get_images_batch=get_images_batch): # unittest
+                 get_image_info=get_image_info,  # unittest
+                 get_images_batch=get_images_batch):  # unittest
 
     include_image_url = request.params.get('include_image_url', None)
     # include_image_url is a special case.
@@ -286,14 +289,15 @@ def batch_images(context, request,
             start += 1
 
     return dict(
-        records = records,
-        start = start,
-        totalRecords = totalRecords,
+        records=records,
+        start=start,
+        totalRecords=totalRecords,
         )
+
 
 @jsonview()
 def drawer_dialog_view(context, request,
-                       batch_images=batch_images): # unittest
+                       batch_images=batch_images):  # unittest
     """This view returns a json reply that is a dictionary containing:
 
         dialog_snippet: the html of the dialog
@@ -308,24 +312,24 @@ def drawer_dialog_view(context, request,
     # Read the dialog snippet
     # It is located where the tinymce plugin is.
     here = os.path.abspath(os.path.dirname(__file__))
-    dialog_snippet = file(os.path.join(here,
-            'static', 'tinymce-plugins', 'imagedrawer',
-            'imagedrawer_dialog_snippet.html',
-        )).read()
+    dialog_snippet = file(
+        os.path.join(here,
+                     'static', 'tinymce-plugins', 'imagedrawer',
+                     'imagedrawer_dialog_snippet.html')).read()
 
     d = dict(
-        dialog_snippet = dialog_snippet,
-        )
+        dialog_snippet=dialog_snippet)
 
     # Download sources will need a batch result
     # to be included in the response.
     source = request.params.get('source', None)
     assert source in ('upload', 'myrecent', 'thiscommunity',
-                    'allkarl', 'external', None)
-    if source in ('myrecent', 'thiscommunity', 'allkarl'):
+                      'allkarl', 'external', None)
+    if source in ('my}ecent', 'thiscommunity', 'allkarl'):
         d['images_info'] = batch_images(context, request)
 
     return d
+
 
 @jsonview()
 def drawer_data_view(context, request,
@@ -352,15 +356,15 @@ def drawer_upload_view(context, request,
     """Drawer posts a file with the parameter name "file".
     """
 
-    ## XXX The rest is copied from add_file_view. A common denominator
-    ## would be desirable.
+    # XXX The rest is copied from add_file_view. A common denominator
+    # would be desirable.
 
     creator = authenticated_userid(request)
 
     fieldstorage = request.params.get('file')
     if not hasattr(fieldstorage, 'filename'):
         msg = 'You must select a file before clicking Upload.'
-        return dict(error = msg)
+        return dict(error=msg)
 
     # For file objects, OSI's policy is to store the upload file's
     # filename as the objectid, instead of basing __name__ on the
@@ -371,12 +375,11 @@ def drawer_upload_view(context, request,
     # use parameter, as the title (or basename, if missing).
     title = request.params.get('title', filename)
     image = create_content(ICommunityFile,
-                          title=title,
-                          stream=stream,
-                          mimetype=get_upload_mimetype(fieldstorage),
-                          filename=fieldstorage.filename,
-                          creator=creator,
-                          )
+                           title=title,
+                           stream=stream,
+                           mimetype=get_upload_mimetype(fieldstorage),
+                           filename=fieldstorage.filename,
+                           creator=creator)
     # Check if it's an image.
     if not IImage.providedBy(image):
         msg = 'File %s is not an image' % filename
@@ -419,7 +422,6 @@ def drawer_upload_view(context, request,
         image.modified = datetime.datetime.now()
         tempfolder = find_tempfolder(context)
         tempfolder.add_document(image)
-
 
     # Return info about the image uploaded
     return dict(
