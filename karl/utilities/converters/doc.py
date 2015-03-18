@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -26,16 +26,18 @@ import os
 from karl.utilities.converters.baseconverter import BaseConverter
 here = os.path.dirname(__file__)
 
+
 class Converter(BaseConverter):
 
     content_type = ('application/msword',
-                    'application/ms-word','application/vnd.ms-word')
+                    'application/ms-word',
+                    'application/vnd.ms-word')
     content_description = "Microsoft Word"
     depends_on = 'doctotext'
 
     def convert(self, filename, encoding, mimetype):
         """Convert WinWord document to raw text"""
-        
+
         return self.execute('doctotext "%s"' % filename), 'utf-8'
 
 DocConverter = Converter()

@@ -1,8 +1,16 @@
 karl package Changelog
 ======================
 
-5.0 (unreleased)
-----------------
+
+5.0.0a2 (2015-03-18)
+--------------------
+
+- change multi-file upload to not batch everything into one
+  huge commit at the end. This prevents very long lasting
+  last file upload timeouts
+
+5.0.0a1 (2015-03-17)
+--------------------
 
 - be able to provide override packages and easily override templates
 

@@ -20,7 +20,6 @@ import logging
 import tempfile
 import transaction
 from urllib import quote_plus
-from simplejson import JSONDecoder
 from os.path import splitext
 from zipfile import ZipFile
 
@@ -1397,68 +1396,39 @@ def ajax_file_upload_view(context, request):
             filename=filename,
         )
 
-        if is_last_chunk and end_batch is not None:
-            # The client marks this as the last file in the batch.
-            # We finalize the transaction by moving all files to the folder.
-            end_batch = JSONDecoder().decode(end_batch)
-            last_fileobj = fileobj
-            # append the last file to the process queue
-            end_batch.append(client_id)
+        if is_last_chunk:
+            # move temp file into folder
+            # batch security protection
+            # to avoid attacks or malformed end_batch parameters
+            if fileobj.__client_file_id__ != client_id:
+                msg = 'Inconsistent client file id'
+                raise ErrorResponse(msg, client_id='')
+            if fileobj.__transaction_parent__ != context:
+                msg = 'Inconsistent batch transaction'
+                raise ErrorResponse(msg, client_id=client_id)
 
-            # Iterate on all the files in the just finishing batch.
-            for client_id in end_batch:
-                temp_id = make_temp_id(client_id)
-                try:
-                    fileobj = tempfolder[temp_id]
-                except:
-                    msg = ("Inconsistent transaction, "
-                           "lost a file (temp_id='%s') " % (temp_id, ))
-                    raise ErrorResponse(msg, client_id=client_id)
+            # we are final, so remove all metadata
+            del fileobj.__transaction_parent__
+            del fileobj.__client_file_id__
+            del fileobj.__chunks__
+            del fileobj.__chunk__
 
-                # batch security protection
-                # to avoid attacks or malformed end_batch parameters
-                if fileobj.__client_file_id__ != client_id:
-                    msg = 'Inconsistent client file id'
-                    raise ErrorResponse(msg, client_id='')
-                if fileobj.__transaction_parent__ != context:
-                    msg = 'Inconsistent batch transaction'
-                    raise ErrorResponse(msg, client_id=client_id)
-                if fileobj.creator != last_fileobj.creator:
-                    msg = 'Inconsistent ownership'
-                    raise ErrorResponse(msg, client_id=client_id)
+            check_upload_size(context, fileobj, 'file')
 
-                # we are final, so remove all metadata
-                del fileobj.__transaction_parent__
-                del fileobj.__client_file_id__
-                del fileobj.__chunks__
-                del fileobj.__chunk__
+            # create a unique name of the -1, -2, ... style
+            # also change title and filename properties as needed
+            name = make_unique_file_in_folder(context, fileobj)
 
-                check_upload_size(context, fileobj, 'file')
+            # Move the file to its permanent location
+            del tempfolder[temp_id]
+            context[name] = fileobj
 
-                # create a unique name of the -1, -2, ... style
-                # also change title and filename properties as needed
-                name = make_unique_file_in_folder(context, fileobj)
+            # XXX What to do with the workflow?
+            workflow = get_workflow(ICommunityFolder, 'security', context)
+            if workflow is not None:
+                workflow.initialize(fileobj)
 
-                # Move the file to its permanent location
-                del tempfolder[temp_id]
-                context[name] = fileobj
-
-                # XXX What to do with the workflow?
-                workflow = get_workflow(ICommunityFolder, 'security', context)
-                if workflow is not None:
-                    workflow.initialize(fileobj)
-                    # if 'security_state' in XXXconverted:
-                    #    workflow.transition_to_state(fileobj, request,
-                    #                                params['security_state'])
-
-                # Tags, attachments
-                # set_tags(fileobj, request, paramsXXX['tags'])
-
-                # Alerts
-                # if params.get('sendalert'):
-                #    alerts = queryUtility(IAlerts, default=Alerts())
-                #    alerts.emit(fileobj, request)
-
+        if end_batch is not None:
             payload['batch_completed'] = True
 
     except ErrorResponse, exc:
