@@ -26,64 +26,65 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from zope.component import queryUtility
 
+
 def tinymce_spellcheck_view(context, request):
     methodcall, language, words = _parse_tinymce_request(request)
-    
+
     # get aspell settings
     settings = _get_aspell_settings(context)
     if language not in settings['languages']:
         return _make_tinymce_response(error="Language is not supported")
-                                    
+
     # initialize spellchecker
     klass = queryUtility(ISpellChecker, default=SpellChecker)
-    try:                                            
+    try:
         spellchecker = klass(settings['executable'], language)
     except SpellCheckError, why:
         return _make_tinymce_response(error=why[0])
 
-    # handle tinymce rpc spelling request    
+    # handle tinymce rpc spelling request
     if methodcall == 'checkWords':
-        misspellings = spellchecker.find_misspelled_words(words, 
-                        max_words=settings['max_words'])
-        response = _make_tinymce_response(misspellings)        
+        misspellings = spellchecker.find_misspelled_words(
+            words,
+            max_words=settings['max_words'])
+        response = _make_tinymce_response(misspellings)
 
     elif methodcall == 'getSuggestions':
-        suggestions = spellchecker.suggestions_for_word(words[0],
-                        max_suggestions=10) # keeps ui pretty
-        response = _make_tinymce_response(suggestions)        
+        suggestions = spellchecker.suggestions_for_word(
+            words[0], max_suggestions=10)  # keeps ui pretty
+        response = _make_tinymce_response(suggestions)
 
-    del spellchecker # ensure close
+    del spellchecker  # ensure close
     return response
 
 
 def _parse_tinymce_request(request):
     if request.method != 'POST':
-       raise HTTPMethodNotAllowed('Expected POST')
+        raise HTTPMethodNotAllowed('Expected POST')
 
-    try:                                             
+    try:
         from_json = JSONDecoder().decode(request.body)
         methodcall = from_json['method']
         lang, words = from_json['params']
         if not isinstance(words, list):
-            words = [ words ]
+            words = [words]
     except (KeyError, ValueError):
         raise HTTPBadRequest('Invalid JSON payload')
-    
+
     if methodcall not in ('checkWords', 'getSuggestions'):
         raise HTTPBadRequest('Unknown RPC method')
-    
-    return methodcall, lang, words 
+
+    return methodcall, lang, words
 
 
-def _make_tinymce_response(result=[], id=None, error=None): 
-    return {'id':id, 'error':error, 'result':result}
- 
+def _make_tinymce_response(result=[], id=None, error=None):
+    return {'id': id, 'error': error, 'result': result}
+
 
 def _get_aspell_settings(context):
     D = {}
     D['executable'] = get_setting(context, 'aspell_executable', 'aspell')
     D['max_words'] = int(get_setting(context, 'aspell_max_words', 5000))
-    langs_csv = get_setting(context, 'aspell_languages', 'en')  
+    langs_csv = get_setting(context, 'aspell_languages', 'en')
     D['languages'] = [x.strip() for x in langs_csv.split(',')]
     return D
- 

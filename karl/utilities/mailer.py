@@ -9,11 +9,13 @@ from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.utils import get_settings
 
+
 def boolean(s):
     s = s.lower()
     return s.startswith('y') or s.startswith('1') or s.startswith('t')
 
-def mail_delivery_factory(os=os): # accepts 'os' for unit test purposes
+
+def mail_delivery_factory(os=os):  # accepts 'os' for unit test purposes
     """Factory method for creating an instance of repoze.sendmail.IDelivery
     for use by this application.
     """
@@ -73,7 +75,7 @@ class FakeMailDelivery:
         self.quiet = quiet
 
     def send(self, mto, msg):
-        if not self.quiet: #pragma NO COVERAGE
+        if not self.quiet:  # pragma NO COVERAGE
             print 'To:', mto
             print 'Message:', msg
 
@@ -110,7 +112,7 @@ class WhiteListMailDelivery(object):
     def _send(self, toaddrs, message, send):
         if self.white_list is not None:
             toaddrs = [addr for addr in toaddrs
-                if self._normalize(addr) in self.white_list]
+                       if self._normalize(addr) in self.white_list]
         if toaddrs:
             send(toaddrs, message)
 
@@ -119,4 +121,3 @@ class WhiteListMailDelivery(object):
         if '<' in addr:
             addr = addr[addr.index('<') + 1:addr.rindex('>')]
         return unicode(addr.strip()).lower()
-

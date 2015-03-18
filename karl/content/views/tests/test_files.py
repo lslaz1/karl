@@ -1644,17 +1644,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
         data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
 
-        file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
+        file1 = context['f1.txt']
         self.assertEqual(file1.title, 'f1.txt')
         self.assertEqual(file1.mimetype, 'text/plain')
         self.assertEqual(file1.filename, 'f1.txt')
         self.assertEqual(file1.creator, 'chris')
         self.assertEqual(file1.size, 1000)
         self.assertEqual(len(file1.blobfile.open().read()), 1000)
-        self.assertEqual(self.workflow.initialized_list, [])
-
-        self.failUnless(hasattr(file1, '__client_file_id__'))
-        self.failUnless(hasattr(file1, '__transaction_parent__'))
 
         request = testing.DummyRequest(
             params={
@@ -1665,17 +1661,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
         data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f2.txt'})
 
-        file2 = context['TEMP']['PLUPLOAD-ABCDEF2']
+        file2 = context['f2.txt']
         self.assertEqual(file2.title, 'f2.txt')
         self.assertEqual(file2.mimetype, 'text/plain')
         self.assertEqual(file2.filename, 'f2.txt')
         self.assertEqual(file2.creator, 'chris')
         self.assertEqual(file2.size, 1000)
         self.assertEqual(len(file2.blobfile.open().read()), 1000)
-        self.assertEqual(self.workflow.initialized_list, [])
-
-        self.failUnless(hasattr(file2, '__client_file_id__'))
-        self.failUnless(hasattr(file2, '__transaction_parent__'))
 
         request = testing.DummyRequest(
             params={
@@ -1726,7 +1718,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(data, {
             u'result': u'OK',
             u'filename': u'f1.txt'})
-        self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
+        self.assertEqual(list(context.keys()), ['f1.txt', 'TEMP'])
 
         # this batch is now doomed and client retries - with the same id.
         request = testing.DummyRequest(
@@ -1737,109 +1729,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
         )
         data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
-        self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
+        self.assertEqual(list(context.keys()), ['f1-1.txt', 'f1.txt', 'TEMP'])
         # - it just overwrites the object: this is ok. (It is for sure
         # from the same client.)
-
-    def test_security_assertions(self):
-        karl.testing.registerDummySecurityPolicy('chris')
-        context = self._make_context()
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f1.txt'),
-                'client_id': 'ABCDEF1',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'result': u'OK',
-            u'filename': u'f1.txt'})
-
-        file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
-
-        # client id mismatch: bad. Smells like bad intention.
-        self.assertEqual(file1.__client_file_id__, 'ABCDEF1')
-        file1.__client_file_id__ = 'h4x3r'
-
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f2.txt'),
-                'client_id': 'ABCDEF2',
-                'end_batch': '["ABCDEF1"]',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'client_id': u'',
-            u'error': u'Inconsistent client file id'})
-        self.failUnless(self.transaction.doomed)  # assert that doom was called
-        self.transaction.doomed = False
-
-        # Another one
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f3.txt'),
-                'client_id': 'ABCDEF3',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'result': u'OK',
-            u'filename': u'f3.txt'})
-
-        file1 = context['TEMP']['PLUPLOAD-ABCDEF3']
-
-        # parent changes during the transaction: very bad.
-        self.assertEqual(file1.__transaction_parent__, context)
-        file1.__transaction_parent__ = 'h4x3r'
-
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f4.txt'),
-                'client_id': 'ABCDEF4',
-                'end_batch': '["ABCDEF3"]',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'client_id': u'ABCDEF3',
-            u'error': u'Inconsistent batch transaction',
-            })
-        self.failUnless(self.transaction.doomed)  # assert that doom was called
-        self.transaction.doomed = False
-
-        # Another one
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f5.txt'),
-                'client_id': 'ABCDEF5',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'result': u'OK',
-            u'filename': u'f5.txt',
-            })
-
-        file1 = context['TEMP']['PLUPLOAD-ABCDEF5']
-
-        # the security credentials change during the batch: very very bad.
-        karl.testing.registerDummySecurityPolicy('paul')
-
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f6.txt'),
-                'client_id': 'ABCDEF6',
-                'end_batch': '["ABCDEF5"]',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'client_id': u'ABCDEF5',
-            u'error': u'Inconsistent ownership',
-            })
-        self.failUnless(self.transaction.doomed)  # assert that doom was called
-        self.transaction.doomed = False
 
     def test_chunks_onechunk(self):
         karl.testing.registerDummySecurityPolicy('chris')
@@ -2013,38 +1905,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
             })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
-    def test_lost_tempfile(self):
-        karl.testing.registerDummySecurityPolicy('chris')
-        context = self._make_context()
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f1.txt'),
-                'client_id': 'ABCDEF1',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            u'result': u'OK',
-            u'filename': u'f1.txt',
-            })
-
-        # file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
-        # now the file is lost somehow:
-        del context['TEMP']['PLUPLOAD-ABCDEF1']
-
-        request = testing.DummyRequest(
-            params={
-                'file': DummyUpload(filename='f2.txt'),
-                'client_id': 'ABCDEF2',
-                'end_batch': '["ABCDEF1"]',
-            }
-        )
-        data = self._call_fut(context, request)
-        self.assertEqual(data, {
-            'client_id': 'ABCDEF1',
-            'error': "Inconsistent transaction, lost a file "
-                     "(temp_id='PLUPLOAD-ABCDEF1') "})
 
     def test_unique_filenames(self):
         karl.testing.registerDummySecurityPolicy('chris')

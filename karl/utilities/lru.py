@@ -19,6 +19,7 @@ import threading
 
 _marker = object()
 
+
 class LRUCache(object):
     """ Implements a pseudo-LRU algorithm (CLOCK) """
     lock = threading.Lock()
@@ -36,7 +37,7 @@ class LRUCache(object):
                 raise ValueError('size must be >1')
             self.clock = []
             for i in xrange(0, size):
-                self.clock.append({'key':_marker, 'ref':False})
+                self.clock.append({'key': _marker, 'ref': False})
             self.hand = 0
             self.data = {}
         finally:
@@ -98,4 +99,3 @@ class LRUCache(object):
                     break
         finally:
             lock.release()
-

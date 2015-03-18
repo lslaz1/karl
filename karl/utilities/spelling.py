@@ -39,7 +39,7 @@ class SpellChecker:
 
         # first line will either be version info or an error
         # such as the language file cannot be loaded
-        msg = self._subprocess.stdout.readline()
+        self.msg = self._subprocess.stdout.readline()
 
     def _spawn_aspell(self, aspell_executable, language):
         args = [aspell_executable,
@@ -51,8 +51,7 @@ class SpellChecker:
             self._subprocess = subprocess.Popen(args=args,
                                                 shell=False,
                                                 stdin=subprocess.PIPE,
-                                                stdout=subprocess.PIPE,
-                                               )
+                                                stdout=subprocess.PIPE)
         except OSError:
             msg = 'Spell checker could not be started'
             log.error(msg, exc_info=True)
@@ -97,12 +96,11 @@ class SpellChecker:
         if max_words is not None:
             list_of_words = list_of_words[:max_words]
 
-        words = [word.strip() for word in list_of_words]
         if '' in list_of_words:
             list_of_words.remove('')
 
         if not list_of_words:
-            return result # nothing to do
+            return result  # nothing to do
 
         line = ' '.join(set(list_of_words))
 
@@ -120,7 +118,7 @@ class SpellChecker:
                         have_replacement = False
                     assert match, 'Unknown formatted line: %s' % resline
                     word = match.group(1)
-                    if result.has_key(word):
+                    if word in result:
                         continue
                     replacements = []
                     if have_replacement:

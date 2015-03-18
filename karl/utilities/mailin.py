@@ -41,12 +41,13 @@ from karl.utils import find_peopledirectory
 from karl.utils import get_setting
 from karl.utils import hex_to_docid
 
-#BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
+# BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
 REPLY_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)-(?P<reply>\w+)@')
 TOOL_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)@')
 LOG_FMT = '%s %s %s %s\n'
 
 log = logging.getLogger('karl.mailin')
+
 
 class MailinRunner2(object):
     def __init__(self, root, poroot, zodb_path, queue_name):
@@ -99,15 +100,15 @@ class MailinRunner2(object):
                             message_id, error, repr(info)))
                         continue
                     process_error = self.process_message(message, info, target,
-                        text, attachments)
+                                                         text, attachments)
                     if process_error:
                         self.bounce_message(message, process_error)
                         log.info('Bounced %s %s %s' % (
                             message_id, error, repr(info)))
                         continue
                     extra = ['%s:%s' % (x, info.get(x))
-                            for x in ('community', 'in_reply_to', 'tool',
-                                      'author') if info.get(x) is not None]
+                             for x in ('community', 'in_reply_to', 'tool',
+                                       'author') if info.get(x) is not None]
                     log.info('Processed %s %s', message_id, ','.join(extra))
                     success = True
                 return success

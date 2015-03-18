@@ -249,7 +249,7 @@ class UserSync(object):
             profiles = find_profiles(self.context)
             missing = set([p.__name__ for p in profiles.values()
                            if p.security_state == 'active' and
-                              getattr(p, 'usersync_managed', False)])
+                           getattr(p, 'usersync_managed', False)])
         else:
             missing = Empty()
 
@@ -341,4 +341,3 @@ class UserSync(object):
     def update(self, profile, data):
         for key in self.profile_keys:
             setattr(profile, key, data.pop(key, getattr(profile, key, None)))
-

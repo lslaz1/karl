@@ -15,6 +15,7 @@ from karl.scripting import only_one
 
 log = logging.getLogger(__name__)
 
+
 def main(argv=sys.argv):
     default_interval = 300
     parser = create_karl_argparser(description='Process incoming mail.')
@@ -58,6 +59,7 @@ def mailin(args, env, parser):
 
     request = env['request']
     only_one(go, registry, 'mailin')(root, request, zodb_path, queue)
+
 
 def go(root, request, zodb_path, queue):
     runner = None

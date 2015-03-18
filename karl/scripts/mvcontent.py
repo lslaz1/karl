@@ -63,6 +63,7 @@ def postorder(startnode):
             node._p_deactivate()
     return visit(startnode)
 
+
 def move_content(root, src, dst, wf_state):
     try:
         context = find_resource(root, src)
@@ -125,6 +126,7 @@ def move_content(root, src, dst, wf_state):
     if hasattr(context, 'text'):
         context.text = "%s\n%s" % (move_header, context.text)
 
+
 def main(argv=sys.argv):
     logging.basicConfig()
     log.setLevel(logging.INFO)
@@ -133,12 +135,12 @@ def main(argv=sys.argv):
         description="Move content to another folder",
         )
     parser.add_argument('-d', '--dry-run', dest='dry_run',
-        action="store_true", default=False,
-        help="Don't commit the transaction")
+                        action="store_true", default=False,
+                        help="Don't commit the transaction")
     parser.add_argument('-S', '--security-state', dest='security_state',
-                      default=None,
-                      help="Force workflow transition to given state.  By "
-                      "default no transition is performed.")
+                        default=None,
+                        help="Force workflow transition to given state.  By "
+                             "default no transition is performed.")
     parser.add_argument('source')
     parser.add_argument('dest')
     args = parser.parse_args(argv[1:])
@@ -148,7 +150,7 @@ def main(argv=sys.argv):
 
     env = args.bootstrap(args.config_uri)
 
-    root, closer = env['root'], env['closer']
+    root = env['root']
 
     try:
         move_content(root, args.source, args.dest, args.security_state)
