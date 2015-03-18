@@ -2,6 +2,11 @@ karl package Changelog
 ======================
 
 
+5.0.0a3 (unreleased)
+--------------------
+
+- be able to customize batch sizes
+
 5.0.0a2 (2015-03-18)
 --------------------
 

@@ -215,6 +215,18 @@
       </script>
     </div>
 
+    <metal:pagesize metal:define-macro="batch_size_selector">
+      <div class="batch-size"
+           tal:define="default_batch_size default_batch_size|string:25;
+                       current python: request.params.get('limit', request.params.get('batch_size', default_batch_size));">
+        <span class="label">Batch size:</span>
+        <a href="${request.path_url}?limit=10" tal:omit-tag="python: current == '10'">10</a> |
+        <a href="${request.path_url}?limit=25" tal:omit-tag="python: current == '25'">25</a> |
+        <a href="${request.path_url}?limit=50" tal:omit-tag="python: current == '50'">50</a> |
+        <a href="${request.path_url}?limit=100" tal:omit-tag="python: current == '100'">100</a>
+      </div>
+    </metal:pagesize>
+
     <metal:table metal:define-macro="folder_grid">
        <div id="filegrid"></div>
       <script language="javascript" type="text/javascript">
@@ -241,8 +253,8 @@
                 url: here_url + "jquery_grid_list",
                 delete_url: here_url + "delete_files.json",
                 moveto_url: here_url + "move_files.json",
-		download_url: here_url + "download_zipped",
-                limit: 10,
+            		download_url: here_url + "download_zipped",
+                limit: filegrid_data.limit || 20,
                 height: 'auto',
                 width: 666,
                 pagination: true,

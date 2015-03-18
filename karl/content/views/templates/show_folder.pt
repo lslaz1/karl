@@ -67,6 +67,8 @@
 
     <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
+    <div metal:use-macro="api.snippets.macros['batch_size_selector']"> </div>
+    
     <div metal:use-macro="api.snippets.macros['folder_grid']"> </div>
 
     <div metal:use-macro="api.snippets.macros['rss_icon']"/>

@@ -22,8 +22,9 @@
       <span tal:replace="structure api.context.text"/>
     </div>
     <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
-    <div class="recentItemsWrapper">
+    <div class="recentItemsWrapper" tal:define="default_batch_size string:10">
       <h3>Recent Activity</h3>
+      <metal:script metal:use-macro="api.snippets.macros['batch_size_selector']"/>
       <table class="content-listing">
         <thead>
           <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">

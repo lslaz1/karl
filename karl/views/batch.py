@@ -32,7 +32,8 @@ def get_catalog_batch(context, request, **kw):
     batch_start = kw.pop('batch_start', 0)
     batch_start = int(request.params.get("batch_start", batch_start))
     batch_size = kw.pop('batch_size', 20)
-    batch_size = int(request.params.get("batch_size", batch_size))
+    batch_size = int(
+        request.params.get("batch_size", request.params.get('limit', batch_size)))
     sort_index = kw.pop('sort_index', None)
     sort_index = request.params.get('sort_index', sort_index)
     reverse = kw.pop('reverse', False)

@@ -2725,3 +2725,7 @@ body .ui-state-default .karl-icon-loading {
   border-top: 1px solid #DDD;
   padding-top: 8px;
 }
+
+.batch-size{
+  float:right;
+}

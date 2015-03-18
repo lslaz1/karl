@@ -111,7 +111,6 @@ log = logging.getLogger(__name__)
 
 
 def show_folder_view(context, request):
-
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
 
@@ -158,14 +157,18 @@ def show_folder_view(context, request):
     else:
         feed_url = None
 
-    _pre_fetch = 50
+    limit = request.params.get('limit', request.params.get('batch_size', '20'))
+    try:
+        limit = int(limit)
+    except:
+        limit = 15
 
     filegrid_data = get_filegrid_client_data(context, request,
                                              start=0,
-                                             limit=_pre_fetch,
+                                             limit=limit,
                                              sort_on='modified_date',
                                              reverse=True)
-    filegrid_data['records'] = filegrid_data['records'][:10]
+    filegrid_data['records'] = filegrid_data['records'][:limit]
 
     # Folder and tag data for Ajax
     client_json_data = dict(
@@ -856,7 +859,7 @@ grid_folder_columns_nofiletool = [
 def jquery_grid_folder_view(context, request):
 
     start = request.params.get('start', '0')
-    limit = request.params.get('limit', '10')
+    limit = request.params.get('limit', request.params.get('batch_size', '20'))
     sort_on = request.params.get('sortColumn', 'modified_date')
     reverse = request.params.get('sortDirection') == 'desc'
 
@@ -959,6 +962,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     payload = dict(
         columns=folder_columns,
         records=records,
+        limit=limit,
         totalRecords=info['total'],
         sortColumn=sort_on,
         sortDirection=reverse and 'desc' or 'asc',

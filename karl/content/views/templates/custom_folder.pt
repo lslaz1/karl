@@ -72,6 +72,7 @@
       </div>
     </div>
 
+    <metal:script metal:use-macro="api.snippets.macros['batch_size_selector']"/>
     <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']"/>
 
     <table class="content-listing" tal:condition="entries">
