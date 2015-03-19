@@ -11,7 +11,6 @@ import transaction
 
 from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
-from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import NewRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -23,7 +22,6 @@ from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
 from karl.models.site import get_weighted_textrepr
-from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
@@ -58,10 +56,8 @@ def configure_karl(config, load_zcml=True):
         AuthTktAuthenticationPolicy(
             settings['who_secret'],
             callback=group_finder,
-            cookie_name=settings['who_cookie']),
-        # for b/w compat with bootstrapper
-        RepozeWho1AuthenticationPolicy(callback=group_finder),
-        BasicAuthenticationPolicy()])
+            cookie_name=settings['who_cookie'])
+    ])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
     # Static tree revisions routing

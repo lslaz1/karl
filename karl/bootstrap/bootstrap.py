@@ -13,6 +13,8 @@ from karl.models.contentfeeds import SiteEvents
 from karl.models.interfaces import IProfile
 from karl.models.site import Site
 from karl.views.community import AddCommunityFormController
+from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.threadlocal import get_current_registry
 
 
 def populate(root, do_transaction_begin=True, request=None):
@@ -76,11 +78,23 @@ def populate(root, do_transaction_begin=True, request=None):
     class FauxPost(dict):
         def getall(self, key):
             return self.get(key, ())
+
+    reg = get_current_registry()
+    auth = reg.queryUtility(IAuthenticationPolicy)
+    if hasattr(auth, '_policies'):
+        auth = auth._policies[0]
+
     request = testing.DummyRequest(context=site)
-    request.environ['repoze.who.identity'] = {
-        'repoze.who.userid': data.admin_user,
-        'groups': data.admin_groups,
-    }
+    request.environ.update({
+        'HTTP_HOST': 'localhost:8080',
+        'karl.identity': {
+            'id': 'admin',
+            'groups': data.admin_groups
+        }
+    })
+    cookies = auth.remember(request, 'admin')
+    name, value = cookies[0][1].split(';')[0].split('=')
+    request.cookies[name] = value
 
     # Create a Default community
     request.POST = FauxPost(request.POST)
