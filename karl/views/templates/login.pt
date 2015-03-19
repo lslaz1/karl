@@ -75,7 +75,7 @@
               e.preventDefault();
               $('.statusbox').karlstatusbox('clearAndAppend', 'Sending authentication code...');
               $.ajax({
-                url: $('#karl-app-url').attr('content') + '/send-auth-code',
+                url: $('#karl-app-url').attr('content') + '/send_auth_code.json',
                 type: 'POST',
                 dataType: 'json',
                 data: {
@@ -166,6 +166,12 @@
         </div>
       </div>
     </form>
+
+
+    <div tal:condition="python: api.site.settings.get('allow_request_accesss', False)">
+      <hr />
+      <a href="${app_url}/request_access.html">Request access to this portal</a>
+    </div>
 
     <div tal:condition="sso_providers">
       <hr/>

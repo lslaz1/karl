@@ -20,6 +20,7 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 from urlparse import urljoin
+import re
 
 from repoze.who.plugins.zodb.users import get_sha_password
 
@@ -28,6 +29,7 @@ from pyramid.renderers import render_to_response
 from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.url import resource_url
+from pyramid.exceptions import NotFound
 
 from karl.application import is_normal_mode
 from karl.utils import asbool
@@ -37,6 +39,8 @@ from karl.utils import find_users
 from karl.utils import get_setting
 from karl.utils import make_random_code
 from karl.utils import strings_differ
+from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import IProfile
 
 from karl.views.api import TemplateAPI
 
@@ -45,6 +49,8 @@ from repoze.sendmail.interfaces import IMailDelivery
 from repoze.postoffice.message import Message
 
 log = logging.getLogger(__name__)
+
+EMAIL_RE = re.compile(r'[^@]+@[^@]+\.[^@]+')
 
 
 def _fixup_came_from(request, came_from):
@@ -124,7 +130,7 @@ def login_view(context, request):
             try_kerberos = False
 
     # Per #366377, don't say what screen
-    page_title = 'Login to %s' % settings.get('system_name', 'KARL')
+    page_title = 'Login to %s' % context.title
     api = TemplateAPI(context, request, page_title)
 
     sso_providers = []
@@ -227,6 +233,75 @@ def send_auth_code_view(context, request):
     return {
         'message': 'Authorization code has been sent'
     }
+
+
+def request_access_view(context, request):
+    if not context.settings.get('allow_request_accesss', False):
+        raise NotFound
+
+    error = None
+    submitted = False
+    if request.params.get('form.submitted', None) is not None:
+        email = request.POST.get('email', '')
+        name = request.POST.get('fullname', '')
+        if not email or not EMAIL_RE.match(email):
+            error = 'Must provide valid email'
+        if not name:
+            error = 'Must provide full name'
+        if email in context.access_requests:
+            error = 'You have already requested access'
+
+        if not error:
+            # add access request
+            context.access_requests[email] = {
+                'email': email,
+                'fullname': name,
+                'date_requested': datetime.utcnow()
+            }
+            mailer = getUtility(IMailDelivery)
+            message = Message()
+            message['Subject'] = '%s Access Request(%s)' % (
+                context.title, name)
+            message['From'] = get_setting(context, 'admin_email')
+            body = u'''<html><body>
+<p>New access request has been submitted for the site %s</p>
+<p><b>Email</b>: %s <br />
+   <b>Name</b>: %s <br />
+</p>
+</body></html>''' % (
+                request.application_url,
+                email,
+                name
+            )
+            message.set_payload(body.encode('UTF-8'), 'UTF-8')
+            message.set_type('text/html')
+            # send mail to all admins
+            users = find_users(context)
+            search = ICatalogSearch(context)
+            count, docids, resolver = search(interfaces=[IProfile])
+            for docid in docids:
+                profile = resolver(docid)
+                if getattr(profile, 'security_state', None) == 'inactive':
+                    continue
+                userid = profile.__name__
+                if not users.member_of_group(userid, 'group.KarlAdmin'):
+                    continue
+                message['To'] = '%s <%s>' % (profile.title, profile.email)
+                mailer.send([profile.email], message)
+            submitted = True
+            error = 'Successfully requested access'
+
+    page_title = 'Request access to %s' % context.title
+    api = TemplateAPI(context, request, page_title)
+    api.status_message = error
+    return render_to_response(
+        'templates/request_access.pt',
+        dict(
+            api=api,
+            nothing='',
+            submitted=submitted,
+            app_url=request.application_url),
+        request=request)
 
 
 def password_authenticator(users, login, password):

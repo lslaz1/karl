@@ -47,6 +47,11 @@
           <div class="portlet-item">
               <a href="rename_user.html">Rename or Merge Users</a>
           </div>
+          <div class="portlet-item" tal:condition="python: api.site.settings.get('allow_request_accesss')">
+              <a href="${api.app_url}/review_access_requests.html">
+                Review Access Requests
+              </a>
+          </div>
         </div>
         <div class="generic-portlet"
              tal:condition="api.can_administer">

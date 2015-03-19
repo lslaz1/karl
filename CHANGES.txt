@@ -5,6 +5,12 @@ karl package Changelog
 5.0.0a3 (unreleased)
 --------------------
 
+- be able to allow users to request access to system
+
+- add in bower support
+
+- upgrade to jquery 1.8.3
+
 - add site settings form
 
 - prevent redirecting to logout after login

@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+  
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <h1 class="kscreentitle">Review Access Requests</h1>
+
+    <form method="POST" class="access-request-review">
+      <table>
+        <thead>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Date Requested</th>
+          <th>Approve</th>
+          <th>Decline</th>
+        </thead>
+        <tbody>
+          <tal:req tal:repeat="req access_requests">
+            <tr>
+              <td>${python: req['fullname']}</td>
+              <td>${python: req['email']}</td>
+              <td>${python: req['date_requested'].isoformat()}</td>
+              <td><input type="checkbox" name="approve" value="${python: req['email']}" /></td>
+              <td><input type="checkbox" name="decline" value="${python: req['email']}" /></td>
+            </tr>
+          </tal:req>
+        </tbody>
+      </table>
+      <div class="formControlls loginLeftPadding">
+        <input type="hidden" name="form.submitted" value="1" />
+
+        <div class="buttons clearafter">
+          <button name="image" type="submit" id="signin" class="button primary_button"><span>Submit changes</span></button>
+        </div>
+      </div>
+    </form>
+
+    <script>
+    jQuery(document).ready(function(){
+      $('.access-request-review input').change(function(){
+        var $el = $(this).parent();
+        var $other = $el.next().find('input');
+        if($other.length === 0){
+          $other = $el.prev().find('input');
+        }
+        $other[0].checked = false;
+      });
+    });
+    </script>
+  </div>
+
+</html>

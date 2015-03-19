@@ -78,6 +78,7 @@ from karl.views.utils import photo_from_filestore_view
 
 PROFILE_THUMB_SIZE = (75, 100)
 
+
 def _get_manage_actions(community, request):
 
     # Filter the actions based on permission in the **community**
@@ -88,6 +89,7 @@ def _get_manage_actions(community, request):
         actions.append(('Invite New', 'invite_new.html'))
 
     return actions
+
 
 def _get_common_email_info(community, community_href):
     info = {}
@@ -103,20 +105,22 @@ def _get_common_email_info(community, community_href):
 
     return info
 
+
 def _member_profile_batch(context, request):
     community = find_interface(context, ICommunity)
     member_names = community.member_names
     profiles_path = resource_path(find_profiles(context))
     batch = get_catalog_batch(
         context, request,
-        batch_size = 12,
-        interfaces = [IProfile],
+        batch_size=12,
+        interfaces=[IProfile],
         path={'query': profiles_path, 'depth': 1},
         allowed={'query': effective_principals(request), 'operator': 'or'},
-        name = list(member_names),
+        name=list(member_names),
         sort_index='lastfirst',
         )
     return batch
+
 
 def show_members_view(context, request):
     """Default view of community members (with/without pictures)."""
@@ -241,6 +245,7 @@ def _send_moderators_changed_email(community,
     msg.set_type('text/html')
     mailer.send(to_addrs, msg)
 
+
 class ManageMembersFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -265,14 +270,14 @@ class ManageMembersFormController(object):
             profile = profiles[mod_name]
             sortkey = (0, '%s, %s' % (profile.lastname, profile.firstname))
             record = {
-                'sortkey':sortkey,
-                'name':mod_name,
-                'title':profile.title,
-                'moderator':True,
-                'member':True,
-                'resend':False,
-                'remove':False,
-                'invite':False,
+                'sortkey': sortkey,
+                'name': mod_name,
+                'title': profile.title,
+                'moderator': True,
+                'member': True,
+                'resend': False,
+                'remove': False,
+                'invite': False,
                 }
             records.append(record)
         for mem_name in member_names:
@@ -281,31 +286,31 @@ class ManageMembersFormController(object):
             profile = profiles[mem_name]
             sortkey = (1, '%s, %s' % (profile.lastname, profile.firstname))
             record = {
-                'sortkey':sortkey,
-                'name':mem_name,
-                'title':profile.title,
-                'member':True,
-                'moderator':False,
-                'resend':False,
-                'remove':False,
-                'invite':False,
+                'sortkey': sortkey,
+                'name': mem_name,
+                'title': profile.title,
+                'member': True,
+                'moderator': False,
+                'resend': False,
+                'remove': False,
+                'invite': False,
                 }
             records.append(record)
         for invitation in self._getInvitations():
             sortkey = (2, invitation.email)
             record = {
-                'sortkey':sortkey,
-                'title':invitation.email,
-                'name':invitation.__name__,
-                'member':False,
-                'moderator':False,
-                'resend':False,
-                'remove':False,
-                'invite':True,
+                'sortkey': sortkey,
+                'title': invitation.email,
+                'name': invitation.__name__,
+                'member': False,
+                'moderator': False,
+                'resend': False,
+                'remove': False,
+                'invite': True,
                 }
             records.append(record)
         records.sort(key=lambda x: x['sortkey'])
-        return {'members':records}
+        return {'members': records}
 
     def form_fields(self):
         class Member(schemaish.Structure):
@@ -323,13 +328,13 @@ class ManageMembersFormController(object):
 
     def form_widgets(self, fields):
         return {
-            'members':ManageMembersWidget(),
-            'members.*.name':formish.widgets.Hidden(),
-            'members.*.title':formish.widgets.Input(readonly=True),
-            'members.*.moderator':formish.widgets.Checkbox(),
-            'members.*.member':formish.widgets.Hidden(),
-            'members.*.resend':formish.widgets.Checkbox(),
-            'members.*.remove':formish.widgets.Checkbox(),
+            'members': ManageMembersWidget(),
+            'members.*.name': formish.widgets.Hidden(),
+            'members.*.title': formish.widgets.Input(readonly=True),
+            'members.*.moderator': formish.widgets.Checkbox(),
+            'members.*.member': formish.widgets.Hidden(),
+            'members.*.resend': formish.widgets.Checkbox(),
+            'members.*.remove': formish.widgets.Checkbox(),
             }
 
     def __call__(self):
@@ -357,9 +362,9 @@ class ManageMembersFormController(object):
         community_href = resource_url(community, self.request)
         context = self.context
         request = self.request
-        moderators = community.moderator_names # property
-        members = community.member_names # property
-        invitation_names = [ x.__name__ for x in self._getInvitations() ]
+        moderators = community.moderator_names  # property
+        members = community.member_names  # property
+        invitation_names = [x.__name__ for x in self._getInvitations()]
 
         members_group_name = community.members_group_name
         moderators_group_name = community.moderators_group_name
@@ -385,16 +390,16 @@ class ManageMembersFormController(object):
             else:
                 if record['resend']:
                     invitation = context.get(name)
-                    _send_invitation_email(request, community, community_href,
-                                           invitation)
-                    results.append('Resent invitation to %s'%
+                    send_invitation_email(request, community, community_href,
+                                          invitation)
+                    results.append('Resent invitation to %s' %
                                    record['title'])
                 else:
                     if (name in moderators) and (not record['moderator']):
                         users.remove_group(name, moderators_group_name)
-                        results.append('%s is no longer a moderator'%
+                        results.append('%s is no longer a moderator' %
                                        record['title'])
-                    if (not name in moderators) and record['moderator']:
+                    if (name not in moderators) and record['moderator']:
                         users.add_group(name, moderators_group_name)
                         results.append('%s is now a moderator' %
                                        record['title'])
@@ -415,7 +420,7 @@ class ManageMembersFormController(object):
         joined_result = ', '.join(results)
         status_message = 'Membership information changed: %s' % joined_result
         location = resource_url(context, request, "manage.html",
-                             query={"status_message": status_message})
+                                query={"status_message": status_message})
         return HTTPFound(location=location)
 
 
@@ -451,7 +456,7 @@ def _send_aeu_emails(community, community_href, profiles, text):
 
         msg.set_payload(body, "UTF-8")
         msg.set_type('text/html')
-        mailer.send([to_email,], msg)
+        mailer.send([to_email], msg)
 
 
 class AddExistingUserFormController(object):
@@ -473,7 +478,7 @@ class AddExistingUserFormController(object):
 
     def form_widgets(self, fields):
         return {
-            'users':karlwidgets.UserProfileLookupWidget(),
+            'users': karlwidgets.UserProfileLookupWidget(),
             'text': karlwidgets.RichTextWidget(),
             }
 
@@ -490,7 +495,7 @@ class AddExistingUserFormController(object):
         if add_user_id is not None:
             profile = profiles.get(add_user_id, None)
             if profile is not None:
-                return _add_existing_users(context, community, [profile,],
+                return _add_existing_users(context, community, [profile],
                                            "", request)
 
         system_name = get_setting(context, 'system_name', 'KARL')
@@ -525,6 +530,7 @@ class AddExistingUserFormController(object):
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
 
+
 def _add_existing_users(context, community, profiles, text, request):
     users = find_users(community)
     for profile in profiles:
@@ -546,11 +552,13 @@ def _add_existing_users(context, community, profiles, text, request):
         fmt = '%s members added and emails sent.'
         msg = fmt % len(profiles)
     location = resource_url(context, request, 'manage.html',
-                         query={'status_message': msg})
+                            query={'status_message': msg})
     return HTTPFound(location=location)
+
 
 def accept_invitation_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'accept-invitation')
+
 
 class AcceptInvitationFormController(object):
     def __init__(self, context, request):
@@ -582,10 +590,10 @@ class AcceptInvitationFormController(object):
             ('organization', schemaish.String()),
             ('country', schemaish.String(
                 validator=validator.All(
-                            validator.OneOf(countries.as_dict.keys()),
-                            validator.Required()),
+                    validator.OneOf(countries.as_dict.keys()),
+                    validator.Required()),
                 ),
-            ),
+             ),
             ('location', schemaish.String()),
             ('department', schemaish.String()),
             ('position', schemaish.String()),
@@ -619,17 +627,17 @@ class AcceptInvitationFormController(object):
         system_name = get_setting(self.context, 'system_name', 'KARL')
         widgets = {
             'biography': karlwidgets.RichTextWidget(),
-            'password':formish.Password(),
-            'password_confirm':formish.Password(),
-            'country':formish.SelectChoice(countries),
-            'photo':karlwidgets.PhotoImageWidget(
+            'password': formish.Password(),
+            'password_confirm': formish.Password(),
+            'country': formish.SelectChoice(countries),
+            'photo': karlwidgets.PhotoImageWidget(
                 filestore=self.filestore,
                 url_base=resource_url(self.context, self.request, 'photo'),
                 image_thumbnail_default=default_icon),
-            'date_format':formish.SelectChoice(cultures),
+            'date_format': formish.SelectChoice(cultures),
             'websites': formish.TextArea(
                 rows=3,
-                converter_options={'delimiter':'\n'}),
+                converter_options={'delimiter': '\n'}),
             }
 
         r = queryMultiAdapter((self.context, self.request),
@@ -672,7 +680,7 @@ class AcceptInvitationFormController(object):
             raise ValidationError(username='Username already taken')
 
         community_href = resource_url(community, request)
-        groups = [ community.members_group_name ]
+        groups = [community.members_group_name]
         users.add(username, username, password, groups)
         remember_headers = remember(request, username)
         profile = create_content(
@@ -703,7 +711,7 @@ class AcceptInvitationFormController(object):
 
         del context.__parent__[context.__name__]
         url = resource_url(community, request,
-                        query={'status_message':'Welcome!'})
+                           query={'status_message': 'Welcome!'})
         _send_ai_email(community, community_href, username, profile)
         self.filestore.clear()
         return HTTPFound(headers=remember_headers, location=url)
@@ -717,9 +725,9 @@ class AcceptInvitationFormController(object):
         desc = ('You have been invited to join the "%s" in %s.  Please begin '
                 'by creating a %s login with profile information.' %
                 (community_name, system_name, system_name))
-        return {'api':self.api,
-                'page_title':'Accept %s Invitation' % system_name,
-                'page_description':desc}
+        return {'api': self.api,
+                'page_title': 'Accept %s Invitation' % system_name,
+                'page_description': desc}
 
 
 def _send_ai_email(community, community_href, username, profile):
@@ -748,7 +756,8 @@ def _send_ai_email(community, community_href, username, profile):
 
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
-    mailer.send([profile.email,], msg)
+    mailer.send([profile.email], msg)
+
 
 class InviteNewUsersFormController(object):
     def __init__(self, context, request):
@@ -767,9 +776,9 @@ class InviteNewUsersFormController(object):
 
     def form_widgets(self, fields):
         return {
-            'email_addresses':formish.TextArea(
-                converter_options={'delimiter':'\n'}),
-            'text':karlwidgets.RichTextWidget(),
+            'email_addresses': formish.TextArea(
+                converter_options={'delimiter': '\n'}),
+            'text': karlwidgets.RichTextWidget(),
             }
 
     def __call__(self):
@@ -810,7 +819,7 @@ class InviteNewUsersFormController(object):
         for email_address in addresses:
             # Check for existing members
             total, docids, resolver = search(email=email_address.lower(),
-                                             interfaces=[IProfile,])
+                                             interfaces=[IProfile])
 
             if total:
                 # User is already a member of Karl
@@ -825,7 +834,7 @@ class InviteNewUsersFormController(object):
                     # active, just add them to the community as though we had
                     # used the add existing user form.
                     if profile.security_state == 'active':
-                        _add_existing_users(context, community, [profile,],
+                        _add_existing_users(context, community, [profile],
                                             html_body, request)
                         nadded += 1
                     else:
@@ -849,8 +858,8 @@ class InviteNewUsersFormController(object):
                         context[name] = invitation
                         break
 
-                _send_invitation_email(request, community, community_href,
-                                       invitation)
+                send_invitation_email(request, community, community_href,
+                                      invitation)
                 ninvited += 1
 
         status = ''
@@ -874,11 +883,12 @@ class InviteNewUsersFormController(object):
                 status += '%d users already members.' % nignored
 
         location = resource_url(context, request, 'manage.html',
-                             query={'status_message': status})
+                                query={'status_message': status})
 
         return HTTPFound(location=location)
 
-def _send_invitation_email(request, community, community_href, invitation):
+
+def send_invitation_email(request, community, community_href, invitation):
     mailer = getUtility(IMailDelivery)
     info = _get_common_email_info(community, community_href)
     subject_fmt = 'Please join the %s community at %s'
@@ -898,7 +908,7 @@ def _send_invitation_email(request, community, community_href, invitation):
         community_description=info['c_description'],
         personal_message=invitation.message,
         invitation_url=resource_url(invitation.__parent__, request,
-                                 invitation.__name__)
+                                    invitation.__name__)
         )
 
     if isinstance(body, unicode):
@@ -906,7 +916,7 @@ def _send_invitation_email(request, community, community_href, invitation):
 
     msg.set_payload(body, "UTF-8")
     msg.set_type('text/html')
-    mailer.send([invitation.email,], msg)
+    mailer.send([invitation.email], msg)
 
 
 def jquery_member_search_view(context, request):
@@ -924,10 +934,8 @@ def jquery_member_search_view(context, request):
     try:
         total, docids, resolver = searcher(**query)
         profiles = filter(None, map(resolver, docids))
-        records = [dict(
-                    id = profile.__name__,
-                    text = profile.title,
-                    )
+        records = [dict(id=profile.__name__,
+                        text=profile.title)
                    for profile in profiles
                    if profile.__name__ not in community_member_names
                    and profile.security_state != 'inactive']

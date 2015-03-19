@@ -434,6 +434,7 @@ class Site(Folder):
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
         self.settings = OOBTree(self._default_settings)
+        self.access_requests = OOBTree()
 
     @property
     def repo(self):

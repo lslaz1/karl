@@ -5,7 +5,7 @@
   "js": {
     "karl-ui": [
       "dist/jquery/jquery.js",
-      "dist/jquery-ui/external/jquery.bgiframe-2.1.2.js",
+      "dist/jquery-ui/external/jquery.bgiframe.js",
       "dist/jquery-ui/ui/jquery.ui.core.js",
       "dist/jquery-ui/ui/jquery.ui.widget.js",
       "dist/jquery-ui/ui/jquery.ui.mouse.js",

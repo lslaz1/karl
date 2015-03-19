@@ -5,9 +5,10 @@
   "description": "karl frontend",
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:karlproject/karl.git"
+    "url": "git@github.com:wildcardcorp/karl.git"
   },
   "devDependencies": {
+    "bower": "~1.3.2",
     "gulp": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
@@ -36,8 +37,6 @@
     "migrate-selenium": "node ./frontend-test/e2e/migrate-selenium.js"
   },
   "napa": {
-    "jquery": "jquery/jquery#1.4.4",
-    "jquery-ui": "jquery/jquery-ui#1.9m3",
     "tinymce": "tinymce/tinymce#3.5.2"
   }
 }

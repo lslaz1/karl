@@ -39,14 +39,14 @@ gulp.task('stamp', function() {
 
 gulp.task('copy', function() {
   // jquery from napa
-  gulp.src(['./node_modules/jquery/jquery.js'])
+  gulp.src(['./bower_components/jquery/jquery.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
   // jquery-ui from napa
-  gulp.src(['./node_modules/jquery-ui/ui/**/*'])
+  gulp.src(['./bower_components/jquery-ui/ui/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
-  gulp.src(['./node_modules/jquery-ui/external/jquery.bgiframe-2.1.2.js'])
+  gulp.src(['./bower_components/bgiframe/jquery.bgiframe.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
-  gulp.src(['./node_modules/jquery-ui/themes/base/**/*'])
+  gulp.src(['./bower_components/jquery-ui/themes/base/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
   // tinymce from napa
   gulp.src(['./node_modules/tinymce/jscripts/**/*'])

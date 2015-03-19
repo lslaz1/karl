@@ -8,18 +8,21 @@ from zope.component import getUtilitiesFor
 
 from karl.scripting import create_karl_argparser
 
+
 def main(argv=sys.argv):
     parser = create_karl_argparser(
         description='Bring database up to date with code.'
         )
     parser.add_argument('--latest', action='store_true',
                         help='Update to latest versions.')
+    parser.add_argument('--force-version', dest='force_version',
+                        help='Force to run again.', type=int)
     args = parser.parse_args(argv[1:])
-    out =  args.out
+    out = args.out
 
     env = args.bootstrap(args.config_uri)
 
-    root, closer = env['root'], env['closer']
+    root = env['root']
 
     print >> out, "=" * 78
 
@@ -31,6 +34,8 @@ def main(argv=sys.argv):
         VERSION = pkg.VERSION
         print >> out, 'Package %s' % pkg_name
         manager = factory(root, pkg_name, VERSION, 0)
+        if args.force_version:
+            manager.set_db_version(args.force_version)
         db_version = manager.get_db_version()
         print >> out, 'Code at software version %s' % VERSION
         print >> out, 'Database at version %s' % db_version

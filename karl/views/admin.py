@@ -38,6 +38,7 @@ from karl.models.interfaces import IProfile
 from karl.security.policy import ADMINISTER
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
+from karl.utilities.interfaces import IRandomId
 
 from karl.utils import asbool
 from karl.utils import find_communities
@@ -49,6 +50,11 @@ from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 from karl.views.batch import get_fileline_batch
+from karl.views.forms import widgets as karlwidgets
+
+import schemaish
+import formish
+from validatish import validator
 
 
 class AdminTemplateAPI(TemplateAPI):
@@ -1014,3 +1020,176 @@ def debug_converters(request):
             'api': api,
             'menu': _menu_macro(),
             }
+
+
+def send_invitation_email(request, context, invitation):
+    mailer = getUtility(IMailDelivery)
+    body_template = get_renderer(
+        'templates/admin/email_invite_new.pt').implementation()
+
+    msg = Message()
+    msg['From'] = '%s <%s>' % (
+        context.title,
+        get_setting(context, 'system_email_domain'))
+    msg['To'] = invitation.email
+    msg['Subject'] = 'Please join %s' % context.title
+    body = body_template(
+        system_name=context.title,
+        invitation_url=resource_url(invitation.__parent__, request,
+                                    invitation.__name__)
+        )
+
+    if isinstance(body, unicode):
+        body = body.encode("UTF-8")
+
+    msg.set_payload(body, "UTF-8")
+    msg.set_type('text/html')
+    mailer.send([invitation.email], msg)
+
+
+def review_access_requests_view(context, request):
+    if request.method == 'POST' and request.POST.get('form.submitted'):
+        import pdb; pdb.set_trace()
+        data = request.POST.dict_of_lists()
+
+        search = ICatalogSearch(context)
+        random_id = getUtility(IRandomId)
+        html_body = '''
+<p>Your access request has been approved<p>'''
+        for email in data.get('approve', []):
+            total, docids, resolver = search(email=email.lower(),
+                                             interfaces=[IProfile])
+
+            if total:
+                continue
+            # Invite new user to Karl
+            invitation = create_content(
+                IInvitation,
+                email,
+                html_body
+            )
+            while 1:
+                name = random_id()
+                if name not in context:
+                    context[name] = invitation
+                    break
+
+            send_invitation_email(request, context, invitation)
+            if email in context.access_requests:
+                del context.access_requests[email]
+
+        for email in data.get('decline', []):
+            if email in context.access_requests:
+                del context.access_requests[email]
+    return {
+        'api': AdminTemplateAPI(context, request),
+        'page_title': 'Review Access Requests',
+        'menu': _menu_macro(),
+        'access_requests': context.access_requests.values()
+    }
+
+
+class BaseSiteFormController(object):
+    page_title = 'Form'
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        return self.schema
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = AdminTemplateAPI(context, request)
+        return {'api': api,
+                'actions': [],
+                'page_title': self.page_title,
+                'menu': _menu_macro()
+                }
+
+
+class EditFooterFormController(BaseSiteFormController):
+    page_title = 'Edit footer'
+    schema = [
+        ('footer_html', schemaish.String(
+            validator=validator.Required(),
+            description="HTML for footer")),
+    ]
+
+    def form_defaults(self):
+        return {
+            'footer_html': self.context.settings['footer_html']
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'footer_html': karlwidgets.RichTextWidget(empty=''),
+        }
+
+    def handle_submit(self, converted):
+        self.context.settings['footer_html'] = converted['footer_html']
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+
+
+class SiteSettingsFormController(BaseSiteFormController):
+    page_title = 'Site Settings'
+    schema = [
+        ('title', schemaish.String(
+            validator=validator.Required(),
+            description="Site title")),
+    ]
+
+    def form_defaults(self):
+        return {
+            'title': self.context.title
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'title': formish.widgets.Input()
+        }
+
+    def handle_submit(self, converted):
+        self.context.title = converted['title']
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+
+
+class AuthenticationFormController(BaseSiteFormController):
+    page_title = 'Authentication Settings'
+    schema = [
+        ('two_factor_enabled', schemaish.Boolean(
+            description="Enable 2 factor authentication")),
+        ('two_factor_auth_code_valid_duration', schemaish.Integer(
+            description="How long 2 factor auth codes are valid for"
+        )),
+        ('allow_request_accesss', schemaish.Boolean(
+            description="Allow people to request access to site")),
+    ]
+
+    def form_defaults(self):
+        return {
+            'two_factor_enabled': self.context.settings.get('two_factor_enabled', False),
+            'allow_request_accesss': self.context.settings.get('allow_request_accesss',
+                                                               False),
+            'two_factor_auth_code_valid_duration': self.context.settings.get(
+                'two_factor_auth_code_valid_duration', 300),
+
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'two_factor_enabled': formish.widgets.Checkbox(),
+            'allow_request_accesss': formish.widgets.Checkbox(),
+            'two_factor_auth_code_valid_duration': formish.widgets.Input()
+        }
+
+    def handle_submit(self, converted):
+        self.context.settings['two_factor_enabled'] = converted['two_factor_enabled']
+        self.context.settings['allow_request_accesss'] = converted['allow_request_accesss']  # noqa
+        self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)

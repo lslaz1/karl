@@ -228,11 +228,11 @@
 
 
   <formish:form
-     controller=".site.EditFooterFormController"
+     controller=".admin.EditFooterFormController"
      name="edit_footer.html"
      for="karl.models.interfaces.ISite"
      permission="administer"
-     renderer="karl.views.forms:templates/formish_form.pt"
+     renderer="karl.views:templates/admin/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -243,11 +243,11 @@
   </formish:form>
 
   <formish:form
-     controller=".site.AuthenticationFormController"
+     controller=".admin.AuthenticationFormController"
      name="edit_authentication.html"
      for="karl.models.interfaces.ISite"
      permission="administer"
-     renderer="karl.views.forms:templates/formish_form.pt"
+     renderer="karl.views:templates/admin/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -258,11 +258,11 @@
   </formish:form>
 
   <formish:form
-     controller=".site.SiteSettingsFormController"
+     controller=".admin.SiteSettingsFormController"
      name="edit_sitesettings.html"
      for="karl.models.interfaces.ISite"
      permission="administer"
-     renderer="karl.views.forms:templates/formish_form.pt"
+     renderer="karl.views:templates/admin/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -942,9 +942,15 @@
 
   <view
     for="karl.models.interfaces.ISite"
-    name="send-auth-code"
+    name="send_auth_code.json"
     view=".login.send_auth_code_view"
     renderer="json"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="request_access.html"
+    view=".login.request_access_view"
   />
 
   <formish:form
@@ -1795,6 +1801,14 @@
     renderer="templates/admin/email_users.pt"
     permission="email"
     name="email_users.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.review_access_requests_view"
+    renderer="templates/admin/review_access_requests.pt"
+    permission="administer"
+    name="review_access_requests.html"
     />
 
   <view
