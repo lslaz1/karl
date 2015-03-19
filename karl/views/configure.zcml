@@ -258,6 +258,21 @@
   </formish:form>
 
   <formish:form
+     controller=".site.SiteSettingsFormController"
+     name="edit_sitesettings.html"
+     for="karl.models.interfaces.ISite"
+     permission="administer"
+     renderer="karl.views.forms:templates/formish_form.pt"
+     form_id="edit">
+
+     <formish:action
+       name="submit"
+       title="Edit Settings"
+       />
+
+  </formish:form>
+
+  <formish:form
      controller=".peopledirectory.AddReportGroupFormController"
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSection"

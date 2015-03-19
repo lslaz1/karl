@@ -133,6 +133,46 @@ class EditFooterFormController(object):
         return HTTPFound(location=location)
 
 
+class SiteSettingsFormController(object):
+    page_title = 'Site Settings'
+    schema = [
+        ('title', schemaish.String(
+            validator=validator.Required(),
+            description="Site title")),
+    ]
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        return self.schema
+
+    def form_defaults(self):
+        return {
+            'title': self.context.title
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'title': formish.widgets.Input()
+        }
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request)
+        return {'api': api,
+                'actions': [],
+                'page_title': self.page_title,
+                }
+
+    def handle_submit(self, converted):
+        self.context.title = converted['title']
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+
+
 class AuthenticationFormController(object):
     page_title = 'Authentication Settings'
     schema = [
@@ -158,7 +198,7 @@ class AuthenticationFormController(object):
             'allow_request_accesss': self.context.settings.get('allow_request_accesss',
                                                                False),
             'two_factor_auth_code_valid_duration': self.context.settings.get(
-                'two_factor_auth_code_valid_duration', False),
+                'two_factor_auth_code_valid_duration', 300),
 
         }
 

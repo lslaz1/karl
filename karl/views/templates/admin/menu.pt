@@ -22,8 +22,8 @@
              tal:condition="api.can_administer">
           <h3>Settings</h3>
           <div class="portlet-item">
-              <a href="${api.app_url}/edit_footer.html">
-                Edit Footer
+              <a href="${api.app_url}/edit_sitesettings.html">
+                Site Settings
               </a>
           </div>
           <div class="portlet-item">
@@ -31,6 +31,12 @@
                 Authentication Settings
               </a>
           </div>
+          <div class="portlet-item">
+              <a href="${api.app_url}/edit_footer.html">
+                Edit Footer
+              </a>
+          </div>
+
         </div>
         <div class="generic-portlet"
              tal:condition="api.can_administer">

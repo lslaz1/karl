@@ -5,6 +5,8 @@ karl package Changelog
 5.0.0a3 (unreleased)
 --------------------
 
+- add site settings form
+
 - prevent redirecting to logout after login
 
 - compare strings in a safe way
