@@ -38,7 +38,6 @@ requires = [
     'lxml',
     'markdown2',
     'perfmetrics>=2.0',
-    'pyramid_multiauth',
     'pyramid_zodbconn',
     'python-dateutil',
     'Pillow',

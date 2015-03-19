@@ -17,7 +17,6 @@ from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
 
-from pyramid_multiauth import MultiAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
@@ -52,12 +51,11 @@ except ImportError:
 def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
-    authentication_policy = MultiAuthenticationPolicy([
-        AuthTktAuthenticationPolicy(
-            settings['who_secret'],
-            callback=group_finder,
-            cookie_name=settings['who_cookie'])
-    ])
+    authentication_policy = AuthTktAuthenticationPolicy(
+        settings['who_secret'],
+        callback=group_finder,
+        cookie_name=settings['who_cookie']
+    )
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
     # Static tree revisions routing
