@@ -18,6 +18,7 @@
 import logging
 
 from datetime import datetime
+from datetime import timedelta
 from urlparse import urljoin
 
 from repoze.who.plugins.zodb.users import get_sha_password
@@ -34,8 +35,14 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import make_random_code
+from karl.utils import strings_differ
 
 from karl.views.api import TemplateAPI
+
+from zope.component import getUtility
+from repoze.sendmail.interfaces import IMailDelivery
+from repoze.postoffice.message import Message
 
 log = logging.getLogger(__name__)
 
@@ -60,8 +67,7 @@ def login_view(context, request):
         login = request.POST.get('login')
         password = request.POST.get('password')
         if login is None or password is None:
-            return HTTPFound(location='%s/login.html'
-                                        % request.application_url)
+            return HTTPFound(location='%s/login.html' % request.application_url)
         max_age = request.POST.get('max_age')
         if max_age is not None:
             max_age = int(max_age)
@@ -80,6 +86,23 @@ def login_view(context, request):
             redirect = request.resource_url(
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
+
+        if context.settings.get('two_factor_enabled', False):
+            code = request.POST.get('code')
+            if not code:
+                redirect = request.resource_url(
+                    request.root, 'login.html',
+                    query={'reason': 'No authentication code provided'})
+                return HTTPFound(location=redirect)
+            profiles = find_profiles(context)
+            profile = profiles.get(userid)
+            window = context.settings.get('two_factor_auth_code_valid_duration', 300)
+            now = datetime.utcnow()
+            if (strings_differ(code, profile.current_auth_code) or
+                    now > (profile.current_auth_code_time_stamp + timedelta(seconds=window))):  # noqa
+                redirect = request.resource_url(
+                    request.root, 'login.html', query={'reason': 'Invalid authorization code'})  # noqa
+                return HTTPFound(location=redirect)
 
         # else, remember
         return remember_login(context, request, userid, max_age)
@@ -100,7 +123,8 @@ def login_view(context, request):
         if request.authorization and request.authorization[0] == 'Negotiate':
             try_kerberos = False
 
-    page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
+    # Per #366377, don't say what screen
+    page_title = 'Login to %s' % settings.get('system_name', 'KARL')
     api = TemplateAPI(context, request, page_title)
 
     sso_providers = []
@@ -163,14 +187,54 @@ def logout_view(context, request, reason='Logged out'):
     return redirect
 
 
+def send_auth_code_view(context, request):
+    username = request.params.get('username', '')
+    if not username:
+        return {
+            'message': 'Must provide a username'
+        }
+    users = find_users(context)
+    user = users.get_by_login(username)
+    if user is None:
+        return {
+            'message': 'Not a valid username to send auth code to'
+        }
+    profiles = find_profiles(context)
+    profile = profiles.get(user['id'])
+
+    # get and set current auth code
+    profile.current_auth_code = make_random_code(8)
+    profile.current_auth_code_time_stamp = datetime.utcnow()
+
+    mailer = getUtility(IMailDelivery)
+    message = Message()
+    message['From'] = get_setting(context, 'admin_email')
+    message['To'] = '%s <%s>' % (profile.title, profile.email)
+    message['Subject'] = '%s Authorization Request' % context.title
+    body = u'''<html><body>
+<p>An authorization code has been requested for the site %s.</p>
+<p>Authorization Code: <b>%s</b></p>
+</body></html>''' % (
+        request.application_url,
+        profile.current_auth_code
+    )
+    message.set_payload(body.encode('UTF-8'), 'UTF-8')
+    message.set_type('text/html')
+    mailer.send([profile.email], message)
+
+    return {
+        'message': 'Authorization code has been sent'
+    }
+
+
 def password_authenticator(users, login, password):
     user = users.get(login=login)
-    if user and user['password'] == get_sha_password(password):
+    if user and not strings_differ(user['password'], get_sha_password(password)):
         return user['id']
 
 
 def impersonate_authenticator(users, login, password):
-    if not ':' in password:
+    if ':' not in password:
         return
 
     admin_login, password = password.split(':', 1)

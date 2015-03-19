@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from appendonly import Accumulator
+from datetime import datetime
 from persistent.mapping import PersistentMapping
 from BTrees.OOBTree import OOBTree
 from zope.interface import implementer
@@ -29,15 +30,18 @@ from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
 
+
 class Profile(Folder):
 
     implements(IProfile)
 
     alert_attachments = 'link'
-    fax = '' # BBB
+    fax = ''  # BBB
     _websites = ()
-    last_login_time = None # BBB
-    date_format = None # BBB
+    last_login_time = None  # BBB
+    date_format = None  # BBB
+    current_auth_code = None
+    current_auth_code_time_stamp = datetime.utcnow()
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -57,34 +61,17 @@ class Profile(Folder):
         return ()
 
     def _set_websites(self, value):
-        self._websites = value # coerce / normalize?
+        self._websites = value  # coerce / normalize?
         if 'website' in self.__dict__:
             del self.__dict__['website']
 
     websites = property(_get_websites, _set_websites)
 
-    def __init__(self,
-                 firstname = '',
-                 lastname = '',
-                 email = '',
-                 phone = '',
-                 extension = '',
-                 fax = '',
-                 department = '',
-                 position = '',
-                 organization = '',
-                 location = '',
-                 country = '',
-                 websites = None,
-                 languages = '',
-                 office='',
-                 room_no='',
-                 biography='',
-                 date_format=None,
-                 data=None,
-                 home_path=None,
-                 preferred_communities = None,
-                ):
+    def __init__(self, firstname='', lastname='', email='', phone='', extension='',
+                 fax='', department='', position='', organization='', location='',
+                 country='', websites=None, languages='', office='', room_no='',
+                 biography='', date_format=None, data=None, home_path=None,
+                 preferred_communities=None):
         super(Profile, self).__init__(data)
         self.firstname = firstname
         self.lastname = lastname
@@ -125,7 +112,7 @@ class Profile(Folder):
     def title(self):
         title = [self.firstname.strip(), self.lastname.strip()]
         if getattr(self, 'security_state', None) == 'inactive':
-            title += ['(Inactive)',]
+            title += ['(Inactive)']
         return unicode(' '.join(title))
 
     def get_alerts_preference(self, community_name):
@@ -134,15 +121,15 @@ class Profile(Folder):
 
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
-            IProfile.ALERT_IMMEDIATELY,
-            IProfile.ALERT_DAILY_DIGEST,
-            IProfile.ALERT_NEVER,
-            IProfile.ALERT_WEEKLY_DIGEST,
-            IProfile.ALERT_BIWEEKLY_DIGEST,
-            ):
+                IProfile.ALERT_IMMEDIATELY,
+                IProfile.ALERT_DAILY_DIGEST,
+                IProfile.ALERT_NEVER,
+                IProfile.ALERT_WEEKLY_DIGEST,
+                IProfile.ALERT_BIWEEKLY_DIGEST):
             raise ValueError("Invalid preference.")
 
         self._alert_prefs[community_name] = preference
+
 
 class CaseInsensitiveOOBTree(OOBTree):
     def __getitem__(self, name):
@@ -153,6 +140,7 @@ class CaseInsensitiveOOBTree(OOBTree):
                                                                value)
     def get(self, name, default=None):
         return super(CaseInsensitiveOOBTree, self).get(name.lower(), default)
+
 
 class ProfilesFolder(Folder):
 
@@ -167,29 +155,15 @@ class ProfilesFolder(Folder):
         if name is not None:
             return self[name]
 
+
 @implementer(ITextIndexData)
 @adapter(IProfile)
 def profile_textindexdata(profile):
     """Provides info for the text index"""
     text = []
-    for attr in (
-        '__name__',
-        "firstname",
-        "lastname",
-        "email",
-        "phone",
-        "extension",
-        "department",
-        "position",
-        "organization",
-        "location",
-        "country",
-        "website",
-        "languages",
-        "office",
-        "room_no",
-        "biography",
-        ):
+    for attr in ('__name__', "firstname", "lastname", "email", "phone", "extension",
+                 "department", "position", "organization", "location", "country",
+                 "website", "languages", "office", "room_no", "biography"):
         v = getattr(profile, attr, None)
         if v:
             if isinstance(v, str):

@@ -243,6 +243,21 @@
   </formish:form>
 
   <formish:form
+     controller=".site.AuthenticationFormController"
+     name="edit_authentication.html"
+     for="karl.models.interfaces.ISite"
+     permission="administer"
+     renderer="karl.views.forms:templates/formish_form.pt"
+     form_id="edit">
+
+     <formish:action
+       name="submit"
+       title="Edit Settings"
+       />
+
+  </formish:form>
+
+  <formish:form
      controller=".peopledirectory.AddReportGroupFormController"
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSection"
@@ -908,6 +923,13 @@
     for="karl.models.interfaces.ISite"
     name="logout.html"
     view=".login.logout_view"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    name="send-auth-code"
+    view=".login.send_auth_code_view"
+    renderer="json"
   />
 
   <formish:form

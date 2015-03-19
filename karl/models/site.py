@@ -408,7 +408,12 @@ class Site(Folder):
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
     list_aliases = None
-    footer_html = 'Edit footer in <a href="/edit_footer.html">admin area</a>.'
+    _default_settings = dict(
+        footer_html='Edit footer in <a href="/edit_footer.html">admin area</a>.',
+        two_factor_enabled=False,
+        two_factor_auth_code_valid_duration=300,
+        allow_request_accesss=False,
+    )
     _repo = Uninitialized
 
     def __init__(self):
@@ -428,6 +433,7 @@ class Site(Folder):
         self.sessions = SessionDataManager(3600, 5)
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
+        self.settings = OOBTree(self._default_settings)
 
     @property
     def repo(self):

@@ -5,6 +5,10 @@ karl package Changelog
 5.0.0a3 (unreleased)
 --------------------
 
+- compare strings in a safe way
+
+- implement 2 factor authenticaiton
+
 - remove dependency of pyramid_multiauth. It was an unnecessary
   depedency.
 

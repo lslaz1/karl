@@ -3,7 +3,7 @@
     This template in particular is likely to be overridden a good bit by
     customization packages.
   -->
-  ${structure: api.site.footer_html}
+  ${structure: api.site.settings['footer_html']}
      <tal:block condition="api.user_is_staff">
      </tal:block>
 </div>

@@ -1520,12 +1520,14 @@ span.loginLabelWrapper {
 span.loginLabelWrapper label {
   float: left;
 }
-input#username {
-  width: 370px;
+
+#formLogin input[type="text"],
+#formLogin input[type="password"]{
+  width: 220px;
 }
-input#password {
-  width: 200px;
-  margin-right: 8px;
+
+.compound-field > * {
+  float: left;
 }
 
 /** =FORUMS

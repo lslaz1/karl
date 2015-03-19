@@ -31,6 +31,7 @@ from karl.views.api import TemplateAPI
 from karl.views.forms import widgets as karlwidgets
 
 import schemaish
+import formish
 from validatish import validator
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -109,7 +110,7 @@ class EditFooterFormController(object):
 
     def form_defaults(self):
         return {
-            'footer_html': self.context.footer_html
+            'footer_html': self.context.settings['footer_html']
         }
 
     def form_widgets(self, fields):
@@ -127,6 +128,59 @@ class EditFooterFormController(object):
                 }
 
     def handle_submit(self, converted):
-        self.context.footer_html = converted['footer_html']
+        self.context.settings['footer_html'] = converted['footer_html']
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+
+
+class AuthenticationFormController(object):
+    page_title = 'Authentication Settings'
+    schema = [
+        ('two_factor_enabled', schemaish.Boolean(
+            description="Enable 2 factor authentication")),
+        ('two_factor_auth_code_valid_duration', schemaish.Integer(
+            description="How long 2 factor auth codes are valid for"
+        )),
+        ('allow_request_accesss', schemaish.Boolean(
+            description="Allow people to request access to site")),
+    ]
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def form_fields(self):
+        return self.schema
+
+    def form_defaults(self):
+        return {
+            'two_factor_enabled': self.context.settings.get('two_factor_enabled', False),
+            'allow_request_accesss': self.context.settings.get('allow_request_accesss',
+                                                               False),
+            'two_factor_auth_code_valid_duration': self.context.settings.get(
+                'two_factor_auth_code_valid_duration', False),
+
+        }
+
+    def form_widgets(self, fields):
+        return {
+            'two_factor_enabled': formish.widgets.Checkbox(),
+            'allow_request_accesss': formish.widgets.Checkbox(),
+            'two_factor_auth_code_valid_duration': formish.widgets.Input()
+        }
+
+    def __call__(self):
+        context = self.context
+        request = self.request
+        api = TemplateAPI(context, request)
+        return {'api': api,
+                'actions': [],
+                'page_title': self.page_title,
+                }
+
+    def handle_submit(self, converted):
+        self.context.settings['two_factor_enabled'] = converted['two_factor_enabled']
+        self.context.settings['allow_request_accesss'] = converted['allow_request_accesss']  # noqa
+        self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)

@@ -152,6 +152,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['password'] = 'password'
         context = testing.DummyModel()
         context.users = DummyUsers()
+        context.settings = {}
         context['profiles'] = testing.DummyModel()
         profile = context['profiles']['userid'] = testing.DummyModel()
         before = datetime.utcnow()
@@ -175,6 +176,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['max_age'] = u'100'
         context = testing.DummyModel()
         context.users = DummyUsers()
+        context.settings = {}
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
@@ -193,6 +195,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['password'] = 'admin:admin'
         context = testing.DummyModel()
         context.users = DummyUsers()
+        context.settings = {}
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
@@ -211,6 +214,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['password'] = 'admin:admin'
         context = testing.DummyModel()
         context.users = DummyUsers()
+        context.settings = {}
         del context.users.data['admin']
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)

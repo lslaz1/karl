@@ -36,6 +36,18 @@ from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
+import time
+from datetime import datetime
+import hashlib
+import random
+try:
+    random = random.SystemRandom()
+    using_sysrandom = True
+except NotImplementedError:
+    using_sysrandom = False
+
+from hashlib import sha256 as sha
+
 
 def find_site(context):
     site = find_interface(context, ISite)
@@ -201,3 +213,60 @@ def find_tempfolder(context):
 
 def find_repo(context):
     return getattr(find_site(context), 'repo', None)
+
+
+# generated when process started, hard to guess
+SECRET = random.randint(0, 1000000)
+
+
+def get_random_string(length=12,
+                      allowed_chars='abcdefghijklmnopqrstuvwxyz'
+                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+    """
+    Returns a securely generated random string.
+
+    The default length of 12 with the a-z, A-Z, 0-9 character set returns
+    a 71-bit value. log_2((26+26+10)^12) =~ 71 bits
+    """
+    if not using_sysrandom:
+        # This is ugly, and a hack, but it makes things better than
+        # the alternative of predictability. This re-seeds the PRNG
+        # using a value that is hard for an attacker to predict, every
+        # time a random string is required. This may change the
+        # properties of the chosen random sequence slightly, but this
+        # is better than absolute predictability.
+        random.seed(
+            sha(
+                "%s%s%s" % (
+                    random.getstate(),
+                    time.time(),
+                    SECRET)
+                ).digest())
+    return ''.join([random.choice(allowed_chars) for i in range(length)])
+
+
+def make_random_code(length=255):
+    prehash = hashlib.sha1(str(get_random_string(length)).encode('utf-8')).hexdigest()[:5]
+    return hashlib.sha1(
+        (prehash + str(datetime.now().microsecond)).encode('utf-8')).hexdigest()[:length]
+
+
+def strings_differ(string1, string2):
+    """Check whether two strings differ while avoiding timing attacks.
+
+    This function returns True if the given strings differ and False
+    if they are equal.  It's careful not to leak information about *where*
+    they differ as a result of its running time, which can be very important
+    to avoid certain timing-related crypto attacks:
+
+        http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf
+
+    """
+    if len(string1) != len(string2):
+        return True
+
+    invalid_bits = 0
+    for a, b in zip(string1, string2):
+        invalid_bits += a != b
+
+    return invalid_bits != 0
