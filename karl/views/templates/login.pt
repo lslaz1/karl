@@ -40,7 +40,7 @@
         </span>
         <input type="text" name="code" id="code" value="" size="30" />
         <div class="loginLeftPadding discreet">
-          <label>Authentication code that was emailed to you</label>
+          <label>Authentication code that was emailed to you.</label>
         </div>
 
       </fieldset>
@@ -65,13 +65,13 @@
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         jQuery(function($) {
-            var $authCodeBtn = $('.send-auth-code');
+            var $authCode = $('.send-auth-code');
+            var $authCodeBtn = $('.send-auth-code button');
             var $code = $('#code');
             var $password = $('#password');
             var $username = $('input#username:first');
 
             $authCodeBtn.click(function(e){
-              debugger;
               e.preventDefault();
               $('.statusbox').karlstatusbox('clearAndAppend', 'Sending authentication code...');
               $.ajax({
@@ -83,6 +83,7 @@
                 },
                 success: function(data){
                   $('.statusbox').karlstatusbox('clearAndAppend', data.message);
+                  $authCodeBtn.text('Resend Authentication Code')
                 },
                 failure: function(){
                   $('.statusbox').karlstatusbox('clearAndAppend', 'Error sending authorization code...');
@@ -92,7 +93,7 @@
             if($code.length > 0){
               $username.keyup(function(e){
                 if($username.val().length > 3){
-                  $authCodeBtn.fadeIn();
+                  $authCode.fadeIn();
                 }
               });
             }
