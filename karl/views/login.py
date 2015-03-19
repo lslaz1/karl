@@ -168,6 +168,8 @@ def remember_login(context, request, userid, max_age):
 
     # and redirect
     came_from = request.session.pop('came_from')
+    if 'logout' in came_from:
+        came_from = request.application_url
     return HTTPFound(headers=remember_headers, location=came_from)
 
 
