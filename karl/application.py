@@ -173,12 +173,14 @@ def configure_karl(config, load_zcml=True):
     config.define_css(
         'tinymce-3.5.2.karl', static_path + '/tinymce/tinymce-3.5.2.karl.css',
         always_include=True)
-    config.define_css('karl-ui', static_path + '/karl-ui.css',
-                      always_include=True)
-    config.define_css('karl-custom', static_path + '/karl-custom.css',
-                      always_include=True)
     config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
     config.define_css('karl-multifileupload', static_path + '/karl-multifileupload.css')
+    config.define_css('karl-ui', static_path + '/karl-ui.css',
+                      always_include=True)
+    config.define_css('karl-base', static_path + '/karl-base.css',
+                      always_include=True)
+    config.define_css('karl-theme', static_path + '/karl-theme.css',
+                      always_include=True)
     config.define_css(
         'karl-ie', static_path + '/karl_ie.css',
         always_include=True, ie_expression='lte IE 8')

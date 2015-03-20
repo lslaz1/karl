@@ -105,6 +105,7 @@
     "karl-multifileupload",
     "tinymce/tinymce-3.5.2.karl",
     "karl-wikitoc",
-    "karl-custom"
+    "karl-base",
+    "karl-theme"
   ]
 }
