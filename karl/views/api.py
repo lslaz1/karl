@@ -91,7 +91,7 @@ class TemplateAPI(object):
         self.profile_url = app_url + '/profiles/%s' % self.userid
         self.here_url = self.context_url = resource_url(context, request)
         self.view_url = resource_url(context, request, request.view_name)
-        self.js_devel_mode = asbool(self.settings.get('js_devel_mode', None))
+        self.resource_devel_mode = asbool(self.settings.get('resource_devel_mode', None))
         self.read_only = not is_normal_mode(request.registry)
         self.static_url = '%s/static/%s' % (
             app_url, request.registry.settings.get('static_rev'))
@@ -446,14 +446,13 @@ class TemplateAPI(object):
         return self._livesearch_options
 
     @property
-    def is_js_devel_mode(self):
-        return (self.js_devel_mode == 'true' or self.js_devel_mode == 'True' or
-                self.js_devel_mode is True)
+    def is_resource_devel_mode(self):
+        return self.resource_devel_mode in ('true', 'True', True)
 
     @property
     def resources(self):
         # never cache in devmode.
-        if self.is_js_devel_mode or self._resources is None:
+        if self.is_resource_devel_mode or self._resources is None:
             path = os.path.join(os.path.dirname(__file__), 'static', 'resources.json')
             self._resources = json.load(open(path))
         return self._resources
@@ -463,7 +462,7 @@ class TemplateAPI(object):
             files = self.resources['js'][name]
         except KeyError:
             raise RuntimeError('JS resource "%s" must be defined as a key in resources.json.')  # noqa
-        if self.is_js_devel_mode:
+        if self.is_resource_devel_mode:
             result = ['%s/%s' % (self.static_url, n) for n in files]
         else:
             if name.startswith('tinymce'):
@@ -473,15 +472,11 @@ class TemplateAPI(object):
             result = ['%s/%s%s.min.js' % (self.static_url, prefix, name)]
         return result
 
+    def get_css(self):
+        return self.request.registry['css_resources'].get_all(self.request)
+
     def resource_css(self, name):
-        if name not in self.resources['css']:
-            raise RuntimeError('CSS resource "%s" must be defined as a key in resources.json.')  # noqa
-        if name.startswith('tinymce'):
-            prefix = 'tinymce/'
-        else:
-            prefix = ''
-        if self.is_js_devel_mode:
-            result = '%s/%s%s.css' % (self.static_url, prefix, name)
-        else:
-            result = '%s/%s%s.min.css' % (self.static_url, prefix, name)
-        return result
+        return self.request.registry['css_resources'].get(name)
+
+    def require_css(self, name):
+        self.request.registry['css_resources'].require(self.request, name)

@@ -17,6 +17,8 @@
     "gulp-rename": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
+    "gulp-less": "3.0.2",
+    "less-plugin-inline-urls": "1.1.0",
     "lodash": "*",
     "lodash._htmlescapes": "*",
     "napa": "^0.4.1",

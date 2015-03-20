@@ -4,6 +4,8 @@ karl package Changelog
 5.0.0a4 (unreleased)
 --------------------
 
+- make registering and customizing css resources easier
+
 - use timeago for review access request page
 
 - cleanup some views that didn't have permissions assigned

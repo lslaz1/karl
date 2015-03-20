@@ -7,11 +7,10 @@
 trace_file
 .*.sw?
 .sw?
-dist
 *-ck.js
 node_modules
 /log
 *.sublime-project
 *.sublime-workspace
-
+bower_components
 unit-test-results.xml

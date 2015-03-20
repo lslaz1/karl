@@ -1,0 +1,15 @@
+dist/jquery-ui/external/
+dist/jquery-ui/themes/base/images/
+dist/jquery-ui/themes/base/jquery-ui.css
+dist/jquery-ui/themes/base/jquery.ui.accordion.css
+dist/jquery-ui/themes/base/jquery.ui.all.css
+dist/jquery-ui/themes/base/jquery.ui.base.css
+dist/jquery-ui/themes/base/jquery.ui.resizable.css
+dist/jquery-ui/themes/base/jquery.ui.selectable.css
+dist/jquery-ui/themes/base/jquery.ui.spinner.css
+dist/jquery-ui/themes/base/jquery.ui.theme.css
+dist/jquery-ui/themes/base/jquery.ui.tooltip.css
+dist/jquery-ui/themes/base/minified/
+dist/jquery-ui/ui/
+dist/jquery/
+dist/tinymce/

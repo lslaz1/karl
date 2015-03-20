@@ -131,17 +131,17 @@ div.tiny-imagedrawer-image {
     height: 93px; /* 4px + 85px + 4px */
     display: table;
     overflow: hidden;
-    /* non-w3c hacks: */
-    #position: relative;
+    /* non-w3c hacks: 
+    #position: relative; */
 }
 
 div.tiny-imagedrawer-image div {
     display: table-cell;
     vertical-align: middle;
-    /* non-w3c hacks: */
+    /* non-w3c hacks: 
     #position: absolute;
     #top: 50%;
-    #left: 50%;
+    #left: 50%;*/
 }
 
 div.tiny-imagedrawer-image img {
@@ -154,9 +154,9 @@ div.tiny-imagedrawer-image img {
     max-width: 85px;
     overflow: hidden;
     /* non-w3c hacks: */
-    #position: relative;
+    /*#position: relative;
     #top: -50%;
-    #left: -50%;
+    #left: -50%;*/
 
 }
 

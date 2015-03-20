@@ -13,5 +13,8 @@ copy:
 	$(GULP) copy
 
 
-build-js:
+js:
 	$(GULP) process-js
+
+css:
+	$(GULP) process-css

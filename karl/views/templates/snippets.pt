@@ -66,21 +66,9 @@
 
     <!-- Css resource composition -->
     <metal:resources define-macro="css_resources">
-      <!-- XXX unconditional now. TODO handle from all non-formish pages just like the js! -->
-      <tal:resources condition="(True or 'field.KarlTinyMCE' in api.form_field_templates)">
-        <link rel="stylesheet" href="${api.resource_css('tinymce-3.5.2.karl')}" type="text/css"/>
+      <tal:resources tal:repeat="resource python: api.get_css()">
+        <link rel="stylesheet" href="" type="text/css" tal:replace="structure python: resource.render(request)" />
       </tal:resources>
-      <link rel="stylesheet" href="${api.resource_css('karl-ui')}" type="text/css"/>
-      <link rel="stylesheet" href="${api.resource_css('karl-custom')}" type="text/css"/>
-      <!--[if lte IE 8]> <style type="text/css" media="all">@import
-          url(${api.static_url}/karl_ie.css);</style>
-      <![endif]-->
-      <!--[if IE 8]> <style type="text/css" media="all">@import
-          url(${api.static_url}/karl_ie8.css);</style>
-      <![endif]-->
-      <!--[if gte IE 9]> <style type="text/css" media="all">@import
-          url(${api.static_url}/karl_ie9.css);</style>
-      <![endif]-->
     </metal:resources>
 
     <div metal:define-macro="letter_box" class="kalphabetlisting">

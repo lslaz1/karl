@@ -113,6 +113,7 @@ log = logging.getLogger(__name__)
 def show_folder_view(context, request):
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
+    api.require_css('karl-multifileupload')
 
     # Now get the data that goes with this
 

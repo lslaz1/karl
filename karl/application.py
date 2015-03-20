@@ -9,7 +9,7 @@ from repoze.depinj import lookup
 
 import transaction
 
-from pyramid.config import Configurator
+from pyramid.config import Configurator as BaseConfigurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import NewRequest
@@ -48,6 +48,71 @@ except ImportError:
     slowlog = None
 
 
+class CSSFile(object):
+
+    def __init__(self, path, always_include=False, ie_expression=None):
+        self.path = path
+        self.ie_expression = ie_expression
+        self.always_include = always_include
+
+    def render(self, request):
+        full_path = '%s/%s' % (
+            request.application_url.rstrip('/'),
+            self.path.lstrip('/'))
+        if self.ie_expression:
+            return '''<!--[if %s]> <style type="text/css" media="all">@import
+  url(%s);</style>
+<![endif]-->''' % (self.ie_expression, full_path)
+        else:
+            return '''<link rel="stylesheet"
+href="%s" type="text/css"/>''' % full_path
+
+
+class CSSResources(object):
+
+    def __init__(self):
+        self.data = {}
+        self.order = []
+
+    def add(self, name, path, **kwargs):
+        self.data[name] = CSSFile(path, **kwargs)
+        if name not in self.order:
+            self.order.append(name)
+
+    def get(self, name):
+        return self.data.get(name)
+
+    def get_all(self, request):
+        files = []
+        included_here = request.environ.get('required_css', [])
+        for name in self.order:
+            resource = self.data[name]
+            if resource.always_include or name in included_here:
+                files.append(resource)
+        return files
+
+    def require(self, request, name):
+        if 'required_css' not in request.environ:
+            request.environ['required_css'] = set([])
+        request.environ['required_css'].add(name)
+
+    def disable(self, request, name):
+        if 'required_css' not in request.environ:
+            request.environ['required_css'] = set([])
+        if name in request.environ['required_css']:
+            request.environ['required_css'].remove(name)
+
+
+class Configurator(BaseConfigurator):
+
+    def __init__(self, *args, **kwargs):
+        super(Configurator, self).__init__(*args, **kwargs)
+        self.registry['css_resources'] = CSSResources()
+
+    def define_css(self, name, path, **kwargs):
+        self.registry['css_resources'].add(name, path, **kwargs)
+
+
 def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
@@ -63,8 +128,9 @@ def configure_karl(config, load_zcml=True):
     if not static_rev:
         static_rev = _guess_static_rev()
         settings['static_rev'] = static_rev
+    static_path = '/static/%s' % static_rev
     config.add_static_view(
-        '/static/%s' % static_rev, 'karl.views:static',
+        static_path, 'karl.views:static',
         cache_max_age=60 * 60 * 24 * 365)
     # Add a redirecting static view to all _other_ revisions.
     def _expired_static_predicate(info, request):
@@ -102,6 +168,26 @@ def configure_karl(config, load_zcml=True):
 
     if perfmetrics is not None:
         config.include(perfmetrics)
+
+    # define css
+    config.define_css(
+        'tinymce-3.5.2.karl', static_path + '/tinymce/tinymce-3.5.2.karl.css',
+        always_include=True)
+    config.define_css('karl-ui', static_path + '/karl-ui.css',
+                      always_include=True)
+    config.define_css('karl-custom', static_path + '/karl-custom.css',
+                      always_include=True)
+    config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
+    config.define_css('karl-multifileupload', static_path + '/karl-multifileupload.css')
+    config.define_css(
+        'karl-ie', static_path + '/karl_ie.css',
+        always_include=True, ie_expression='lte IE 8')
+    config.define_css(
+        'karl-ie8', static_path + '/karl_ie8.css',
+        always_include=True, ie_expression='IE 8')
+    config.define_css(
+        'karl-ie9', static_path + '/karl_ie9.css',
+        always_include=True, ie_expression='gte IE 9')
 
 
 def block_webdav(event):
@@ -263,12 +349,10 @@ def main(global_config, **settings):
             package = sys.modules[pkg_name]
             packages.append(package)
             configure_overrides = get_imperative_config(package)
-            if not configure_overrides:
-                configurers.append(configure_karl)
+            if configure_overrides:
+                configurers.append(configure_overrides)
         except ImportError:
             pass
-    else:
-        configure_overrides = configure_karl
 
     config = Configurator(
         package=karl.includes,

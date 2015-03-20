@@ -1,0 +1,37 @@
+
+/**
+* KARL UI resource composition
+*
+*/
+
+/* jquery-ui: */
+
+/* base jquery-ui styles */
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.core.css";
+/*@ import url("dist/jquery-ui/themes/base/jquery.ui.accordion.css");*/
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.autocomplete.css";
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.button.css";
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.datepicker.css";
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.dialog.css";
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.menu.css";
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.progressbar.css";
+/*@ import url("dist/jquery-ui/themes/base/jquery.ui.resizable.css");*/
+/*@ import url("dist/jquery-ui/themes/base/jquery.ui.selectable.css");*/
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.slider.css";
+/*@ import url("dist/jquery-ui/themes/base/jquery.ui.spinner.css");*/
+@import (less) "dist/jquery-ui/themes/base/jquery.ui.tabs.css";
+/*@ import url("dist/jquery-ui/themes/base/jquery.ui.tooltip.css");*/
+
+/* our actual theme, is "smoothness" based, and contains a "karl" skin */
+@import "jquery-ui-themes/smoothness/jquery.ui.theme.less";
+
+/* autobox depends on jquery-ui */
+@import "jquery-ui-plugins/autobox2/jquery.ui.autobox.less";
+
+/* KARL plugins */
+@import (less) "karl-plugins/karl-multistatusbox/karl.multistatusbox.css";
+@import (less) "karl-plugins/karl-captionedimage/karl.captionedimage.css";
+@import (less) "karl-plugins/karl-buttonset/karl.buttonset.css";
+
+/* customize jquery-ui */
+@import "jquery-ui-plugins/ui.custom.less";

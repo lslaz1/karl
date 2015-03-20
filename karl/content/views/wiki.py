@@ -335,6 +335,7 @@ def show_wikitoc_view(context, request):
     actions = []
 
     api = TemplateAPI(context, request, page_title)
+    api.require_css('karl-wikitoc')
 
     wikitoc_data = get_wikitoc_data(context, request)
 

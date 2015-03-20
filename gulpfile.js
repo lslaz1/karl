@@ -9,7 +9,11 @@ var _ = require('lodash'),
     util = require('gulp-util'),
     fs = require('fs'),
     karma = require('karma').server,
-    browserSync = require("browser-sync");
+    browserSync = require("browser-sync"),
+    minifyCSS = require('gulp-minify-css'),
+    less = require('gulp-less');
+
+  var LessPluginInlineUrls = require('less-plugin-inline-urls');
 
 
 var res = require('./karl/views/static/resources.json');
@@ -71,15 +75,17 @@ gulp.task('process-js', function () {
 
 gulp.task('process-css', function () {
   _.each(res.css, function(name) {
-    var fullName = name + '.min.css';
-    var dest = destFolder(name);
-    gulp.src(res.staticPrefix + name + '.css')
-      .pipe(plugins.minifyCss())
-      .pipe(plugins.header(_.template(banner, {fullName: fullName})))
-      .pipe(plugins.rename({suffix: '.min'}))
-      // same dest as src.
-      .pipe(gulp.dest(res.staticPrefix));
-    util.log('Producing', util.colors.green(res.staticPrefix + fullName));
+    var dest = res.staticPrefix;
+    if(name.indexOf('tinymce') !== -1){
+      dest += '/tinymce';
+    }
+    gulp.src(res.staticPrefix + name + '.less')
+      .pipe(less({
+        plugins: [LessPluginInlineUrls]
+      }))
+      //.pipe(minifyCSS())
+      .pipe(gulp.dest(dest));
+    util.log('Producing', util.colors.green(res.staticPrefix + name));
   });
 });
 
