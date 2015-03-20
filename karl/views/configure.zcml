@@ -7,12 +7,14 @@
     for="*"
     view=".zodbinfo.show_zodbinfo"
     name="zodbinfo.html"
+    permission="administer"
   />
 
   <view
     for="*"
     view=".ok.ok"
     name="ok.html"
+    permission="view"
   />
 
   <view
@@ -1876,6 +1878,7 @@
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.postoffice_quarantine_status_view"
     name="po_quarantine_status.txt"
+    permission="administer"
     />
 
   <view
@@ -1883,6 +1886,7 @@
     view="karl.views.admin.rename_or_merge_user_view"
     name="rename_user.html"
     renderer="templates/admin/rename_merge_user.pt"
+    permission="administer"
     />
 
   <view
@@ -1890,6 +1894,7 @@
     view="karl.views.admin.debug_converters"
     name="debug_converters.html"
     renderer="templates/admin/debug_converters.pt"
+    permission="administer"
     />
 
   <route
