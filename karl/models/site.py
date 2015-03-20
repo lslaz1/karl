@@ -413,6 +413,8 @@ class Site(Folder):
         two_factor_enabled=False,
         two_factor_auth_code_valid_duration=300,
         allow_request_accesss=False,
+        recaptcha_api_site_key='',
+        recaptcha_api_secret_key=''
     )
     _repo = Uninitialized
 

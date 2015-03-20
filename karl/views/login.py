@@ -21,6 +21,7 @@ from datetime import datetime
 from datetime import timedelta
 from urlparse import urljoin
 import re
+import requests
 
 from repoze.who.plugins.zodb.users import get_sha_password
 
@@ -235,6 +236,22 @@ def send_auth_code_view(context, request):
     }
 
 
+def verify_recaptcha(site, request, code):
+    key = site.settings.get('recaptcha_api_secret_key')
+    resp = requests.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        data=dict(
+            secret=key,
+            response=code,
+            remoteip=request.remote_addr
+        )
+    )
+    try:
+        return resp.json()['success']
+    except:
+        return False
+
+
 def request_access_view(context, request):
     if not context.settings.get('allow_request_accesss', False):
         raise NotFound
@@ -250,6 +267,10 @@ def request_access_view(context, request):
             error = 'Must provide full name'
         if email in context.access_requests:
             error = 'You have already requested access'
+
+        if not verify_recaptcha(context, request,
+                                request.POST.get('g-recaptcha-response', '')):
+            error = 'Invalid recaptcha'
 
         if not error:
             # add access request

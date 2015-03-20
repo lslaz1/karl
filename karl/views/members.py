@@ -93,7 +93,8 @@ def _get_manage_actions(community, request):
 
 def _get_common_email_info(community, community_href):
     info = {}
-    info['system_name'] = get_setting(community, 'system_name', 'KARL')
+    site = find_site(community)
+    info['system_name'] = site.title
     info['system_email_domain'] = get_setting(community,
                                               'system_email_domain')
     info['from_name'] = '%s invitation' % info['system_name']

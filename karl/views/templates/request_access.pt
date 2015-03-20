@@ -3,6 +3,9 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.anonymous_layout">
 
+  <div metal:fill-slot="extra-headers">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  </div>
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
@@ -21,6 +24,15 @@
           <label for="fullname">Full Name</label>
         </span>
         <input name="fullname" type="text" id="fullname" size="30" value="${python: request.POST.get('fullname', '')}">
+      </fieldset>
+
+      <fieldset class="field">
+        <span class="loginLabelWrapper">
+          <label for="recaptcha">ReCaptcha</label>
+        </span>
+        <div class="recaptcha-container">
+          <div class="g-recaptcha" data-sitekey="${python: api.site.settings.get('recaptcha_api_site_key')}"></div>
+        </div>
       </fieldset>
 
       <div class="formControlls loginLeftPadding">

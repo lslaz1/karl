@@ -1049,7 +1049,6 @@ def send_invitation_email(request, context, invitation):
 
 def review_access_requests_view(context, request):
     if request.method == 'POST' and request.POST.get('form.submitted'):
-        import pdb; pdb.set_trace()
         data = request.POST.dict_of_lists()
 
         search = ICatalogSearch(context)
@@ -1140,20 +1139,34 @@ class SiteSettingsFormController(BaseSiteFormController):
         ('title', schemaish.String(
             validator=validator.Required(),
             description="Site title")),
+        ('recaptcha_api_site_key', schemaish.String(
+            validator=validator.Required(),
+            description="")),
+        ('recaptcha_api_secret_key', schemaish.String(
+            validator=validator.Required(),
+            description="")),
     ]
 
     def form_defaults(self):
         return {
-            'title': self.context.title
+            'title': self.context.title,
+            'recaptcha_api_site_key': self.context.settings.get(
+                'recaptcha_api_site_key', ''),
+            'recaptcha_api_secret_key': self.context.settings.get(
+                'recaptcha_api_secret_key', '')
         }
 
     def form_widgets(self, fields):
         return {
-            'title': formish.widgets.Input()
+            'title': formish.widgets.Input(),
+            'recaptcha_api_site_key': formish.widgets.Input(),
+            'recaptcha_api_secret_key': formish.widgets.Input()
         }
 
     def handle_submit(self, converted):
         self.context.title = converted['title']
+        self.context.settings['recaptcha_api_site_key'] = converted['recaptcha_api_site_key']  # noqa
+        self.context.settings['recaptcha_api_secret_key'] = converted['recaptcha_api_secret_key']  # noqa
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 
