@@ -34,6 +34,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IInvitation
+from karl.models.interfaces import ISiteInvitation
 from karl.models.interfaces import IProfile
 from karl.models.adapters import TIMEAGO_FORMAT
 from karl.security.policy import ADMINISTER
@@ -1053,10 +1054,12 @@ def review_access_requests_view(context, request):
     if request.method == 'POST' and request.POST.get('form.submitted'):
         data = request.POST.dict_of_lists()
 
+        invitations = context['invitations']
         search = ICatalogSearch(context)
         random_id = getUtility(IRandomId)
         html_body = '''
 <p>Your access request has been approved<p>'''
+        import pdb; pdb.set_trace()
         for email in data.get('approve', []):
             total, docids, resolver = search(email=email.lower(),
                                              interfaces=[IProfile])
@@ -1065,14 +1068,14 @@ def review_access_requests_view(context, request):
                 continue
             # Invite new user to Karl
             invitation = create_content(
-                IInvitation,
+                ISiteInvitation,
                 email,
                 html_body
             )
             while 1:
                 name = random_id()
-                if name not in context:
-                    context[name] = invitation
+                if name not in invitations:
+                    invitations[name] = invitation
                     break
 
             send_invitation_email(request, context, invitation)

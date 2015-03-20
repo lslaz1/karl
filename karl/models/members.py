@@ -29,7 +29,15 @@ from repoze.folder import Folder
 
 from karl.models.interfaces import IMembers
 from karl.models.interfaces import IInvitation
+from karl.models.interfaces import IInvitationsFolder
+from karl.models.interfaces import ISiteInvitation
+from pyramid.interfaces import ILocation
 from persistent import Persistent
+
+
+class InvitationsFolder(Folder):
+    implements(IInvitationsFolder, ILocation)
+
 
 class Invitation(Persistent):
     implements(IInvitation)
@@ -39,6 +47,10 @@ class Invitation(Persistent):
         self.email = unicode(email)
         self.message = unicode(message)
 
+
+class SiteInvitation(Invitation):
+    implements(ISiteInvitation)
+
+
 class Members(Folder):
     implements(IMembers)
-

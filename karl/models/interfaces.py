@@ -146,6 +146,14 @@ class IInvitation(Interface):
     message = Attribute(u'Personal message sent along with the invitation')
 
 
+class ISiteInvitation(IInvitation):
+    pass
+
+
+class IInvitationsFolder(IFolder):
+    pass
+
+
 class IProfiles(IFolder):
     """ Profiles folder """
     taggedValue('name', 'Profiles')

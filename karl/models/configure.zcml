@@ -283,6 +283,14 @@
       factory=".members.Invitation"
       type="karl.models.interfaces.IInvitation"
       />
+  <lemonade:content
+      factory=".members.SiteInvitation"
+      type="karl.models.interfaces.ISiteInvitation"
+      />
+  <lemonade:content
+      factory=".members.InvitationsFolder"
+      type="karl.models.interfaces.IInvitationsFolder"
+      />
 
   <lemonade:content
       factory=".site.Site"

@@ -561,14 +561,20 @@ def accept_invitation_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'accept-invitation')
 
 
-class AcceptInvitationFormController(object):
+class BaseInvitationFormController(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.community = find_interface(context, ICommunity)
         self.profiles = find_profiles(context)
         self.api = TemplateAPI(context, request)
         self.filestore = get_filestore(context, request, 'accept-invitation')
+
+    @property
+    def description(self):
+        system_name = get_setting(self.context, 'title', 'KARL')
+        return ('You have been invited to join the "%s".  Please begin '
+                'by creating a login with profile information.' %
+                system_name)
 
     def form_fields(self):
         required = validator.Required()
@@ -662,9 +668,11 @@ class AcceptInvitationFormController(object):
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
 
+    def get_groups(self):
+        return []
+
     def handle_submit(self, converted):
         context = self.context
-        community = self.community
         request = self.request
         users = find_users(context)
         profiles = self.profiles
@@ -680,8 +688,7 @@ class AcceptInvitationFormController(object):
         if username in profiles:
             raise ValidationError(username='Username already taken')
 
-        community_href = resource_url(community, request)
-        groups = [community.members_group_name]
+        groups = self.get_groups()
         users.add(username, username, password, groups)
         remember_headers = remember(request, username)
         profile = create_content(
@@ -710,25 +717,84 @@ class AcceptInvitationFormController(object):
         except Invalid, e:
             raise ValidationError(**e.error_dict)
 
+        self.send_mail(username, profile)
+        url = self.get_redirect_url()
+
+        # delete it
         del context.__parent__[context.__name__]
-        url = resource_url(community, request,
-                           query={'status_message': 'Welcome!'})
-        _send_ai_email(community, community_href, username, profile)
+
         self.filestore.clear()
         return HTTPFound(headers=remember_headers, location=url)
 
+    def send_mail(self, username, profile):
+        pass
+
+    def get_redirect_url(self):
+        return resource_url(find_site(self.context), self.request,
+                            query={'status_message': 'Welcome!'})
+
     def __call__(self):
-        community_name = self.community.title
-        context = self.context
-
-        system_name = get_setting(context, 'title', 'KARL')
-
-        desc = ('You have been invited to join the "%s" in %s.  Please begin '
-                'by creating a %s login with profile information.' %
-                (community_name, system_name, system_name))
+        system_name = get_setting(self.context, 'title', 'KARL')
         return {'api': self.api,
                 'page_title': 'Accept %s Invitation' % system_name,
-                'page_description': desc}
+                'page_description': self.description}
+
+
+class AcceptInvitationFormController(BaseInvitationFormController):
+    def __init__(self, context, request):
+        super(AcceptInvitationFormController, self).__init__(context, request)
+        self.community = find_interface(context, ICommunity)
+
+    @property
+    def description(self):
+        community_name = self.community.title
+        system_name = get_setting(self.context, 'title', 'KARL')
+        return ('You have been invited to join the "%s" in %s.  Please begin '
+                'by creating a %s login with profile information.' %
+                (community_name, system_name, system_name))
+
+    def get_groups(self):
+        return [self.community.members_group_name]
+
+    def get_redirect_url(self):
+        return resource_url(self.community, self.request,
+                            query={'status_message': 'Welcome!'})
+
+    def send_mail(self, username, profile):
+        community = self.community
+        request = self.request
+        community_href = resource_url(community, request)
+        _send_ai_email(community, community_href, username, profile)
+
+
+class AcceptSiteInvitationFormController(BaseInvitationFormController):
+    def send_mail(self, username, profile):
+        site = find_site(self.context)
+        title = get_setting(self.context, 'title')
+        subject = 'Thank you for joining %s' % title
+        body_template = get_renderer(
+            'templates/email_accept_site_invitation.pt').implementation()
+
+        system_email_domain = get_setting(self.context, 'system_email_domain')
+        from_name = '%s invitation' % title
+        from_email = 'invitation@%s' % system_email_domain
+        mailer = getUtility(IMailDelivery)
+        msg = Message()
+        msg['From'] = '%s <%s>' % (from_name, from_email)
+        msg['To'] = profile.email
+        msg['Subject'] = subject
+        body = body_template(
+            username=username,
+            site_href=resource_url(site, self.request),
+            system_name=title
+            )
+
+        if isinstance(body, unicode):
+            body = body.encode("UTF-8")
+
+        msg.set_payload(body, "UTF-8")
+        msg.set_type('text/html')
+        mailer.send([profile.email], msg)
 
 
 def _send_ai_email(community, community_href, username, profile):

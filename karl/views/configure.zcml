@@ -1220,6 +1220,24 @@
   </formish:form>
 
   <formish:form
+     controller=".members.AcceptSiteInvitationFormController"
+     for="karl.models.interfaces.ISiteInvitation"
+     renderer="karl.views.forms:templates/accept_invitation.pt">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
      controller=".members.AcceptInvitationFormController"
      for="karl.models.interfaces.IInvitation"
      renderer="karl.views.forms:templates/accept_invitation.pt">

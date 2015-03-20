@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -24,12 +24,13 @@ from karl.models.members import Members
 
 from karl.utils import find_users
 
+
 class Community(Folder):
     implements(ICommunity)
     _members_group = 'group.community:%s:members'
     _moderators_group = 'group.community:%s:moderators'
-    default_tool = '' # means default tab (overview)
-    content_modified = None # will be set by subscriber
+    default_tool = ''  # means default tab (overview)
+    content_modified = None  # will be set by subscriber
     modified_by = None
     sendalert_default = True
 
@@ -41,9 +42,9 @@ class Community(Folder):
         if text is None:
             self.text = u''
         else:
-            self.text = unicode(text)            
+            self.text = unicode(text)
         self.creator = self.modified_by = creator
-        self['members'] = members = Members()
+        self['members'] = Members()
 
     @property
     def members_group_name(self):
@@ -71,7 +72,7 @@ class Community(Folder):
         users = find_users(self)
         names = users.users_in_group(group)
         return set(names)
-        
+
 
 class CommunitiesFolder(Folder):
     implements(ICommunities)

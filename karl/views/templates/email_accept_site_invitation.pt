@@ -1,0 +1,13 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+    <p>Thank you for accepting our invitation.  You are now a member of the ${system_name}:
+    <a href="${site_href}">${site_href}</a></p>
+    
+    <p>
+      Your username is: ${username}
+    </p>
+    
+  </body>
+</html>

@@ -50,6 +50,7 @@ from karl.content.interfaces import IPhoto
 from karl.content.models.adapters import FlexibleTextIndexData
 from karl.models.catalog import CachingCatalog
 from karl.models.catalog import GranularIndex
+from karl.models.interfaces import IInvitationsFolder
 from karl.models.interfaces import ICommunities
 from karl.models.interfaces import IIndexFactory
 from karl.models.interfaces import IPeopleDirectory
@@ -445,6 +446,7 @@ class Site(Folder):
         self.list_aliases = OOBTree()
         self.settings = OOBTree(self._default_settings)
         self.access_requests = OOBTree()
+        self['invitations'] = create_content(IInvitationsFolder)
 
     @property
     def title(self):
