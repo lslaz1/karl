@@ -3,6 +3,17 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
+<head>
+<metal:block metal:fill-slot="extra-headers">
+<script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("abbr.timeago").timeago();
+});
+</script>
+</metal:block>
+</head>
+
   <div metal:fill-slot="portlets">
     <div metal:use-macro="menu"/>
   </div>
@@ -24,10 +35,10 @@
         </thead>
         <tbody>
           <tal:req tal:repeat="req access_requests">
-            <tr>
+            <tr tal:define="date python: format_date(req['date_requested'])">
               <td>${python: req['fullname']}</td>
               <td>${python: req['email']}</td>
-              <td>${python: req['date_requested'].isoformat()}</td>
+              <td><abbr class="timeago" title=${date}>${date}</abbr></td>
               <td><input type="checkbox" name="approve" value="${python: req['email']}" /></td>
               <td><input type="checkbox" name="decline" value="${python: req['email']}" /></td>
             </tr>

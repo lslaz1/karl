@@ -35,6 +35,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IInvitation
 from karl.models.interfaces import IProfile
+from karl.models.adapters import TIMEAGO_FORMAT
 from karl.security.policy import ADMINISTER
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
@@ -1084,6 +1085,7 @@ def review_access_requests_view(context, request):
     return {
         'api': AdminTemplateAPI(context, request),
         'page_title': 'Review Access Requests',
+        'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
         'menu': _menu_macro(),
         'access_requests': context.access_requests.values()
     }
