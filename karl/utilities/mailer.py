@@ -7,7 +7,7 @@ from zope.interface import implements
 from repoze.sendmail.delivery import QueuedMailDelivery
 from repoze.sendmail.interfaces import IMailDelivery
 
-from karl.utils import get_settings
+from karl.utils import get_config_settings
 
 
 def boolean(s):
@@ -19,7 +19,7 @@ def mail_delivery_factory(os=os):  # accepts 'os' for unit test purposes
     """Factory method for creating an instance of repoze.sendmail.IDelivery
     for use by this application.
     """
-    settings = get_settings()
+    settings = get_config_settings()
 
     # If settings utility not present, we are probably testing and should
     # suppress sending mail.  Can also be set explicitly in environment
@@ -88,7 +88,7 @@ class WhiteListMailDelivery(object):
 
     def __init__(self, md):
         self.md = md
-        settings = get_settings()
+        settings = get_config_settings()
         white_list_fn = settings.get("mail_white_list", None)
         if white_list_fn:
             with open(white_list_fn) as f:

@@ -340,7 +340,7 @@ class BlogAlert(Alert):
         community_href = resource_url(community, request)
         blogentry_href = resource_url(blogentry, request)
         manage_preferences_href = resource_url(profile, request)
-        system_name = get_setting(self.context, "system_name", "KARL")
+        system_name = get_setting(self.context, "title", "KARL")
         system_email_domain = get_setting(self.context, "system_email_domain")
 
         reply_to = '"%s" <%s+blog-%s@%s>' % (community.title,
@@ -534,7 +534,7 @@ class NonBlogAlert(Alert):
         community_href = resource_url(community, request)
         model_href = resource_url(model, request)
         manage_preferences_href = resource_url(profile, request)
-        system_name = get_setting(self.context, "system_name", "KARL")
+        system_name = get_setting(self.context, "title", "KARL")
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 

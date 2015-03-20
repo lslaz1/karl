@@ -406,13 +406,21 @@ class Site(Folder):
     __name__ = None
     __parent__ = None
     __acl__ = [(Allow, Authenticated, 'view')]
-    title = 'Site'
     list_aliases = None
     _default_settings = dict(
+        title='KARL',
         footer_html='Edit footer in <a href="/edit_footer.html">admin area</a>.',
         two_factor_enabled=False,
         two_factor_auth_code_valid_duration=300,
         allow_request_accesss=False,
+        admin_email='foo@bar.com',
+        system_list_subdomain='',
+        system_email_domain='karl3.example.com',
+        site_url='http://offline.example.com/',
+        max_upload_size=0,
+        min_pw_length=8,
+        selectable_groups='group.KarlStaff group.KarlUserAdmin group.KarlAdmin group.KarlCommunications',  # noqa
+        date_format='en-US',
         recaptcha_api_site_key='',
         recaptcha_api_secret_key=''
     )
@@ -437,6 +445,10 @@ class Site(Folder):
         self.list_aliases = OOBTree()
         self.settings = OOBTree(self._default_settings)
         self.access_requests = OOBTree()
+
+    @property
+    def title(self):
+        return self.settings.get('title', 'KARL')
 
     @property
     def repo(self):

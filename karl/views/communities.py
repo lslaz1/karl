@@ -131,7 +131,7 @@ def _show_communities_view_helper(context, request, prefix='', **kw):
     if has_permission('create', context, request):
         actions.append(('Add Community', 'add_community.html'))
 
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     page_title = '%s%s Communities' % (prefix, system_name)
 
     my_communities = get_my_communities(context, request)

@@ -71,15 +71,6 @@ from karl.views.communities import get_my_communities
 
 PROFILE_THUMB_SIZE = (75, 100)
 
-_MIN_PW_LENGTH = None
-
-
-def min_pw_length():
-    global _MIN_PW_LENGTH
-    if _MIN_PW_LENGTH is None:
-        _MIN_PW_LENGTH = get_setting(None, 'min_pw_length', 8)
-    return _MIN_PW_LENGTH
-
 
 def edit_profile_filestore_photo_view(context, request):
     return photo_from_filestore_view(context, request, 'edit-profile')
@@ -297,7 +288,8 @@ class AdminEditProfileFormController(EditProfileFormController):
                          'community list.'))
         if self.user is not None:
             password_field = schemaish.String(
-                validator=karlvalidators.PasswordLength(min_pw_length()),
+                validator=karlvalidators.PasswordLength(
+                    get_setting(context, 'min_pw_length', 8)),
                 title='Reset Password',
                 description=('Enter a new password for the user here, '
                              'or leave blank to leave the password '
@@ -401,7 +393,8 @@ class AdminEditProfileFormController(EditProfileFormController):
 
 def get_group_options(context):
     group_options = []
-    for group in get_setting(context, "selectable_groups").split():
+    for group in get_setting(context, "selectable_groups",
+                             'group.KarlAdmin group.KarlLovers').split():  # noqa
         if group.startswith('group.'):
             title = group[6:]
         else:
@@ -438,7 +431,7 @@ class AddUserFormController(EditProfileFormController):
                          'community list.'))
         password_field = schemaish.String(
             validator=(validator.All(
-                karlvalidators.PasswordLength(min_pw_length()),
+                karlvalidators.PasswordLength(get_setting(context, 'min_pw_length', 8)),
                 validator.Required())))
         fields = [('login', login_field),
                   ('groups', groups_field),
@@ -871,7 +864,7 @@ def show_profiles_view(context, request):
         return HTTPFound(request.resource_url(people))
 
     # No people directory, show basic listing of profiles
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     page_title = '%s Profiles' % system_name
     api = TemplateAPI(context, request, page_title)
 
@@ -924,7 +917,8 @@ class ChangePasswordFormController(object):
         new_password_field = schemaish.String(
             title="New Password",
             validator=validator.All(
-                karlvalidators.PasswordLength(min_pw_length()),
+                karlvalidators.PasswordLength(
+                    get_setting(self.context, 'min_pw_length', 8)),
                 validator.Required())
             )
         fields = [('old_password', old_password_field),

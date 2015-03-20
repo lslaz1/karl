@@ -39,6 +39,7 @@ from karl.utils import find_catalog
 from karl.utils import find_communities
 from karl.utils import find_peopledirectory
 from karl.utils import get_setting
+from karl.utils import get_config_setting
 from karl.utils import hex_to_docid
 
 # BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
@@ -141,14 +142,14 @@ class MailinRunner2(object):
 
     def bounce_message(self, message, error):
         mailer = getUtility(IMailDelivery)
-        from_email = get_setting(self.root, 'postoffice.bounce_from_email')
+        from_email = get_config_setting('postoffice.bounce_from_email')
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
         self.queue.bounce(message, wrap_send(mailer.bounce), from_email, error)
 
     def bounce_message_throttled(self, message):
         mailer = getUtility(IMailDelivery)
-        from_email = get_setting(self.root, 'postoffice.bounce_from_email')
+        from_email = get_config_setting('postoffice.bounce_from_email')
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
 
@@ -160,7 +161,7 @@ class MailinRunner2(object):
         bounce_message.set_payload(render(
             'templates/bounce_email_throttled.pt',
             dict(subject=message.get('Subject'),
-                 system_name=get_setting(self.root, 'system_name', 'KARL'),
+                 system_name=get_setting(self.root, 'title', 'KARL'),
                  admin_email=get_setting(self.root, 'admin_email'),
                  ),
         ).encode('UTF-8'), 'UTF-8')
@@ -172,7 +173,7 @@ class MailinRunner2(object):
 
     def quarantine_message(self, message):
         mailer = getUtility(IMailDelivery)
-        from_email = get_setting(self.root, 'postoffice.bounce_from_email')
+        from_email = get_config_setting('postoffice.bounce_from_email')
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
         error = traceback.format_exc()

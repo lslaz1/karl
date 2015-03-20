@@ -39,18 +39,20 @@ from karl.utils import find_users
 from karl.utils import get_setting
 
 REPORT_REPLY_REGX = re.compile(r'peopledir-'
-                                '(?P<report>\w+(\+\w+)*)'
+                                '(?P<report>\w+(\+\w+)*)'  # noqa
                                 '-(?P<reply>\w+)@')
 
 REPORT_REGX = re.compile(r'peopledir-'
-                          '(?P<report>\w+(\+\w+)*)')
+                          '(?P<report>\w+(\+\w+)*)')  # noqa
 
 REPLY_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)'
-                         '-(?P<reply>\w+)@')
+                         '-(?P<reply>\w+)@')  # noqa
 
 TOOL_REGX = re.compile(r'(?P<community>[^+]+)\+(?P<tool>\w+)@')
 
 ALIAS_REGX = None
+
+
 def _get_ALIAS_REGX(context):
     global ALIAS_REGX
     if ALIAS_REGX is None:
@@ -60,6 +62,7 @@ def _get_ALIAS_REGX(context):
         else:
             ALIAS_REGX = re.compile(r'(?P<alias>.*)@')
     return ALIAS_REGX
+
 
 class MailinDispatcher(object):
     implements(IMailinDispatcher)
@@ -100,7 +103,7 @@ class MailinDispatcher(object):
     def getCommunityId(self, email):
         """ See IMailinDispatcher.
         """
-        community_id = email.split('@',1)[0]
+        community_id = email.split('@', 1)[0]
         if self.isCommunity(community_id):
             return community_id
 
@@ -128,12 +131,12 @@ class MailinDispatcher(object):
 
         seen = set([x[1].lower() for x in to])
         to = to + [x for x in self.getAddrList(message, 'Cc')
-                      if x[1].lower() not in seen]
+                   if x[1].lower() not in seen]
 
         # Include BCC'ed targets
         seen = set([x[1].lower() for x in to])
         to = to + [x for x in self.getAddrList(message, 'X-Original-To')
-                      if x[1].lower() not in seen]
+                   if x[1].lower() not in seen]
 
         info = {
             'to': to,
@@ -206,7 +209,7 @@ class MailinDispatcher(object):
                 targets.append(target)
                 continue
 
-        good_targets = [target for target in targets if 'error' not in target]
+        good_targets = [t for t in targets if 'error' not in t]
         if not good_targets:
             info['error'] = 'no community or distribution list specified'
         return info
@@ -358,7 +361,7 @@ class MailinDispatcher(object):
 
         # Check that author has permission to create content in the target
         self.checkPermission(info)
-        good_targets = [t for t in info['targets'] if 'error' not in t]
+        good_targets = [tar for tar in info['targets'] if 'error' not in tar]
         if not good_targets:
             return info
 
@@ -390,7 +393,6 @@ class MailinDispatcher(object):
                 attachments.append((filename, mimetype, data))
             elif mimetype.startswith('text/plain'):
                 texts.append(data)
-                text_mimetype = mimetype
 
         if texts:
             text = '\n\n'.join(texts)
@@ -430,7 +432,6 @@ class MailinDispatcher(object):
                 return body.decode(charset)
             except (LookupError, UnicodeDecodeError):
                 pass
-
 
         # Try UTF-8 if we haven't already
         if charset.lower().replace('-', '') != 'utf8':

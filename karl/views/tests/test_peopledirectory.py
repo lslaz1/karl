@@ -22,6 +22,8 @@ import unittest
 from pyramid import testing
 
 import karl.testing
+from karl.testing import makeRoot
+
 
 class Test_admin_contents(unittest.TestCase):
 
@@ -655,8 +657,10 @@ class Test_report_view(unittest.TestCase):
                          'mailto:alias@karl3.example.com')
 
     def test_report_with_mailinglist_w_subdomain(self):
-        self._register(system_list_subdomain='lists.example.com')
+        self._register()
         pd, section, report = _makeReport()
+        pd.__parent__.settings['system_list_subdomain'] = 'lists.example.com'
+
         report['mailinglist'] = testing.DummyModel(short_address='alias')
         request = testing.DummyRequest()
 
@@ -874,17 +878,6 @@ class Test_picture_view(unittest.TestCase):
 
         self.assertEqual(info['mailto'],
                          'mailto:alias@karl3.example.com')
-
-    def test_report_with_mailinglist_w_subdomain(self):
-        self._register(system_list_subdomain='lists.example.com')
-        pd, section, report = _makeReport()
-        report['mailinglist'] = testing.DummyModel(short_address='alias')
-        request = testing.DummyRequest()
-
-        info = self._callFUT(report, request)
-
-        self.assertEqual(info['mailto'],
-                         'mailto:alias@lists.example.com')
 
 
 class Test_get_search_qualifiers(unittest.TestCase):
@@ -1564,8 +1557,9 @@ class DummyLetterManager:
 def _makeReport():
     from zope.interface import directlyProvides
     from karl.models.interfaces import IPeopleDirectory
-    site = testing.DummyModel()
+    site = makeRoot()
     pd = site['people'] = testing.DummyModel(order=[])
+    pd.__parent__ = site
     directlyProvides(pd, IPeopleDirectory)
     pd['categories'] = testing.DummyModel()
 

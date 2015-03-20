@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright (C) 2008-2009 Open Society Institute
 #               Thomas Moroz: tmoroz@sorosny.org
 #
@@ -20,6 +21,8 @@ import unittest
 from pyramid import testing
 
 import karl.testing
+from karl.testing import makeRoot
+
 
 class TestClientJsonData(unittest.TestCase):
 
@@ -188,10 +191,11 @@ class TestGetUserDateFormat(unittest.TestCase):
     def tearDown(self):
         testing.cleanUp()
 
+
     def test_not_logged_in(self):
         from karl.views.utils import get_user_date_format
         karl.testing.registerDummySecurityPolicy()
-        context = testing.DummyModel()
+        context = makeRoot()
         request = testing.DummyRequest()
         date_format = get_user_date_format(context, request)
         self.assertEqual(date_format, 'en-US')
@@ -200,7 +204,7 @@ class TestGetUserDateFormat(unittest.TestCase):
         from karl.views.utils import get_user_date_format
         from karl.testing import DummyUsers
         karl.testing.registerDummySecurityPolicy("userid")
-        context = testing.DummyModel()
+        context = makeRoot()
         profiles = context["profiles"] = testing.DummyModel()
         users = context.users = DummyUsers()
         users.add("userid", "userid", "password", [])
@@ -438,9 +442,10 @@ class TestHandlePhotoUpload(unittest.TestCase):
             return res
         registerContentFactory(make_image, ICommunityFile)
 
-        context = testing.DummyModel()
+        context = makeRoot()
         context.title = 'Howdy Doody'
         context.__name__ = 'howdydoody'
+        context.size = 1000
         form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
         self._callFUT(context, form)
         self.assertTrue('photo' in context)
@@ -475,9 +480,10 @@ class TestHandlePhotoUpload(unittest.TestCase):
                     raise KeyError(u'An object named %s already exists' % name)
                 return testing.DummyModel.__setitem__(self, name, value)
 
-        context = DummyModel()
+        context = makeRoot()
         context.title = 'Howdy Doody'
         context.__name__ = 'howdydoody'
+        context.size = 1000
         context['photo'] = testing.DummyModel()
         form = {'photo': DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')}
         self._callFUT(context, form)
@@ -537,9 +543,10 @@ class TestHandlePhotoUpload(unittest.TestCase):
             return res
         registerContentFactory(make_image, ICommunityFile)
 
-        context = testing.DummyModel()
+        context = makeRoot()
         context.title = 'Howdy Doody'
         context.__name__ = 'howdydoody'
+        context.size = 1000
         dummy_upload = DummyUpload(StringIO(one_pixel_jpeg), 'image/jpeg')
         dummy_upload.mimetype = dummy_upload.type
         del dummy_upload.type
@@ -616,6 +623,8 @@ class DummyUpload:
     def __init__(self, file, type):
         self.file = file
         self.type = type
+        self.size = 3000
+
 
 def dummy_traverser_factory(root):
     def traverser(request):

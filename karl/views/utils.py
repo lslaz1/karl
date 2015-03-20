@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright (C) 2008-2009 Open Society Institute
 #               Thomas Moroz: tmoroz@sorosny.org
 #
@@ -47,7 +48,7 @@ from textwrap import dedent
 from pyramid.response import Response
 import transaction
 
-_convert_to_dashes = re.compile(r"""[\s/:"']""") # ' damn you emacs
+_convert_to_dashes = re.compile(r"""[\s/:"']""")  # ' damn you emacs
 _safe_char_check = re.compile(r"[\w.-]+$")
 _reduce_dashes = re.compile(r"-{2,}")
 
@@ -106,6 +107,7 @@ _ascii_mapping = {
     1105 : 'yo', 1025 : 'YO',
 }
 
+
 def _encode_name(name):
     """Encode the Unicode characters in a name"""
     res = []
@@ -144,6 +146,7 @@ def make_name(context, title, raise_error=True):
     else:
         return name
 
+
 def make_unique_name(context, title):
     """Make a correct __name__ that is unique in the context.
 
@@ -152,6 +155,7 @@ def make_unique_name(context, title):
     """
     unique_name, postfix = make_unique_name_and_postfix(context, title)
     return unique_name
+
 
 def make_unique_name_and_postfix(context, title):
     """Make a correct __name__ that is unique in the context.
@@ -180,6 +184,7 @@ def make_unique_name_and_postfix(context, title):
             # processes hang forever :)
 
     return unique_name, postfix
+
 
 def basename_of_filepath(title):
     """
@@ -252,8 +257,9 @@ def _get_user_home_path(context, request):
 
     return target, subpath
 
+
 def get_user_date_format(context, request):
-    default_date_format= get_setting(context, 'date_format', 'en-US')
+    default_date_format = get_setting(context, 'date_format', 'en-US')
 
     userid = authenticated_userid(request)
     if userid is None:
@@ -261,7 +267,7 @@ def get_user_date_format(context, request):
 
     site = find_site(context)
     profiles = find_profiles(site)
-    profile =  profiles.get(userid, None)
+    profile = profiles.get(userid, None)
     if profile is None:
         return default_date_format
 
@@ -270,6 +276,7 @@ def get_user_date_format(context, request):
         date_format = default_date_format
 
     return date_format
+
 
 def get_user_community_names(context, request):
     userid = authenticated_userid(request)
@@ -349,8 +356,12 @@ class Invalid(Exception):
     def __init__(self, error_dict):
         self.error_dict = error_dict
 
+
 def check_upload_size(context, obj, field_name):
-    max_size = int(get_setting(context, 'upload_limit', 0))
+    try:
+        max_size = int(get_setting(context, 'max_upload_size', 0))
+    except:
+        max_size = 0
     if max_size and obj.size > max_size:
         msg = 'File size exceeds upload limit of %d.' % max_size
         transaction.get().doom()

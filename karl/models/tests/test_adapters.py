@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright (C) 2008-2009 Open Society Institute
 #               Thomas Moroz: tmoroz@sorosny.org
 #
@@ -21,6 +22,8 @@ from pyramid import testing
 from zope.interface import Interface
 
 from karl import testing as karltesting
+from karl.testing import makeRoot
+
 
 class TestDeprecatedCatalogSearch(unittest.TestCase):
 
@@ -898,12 +901,12 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         self.assertEqual(len(md._sent), 0)
 
     def test_handle_w_mailinglist_wo_subdomain(self):
-        karltesting.registerSettings()
         md = self._registerMailDelivery()
         _called_with = self._registerCatalogSearch([0, 1])
         message = self._makeMessage()
-        root = testing.DummyModel()
+        root = makeRoot()
         people = root['people'] = testing.DummyModel()
+        people.__parent__ = root
         section = people['section'] = testing.DummyModel()
         report = section['report'] = testing.DummyModel()
         report['mailinglist'] = testing.DummyModel(short_address='alias')
@@ -921,13 +924,13 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         self.assertEqual(_called_with, [{'testing': True}])
 
     def test_handle_w_mailinglist_w_subdomain(self):
-        karltesting.registerSettings(
-                system_list_subdomain='lists.example.com')
         md = self._registerMailDelivery()
         _called_with = self._registerCatalogSearch([0, 1])
         message = self._makeMessage()
-        root = testing.DummyModel()
+        root = makeRoot()
+        root.settings['system_list_subdomain'] = 'lists.example.com'
         people = root['people'] = testing.DummyModel()
+        people.__parent__ = root
         section = people['section'] = testing.DummyModel()
         report = section['report'] = testing.DummyModel()
         report['mailinglist'] = testing.DummyModel(short_address='alias')

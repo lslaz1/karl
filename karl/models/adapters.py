@@ -214,8 +214,7 @@ class TagQuery(object):
     @property
     def docid(self):
         if self._docid is None:
-            self._docid = self.catalog.document_map.docid_for_address(
-                                                                self.path)
+            self._docid = self.catalog.document_map.docid_for_address(self.path)
         return self._docid
 
     @property
@@ -239,11 +238,11 @@ class TagQuery(object):
             if tagObj.name != current:
                 if current is not None:
                     alltaginfo.append({
-                            'tag': current,
-                            'count': len(current_users),
-                            'snippet': (self.username not in current_users
-                                            and 'nondeleteable' or ''),
-                            })
+                        'tag': current,
+                        'count': len(current_users),
+                        'snippet': (self.username not in current_users
+                                    and 'nondeleteable' or ''),
+                    })
                 current = tagObj.name
                 count = 1
                 current_users = [tagObj.user]
@@ -252,11 +251,11 @@ class TagQuery(object):
                 current_users.append(tagObj.user)
         if current is not None:
             alltaginfo.append({
-                    'tag': current,
-                    'count': len(current_users),
-                    'snippet': (self.username not in current_users
-                                    and 'nondeleteable' or ''),
-                    })
+                'tag': current,
+                'count': len(current_users),
+                'snippet': (self.username not in current_users
+                            and 'nondeleteable' or ''),
+                })
 
         # Sort the tags alphabetically
         return sorted(alltaginfo, key=lambda r: r['tag'])
@@ -321,15 +320,15 @@ class CommunityInfo(object):
 
             overview_css_class = ''
 
-            if ( ICommunity.providedBy(self.request.context) and
-                 self.request.view_name in ['','view.html'] ):
+            if (ICommunity.providedBy(self.request.context) and
+                    self.request.view_name in ['', 'view.html']):
                 overview_css_class = 'curr'
                 found_current = True
 
             tabs = [
-                {'url':resource_url(self.context, self.request, 'view.html'),
-                 'css_class':overview_css_class,
-                 'name':'OVERVIEW'}
+                {'url': resource_url(self.context, self.request, 'view.html'),
+                 'css_class': overview_css_class,
+                 'name': 'OVERVIEW'}
                 ]
 
             for toolinfo in get_listitems(IToolFactory):
@@ -366,7 +365,7 @@ class CommunityInfo(object):
         return getattr(self.context, 'security_state', 'inherits') == 'public'
 
 
-class LetterManager(object): # abstract adapter class, requires iface attr
+class LetterManager(object):  # abstract adapter class, requires iface attr
     implements(ILetterManager)
 
     def __init__(self, context):
@@ -416,14 +415,13 @@ class LetterManager(object): # abstract adapter class, requires iface attr
                             'href': href,
                             'css_class': css_class,
                             'is_current': letter == current,
-                           })
+                            })
         letters.append({'name': 'Any',
                         'href': current is not None and
-                                    request.path_url or None,
-                        'css_class': current is None and
-                                        'current' or 'notcurrent',
+                                request.path_url or None,
+                        'css_class': current is None and 'current' or 'notcurrent',
                         'is_current': current is None,
-                       })
+                        })
         return letters
 
 
@@ -448,7 +446,7 @@ class PeopleReportLetterManager(object):
         # Use the lastnamestartswith index directly for speed.
         index = catalog['lastnamestartswith']
         filters = [(name, obj) for name, obj in report.items()
-                        if IPeopleReportFilter.providedBy(obj)]
+                   if IPeopleReportFilter.providedBy(obj)]
         if not filters:
             # Any letter in the index will suffice.  This is a fast
             # common case.
@@ -460,11 +458,10 @@ class PeopleReportLetterManager(object):
         for catid, filter in filters:
             if IPeopleReportCategoryFilter.providedBy(filter):
                 kw['category_%s' % str(catid)] = {'query': filter.values,
-                                                  'operator': 'or',
-                                                 }
+                                                  'operator': 'or'}
             elif IPeopleReportGroupFilter.providedBy(filter):
-                kw['groups'] =  {'query': filter.values,
-                                 'operator': 'or',
+                kw['groups'] = {'query': filter.values,
+                                'operator': 'or',
                                 }
         total, docids = catalog.search(**kw)
 
@@ -504,12 +501,10 @@ class PeopleReportLetterManager(object):
                 'is_current': letter == current,
                 })
         letters.append({'name': 'Any',
-                        'href': current is not None and
-                                    request.path_url or None,
-                        'css_class': current is None and
-                                        'current' or 'notcurrent',
+                        'href': current is not None and request.path_url or None,
+                        'css_class': current is None and 'current' or 'notcurrent',
                         'is_current': current is None,
-                       })
+                        })
 
         return letters
 
@@ -555,10 +550,8 @@ class PeopleReportMailinHandler(object):
         """
         mailinglist = self.context.get('mailinglist')
         if mailinglist is not None:
-            system_email_domain = get_setting(self.context,
-                                                "system_email_domain")
-            system_list_subdomain = get_setting(self.context,
-                                                "system_list_subdomain",
+            system_email_domain = get_setting(self.context, "system_email_domain")
+            system_list_subdomain = get_setting(self.context, "system_list_subdomain",
                                                 system_email_domain)
             reply_to = "%s@%s" % (mailinglist.short_address,
                                   system_list_subdomain)
@@ -616,6 +609,7 @@ class PGTextIndexContextualSummarizer(object):
             pieces.append('...')
         return ' '.join(pieces)
 
+
 class ZopeTextIndexContextualSummarizer(object):
     implements(IContextualSummarizer)
 
@@ -627,4 +621,3 @@ class ZopeTextIndexContextualSummarizer(object):
             return getattr(document, 'description')
         except AttributeError:
             return ''
-

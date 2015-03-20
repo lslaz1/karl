@@ -42,6 +42,7 @@ from karl.consts import cultures
 from karl.utils import asbool
 from karl.utils import find_site
 from karl.utils import get_settings
+from karl.utils import get_config_settings
 from karl.utils import support_attachments
 from karl.views.utils import convert_to_script
 
@@ -80,7 +81,8 @@ class TemplateAPI(object):
     _resources = None
 
     def __init__(self, context, request, page_title=None):
-        self.settings = get_settings() or {}
+        self.settings = dict(get_settings(context))
+        self.settings.update(get_config_settings())
         self.site = site = find_site(context)
         self.context = context
         self.request = request
@@ -111,7 +113,7 @@ class TemplateAPI(object):
                 full_static_path = full_static_path % self._start_time
             self.static_url = full_static_path
         self.page_title = page_title
-        self.system_name = self.settings.get('system_name', 'KARL')
+        self.system_name = self.title = self.settings.get('title', 'KARL')
         self.user_is_admin = 'group.KarlAdmin' in effective_principals(request)
         self.can_administer = has_permission('administer', site, request)
         self.can_email = has_permission('email', site, request)

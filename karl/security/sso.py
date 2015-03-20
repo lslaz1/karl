@@ -8,7 +8,7 @@ from pyramid.view import view_config
 
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import ICatalogSearch
-from karl.utils import find_users
+from karl.utils import find_users, get_setting
 from karl.views.login import remember_login
 
 resolve_dotted_name = DottedNameResolver(sys.modules[__name__]).resolve
@@ -78,7 +78,7 @@ def sso_login_success(context, request):
 
     return HTTPFound(request.resource_url(site, 'login.html', query={
         'reason': "Credentials from provider don't match credentials in %s" %
-        settings.get('system_name', 'KARL')}))
+        get_setting(context, 'title', 'KARL')}))
 
 
 @view_config(context='velruse.AuthenticationDenied')

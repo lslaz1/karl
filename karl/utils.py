@@ -103,6 +103,22 @@ def find_peopledirectory_catalog(context):
 
 
 def get_setting(context, setting_name, default=None):
+    site = find_site(context)
+    try:
+        return site.settings.get(setting_name, default)
+    except AttributeError:
+        return default
+
+
+def get_settings(context):
+    site = find_site(context)
+    try:
+        return site.settings
+    except AttributeError:
+        return {}
+
+
+def get_config_setting(setting_name, default=None):
     # Grab a setting from ISettings.  (context is ignored.)
     settings = queryUtility(ISettings)
     if settings is not None:
@@ -110,7 +126,7 @@ def get_setting(context, setting_name, default=None):
     return default
 
 
-def get_settings():
+def get_config_settings():
     return queryUtility(ISettings)
 
 

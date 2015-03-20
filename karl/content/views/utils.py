@@ -41,7 +41,8 @@ from karl.views.utils import make_unique_name
 
 def fetch_attachments(attachments_folder, request):
     return [getMultiAdapter((attachment, request), IFileInfo)
-                   for attachment in attachments_folder.values()]
+            for attachment in attachments_folder.values()]
+
 
 def upload_attachments(attachments, folder, creator, request):
     """ This creates *and removes* attachments based on information
@@ -55,13 +56,16 @@ def upload_attachments(attachments, folder, creator, request):
                 )
             folder[filename] = obj = create_content(
                 ICommunityFile,
-                title = filename,
-                stream = attachment.file,
-                mimetype = mimetype,
-                filename = filename,
-                creator = creator,
+                title=filename,
+                stream=attachment.file,
+                mimetype=mimetype,
+                filename=filename,
+                creator=creator,
                 )
-            max_size = int(get_setting(folder, 'upload_limit', 0))
+            try:
+                max_size = int(get_setting(folder, 'max_upload_size', 0))
+            except:
+                max_size = 0
             if max_size and obj.size > max_size:
                 msg = 'File size exceeds upload limit of %d.' % max_size
                 raise ValueError(msg)
@@ -83,6 +87,7 @@ def _find_view(context, request, name):
     except AttributeError:
         reg = get_current_registry()
     return reg.adapters.lookup(provides, IView, name=name)
+
 
 def get_previous_next(context, request, viewname=''):
 
@@ -122,16 +127,19 @@ def get_previous_next(context, request, viewname=''):
 
 _WIKI_WORDS = re.compile(r'[(][(]([^)]+)[)][)]')
 
+
 def _crack_words(text):
     text = text.strip()
     text = _WIKI_WORDS.sub(r'\1', text)
     for word in text.split():
         yield word.strip()
 
+
 def _crack_html_words(htmlstring):
     # Yield words from markup.
     for word in _crack_words(html2text(htmlstring)):
         yield word
+
 
 def extract_description(htmlstring):
     """ Get a summary-style description from the HTML in text field """
@@ -141,7 +149,7 @@ def extract_description(htmlstring):
     # listing and search results, for example.  So extract a
     # description from the HTML text.
 
-    summary_limit = 50 # number of "words"
+    summary_limit = 50  # number of "words"
 
     words = list(islice(_crack_html_words(htmlstring), summary_limit + 1))
     summary_list = words[0:summary_limit]
@@ -151,16 +159,19 @@ def extract_description(htmlstring):
 
     return summary
 
+
 def get_show_sendalert(context, request):
     show_sendalert = queryMultiAdapter((context, request), IShowSendalert)
     if show_sendalert is None:
         show_sendalert = DefaultShowSendalert(context, request)
     return show_sendalert.show_sendalert
 
+
 def sendalert_default(context, request):
     # See LP #1207987
     community = find_community(context)
     return getattr(community, 'sendalert_default', True)
+
 
 def split_lines(lines):
     """

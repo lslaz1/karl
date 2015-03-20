@@ -12,14 +12,14 @@ from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IObjectVersion
 from karl.scripting import create_karl_argparser
 from karl.utils import find_catalog
-from karl.utils import find_interface
 from karl.utils import find_repo
-from karl.utils import get_setting
+from karl.utils import get_config_setting
 
 Set = BTrees.family32.OI.Set
 
+
 def main(argv=sys.argv):
-    parser =  create_karl_argparser(description="Change creator of content.")
+    parser = create_karl_argparser(description="Change creator of content.")
     parser.add_argument('--batch-size', type=int, default=500,
                         help='Number of objects to initialize per transaction.')
     args = parser.parse_args(argv[1:])
@@ -92,7 +92,7 @@ def init_container(docid, path, repo, site):
         print "Updating container version for %s" % resource_path(context)
         user = getattr(context, 'creator', None)
         if user is None:
-            user = get_setting(context, 'system_user', 'admin')
+            user = get_config_setting('system_user', 'admin')
         repo.archive_container(container, user)
 
     context._p_deactivate()

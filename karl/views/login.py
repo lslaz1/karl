@@ -38,6 +38,7 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import get_config_setting
 from karl.utils import make_random_code
 from karl.utils import strings_differ
 from karl.models.interfaces import ICatalogSearch
@@ -119,7 +120,7 @@ def login_view(context, request):
     if try_kerberos:
         try_kerberos = asbool(try_kerberos)
     else:
-        try_kerberos = asbool(get_setting(context, 'kerberos', 'False'))
+        try_kerberos = asbool(get_config_setting('kerberos', 'False'))
     if try_kerberos:
         from karl.security.kerberos_auth import get_kerberos_userid
         userid = get_kerberos_userid(request)
@@ -131,7 +132,7 @@ def login_view(context, request):
             try_kerberos = False
 
     # Per #366377, don't say what screen
-    page_title = 'Login to %s' % context.title
+    page_title = 'Login to %s' % get_setting(context, 'title')
     api = TemplateAPI(context, request, page_title)
 
     sso_providers = []
@@ -185,7 +186,7 @@ def logout_view(context, request, reason='Logged out'):
     site_url = resource_url(site, request)
     request.session['came_from'] = site_url
     query = {'reason': reason}
-    if asbool(get_setting(context, 'kerberos', 'False')):
+    if asbool(get_config_setting('kerberos', 'False')):
         # If user explicitly logs out, don't try to log back in immediately
         # using kerberos.
         query['try_kerberos'] = 'False'

@@ -20,7 +20,7 @@
 from karl.utilities.interfaces import ISpellChecker
 from karl.utilities.spelling import SpellChecker
 from karl.utilities.spelling import SpellCheckError
-from karl.utils import get_setting
+from karl.utils import get_config_setting
 from simplejson import JSONDecoder
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -83,8 +83,8 @@ def _make_tinymce_response(result=[], id=None, error=None):
 
 def _get_aspell_settings(context):
     D = {}
-    D['executable'] = get_setting(context, 'aspell_executable', 'aspell')
-    D['max_words'] = int(get_setting(context, 'aspell_max_words', 5000))
-    langs_csv = get_setting(context, 'aspell_languages', 'en')
+    D['executable'] = get_config_setting('aspell_executable', 'aspell')
+    D['max_words'] = int(get_config_setting('aspell_max_words', 5000))
+    langs_csv = get_config_setting('aspell_languages', 'en')
     D['languages'] = [x.strip() for x in langs_csv.split(',')]
     return D

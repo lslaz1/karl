@@ -20,6 +20,8 @@ import unittest
 from pyramid import testing
 
 import karl.testing
+from karl.testing import makeRoot
+
 
 class TestLoginView(unittest.TestCase):
     def setUp(self):
@@ -34,7 +36,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest(session={'came_from':'/login.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'], 'http://example.com/')
@@ -43,7 +45,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_login_html_absolute(self):
         request = testing.DummyRequest(session={'came_from':
                                             'http://example.com/login.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'], 'http://example.com/')
@@ -51,7 +53,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_endswith_logout_html_relative(self):
         request = testing.DummyRequest(session={'came_from':'/logout.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'], 'http://example.com/')
@@ -60,7 +62,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_endswith_logout_html_absolute(self):
         request = testing.DummyRequest(session={'came_from':
                                             'http://example.com/logout.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'], 'http://example.com/')
@@ -68,7 +70,7 @@ class TestLoginView(unittest.TestCase):
 
     def test_GET_came_from_other_relative(self):
         request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'],
@@ -78,7 +80,7 @@ class TestLoginView(unittest.TestCase):
     def test_GET_came_from_other_absolute(self):
         request = testing.DummyRequest(session={'came_from':
                                          'http://example.com/somewhere.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
         self.assertEqual(request.session['came_from'],
@@ -88,7 +90,7 @@ class TestLoginView(unittest.TestCase):
     @mock.patch('karl.views.login.forget')
     def test_GET_forget_headers_when_auth_tkt_not_None(self, forget):
         request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
-        context = testing.DummyModel()
+        context = makeRoot()
         karl.testing.registerDummyRenderer('templates/login.pt')
         forget.return_value = [('a', '1')]
         response = self._callFUT(context, request)
@@ -102,7 +104,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['password'] = 'password'
-        context = testing.DummyModel()
+        context = makeRoot()
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com/login.html')
@@ -112,7 +114,7 @@ class TestLoginView(unittest.TestCase):
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
-        context = testing.DummyModel()
+        context = makeRoot()
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com/login.html')
@@ -131,7 +133,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'wrongpassword'
-        context = testing.DummyModel()
+        context = makeRoot()
         context.users = DummyUsers()
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
@@ -150,7 +152,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
-        context = testing.DummyModel()
+        context = makeRoot()
         context.users = DummyUsers()
         context.settings = {}
         context['profiles'] = testing.DummyModel()
@@ -174,7 +176,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
         request.POST['max_age'] = u'100'
-        context = testing.DummyModel()
+        context = makeRoot()
         context.users = DummyUsers()
         context.settings = {}
         remember.return_value = [('Faux-Header', 'Faux-Value')]
@@ -193,7 +195,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'admin:admin'
-        context = testing.DummyModel()
+        context = makeRoot()
         context.users = DummyUsers()
         context.settings = {}
         remember.return_value = [('Faux-Header', 'Faux-Value')]
@@ -212,7 +214,7 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'admin:admin'
-        context = testing.DummyModel()
+        context = makeRoot()
         context.users = DummyUsers()
         context.settings = {}
         del context.users.data['admin']
@@ -243,7 +245,7 @@ class TestLogoutView(unittest.TestCase):
         request = testing.DummyRequest()
         plugin = DummyAuthenticationPlugin()
         request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
-        context = testing.DummyModel()
+        context = makeRoot()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')
         headers = dict(response.headers)
@@ -255,7 +257,7 @@ class TestLogoutView(unittest.TestCase):
 
     def test_w_explicit_reason(self):
         request = testing.DummyRequest()
-        context = testing.DummyModel()
+        context = makeRoot()
         response = self._callFUT(context, request, reason='testing')
         self.assertEqual(response.status, '302 Found')
         headers = dict(response.headers)

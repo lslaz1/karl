@@ -26,6 +26,8 @@ from pyramid.threadlocal import get_current_registry
 
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import IProfile
+from karl.models.interfaces import ISite
+from pyramid.interfaces import ILocation
 
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
@@ -309,6 +311,7 @@ class DummyProfile(DummyModel):
 
 
 class DummyRoot(DummyModel):
+    implements(ISite, ILocation)
     def __init__(self):
         DummyModel.__init__(self)
         self[u'profiles'] = DummyModel()
@@ -320,18 +323,25 @@ class DummyRoot(DummyModel):
         for dummy in dummies:
             self[u'profiles'][dummy[0]] = DummyModel(title=dummy[1])
         self[u'communities'] = DummyModel()
+        from karl.models.site import Site
+        self.settings = Site._default_settings.copy()
+        self.settings.update({
+            'title': 'karl3test',
+            'system_email_domain': "karl3.example.com",
+            'admin_email': 'admin@example.com',
+            'min_pw_length': 8,
+            'site_url': "http://offline.example.com/app",
+            'selectable_groups': 'group.KarlAdmin group.KarlLovers',
+            'system_list_subdomain': 'karl3.example.com'
+            })
+        self.sessions = DummySessions()
 
 
 class DummySettings(dict):
     reload_templates = True
-    system_name = "karl3test"
     system_email_domain = "karl3.example.com"
-    min_pw_length = 8
-    admin_email = 'admin@example.com'
     staff_change_password_url = 'http://pw.example.com'
     forgot_password_url = 'http://login.example.com/resetpassword'
-    offline_app_url = "http://offline.example.com/app"
-    selectable_groups = 'group.KarlAdmin group.KarlLovers'
 
     def __init__(self, **kw):
         for k, v in self.__class__.__dict__.items():
@@ -650,3 +660,26 @@ def registerSettings(**kw):
     settings = DummySettings(**kw)
     registry.settings = settings
     registerUtility(settings, ISettings)
+
+
+def makeContext(**kw):
+    from pyramid.testing import DummyModel
+    return DummyModel(**kw)
+
+
+def makeRoot():
+    from zope.interface import directlyProvides
+    from karl.models.site import Site
+    context = makeContext(list_aliases={}, sessions=DummySessions())
+    directlyProvides(context, ISite)
+    context.settings = Site._default_settings.copy()
+    context.settings.update({
+        'title': 'karl3test',
+        'system_email_domain': "karl3.example.com",
+        'admin_email': 'admin@example.com',
+        'min_pw_length': 8,
+        'site_url': "http://offline.example.com/app",
+        'selectable_groups': 'group.KarlAdmin group.KarlLovers',
+        'system_list_subdomain': 'karl3.example.com'
+    })
+    return context

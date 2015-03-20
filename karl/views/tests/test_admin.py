@@ -5,6 +5,8 @@ import unittest
 
 from pyramid import testing
 from karl import testing as karltesting
+from karl.testing import makeRoot
+
 
 class TestAdminView(unittest.TestCase):
     def setUp(self):
@@ -434,7 +436,7 @@ class TestEmailUsersView(unittest.TestCase):
         self.mailer = karltesting.DummyMailer()
         karltesting.registerUtility(self.mailer, IMailDelivery)
 
-        site = self.site = testing.DummyModel()
+        site = self.site = makeRoot()
         profiles = site['profiles'] = testing.DummyModel()
         users = site.users = karltesting.DummyUsers()
         fred = profiles['fred'] = testing.DummyModel(

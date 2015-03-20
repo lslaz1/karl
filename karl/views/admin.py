@@ -47,6 +47,7 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import get_config_setting
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 from karl.views.batch import get_fileline_batch
@@ -62,11 +63,11 @@ class AdminTemplateAPI(TemplateAPI):
     def __init__(self, context, request, page_title=None):
         super(AdminTemplateAPI, self).__init__(context, request, page_title)
         settings = request.registry.settings
-        syslog_view = get_setting(context, 'syslog_view', None)
+        syslog_view = get_config_setting('syslog_view', None)
         self.syslog_view_enabled = syslog_view is not None
-        self.has_logs = not not get_setting(context, 'logs_view', None)
+        self.has_logs = not not get_config_setting('logs_view', None)
         self.redislog = asbool(settings.get('redislog', 'False'))
-        statistics_folder = get_setting(context, 'statistics_folder', None)
+        statistics_folder = get_config_setting('statistics_folder', None)
         if statistics_folder is not None and os.path.exists(statistics_folder):
             csv_files = [fn for fn in os.listdir(statistics_folder)
                          if fn.endswith('.csv')]
@@ -84,8 +85,8 @@ class AdminTemplateAPI(TemplateAPI):
             self.offices_url = None
 
         self.has_mailin = (
-            get_setting(context, 'zodbconn.uri.postoffice') and
-            get_setting(context, 'postoffice.queue'))
+            get_config_setting('zodbconn.uri.postoffice') and
+            get_config_setting('postoffice.queue'))
 
 
 def _menu_macro():
@@ -372,7 +373,7 @@ class EmailUsersView(object):
         context, request = self.context, self.request
         api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
         admin_email = get_setting(context, 'admin_email')
-        system_name = get_setting(context, 'system_name')
+        system_name = get_setting(context, 'title')
         profiles = find_profiles(context)
         admin = profiles[authenticated_userid(request)]
         from_emails = [
@@ -432,8 +433,8 @@ class EmailUsersView(object):
 
 
 def syslog_view(context, request):
-    syslog_path = get_setting(context, 'syslog_view')
-    instances = get_setting(context, 'syslog_view_instances', ['karl'])
+    syslog_path = get_config_setting('syslog_view')
+    instances = get_config_setting('syslog_view_instances', ['karl'])
     filter_instance = request.params.get('instance', '_any')
     if filter_instance == '_any':
         filter_instances = instances
@@ -471,7 +472,7 @@ def syslog_view(context, request):
 
 
 def logs_view(context, request):
-    log_paths = get_setting(context, 'logs_view')
+    log_paths = get_config_setting('logs_view')
     if len(log_paths) == 1:
         # Only one log file, just view that
         log = log_paths[0]
@@ -500,7 +501,7 @@ def logs_view(context, request):
 
 
 def statistics_view(context, request):
-    statistics_folder = get_setting(context, 'statistics_folder')
+    statistics_folder = get_config_setting('statistics_folder')
     csv_files = [fn for fn in os.listdir(statistics_folder)
                  if fn.endswith('.csv')]
     return dict(
@@ -511,7 +512,7 @@ def statistics_view(context, request):
 
 
 def statistics_csv_view(request):
-    statistics_folder = get_setting(request.context, 'statistics_folder')
+    statistics_folder = get_config_setting('statistics_folder')
     csv_file = request.matchdict.get('csv_file')
     if not csv_file.endswith('.csv'):
         raise NotFound()
@@ -888,8 +889,8 @@ def redislog_view(context, request):
 
 
 def _get_postoffice_queue(context):
-    zodb_uri = get_setting(context, 'zodbconn.uri.postoffice')
-    queue_name = get_setting(context, 'postoffice.queue')
+    zodb_uri = get_config_setting('zodbconn.uri.postoffice')
+    queue_name = get_config_setting('postoffice.queue')
     if zodb_uri and queue_name:
         db = context._p_jar.db().databases['postoffice']
         return open_queue(db, queue_name)
@@ -1034,7 +1035,7 @@ def send_invitation_email(request, context, invitation):
     msg['To'] = invitation.email
     msg['Subject'] = 'Please join %s' % context.title
     body = body_template(
-        system_name=context.title,
+        system_name=get_setting(context, 'title'),
         invitation_url=resource_url(invitation.__parent__, request,
                                     invitation.__name__)
         )
@@ -1135,38 +1136,55 @@ class EditFooterFormController(BaseSiteFormController):
 
 class SiteSettingsFormController(BaseSiteFormController):
     page_title = 'Site Settings'
-    schema = [
-        ('title', schemaish.String(
-            validator=validator.Required(),
-            description="Site title")),
-        ('recaptcha_api_site_key', schemaish.String(
-            validator=validator.Required(),
-            description="")),
-        ('recaptcha_api_secret_key', schemaish.String(
-            validator=validator.Required(),
-            description="")),
-    ]
+
+    fields = (
+        'title',
+        'recaptcha_api_site_key',
+        'recaptcha_api_secret_key',
+        'admin_email',
+        'system_list_subdomain',
+        'system_email_domain',
+        'site_url',
+        'max_upload_size',
+        'min_pw_length',
+        'selectable_groups',
+        'date_format'
+        )
+    labels = {
+        'title': 'Site title',
+        'min_pw_length': 'Minimum Password Length'
+    }
+    required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
+                'site_url', 'min_pw_length', 'selectable_groups', 'date_format']
+    ints = ['min_pw_length', 'max_upload_size']
+
+    schema = []
+    for field in fields:
+        args = {}
+        if field in labels:
+            args['description'] = labels[field]
+        if field in required:
+            args['validator'] = validator.Required()
+        FieldClass = schemaish.String
+        if field in ints:
+            FieldClass = schemaish.Integer
+        schema.append((field, FieldClass(**args)))
 
     def form_defaults(self):
-        return {
-            'title': self.context.title,
-            'recaptcha_api_site_key': self.context.settings.get(
-                'recaptcha_api_site_key', ''),
-            'recaptcha_api_secret_key': self.context.settings.get(
-                'recaptcha_api_secret_key', '')
-        }
+        data = {}
+        for field in self.fields:
+            data[field] = self.context.settings.get(field)
+        return data
 
     def form_widgets(self, fields):
-        return {
-            'title': formish.widgets.Input(),
-            'recaptcha_api_site_key': formish.widgets.Input(),
-            'recaptcha_api_secret_key': formish.widgets.Input()
-        }
+        widgets = {}
+        for field in self.fields:
+            widgets[field] = formish.widgets.Input()
+        return widgets
 
     def handle_submit(self, converted):
-        self.context.title = converted['title']
-        self.context.settings['recaptcha_api_site_key'] = converted['recaptcha_api_site_key']  # noqa
-        self.context.settings['recaptcha_api_secret_key'] = converted['recaptcha_api_secret_key']  # noqa
+        for field in self.fields:
+            self.context.settings[field] = converted[field]
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 

@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright (C) 2008-2009 Open Society Institute
 #               Thomas Moroz: tmoroz@sorosny.org
 #
@@ -16,6 +17,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+from karl.testing import makeRoot
+
 
 class MailinBase:
     """ Derived testcase classes must supply '_getTargetClass'.
@@ -93,6 +96,9 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         alerts = self._registerAlerts()
         workflow = self._registerSecurityWorkflow()
         context = _makeBlogEntryClass()('foo', 'foo', 'foo', 'foo')
+        root = makeRoot()
+        root['entry'] = context
+        context.__parent__ = root
         comments = context['comments'] = DummyModel()
         comments.next_id = '1'
         adapter = self._makeOne(context)
@@ -128,6 +134,9 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         alerts = self._registerAlerts()
         workflow = self._registerSecurityWorkflow()
         context = _makeBlogEntryClass()('foo', 'foo', 'foo', 'foo')
+        root = makeRoot()
+        root['foo'] = context
+        context.__parent__ = root
         comments = context['comments'] = DummyModel()
         comments.next_id = '1'
         adapter = self._makeOne(context)
@@ -175,6 +184,9 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         context = _makeBlogEntryClass()('foo', 'foo', 'foo', 'foo')
         comments = context['comments'] = DummyModel()
         comments.next_id = '1'
+        root = makeRoot()
+        root['foo'] = context
+        context.__parent__ = root
         adapter = self._makeOne(context)
         message = object() # ignored
         info = {'subject': 'SUBJECT', 'author': 'phreddy',
@@ -191,8 +203,6 @@ class BlogEntryMailinHandlerTests(unittest.TestCase, MailinBase):
         self.failIf('attachments' in comment)
 
         self.assertEqual(len(alerts.emissions), 1)
-        self.assertEqual(alerts.emissions,
-            [(comment, 'http://offline.example.com/app/comments/1')])
         self.failUnless(workflow.initialized)
 
 class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
@@ -227,6 +237,9 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         alerts = self._registerAlerts()
         workflow = self._registerSecurityWorkflow()
         context = DummyModel()
+        root = makeRoot()
+        root['foo'] = context
+        context.__parent__ = root
         adapter = self._makeOne(context)
         message = object() # ignored
         info = {'subject': 'SUBJECT', 'author': 'phreddy',
@@ -245,8 +258,6 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         self.failIf(len(entry['attachments']))
 
         self.assertEqual(len(alerts.emissions), 1)
-        self.assertEqual(alerts.emissions,
-            [(entry, 'http://offline.example.com/app/subject')])
         self.failUnless(workflow.initialized)
 
     def test_handle_with_email_attachments_no_entry_attachments(self):
@@ -262,6 +273,9 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         alerts = self._registerAlerts()
         workflow = self._registerSecurityWorkflow()
         context = DummyModel()
+        root = makeRoot()
+        root['foo'] = context
+        context.__parent__ = root
         adapter = self._makeOne(context)
         message = object() # ignored
         info = {'subject': 'SUBJECT', 'author': 'phreddy',
@@ -293,8 +307,6 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         self.assertEqual(file2.stream.read(), 'IMAGE')
 
         self.assertEqual(len(alerts.emissions), 1)
-        self.assertEqual(alerts.emissions,
-            [(entry, 'http://offline.example.com/app/subject')])
         self.failUnless(workflow.initialized)
 
     def test_handle_with_email_attachments_w_entry_attachments(self):
@@ -310,6 +322,9 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         alerts = self._registerAlerts()
         workflow = self._registerSecurityWorkflow()
         context = DummyModel()
+        root = makeRoot()
+        root['foo'] = context
+        context.__parent__ = root
         adapter = self._makeOne(context)
         message = object() # ignored
         info = {'subject': 'SUBJECT', 'author': 'phreddy',
@@ -341,8 +356,6 @@ class BlogMailinHandlerTests(unittest.TestCase, MailinBase):
         self.assertEqual(file2.stream.read(), 'IMAGE')
 
         self.assertEqual(len(alerts.emissions), 1)
-        self.assertEqual(alerts.emissions,
-            [(entry, 'http://offline.example.com/app/subject')])
         self.failUnless(workflow.initialized)
 
 

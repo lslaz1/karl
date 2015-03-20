@@ -56,8 +56,8 @@ def get_tags_client_data(context, request):
     # provide client data for rendering current tags in the tagbox.
     tagquery = getMultiAdapter((context, request), ITagQuery)
     tags_field = dict(
-        records = tagquery.tagswithcounts,
-        docid = tagquery.docid,
+        records=tagquery.tagswithcounts,
+        docid=tagquery.docid,
         )
     return tags_field
 
@@ -75,11 +75,12 @@ def add_tags(context, request, values):
         docid = catalog.document_map.docid_for_address(path)
         username = authenticated_userid(request)
         tags = find_tags(context)
-        if tags is not None: # testing
+        if tags is not None:  # testing
             new = list(tags.getTags(items=(docid,), users=(username,)))
             new.extend(values)
             tags.update(item=docid, user=username, tags=new)
             catalog.reindex_doc(docid, context)
+
 
 def del_tags(context, request, values):
     """ Delete the specified tags.
@@ -93,6 +94,7 @@ def del_tags(context, request, values):
         tags.delete(item=docid, user=username, tag=tag)
         catalog.reindex_doc(docid, context)
 
+
 def set_tags(context, request, values):
     """ Set the specified tags, previously removing any existing tags.
     """
@@ -103,7 +105,7 @@ def set_tags(context, request, values):
     catalog = find_catalog(context)
     docid = catalog.document_map.docid_for_address(path)
     tags = find_tags(context)
-    if tags is not None: # testing
+    if tags is not None:  # testing
         tags.update(item=docid, user=username, tags=values)
         catalog.reindex_doc(docid, context)
 
@@ -123,8 +125,10 @@ def jquery_tag_search_view(context, request):
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
 
+
 def _validate_tag(tag):
     return re_tag.match(tag)
+
 
 def jquery_tag_add_view(context, request):
     value = request.params['val'].strip()
@@ -137,11 +141,13 @@ def jquery_tag_add_view(context, request):
         status['error'] = 'Adding tag failed, it contains illegal characters.'
     return status
 
+
 def jquery_tag_del_view(context, request):
     value = request.params['val'].strip()
     value = value.decode('utf')
     del_tags(context, request, [value])
     return {}
+
 
 def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""
@@ -213,7 +219,7 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
                 tuh = '%s people' % len(users)
 
             tuhref = resource_url(context, request, 'tagusers.html',
-                               query={'tag': tag, 'docid': docid})
+                                  query={'tag': tag, 'docid': docid})
             entry = {
                 'title': resource.title,
                 'description': getattr(resource, 'description', ''),
@@ -233,11 +239,12 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
 
     if crumb_title:
         # XXX Would context.title be a bit nicer for displaying to user?
-        system_name = get_setting(context, 'system_name', 'KARL')
+        system_name = get_setting(context, 'title', 'KARL')
         args['crumbs'] = '%s / %s / %s' % (
             system_name, crumb_title, context.__name__)
 
     return dict(**args)
+
 
 def community_showtag_view(context, request):
     """Show a page for a particular community tag."""
@@ -245,11 +252,13 @@ def community_showtag_view(context, request):
                         community=context.__name__,
                         crumb_title='Communities')
 
+
 def profile_showtag_view(context, request):
     """Show a page for a particular user tag."""
     return showtag_view(context, request,
                         user=context.__name__,
                         crumb_title='Profiles')
+
 
 def norm(factor, stddev):
     if factor >= 2 * stddev:
@@ -268,6 +277,7 @@ def norm(factor, stddev):
         weight = 1
     return weight
 
+
 def _calculateTagWeights(taglist):
     if not taglist:
         return taglist
@@ -275,9 +285,9 @@ def _calculateTagWeights(taglist):
     for tag in taglist:
         counts.append(tag['count'])
     count = len(taglist)
-    total = reduce(lambda x, y: x+ y, counts)
+    total = reduce(lambda x, y: x + y, counts)
     mean = total/count
-    var = reduce(lambda x,y: x + math.pow(y-mean, 2), counts, 0)/count
+    var = reduce(lambda x, y: x + math.pow(y-mean, 2), counts, 0)/count
     stddev = math.sqrt(var)
     for t in taglist:
         factor = (t['count'] - mean)
@@ -285,14 +295,14 @@ def _calculateTagWeights(taglist):
         t['class'] = 'tagweight%d' % weight
     return taglist
 
+
 def tag_cloud_view(context, request):
     page_title = 'Tag Cloud'
     api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]} for x in tags.getCloud()]
-        limited = list(reversed(sorted(cloud, key=lambda x: x['count']))
-                      )[:100]
+        limited = list(reversed(sorted(cloud, key=lambda x: x['count'])))[:100]
         entries = sorted(_calculateTagWeights(limited),
                          key=lambda x: x['name'])
     else:
@@ -303,21 +313,21 @@ def tag_cloud_view(context, request):
         entries=entries,
         )
 
+
 def community_tag_cloud_view(context, request):
     page_title = 'Tag Cloud'
     api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]}
-                    for x in tags.getCloud(community=context.__name__)]
-        limited = list(reversed(sorted(cloud, key=lambda x: x['count']))
-                      )[:100]
+                 for x in tags.getCloud(community=context.__name__)]
+        limited = list(reversed(sorted(cloud, key=lambda x: x['count'])))[:100]
         entries = sorted(_calculateTagWeights(limited),
                          key=lambda x: x['name'])
     else:
         entries = ()
 
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     return dict(
         api=api,
         entries=entries,
@@ -352,10 +362,10 @@ def community_tag_listing_view(context, request):
         entries = ()
     else:
         entries = [{'name': x[0], 'count': x[1]}
-                        for x in tags.getFrequency(community=context.__name__)]
+                   for x in tags.getFrequency(community=context.__name__)]
         entries.sort(key=lambda x: x['name'])
 
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     return dict(
         api=api,
         entries=entries,
@@ -374,17 +384,17 @@ def profile_tag_listing_view(context, request):
     else:
         names = tags.getTags(users=(context.__name__,))
         entries = [{'name': x[0], 'count': x[1]}
-                        for x in tags.getFrequency(names,
-                                                   user=context.__name__)]
+                   for x in tags.getFrequency(names, user=context.__name__)]
         entries.sort(key=lambda x: x['name'])
 
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     return dict(
         api=api,
         entries=entries,
         scope='site',
         crumbs='%s / Profiles / %s' % (system_name, context.__name__),
         )
+
 
 def tag_users_view(context, request):
     page_title = 'Tag Users'
@@ -410,11 +420,11 @@ def tag_users_view(context, request):
             profile = profiles[userid]
             fullname = profile.firstname + ' ' + profile.lastname
             also = [x for x in tags.getTags(items=[docid], users=[userid])
-                         if x != tag]
+                    if x != tag]
             users.append({'login': userid,
                           'fullname': fullname,
                           'also': also,
-                         })
+                          })
 
     else:
         users = ()
@@ -426,6 +436,7 @@ def tag_users_view(context, request):
         title=target.title,
         users=users,
         )
+
 
 def community_tag_users_view(context, request):
     page_title = 'Tag Users'
@@ -453,11 +464,11 @@ def community_tag_users_view(context, request):
             fullname = profile.firstname + ' ' + profile.lastname
             also = [x for x in tags.getTags(items=[docid], users=[userid],
                                             community=context.__name__)
-                         if x != tag]
+                    if x != tag]
             users.append({'login': userid,
                           'fullname': fullname,
                           'also': also,
-                         })
+                          })
 
     else:
         users = ()
@@ -472,6 +483,7 @@ def community_tag_users_view(context, request):
 
 
 re_tag = re.compile(r"^[a-zA-Z0-9\.\-_]+$")
+
 
 def manage_tags_view(context, request):
     page_title = 'Manage Tags'

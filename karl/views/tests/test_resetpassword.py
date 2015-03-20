@@ -23,15 +23,15 @@ from pyramid.threadlocal import get_current_registry
 from karl.testing import DummySessions
 
 import karl.testing
+from karl.testing import makeRoot
+
 
 class ResetRequestFormControllerTests(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
         from karl.testing import registerSettings
         registerSettings()
-        from karl.models.interfaces import ISite
-        site = testing.DummyModel(sessions=DummySessions())
-        directlyProvides(site, ISite)
+        site = makeRoot()
         self.context = site
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'

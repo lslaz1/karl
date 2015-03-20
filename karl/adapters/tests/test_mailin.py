@@ -1,6 +1,7 @@
 import unittest
 from pyramid import testing
 
+
 class MailinDispatcherTests(unittest.TestCase):
 
     def setUp(self):
@@ -41,7 +42,13 @@ class MailinDispatcherTests(unittest.TestCase):
         return DummyModel(**kw)
 
     def _makeRoot(self):
-        return self._makeContext(list_aliases={})
+        from karl.models.interfaces import ISite
+        from zope.interface import directlyProvides
+        from karl.models.site import Site
+        context = self._makeContext(list_aliases={})
+        directlyProvides(context, ISite)
+        context.settings = Site._default_settings
+        return context
 
     def test_class_conforms_to_IMailinDispatcher(self):
         from zope.interface.verify import verifyClass
@@ -70,12 +77,10 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne()
         message = DummyMessage()
         message.get_all = lambda name: ['Phred Bloggs <phreddy@example.com>',
-                                        'Sally Port <sally@example.com>',
-                                       ]
+                                        'Sally Port <sally@example.com>']
         self.assertEqual(list(mailin.getAddrList(message, 'To')),
                          [('Phred Bloggs', 'phreddy@example.com'),
-                          ('Sally Port', 'sally@example.com'),
-                         ])
+                          ('Sally Port', 'sally@example.com')])
 
     def test_isCommunity_nonesuch(self):
         context = self._makeRoot()
@@ -442,7 +447,7 @@ class MailinDispatcherTests(unittest.TestCase):
         context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
-        section = pd['section'] = self._makeContext()
+        pd['section'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('peopledir-section+nonesuch-12345@example.com',)
@@ -488,7 +493,7 @@ class MailinDispatcherTests(unittest.TestCase):
         context = self._makeRoot()
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
-        section = pd['section'] = self._makeContext()
+        pd['section'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
         message.to = ('peopledir-section+nonesuch@example.com',)
@@ -554,14 +559,11 @@ class MailinDispatcherTests(unittest.TestCase):
         self.failIf(info.get('in_reply_to'), info)
 
     def test_getMessageTarget_report_alias_doesnt_shadow_community(self):
-        from pyramid.interfaces import ISettings
         from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        from karl.testing import registerUtility
-        settings = dict(system_list_subdomain = 'lists.example.com')
-        registerUtility(settings, ISettings)
         context = self._makeRoot()
+        context.settings['system_list_subdomain'] = 'lists.example.com'
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         pd = context['people'] = self._makeContext()
@@ -586,14 +588,11 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['in_reply_to'], None)
 
     def test_getMessageTarget_report_alias_w_subdomain(self):
-        from pyramid.interfaces import ISettings
         from pyramid.traversal import resource_path
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleDirectory
-        from karl.testing import registerUtility
-        settings = dict(system_list_subdomain = 'lists.example.com')
-        registerUtility(settings, ISettings)
         context = self._makeRoot()
+        context.settings['system_list_subdomain'] = 'lists.example.com'
         cf = context['communities'] = self._makeContext()
         cf['testing'] = self._makeContext()
         pd = context['people'] = self._makeContext()
@@ -626,8 +625,7 @@ class MailinDispatcherTests(unittest.TestCase):
         mailin = self._makeOne()
         message = DummyMessage()
         message.from_ = ('member1@example.com',
-                         'member2@example.com',
-                        )
+                         'member2@example.com')
         info = mailin.getMessageAuthorAndSubject(message)
         self.assertEqual(info['error'], 'multiple From:')
 
@@ -691,7 +689,7 @@ class MailinDispatcherTests(unittest.TestCase):
         community = communities['testcommunity'] = self._makeContext()
         community['testtool'] = self._makeContext()
         users = context.users = DummyUsers()
-        userinfo = users._by_id['phred'] = {}
+        users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
                 'targets': [{
@@ -716,7 +714,7 @@ class MailinDispatcherTests(unittest.TestCase):
         community = communities['testcommunity'] = self._makeContext()
         community['testtool'] = self._makeContext()
         users = context.users = DummyUsers()
-        userinfo = users._by_id['phred'] = {}
+        users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
                 'targets': [{
@@ -724,7 +722,7 @@ class MailinDispatcherTests(unittest.TestCase):
                     'tool': 'testtool',
                     'report': None,
                 }]
-               }
+                }
         mailin.checkPermission(info)
         self.failIf('error' in info['targets'][0])
 
@@ -738,9 +736,9 @@ class MailinDispatcherTests(unittest.TestCase):
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
-        report = section['report'] = self._makeContext()
+        section['report'] = self._makeContext()
         users = context.users = DummyUsers()
-        userinfo = users._by_id['phred'] = {}
+        users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
                 'targets': [{
@@ -748,7 +746,7 @@ class MailinDispatcherTests(unittest.TestCase):
                     'tool': None,
                     'report': 'section+report',
                 }]
-               }
+                }
         mailin.checkPermission(info)
         self.assertEqual(info['targets'][0]['error'], 'Permission Denied')
 
@@ -762,9 +760,9 @@ class MailinDispatcherTests(unittest.TestCase):
         pd = context['people'] = self._makeContext()
         directlyProvides(pd, IPeopleDirectory)
         section = pd['section'] = self._makeContext()
-        report = section['report'] = self._makeContext()
+        section['report'] = self._makeContext()
         users = context.users = DummyUsers()
-        userinfo = users._by_id['phred'] = {}
+        users._by_id['phred'] = {}
         mailin = self._makeOne(context)
         info = {'author': 'phred',
                 'targets': [{
@@ -772,7 +770,7 @@ class MailinDispatcherTests(unittest.TestCase):
                     'tool': None,
                     'report': 'section+report',
                 }]
-               }
+                }
         mailin.checkPermission(info)
         self.failIf('error' in info['targets'][0])
 
@@ -812,7 +810,7 @@ class MailinDispatcherTests(unittest.TestCase):
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         community = cf['testing'] = self._makeContext()
-        tool = community['default'] = self._makeContext()
+        community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -845,7 +843,7 @@ class MailinDispatcherTests(unittest.TestCase):
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         community = cf['testing'] = self._makeContext()
-        tool = community['default'] = self._makeContext()
+        community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -871,7 +869,7 @@ class MailinDispatcherTests(unittest.TestCase):
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         community = cf['testing'] = self._makeContext()
-        tool = community['default'] = self._makeContext()
+        community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -894,7 +892,7 @@ class MailinDispatcherTests(unittest.TestCase):
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         community = cf['testing'] = self._makeContext()
-        tool = community['default'] = self._makeContext()
+        community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -927,7 +925,7 @@ class MailinDispatcherTests(unittest.TestCase):
         pf.getProfileByEmail = lambda email: by_email.get(email)
         cf = context['communities'] = self._makeContext()
         community = cf['testing'] = self._makeContext()
-        tool = community['default'] = self._makeContext()
+        community['default'] = self._makeContext()
         mailin = self._makeOne(context)
         mailin.default_tool = 'default'
         message = DummyMessage()
@@ -1198,7 +1196,7 @@ class MailinDispatcherTests(unittest.TestCase):
         forwarded = DummyMessage()
         forwarded.payload = None
         forwarded.filename = "Re: prune script testing."
-        forwarded.content_type='message/rfc822; name="Re: prune script..."'
+        forwarded.content_type = 'message/rfc822; name="Re: prune script..."'
         textpart = DummyMessage()
         textpart.payload = 'payload'
         textpart.charset = 'rot13'

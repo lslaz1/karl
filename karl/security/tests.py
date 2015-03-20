@@ -8,6 +8,8 @@ try:
 except ImportError:
     import unittest
 
+from karl.models.interfaces import ISite
+
 
 class TestACLPathCache(unittest.TestCase):
 
@@ -1035,6 +1037,8 @@ class TestSSOLoginSuccess(unittest.TestCase):
         self.site = request.registry.queryUtility.return_value.return_value = \
             testing.DummyResource(users=mock.Mock())
         self.context = mock.Mock()
+        from zope.interface import directlyProvides
+        directlyProvides(self.context, ISite)
         self.context.profile = {}
 
     def call_fut(self):

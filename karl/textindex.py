@@ -1,4 +1,4 @@
-from karl.utils import get_setting
+from karl.utils import get_config_setting
 
 try:
     from repoze.pgtextindex import PGTextIndex
@@ -37,7 +37,7 @@ class KarlPGTextIndex(PGTextIndex):
     def dsn(self):
         dsn = self._v_dsn
         if dsn is None:
-            dsn = get_setting(self, 'pgtextindex.dsn')
+            dsn = get_config_setting('pgtextindex.dsn')
             if dsn is None:
                 raise ValueError("Missing setting: pgtextindex.dsn")
             self._v_dsn = dsn
@@ -47,7 +47,7 @@ class KarlPGTextIndex(PGTextIndex):
     def table(self):
         table = self._v_table
         if table is None:
-            table = get_setting(self, 'pgtextindex.table', 'pgtextindex')
+            table = get_config_setting('pgtextindex.table', 'pgtextindex')
             self._v_table = table
         return table
 
@@ -55,7 +55,7 @@ class KarlPGTextIndex(PGTextIndex):
     def ts_config(self):
         ts_config = self._v_ts_config
         if ts_config is None:
-            ts_config = get_setting(self, 'pgtextindex.ts_config', 'english')
+            ts_config = get_config_setting('pgtextindex.ts_config', 'english')
             self._v_ts_config = ts_config
         return ts_config
 
@@ -71,6 +71,6 @@ class KarlPGTextIndex(PGTextIndex):
     def maxlen(self):
         maxlen = self._v_maxlen
         if maxlen is None:
-            maxlen = int(get_setting(self, 'pgtextindex.maxlen', 1048575))
+            maxlen = int(get_config_setting('pgtextindex.maxlen', 1048575))
             self._v_maxlen = maxlen
         return maxlen

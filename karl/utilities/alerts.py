@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from repoze.postoffice.message import Message
-from email.mime.multipart import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -43,6 +42,7 @@ from karl.utils import get_setting
 
 log = logging.getLogger(__name__)
 
+
 class Alerts(object):
     implements(IAlerts)
 
@@ -50,7 +50,7 @@ class Alerts(object):
         # Get community in which event occurred and alert members
         community = find_community(context)
         if community is None:
-            return # Will be true for a mailin test trace
+            return  # Will be true for a mailin test trace
         profiles = find_profiles(context)
         all_names = community.member_names | community.moderator_names
         for profile in [profiles[name] for name in all_names]:
@@ -59,8 +59,7 @@ class Alerts(object):
                 self._send_immediately(context, profile, request)
             elif preference in (IProfile.ALERT_DAILY_DIGEST,
                                 IProfile.ALERT_WEEKLY_DIGEST,
-                                IProfile.ALERT_BIWEEKLY_DIGEST,
-                               ):
+                                IProfile.ALERT_BIWEEKLY_DIGEST):
                 self._queue_digest(context, profile, request,
                                    community.__name__)
 
@@ -91,22 +90,20 @@ class Alerts(object):
              "body": body,
              "attachments": attachments,
              "community": community,
-            })
+             })
 
     def send_digests(self, context, period='daily'):
         PERIODS = {'daily': [IProfile.ALERT_DAILY_DIGEST],
                    'weekly': [IProfile.ALERT_DAILY_DIGEST,
-                              IProfile.ALERT_WEEKLY_DIGEST,
-                             ],
+                              IProfile.ALERT_WEEKLY_DIGEST],
                    'biweekly': [IProfile.ALERT_DAILY_DIGEST,
                                 IProfile.ALERT_WEEKLY_DIGEST,
-                                IProfile.ALERT_BIWEEKLY_DIGEST,
-                               ],
-                  }
+                                IProfile.ALERT_BIWEEKLY_DIGEST],
+                   }
         periods = PERIODS[period]
         mailer = getUtility(IMailDelivery)
 
-        system_name = get_setting(context, "system_name", "KARL")
+        system_name = get_setting(context, "title", "KARL")
         system_email_domain = get_setting(context, "system_email_domain")
         sent_from = "%s@%s" % (system_name, system_email_domain)
         from_addr = "%s <%s>" % (system_name, sent_from)
@@ -132,7 +129,7 @@ class Alerts(object):
                             pending.append(alert)
                         else:
                             skipped.append(alert)
-                    else: # XXX belt-and-suspenders:  send it now
+                    else:  # XXX belt-and-suspenders:  send it now
                         pending.append(alert)
 
                 if len(pending) > 0:
@@ -164,14 +161,14 @@ class Alerts(object):
                     for attachment in attachments:
                         msg.attach(attachment)
 
-                    mailer.send([profile.email,], msg)
+                    mailer.send([profile.email], msg)
 
                 for alert in skipped:
                     profile._pending_alerts.append(alert)
 
                 transaction.manager.commit()
 
-            except Exception, e:
+            except Exception:
                 # Log error and continue
                 log.error("Error sending digest to %s <%s>" %
                           (profile.title, profile.email))

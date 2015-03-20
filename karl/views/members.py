@@ -94,7 +94,7 @@ def _get_manage_actions(community, request):
 def _get_common_email_info(community, community_href):
     info = {}
     site = find_site(community)
-    info['system_name'] = site.title
+    info['system_name'] = get_setting(site, 'title')
     info['system_email_domain'] = get_setting(community,
                                               'system_email_domain')
     info['from_name'] = '%s invitation' % info['system_name']
@@ -499,7 +499,7 @@ class AddExistingUserFormController(object):
                 return _add_existing_users(context, community, [profile],
                                            "", request)
 
-        system_name = get_setting(context, 'system_name', 'KARL')
+        system_name = get_setting(context, 'title', 'KARL')
 
         page_title = u'Add Existing %s Users' % system_name
         api = TemplateAPI(context, request, page_title)
@@ -625,7 +625,7 @@ class AcceptInvitationFormController(object):
 
     def form_widgets(self, fields):
         default_icon = self.api.static_url + '/images/defaultUser.gif'
-        system_name = get_setting(self.context, 'system_name', 'KARL')
+        system_name = get_setting(self.context, 'title', 'KARL')
         widgets = {
             'biography': karlwidgets.RichTextWidget(),
             'password': formish.Password(),
@@ -721,7 +721,7 @@ class AcceptInvitationFormController(object):
         community_name = self.community.title
         context = self.context
 
-        system_name = get_setting(context, 'system_name', 'KARL')
+        system_name = get_setting(context, 'title', 'KARL')
 
         desc = ('You have been invited to join the "%s" in %s.  Please begin '
                 'by creating a %s login with profile information.' %
@@ -786,7 +786,7 @@ class InviteNewUsersFormController(object):
         community = self.community
         context = self.context
         request = self.request
-        system_name = get_setting(context, 'system_name', 'KARL')
+        system_name = get_setting(context, 'title', 'KARL')
 
         page_title = u'Invite New %s Users' % system_name
         api = TemplateAPI(context, request, page_title)

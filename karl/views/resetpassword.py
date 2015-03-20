@@ -21,6 +21,7 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import get_config_setting
 from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.forms import validators as karlvalidators
@@ -57,6 +58,7 @@ email_field = schemaish.String(
                             )
     )
 
+
 class ResetRequestFormController(object):
     def __init__(self, context, request):
         self.context = context
@@ -80,7 +82,7 @@ class ResetRequestFormController(object):
             "button.  You will receive an email with your login instructions.\n"
             "If you need additional help, please email the <a\n"
             'href="%s">Site Administrator</a>.\n'
-            "</p>\n" % self.request.registry.settings['admin_email'])
+            "</p>\n" % get_setting(self.context, 'admin_email'))
 
         return {'api': api, 'blurb_macro': blurb_macro, 'blurb': blurb}
 
@@ -90,7 +92,7 @@ class ResetRequestFormController(object):
     def handle_submit(self, converted):
         context = self.context
         request = self.request
-        system_name = get_setting(context, 'system_name', 'KARL')
+        system_name = get_setting(context, 'title', 'KARL')
         address = converted['email']
         if address:
             address = address.lower()
@@ -111,16 +113,15 @@ class ResetRequestFormController(object):
             # found the profile and user
             break
         else:
-            raise ValidationError(**{"email":
-                "%s has no account with the email address: %s" %
-                (system_name, address)})
+            raise ValidationError(**{
+                "email": "%s has no account with the email address: %s" % (
+                    system_name, address)})
 
         groups = user['groups']
         if groups and 'group.KarlStaff' in groups:
             # because staff accounts are managed centrally, staff
             # must use the forgot_password_url if it is set.
-            forgot_password_url = get_setting(
-                context, 'forgot_password_url')
+            forgot_password_url = get_config_setting('forgot_password_url')
             if forgot_password_url:
                 came_from = resource_url(context, request, "login.html")
                 request.session['came_from'] = came_from
@@ -134,6 +135,7 @@ class ResetRequestFormController(object):
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
 
+
 def request_password_reset(user, profile, request):
     profile.password_reset_key = sha1(
         str(random.random())).hexdigest()
@@ -145,7 +147,7 @@ def request_password_reset(user, profile, request):
 
     # send email
     mail = Message()
-    system_name = get_setting(context, 'system_name', 'KARL')
+    system_name = get_setting(context, 'title', 'KARL')
     admin_email = get_setting(context, 'admin_email')
     mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
     mail["To"] = "%s <%s>" % (profile.title, profile.email)
@@ -168,6 +170,7 @@ def request_password_reset(user, profile, request):
     mailer = getUtility(IMailDelivery)
     mailer.send(recipients, mail)
 
+
 def reset_sent_view(context, request):
     page_title = 'Password Reset Instructions Sent'
     api = TemplateAPI(context, request, page_title)
@@ -185,7 +188,7 @@ class ResetConfirmFormController(object):
         self.request = request
 
     def form_fields(self):
-        min_pw_length = get_setting(None, 'min_pw_length')
+        min_pw_length = get_setting(self.context, 'min_pw_length')
         login_field = schemaish.String(validator=validator.Required())
         password_field = schemaish.String(
             validator=validator.All(
@@ -267,7 +270,7 @@ class ResetConfirmFormController(object):
                 dict(api=api,
                      login=converted['login'],
                      password=converted['password']),
-                request = request,
+                request=request,
                 )
 
         except ResetFailed, e:
@@ -276,6 +279,7 @@ class ResetConfirmFormController(object):
                 'templates/reset_failed.pt',
                 dict(api=api),
                 request=request)
+
 
 class ResetFailed(Exception):
     pass
