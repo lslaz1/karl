@@ -83,7 +83,7 @@ gulp.task('process-css', function () {
       .pipe(less({
         plugins: [LessPluginInlineUrls]
       }))
-      //.pipe(minifyCSS())
+      .pipe(minifyCSS())
       .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(res.staticPrefix + name));
   });
