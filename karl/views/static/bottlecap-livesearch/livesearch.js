@@ -202,7 +202,7 @@ $.widget("bottlecap.livesearch", {
             menu.hide();
             return false;
         }
-        menu.menu("deactivate").show().css({top:0, left:0}).position({
+        menu.show().css({top:0, left:0}).position({
             my: "left top",
             at: "left bottom",
             of: this.selectButton

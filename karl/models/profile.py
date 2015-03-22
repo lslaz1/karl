@@ -69,8 +69,8 @@ class Profile(Folder):
 
     def __init__(self, firstname='', lastname='', email='', phone='', extension='',
                  fax='', department='', position='', organization='', location='',
-                 country='', websites=None, languages='', office='', room_no='',
-                 biography='', date_format=None, data=None, home_path=None,
+                 country='US', websites=None, languages='', office='', room_no='',
+                 biography='', date_format='en-US', data=None, home_path=None,
                  preferred_communities=None):
         super(Profile, self).__init__(data)
         self.firstname = firstname

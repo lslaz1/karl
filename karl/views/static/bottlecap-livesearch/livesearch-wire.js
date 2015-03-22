@@ -75,7 +75,9 @@ $(function() {
         }
     });
 
-    $('.bc-livesearch').livesearch({
+    var $search = $('.bc-livesearch');
+
+    $search.livesearch({
         urlFn: createUrlFn(livesearchUrl),
         search: function(event, ui) {
             var searchText = $.trim(getSearchValue());
@@ -94,7 +96,7 @@ $(function() {
             var urlFn = kind === "all_content"
                 ? createUrlFn(livesearchUrl)
                 : createUrlFn(livesearchUrl, kind);
-            $('.bc-livesearch').livesearch('option', 'urlFn', urlFn);
+            $search.livesearch('option', 'urlFn', urlFn);
         },
         validationFn: $.bottlecap.livesearch.prototype.numCharsValidate,
         queryTransformFn: $.bottlecap.livesearch.prototype.globQueryTransform,
