@@ -562,6 +562,29 @@ def accept_invitation_photo_view(context, request):
 
 
 class BaseInvitationFormController(object):
+    fields = {
+        'firstname': schemaish.String(validator=validator.Required()),
+        'lastname': schemaish.String(validator=validator.Required()),
+        'phone': schemaish.String(),
+        'extension': schemaish.String(),
+        'organization': schemaish.String(),
+        'country': schemaish.String(
+            validator=validator.All(
+                validator.OneOf(countries.as_dict.keys()),
+                validator.Required()),
+            ),
+        'location': schemaish.String(),
+        'department': schemaish.String(),
+        'position': schemaish.String(),
+        'websites': schemaish.Sequence(
+            schemaish.String(validator=validator.URL())),
+        'languages': schemaish.String(),
+        'biography': schemaish.String(),
+        'photo': schemaish.File(),
+        'date_format': schemaish.String(
+            validator=validator.OneOf(cultures.as_dict.keys()))
+    }
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -577,41 +600,25 @@ class BaseInvitationFormController(object):
                 system_name)
 
     def form_fields(self):
-        required = validator.Required()
         min_pw_length = int(get_setting(self.context, 'min_pw_length', 6))
         pwlen = validator.Length(min_pw_length)
         username = karlvalidators.RegularExpression(
             r'^[\w-]+$',
             'Username must contain only letters, numbers, and dashes')
         fields = [
-            ('username', schemaish.String(validator=validator.All(required,
+            ('username', schemaish.String(validator=validator.All(validator.Required(),
                                                                   username))),
             ('password', schemaish.String(
-                validator=validator.All(required, pwlen))),
+                validator=validator.All(validator.Required(), pwlen))),
             ('password_confirm', schemaish.String(
-                validator=validator.All(required, pwlen))),
-            ('firstname', schemaish.String(validator=required)),
-            ('lastname', schemaish.String(validator=required)),
-            ('phone', schemaish.String()),
-            ('extension', schemaish.String()),
-            ('organization', schemaish.String()),
-            ('country', schemaish.String(
-                validator=validator.All(
-                    validator.OneOf(countries.as_dict.keys()),
-                    validator.Required()),
-                ),
-             ),
-            ('location', schemaish.String()),
-            ('department', schemaish.String()),
-            ('position', schemaish.String()),
-            ('websites', schemaish.Sequence(
-                schemaish.String(validator=validator.URL()))),
-            ('languages', schemaish.String()),
-            ('biography', schemaish.String()),
-            ('photo', schemaish.File()),
-            ('date_format', schemaish.String(
-                validator=validator.OneOf(cultures.as_dict.keys()))),
-            ]
+                validator=validator.All(validator.Required(), pwlen))),
+            ('firstname', schemaish.String(validator=validator.Required())),
+            ('lastname', schemaish.String(validator=validator.Required()))
+        ]
+        member_fields = get_setting(self.context, 'member_fields')
+        for field_name in member_fields:
+            if field_name in self.fields:
+                fields.append((field_name, self.fields[field_name]))
 
         r = queryMultiAdapter((self.context, self.request),
                               IInvitationBoilerplate)
@@ -691,23 +698,17 @@ class BaseInvitationFormController(object):
         groups = self.get_groups()
         users.add(username, username, password, groups)
         remember_headers = remember(request, username)
-        profile = create_content(
-            IProfile,
+
+        data = dict(
             firstname=converted['firstname'],
             lastname=converted['lastname'],
-            email=context.email,
-            phone=converted['phone'],
-            extension=converted['extension'],
-            department=converted['department'],
-            position=converted['position'],
-            organization=converted['organization'],
-            location=converted['location'],
-            country=converted['country'],
-            websites=converted['websites'],
-            date_format=converted['date_format'],
-            biography=converted['biography'],
-            languages=converted['languages']
-            )
+            email=context.email
+        )
+        for field_name in get_setting(self.context, 'member_fields'):
+            if field_name in self.fields:
+                data[field_name] = converted[field_name]
+        profile = create_content(IProfile, **data)
+
         profiles[username] = profile
         workflow = get_workflow(IProfile, 'security')
         if workflow is not None:

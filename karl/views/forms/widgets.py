@@ -26,7 +26,8 @@ class RichTextWidget(Widget):
         """
         if data is None:
             return ['']
-        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
+        string_data = string_converter(field.attr).from_type(
+            data, converter_options=self.converter_options)
         # Do the html entity conversion from here, as it seems structure is broken.
         # it does not convert the & from html entities, so for example both &gt; and >
         # will flat out as &gt; in the textarea, which means that < > characters and
@@ -51,7 +52,7 @@ class TagsWidget(Widget):
     type = 'Input'
 
     def __init__(self, **kw):
-        self.tagdata = kw.pop('tagdata', {'records':[]})
+        self.tagdata = kw.pop('tagdata', {'records': []})
         Widget.__init__(self, **kw)
 
     def _get_tagdata(self, tags=()):
@@ -64,7 +65,7 @@ class TagsWidget(Widget):
                 newtags.remove(tag)
 
         for tag in filter(None, newtags):
-            newcopy['records'].append({'count':1, 'snippet':'', 'tag':tag})
+            newcopy['records'].append({'count': 1, 'snippet': '', 'tag': tag})
 
         return newcopy
 
@@ -90,10 +91,12 @@ class TagsWidget(Widget):
                          request_data])
         return result
 
-class TagsEditWidget(TagsWidget): # widget for edit forms (ajax-add-immediate)
+
+class TagsEditWidget(TagsWidget):  # widget for edit forms (ajax-add-immediate)
     template = 'field.KarlTagsEdit'
 
-class TagsAddWidget(TagsWidget): # widget for add forms (deferred til submit)
+
+class TagsAddWidget(TagsWidget):  # widget for add forms (deferred til submit)
     template = 'field.KarlTagsAdd'
 
 class ManageMembersWidget(Grid):
@@ -200,7 +203,7 @@ class FileUpload2(Widget):
         else:
             default = ''
             mimetype = ''
-        return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
+        return {'name': [default], 'default': [default], 'mimetype': [mimetype]}
 
     def pre_parse_incoming_request_data(self, field, data):
         """
@@ -237,7 +240,7 @@ class FileUpload2(Widget):
             remove = request_data.get('remove', [None])[0] is not None
             default = request_data.get('default', [None])[0]
             name = request_data.get('name', [None])[0]
-            meta = {'remove':remove, 'default':default, 'name':name}
+            meta = {'remove': remove, 'default': default, 'name': name}
             return SchemaFile(None, None, None, metadata=meta)
         elif (request_data['name'] == request_data['default']
               and request_data.get('file') is None):
@@ -282,7 +285,7 @@ class PhotoImageWidget(FileUpload2):
             remove = request_data.get('remove', [None])[0] is not None
             default = request_data.get('default', [None])[0]
             name = request_data.get('name', [None])[0]
-            meta = {'remove':remove, 'default':default, 'name':name}
+            meta = {'remove': remove, 'default': default, 'name': name}
             return SchemaFile(None, None, None, metadata=meta)
         elif request_data['name'] == request_data['default']:
             return SchemaFile(None, None, None)
@@ -304,13 +307,14 @@ class PhotoImageWidget(FileUpload2):
             url += '/thumb/100x100.jpg'
         return url
 
+
 class DateTime(Widget):
     template = 'field.DateTime'
-    
+
     def __init__(self, **k):
         super(DateTime, self).__init__(**k)
         self.js_date_format = k.get('js_date_format', None)
-   
+
 
 class VerticalRadioChoice(formish.RadioChoice):
     template = 'field.VerticalRadioChoice'

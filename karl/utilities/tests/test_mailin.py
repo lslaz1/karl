@@ -117,7 +117,7 @@ class MailinRunner2Tests(unittest.TestCase):
         mailin()
 
         self.assertEqual(self.queue.bounced, [
-            (message, None, 'Content no longer exists.', None)])
+            (message, 'foo@bar.com', 'Content no longer exists.', None)])
         self.assertEqual(len(self.mailer), 1)
 
     def test_process_message_reply_w_attachment(self):
@@ -201,7 +201,7 @@ class MailinRunner2Tests(unittest.TestCase):
 
         self._makeOne()()
         self.assertEqual(self.queue.bounced, [
-            (message, None, 'Not witty enough', None)])
+            (message, 'foo@bar.com', 'Not witty enough', None)])
         self.assertEqual(len(self.mailer), 1)
 
     def test_bounce_message_for_target(self):
@@ -220,7 +220,7 @@ class MailinRunner2Tests(unittest.TestCase):
 
         self._makeOne()()
         self.assertEqual(self.queue.bounced, [
-            (message, None, 'Not witty enough', None)])
+            (message, 'foo@bar.com', 'Not witty enough', None)])
         self.assertEqual(len(self.mailer), 1)
 
     def test_bounce_message_throttled(self):
@@ -237,7 +237,7 @@ class MailinRunner2Tests(unittest.TestCase):
         self.assertEqual(len(self.queue.bounced), 1)
         bounced = self.queue.bounced[0]
         self.assertEqual(bounced[0], message)
-        self.assertEqual(bounced[1], None)
+        self.assertEqual(bounced[1], 'foo@bar.com')
         self.assertEqual(bounced[2], None)
         self.assertEqual(bounced[3]['To'], 'Clarence')
         self.assertEqual(len(self.mailer), 1)

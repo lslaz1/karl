@@ -63,6 +63,7 @@ from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
 from karl.models.interfaces import IVirtualData
+from karl.models.profile import Profile
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
 from karl.utilities.groupsearch import WeightedQuery
@@ -427,7 +428,8 @@ class Site(Folder):
         show_terms_and_conditions=False,
         terms_and_conditions=None,
         show_privacy_statement=False,
-        privacy_statement=None
+        privacy_statement=None,
+        member_fields=list(Profile.additional_fields)
     )
     _repo = Uninitialized
 

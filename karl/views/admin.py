@@ -37,6 +37,7 @@ from karl.models.interfaces import IInvitation
 from karl.models.interfaces import ISiteInvitation
 from karl.models.interfaces import IProfile
 from karl.models.adapters import TIMEAGO_FORMAT
+from karl.models.profile import Profile
 from karl.security.policy import ADMINISTER
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
@@ -1228,7 +1229,7 @@ class RegistrationFormController(BaseSiteFormController):
     page_title = 'Registration Settings'
     fields = ('allow_request_accesss', 'show_terms_and_conditions',
               'terms_and_conditions', 'show_privacy_statement',
-              'privacy_statement')
+              'privacy_statement', 'member_fields')
 
     schema = [
         ('allow_request_accesss', schemaish.Boolean(
@@ -1238,13 +1239,14 @@ class RegistrationFormController(BaseSiteFormController):
         ('terms_and_conditions', schemaish.String()),
         ('show_privacy_statement', schemaish.Boolean(
             description="Show privacy statement")),
-        ('privacy_statement', schemaish.String())
+        ('privacy_statement', schemaish.String()),
+        ('member_fields', schemaish.Sequence(schemaish.String()))
     ]
 
     def form_defaults(self):
         defaults = {}
         for field in self.fields:
-            defaults[field] = self.context.settings.get(field, None)
+            defaults[field] = get_setting(self.context, field)
         return defaults
 
     def form_widgets(self, fields):
@@ -1254,14 +1256,14 @@ class RegistrationFormController(BaseSiteFormController):
             'terms_and_conditions': karlwidgets.RichTextWidget(empty=''),
             'show_privacy_statement': formish.widgets.Checkbox(),
             'privacy_statement': karlwidgets.RichTextWidget(empty=''),
+            'member_fields': formish.widgets.CheckboxMultiChoice(
+                [(f, f) for f in Profile.additional_fields])
 
         }
 
     def handle_submit(self, converted):
         # to update
-        for field in ('allow_request_accesss', 'show_terms_and_conditions',
-                      'terms_and_conditions', 'show_privacy_statement',
-                      'privacy_statement'):
+        for field in self.fields:
             self.context.settings[field] = converted[field]
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)

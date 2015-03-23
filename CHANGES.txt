@@ -5,6 +5,8 @@ karl package Changelog
 5.0.0a6 (unreleased)
 --------------------
 
+- be able to customize member fields
+
 - be able to set privacy and terms in site settings
 
 

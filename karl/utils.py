@@ -109,7 +109,9 @@ def get_setting(context, setting_name, default=_marker):
     site = find_site(context)
     if default is _marker:
         try:
-            default = site._default_settings.get(setting_name, None)
+            # use default settings defined on Site object
+            from karl.models.site import Site
+            default = Site._default_settings.get(setting_name, None)
         except AttributeError:
             default = None
     try:

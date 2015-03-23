@@ -20,6 +20,8 @@ import unittest
 from pyramid import testing
 from karl import testing as karltesting
 from karl.testing import DummySessions
+from karl.models.profile import Profile
+
 
 class DummyForm(object):
     allfields = ()
@@ -281,6 +283,9 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         testing.cleanUp()
         self.sessions = sessions = DummySessions()
         context = DummyProfile(sessions=sessions)
+        context.settings = {
+            'member_fields': Profile.additional_fields
+        }
         context.title = 'title'
         self.context = context
         request = testing.DummyRequest()
@@ -492,6 +497,9 @@ class AddUserFormControllerTests(unittest.TestCase):
         testing.cleanUp()
         sessions = self.sessions = DummySessions()
         context = testing.DummyModel(sessions=sessions)
+        context.settings = {
+            'member_fields': Profile.additional_fields
+        }
         context.title = 'profiles'
         self.context = context
 

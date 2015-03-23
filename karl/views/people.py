@@ -105,25 +105,29 @@ class EditProfileFormController(object):
     Formish controller for the profile edit form.  Also the base class
     for the controllers for the admin profile edit and add user forms.
     """
+
+    fields = {
+        'phone': phone_field,
+        'extension': extension_field,
+        'fax': fax_field,
+        'department': department_field,
+        'position': position_field,
+        'organization': organization_field,
+        'location': location_field,
+        'country': country_field,
+        'websites': websites_field,
+        'languages': languages_field,
+        'office': schemaish.String(),
+        'room_no': schemaish.String(),
+        'biography': biography_field,
+        'date_format': date_format_field
+    }
+
     simple_field_names = [
         "firstname",
         "lastname",
         "email",
-        "phone",
-        "extension",
-        "fax",
-        "department",
-        "position",
-        "organization",
-        "location",
-        "country",
-        "websites",
-        "languages",
-        "office",
-        "room_no",
-        "biography",
-        "date_format",
-    ]
+    ] + fields.keys()
 
     def __init__(self, context, request):
         self.context = context
@@ -143,19 +147,10 @@ class EditProfileFormController(object):
         fields = [('firstname', firstname_field),
                   ('lastname', lastname_field),
                   ('email', email_field),
-                  ('phone', phone_field),
-                  ('extension', extension_field),
-                  ('fax', fax_field),
-                  ('department', department_field),
-                  ('position', position_field),
-                  ('organization', organization_field),
-                  ('location', location_field),
-                  ('country', country_field),
-                  ('websites', websites_field),
-                  ('languages', languages_field),
-                  ('biography', biography_field),
-                  ('photo', photo_field),
-                  ('date_format', date_format_field)]
+                  ('photo', photo_field)]
+        for field_name in get_setting(self.context, 'member_fields'):
+            if field_name in self.fields:
+                fields.append((field_name, self.fields[field_name]))
         return fields
 
     def form_widgets(self, fields):

@@ -48,12 +48,6 @@ class TestOfflineContextURL(unittest.TestCase):
         url = self._makeOne()
         self.assertRaises(NotImplementedError, url.virtual_root)
 
-    def test___call___no_settings(self):
-        from pyramid.testing import DummyModel
-        context = DummyModel()
-        url = self._makeOne(context)
-        self.assertRaises(ValueError, url)
-
     def test___call___app_url_trailing_slash(self):
         from pyramid.testing import DummyModel
         root = self._makeRoot()

@@ -42,6 +42,10 @@ class Profile(Folder):
     date_format = None  # BBB
     current_auth_code = None
     current_auth_code_time_stamp = datetime.utcnow()
+    additional_fields = ('phone', 'extension', 'fax', 'department', 'position',
+                         'organization', 'location', 'country', 'websites',
+                         'languages', 'office', 'room_no', 'biography', 'date_format',
+                         'home_path')
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')

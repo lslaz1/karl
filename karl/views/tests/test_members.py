@@ -20,6 +20,7 @@ import unittest
 from pyramid import testing
 from karl import testing as karltesting
 from karl.testing import makeRoot
+from karl.models.profile import Profile
 
 
 class ShowMembersViewTests(unittest.TestCase):
@@ -44,17 +45,17 @@ class ShowMembersViewTests(unittest.TestCase):
         profiles['a'] = karltesting.DummyProfile()
         profiles['b'] = karltesting.DummyProfile()
         context['profiles'] = profiles
-        d = {1:profiles['a'], 2:profiles['b']}
+        d = {1: profiles['a'], 2: profiles['b']}
         searchkw = {}
         def resolver(docid):
             return d.get(docid)
         def dummy_catalog_search(context):
             def search(**kw):
                 searchkw.update(kw)
-                return 2, [1,2], resolver
+                return 2, [1, 2], resolver
             return search
         karltesting.registerAdapter(dummy_catalog_search, (Interface),
-                                ICatalogSearch)
+                                    ICatalogSearch)
         from karl.models.interfaces import ICommunity
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
@@ -129,7 +130,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
         response = controller()
-        self.assertEqual(context.users.added_groups, [('admin','members')])
+        self.assertEqual(context.users.added_groups, [('admin', 'members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
         self.failUnless(
             response.location.startswith('http://example.com/manage.html'))
@@ -139,7 +140,7 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         context = self._getContext()
         controller = self._makeOne(context, request)
-        converted = {'users':('admin', 'nyc99'), 'text':'some text'}
+        converted = {'users': ('admin', 'nyc99'), 'text': 'some text'}
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_success(self):
@@ -149,11 +150,11 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
         mailer = karltesting.DummyMailer()
         karltesting.registerUtility(mailer, IMailDelivery)
         controller = self._makeOne(context, request)
-        converted = {'users': (u'admin',), 'text':'some_text'}
+        converted = {'users': (u'admin',), 'text': 'some_text'}
         karltesting.registerDummyRenderer(
             'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
-        self.assertEqual(context.users.added_groups, [('admin','members')])
+        self.assertEqual(context.users.added_groups, [('admin', 'members')])
         self.assertEqual(mailer[0].mto[0], 'admin@example.com')
         self.failUnless(
             response.location.startswith('http://example.com/manage.html'))
@@ -205,7 +206,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 17)
+        self.assertEqual(len(fields), 16)
 
     def test_form_fields_w_tos_and_privacy_statement_adapter(self):
         from karl.views.interfaces import IInvitationBoilerplate
@@ -218,7 +219,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 19)
+        self.assertEqual(len(fields), 18)
         self.assertEqual(fields[-2][0], "terms_and_conditions")
         self.assertEqual(fields[-1][0], "accept_privacy_policy")
 
@@ -228,12 +229,13 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
             show_terms_and_conditions=True,
             terms_and_conditions='Blah blah blah.',
             show_privacy_statement=True,
-            privacy_statement='Blah blah blah.')
+            privacy_statement='Blah blah blah.',
+            member_fields=Profile.additional_fields)
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         fields = controller.form_fields()
         self.failUnless(fields)
-        self.assertEqual(len(fields), 19)
+        self.assertEqual(len(fields), 18)
         self.assertEqual(fields[-2][0], "terms_and_conditions")
         self.assertEqual(fields[-1][0], "accept_privacy_policy")
 
@@ -265,7 +267,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         context = self._makeContext()
         request = self._makeRequest()
         controller = self._makeOne(context, request)
-        converted = {'password':'1', 'password_confirm':'2'}
+        converted = {'password': '1', 'password_confirm': '2'}
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_username_exists(self):
@@ -276,65 +278,9 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         profiles['a'] = karltesting.DummyProfile()
         context['profiles'] = profiles
         controller = self._makeOne(context, request)
-        converted = {'password':'1', 'password_confirm':'1', 'username':'a'}
+        converted = {'password': '1', 'password_confirm': '1', 'username': 'a'}
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
-    def test_handle_submit_success(self):
-        from karl.models.interfaces import IProfile
-        from repoze.lemonade.testing import registerContentFactory
-        from repoze.sendmail.interfaces import IMailDelivery
-        from repoze.workflow.testing import registerDummyWorkflow
-        from karl.models.interfaces import ICommunity
-        from zope.interface import directlyProvides
-        workflow = registerDummyWorkflow('security')
-        mailer = karltesting.DummyMailer()
-        karltesting.registerUtility(mailer, IMailDelivery)
-        registerContentFactory(DummyContent, IProfile)
-        class DummyWhoPlugin(object):
-            def remember(self, environ, identity):
-                self.identity = identity
-                return []
-        request = self._makeRequest()
-        community = testing.DummyModel()
-        profiles = testing.DummyModel()
-        community['profiles'] = profiles
-        community.users = karltesting.DummyUsers()
-        community.members_group_name = 'community:members'
-        directlyProvides(community, ICommunity)
-        context = self._makeContext()
-        community['invite'] = context
-        community.title = 'Community'
-        community.description = 'Community'
-        community.sessions = DummySessions()
-        context.email = 'a@example.com'
-        controller = self._makeOne(context, request)
-        converted = {'password':'1', 'password_confirm':'1',
-                     'username':'username',
-                     'firstname':'firstname', 'lastname':'lastname',
-                     'phone':'phone', 'extension':'extension',
-                     'department':'department', 'position':'position',
-                     'organization':'organization', 'location':'location',
-                     'country':'country', 'websites':['website'],
-                     'languages':'languages', 'date_format':'en-US',
-                     'biography':'bio',
-                     }
-        karltesting.registerDummyRenderer(
-            'karl.views:templates/email_accept_invitation.pt')
-        # response = controller.handle_submit(converted)
-        # self.assertEqual(response.location,
-        #                  'http://example.com/?status_message=Welcome%21')
-        # self.assertEqual(community.users.added,
-        #                  ('username', 'username', '1', ['community:members']))
-        # profiles = community['profiles']
-        # self.failUnless('username' in profiles)
-        # self.assertEqual(workflow.initialized,[profiles['username']])
-        # profile = profiles['username']
-        # self.assertEqual('phone', profile.phone)
-        # self.assertEqual('firstname', profile.firstname)
-        # self.assertEqual('lastname', profile.lastname)
-        # self.assertEqual('bio', profile.biography)
-        # self.failIf('invite' in community)
-        # self.assertEqual(len(mailer), 1)
 
 class InviteNewUsersFormControllerTests(unittest.TestCase):
     def setUp(self):
@@ -423,13 +369,13 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         karltesting.registerDummyRenderer(
             'karl.views:templates/email_invite_new.pt')
         response = controller.handle_submit(converted)
-        self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=One+user+invited.++'
-                         )
+        self.assertEqual(
+            response.location,
+            'http://example.com/manage.html?status_message=One+user+invited.++')
         invitation = context['A'*6]
         self.assertEqual(invitation.email, 'yo@plope.com')
         self.assertEqual(1, len(mailer))
-        self.assertEqual(mailer[0].mto, [u"yo@plope.com",])
+        self.assertEqual(mailer[0].mto, [u"yo@plope.com"])
 
     def test_handle_submit_already_in_karl(self):
         from repoze.lemonade.testing import registerContentFactory
@@ -441,7 +387,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch()
         profile = karltesting.DummyProfile(security_state='active')
         profile.__name__ = 'd'
-        registerCatalogSearch(results={'email=d@x.org': [profile,]})
+        registerCatalogSearch(results={'email=d@x.org': [profile]})
         def nonrandom(size=6):
             return 'A' * size
         karltesting.registerUtility(nonrandom, IRandomId)
@@ -455,7 +401,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             'karl.views:templates/email_add_existing.pt')
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'
+            'http://example.com/manage.html?status_message=One+existing+Karl+user+added+to+community.++'  # noqa
                          )
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups,
@@ -471,7 +417,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch()
         profile = karltesting.DummyProfile(security_state='inactive')
         profile.__name__ = 'd'
-        registerCatalogSearch(results={'email=d@x.org': [profile,]})
+        registerCatalogSearch(results={'email=d@x.org': [profile]})
         def nonrandom(size=6):
             return 'A' * size
         karltesting.registerUtility(nonrandom, IRandomId)
@@ -496,7 +442,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         registerCatalogSearch()
         profile = karltesting.DummyProfile()
         profile.__name__ = 'a'
-        registerCatalogSearch(results={'email=a@x.org': [profile,]})
+        registerCatalogSearch(results={'email=a@x.org': [profile]})
         def nonrandom(size=6):
             return 'A' * size
         karltesting.registerUtility(nonrandom, IRandomId)
@@ -507,9 +453,9 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
             'text': u'some text',
             }
         response = controller.handle_submit(converted)
-        self.assertEqual(response.location,
-          'http://example.com/manage.html?status_message=One+user+already+member.'
-                         )
+        self.assertEqual(
+            response.location,
+            'http://example.com/manage.html?status_message=One+user+already+member.')
         self.failIf('A'*6 in context)
         self.assertEqual(context.users.added_groups, [])
 
@@ -622,13 +568,13 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[
-            {'remove':True, 'name':'b', 'resend':False,
-             'moderator':False, 'title':'buz'},
-            {'remove':True, 'name':'c', 'resend':False,
-             'moderator':False, 'title':'buz'},
+        converted = {'members': [
+            {'remove': True, 'name': 'b', 'resend': False,
+             'moderator': False, 'title': 'buz'},
+            {'remove': True, 'name': 'c', 'resend': False,
+             'moderator': False, 'title': 'buz'},
             ],
-                     }
+        }
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_deop_sole_moderator(self):
@@ -636,21 +582,21 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[
-            {'remove':False, 'name':'b', 'resend':False,
-             'moderator':False, 'title':'buz'},
-            {'remove':False, 'name':'c', 'resend':False,
-             'moderator':False, 'title':'buz'},
+        converted = {'members': [
+            {'remove': False, 'name': 'b', 'resend': False,
+             'moderator': False, 'title': 'buz'},
+            {'remove': False, 'name': 'c', 'resend': False,
+             'moderator': False, 'title': 'buz'},
             ],
-                     }
+        }
         self.assertRaises(ValidationError, controller.handle_submit, converted)
 
     def test_handle_submit_remove_member(self):
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[{'remove':True, 'name':'a', 'resend':False,
-                                 'moderator':False, 'title':'buz'}]}
+        converted = {'members': [{'remove': True, 'name': 'a', 'resend': False,
+                                  'moderator': False, 'title': 'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
         site = context.__parent__.__parent__
@@ -667,9 +613,9 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[{'remove':True, 'name':'invitation',
-                                 'resend':False, 'moderator':False,
-                                 'title':'buz'}]}
+        converted = {'members': [{'remove': True, 'name': 'invitation',
+                                  'resend': False, 'moderator': False,
+                                  'title': 'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
         self.assertEqual(len(mailer), 0)
@@ -684,8 +630,8 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context = self._makeCommunity()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[{'remove':True, 'name':'b', 'resend':False,
-                                 'moderator':False, 'title':'buz'}]}
+        converted = {'members': [{'remove': True, 'name': 'b', 'resend': False,
+                                  'moderator': False, 'title': 'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
         site = context.__parent__.__parent__
@@ -706,9 +652,9 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context.description = 'description'
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[{'remove':False, 'name':'invitation',
-                                 'resend':True, 'moderator':False,
-                                 'title':'buz'}]}
+        converted = {'members': [{'remove': False, 'name': 'invitation',
+                                  'resend': True, 'moderator': False,
+                                  'title': 'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
         self.assertEqual(len(mailer), 1)
@@ -724,9 +670,9 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         context.description = 'description'
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        converted = {'members':[{'remove':False, 'name':'a',
-                                 'resend':False, 'moderator':True,
-                                 'title':'buz'}]}
+        converted = {'members': [{'remove': False, 'name': 'a',
+                                  'resend': False, 'moderator': True,
+                                  'title': 'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
         self.assertEqual(len(mailer), 0)
@@ -756,7 +702,7 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         directlyProvides(context, ICommunity)
         context.member_names = set('a',)
         context.moderator_names = set()
-        request = testing.DummyRequest(params={'val':'a'})
+        request = testing.DummyRequest(params={'val': 'a'})
         profile_1 = karltesting.DummyProfile(__name__='a',
                                              security_state='active')
         profile_2 = karltesting.DummyProfile(__name__='b',
@@ -766,19 +712,17 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         profile_4 = karltesting.DummyProfile(__name__='d',
                                              security_state='inactive')
         def resolver(docid):
-            d = {1:profile_1, 2:profile_2, 3:profile_3, 4:profile_4}
+            d = {1: profile_1, 2: profile_2, 3: profile_3, 4: profile_4}
             return d.get(docid)
         def dummy_catalog_search(context):
             def search(**kw):
-                return 3, [1,2,3], resolver
+                return 3, [1, 2, 3], resolver
             return search
-        karltesting.registerAdapter(dummy_catalog_search, (Interface),
-                                ICatalogSearch)
+        karltesting.registerAdapter(
+            dummy_catalog_search, (Interface), ICatalogSearch)
         data = self._callFUT(context, request)
-        self.assertEqual(data,
-            [{"text": "title", "id": "b"},
-             {"text": "title", "id": "c"},
-            ])
+        self.assertEqual(data, [{"text": "title", "id": "b"},
+                                {"text": "title", "id": "c"}])
 
 class TestAcceptInvitationPhotoView(unittest.TestCase):
     def _callFUT(self, context, request):
@@ -794,7 +738,7 @@ class TestAcceptInvitationPhotoView(unittest.TestCase):
             def open(self, mode):
                 return ('abc',)
         sessions['1'] = {'accept-invitation':
-                         {'a':([('a', '1')],None, DummyBlob())}
+                         {'a': ([('a', '1')], None, DummyBlob())}
                          }
         context = testing.DummyModel(sessions=sessions)
         response = self._callFUT(context, request)
@@ -814,7 +758,7 @@ class DummyInvitation:
 
 class DummyContent:
     def __init__(self, **kw):
-        for key,value in kw.items():
+        for key, value in kw.items():
             setattr(self, key, value)
 
 def dummy_search(results):
@@ -825,8 +769,8 @@ def dummy_search(results):
 
         def __call__(self, **kw):
             search = []
-            for k,v in kw.items():
-                key = '%s=%s' % (k,v)
+            for k, v in kw.items():
+                key = '%s=%s' % (k, v)
                 if key in results:
                     search.extend(results[key])
 
