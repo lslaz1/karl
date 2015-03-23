@@ -1220,7 +1220,7 @@ class AuthenticationFormController(BaseSiteFormController):
 
     def handle_submit(self, converted):
         self.context.settings['two_factor_enabled'] = converted['two_factor_enabled']
-        self.context.settings['allow_request_accesss'] = converted['allow_request_accesss']  # noqa
+        self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 
