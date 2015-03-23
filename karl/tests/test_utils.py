@@ -171,6 +171,13 @@ class TestGetContentTypeNameAndIcon(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context):
+        # clear cache first
+        from zope.component import getSiteManager
+        from repoze.lemonade.interfaces import IContentTypeCache
+        sm = getSiteManager()
+        cache = sm.queryUtility(IContentTypeCache)
+        if cache is not None:
+            sm.unregisterUtility(cache, IContentTypeCache)
         from karl.utils import get_content_type_name_and_icon as fut
         return fut(context)
 

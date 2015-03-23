@@ -17,6 +17,7 @@
 
 import unittest
 
+
 class ProfileTests(unittest.TestCase):
 
     def setUp(self):
@@ -103,7 +104,7 @@ class ProfileTests(unittest.TestCase):
     def test_pending_alerts_as_accumulator(self):
         inst = self._makeOne()
         self.assertEqual(list(inst._pending_alerts), [])
-        inst._pending_alerts.append( "FOO" )
+        inst._pending_alerts.append("FOO")
         self.assertEqual(list(inst._pending_alerts), ["FOO"])
         alerts = inst._pending_alerts.consume()
         self.assertEqual(alerts, ["FOO"])
@@ -116,7 +117,7 @@ class ProfileTests(unittest.TestCase):
 
     def test_empty_country(self):
         inst = self._makeOne()
-        self.assertEqual(inst.country, 'XX')
+        self.assertEqual(inst.country, 'US')
 
     def test_invalid_country(self):
         inst = self._makeOne(country='XY')
@@ -124,7 +125,7 @@ class ProfileTests(unittest.TestCase):
 
     def test_empty_date_format(self):
         inst = self._makeOne()
-        self.assertEqual(inst.date_format, None)
+        self.assertEqual(inst.date_format, 'en-US')
 
     def test_invalid_date_format(self):
         inst = self._makeOne(date_format='XY')
@@ -168,6 +169,7 @@ class ProfileTests(unittest.TestCase):
         inst.websites = ['http://another.example.com/',
                          'http://yetanother.example.com/']
         self.failIf('website' in inst.__dict__)
+
 
 class ProfilesFolderTests(unittest.TestCase):
 
@@ -220,7 +222,7 @@ class ProfilesFolderTests(unittest.TestCase):
         self.failUnless(pf.getProfileByEmail('Extant@example.com') is profile)
 
 
-class Test_profile_textindexdata(unittest.TestCase):
+class Test_profile_textindexdata(unittest.TestCase):  # noqa
 
     def _callFUT(self, profile):
         from karl.models.profile import profile_textindexdata
@@ -263,8 +265,7 @@ class Test_profile_textindexdata(unittest.TestCase):
         profile = DummyModel(title='Phred Phlyntstone',
                              firstname='Phred',
                              lastname='Phlyntstone',
-                             town='Bedrock',
-                            )
+                             town='Bedrock')
         callable = self._callFUT(profile)
         self.assertEqual(callable(),
                          ('Phred Phlyntstone', 'Phred\nPhlyntstone'))

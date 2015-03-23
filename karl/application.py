@@ -169,27 +169,30 @@ def configure_karl(config, load_zcml=True):
     if perfmetrics is not None:
         config.include(perfmetrics)
 
-    # define css
-    config.define_css(
-        'tinymce-3.5.2.karl', static_path + '/tinymce/tinymce-3.5.2.karl.css',
-        always_include=True)
-    config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
-    config.define_css('karl-multifileupload', static_path + '/karl-multifileupload.css')
-    config.define_css('karl-ui', static_path + '/karl-ui.css',
-                      always_include=True)
-    config.define_css('karl-base', static_path + '/karl-base.css',
-                      always_include=True)
-    config.define_css('karl-theme', static_path + '/karl-theme.css',
-                      always_include=True)
-    config.define_css(
-        'karl-ie', static_path + '/karl_ie.css',
-        always_include=True, ie_expression='lte IE 8')
-    config.define_css(
-        'karl-ie8', static_path + '/karl_ie8.css',
-        always_include=True, ie_expression='IE 8')
-    config.define_css(
-        'karl-ie9', static_path + '/karl_ie9.css',
-        always_include=True, ie_expression='gte IE 9')
+    if isinstance(config, Configurator):
+        # define css only if config is correct instance type
+        # this caused some tests to fail...
+        config.define_css(
+            'tinymce-3.5.2.karl', static_path + '/tinymce/tinymce-3.5.2.karl.css',
+            always_include=True)
+        config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
+        config.define_css('karl-multifileupload',
+                          static_path + '/karl-multifileupload.css')
+        config.define_css('karl-ui', static_path + '/karl-ui.css',
+                          always_include=True)
+        config.define_css('karl-base', static_path + '/karl-base.css',
+                          always_include=True)
+        config.define_css('karl-theme', static_path + '/karl-theme.css',
+                          always_include=True)
+        config.define_css(
+            'karl-ie', static_path + '/karl_ie.css',
+            always_include=True, ie_expression='lte IE 8')
+        config.define_css(
+            'karl-ie8', static_path + '/karl_ie8.css',
+            always_include=True, ie_expression='IE 8')
+        config.define_css(
+            'karl-ie9', static_path + '/karl_ie9.css',
+            always_include=True, ie_expression='gte IE 9')
 
 
 def block_webdav(event):

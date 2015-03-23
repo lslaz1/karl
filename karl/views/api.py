@@ -473,10 +473,18 @@ class TemplateAPI(object):
         return result
 
     def get_css(self):
-        return self.request.registry['css_resources'].get_all(self.request)
+        registry = self.request.registry
+        if 'css_resources' in registry:
+            return registry['css_resources'].get_all(self.request)
+        return []
 
     def resource_css(self, name):
-        return self.request.registry['css_resources'].get(name)
+        registry = self.request.registry
+        if 'css_resources' in registry:
+            return registry['css_resources'].get(name)
+        return None
 
     def require_css(self, name):
-        self.request.registry['css_resources'].require(self.request, name)
+        registry = self.request.registry
+        if 'css_resources' in registry:
+            self.request.registry['css_resources'].require(self.request, name)

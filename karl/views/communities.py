@@ -224,7 +224,10 @@ def set_preferred_communities(context, request, communities):
 def get_preferred_communities(context, request):
     profiles = find_profiles(context)
     userid = authenticated_userid(request)
-    profile = profiles[userid]
+    try:
+        profile = profiles[userid]
+    except KeyError:
+        return None
     # old profiles will not have this attribute, so to be safe use getattr
     preferred_communities = getattr(profile, 'preferred_communities', None)
     return preferred_communities

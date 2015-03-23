@@ -1059,7 +1059,6 @@ def review_access_requests_view(context, request):
         random_id = getUtility(IRandomId)
         html_body = '''
 <p>Your access request has been approved<p>'''
-        import pdb; pdb.set_trace()
         for email in data.get('approve', []):
             total, docids, resolver = search(email=email.lower(),
                                              interfaces=[IProfile])

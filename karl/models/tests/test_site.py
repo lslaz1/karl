@@ -20,6 +20,7 @@ from pyramid import testing
 
 import karl.testing
 
+
 class KARLUsersTests(unittest.TestCase):
 
     def setUp(self):
@@ -113,6 +114,7 @@ class KARLUsersTests(unittest.TestCase):
         ku.remove_group('userid', 'nonesuch')
         self.assertEqual(len(events), 0)
 
+
 class SiteTests(unittest.TestCase):
 
     def setUp(self):
@@ -140,10 +142,11 @@ class SiteTests(unittest.TestCase):
         from karl.models.interfaces import ICommunities
         from karl.models.interfaces import IProfiles
         from karl.models.interfaces import IPeopleDirectory
+        from karl.models.interfaces import IInvitationsFolder
         registerContentFactory(lambda *x: testing.DummyModel(), ICommunities)
         registerContentFactory(lambda *x: testing.DummyModel(), IProfiles)
-        registerContentFactory(lambda *x: testing.DummyModel(),
-            IPeopleDirectory)
+        registerContentFactory(lambda *x: testing.DummyModel(), IPeopleDirectory)
+        registerContentFactory(lambda *x: testing.DummyModel(), IInvitationsFolder)
 
     def _makeOne(self):
         return self._getTargetClass()()
@@ -175,8 +178,7 @@ class SiteTests(unittest.TestCase):
                                       ('start_date', 'GranularIndex'),
                                       ('end_date', 'GranularIndex'),
                                       ('mimetype', 'CatalogFieldIndex'),
-                                      ('email', 'CatalogFieldIndex'),
-                                     ):
+                                      ('email', 'CatalogFieldIndex')):
             index = site.catalog[index_name]
             self.assertEqual(index.__class__.__name__, type_name)
 
@@ -312,7 +314,7 @@ class TestGetWeightedTextReprOldPgtextIndex(unittest.TestCase):
                 return 'stuff'
         karl.testing.registerAdapter(DummyAdapter, (None,), ITextIndexData)
         textrepr = self._callFUT(context, None)
-        self.assertEqual(textrepr, ['stuff',])
+        self.assertEqual(textrepr, ['stuff'])
 
     def test_not_content(self):
         context = testing.DummyModel()
@@ -328,6 +330,7 @@ class TestGetWeightedTextReprOldPgtextIndex(unittest.TestCase):
         directlyProvides(context, IContent)
         textrepr = self._callFUT(context, 'default')
         self.assertEqual(textrepr, 'default')
+
 
 class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
     tags = []
@@ -506,6 +509,7 @@ class _TestGetDate(object):
         result = self._callFUT(context, None)
         self.assertEqual(result, None)
 
+
 class TestGetCreationDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_creation_date
@@ -513,6 +517,7 @@ class TestGetCreationDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.created = val
+
 
 class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
@@ -522,6 +527,7 @@ class TestGetModifiedDate(unittest.TestCase, _TestGetDate):
     def _decorate(self, context, val):
         context.modified = val
 
+
 class TestGetContentModifiedDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_content_modified_date
@@ -529,6 +535,7 @@ class TestGetContentModifiedDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.content_modified = val
+
 
 class TestGetStartDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
@@ -538,6 +545,7 @@ class TestGetStartDate(unittest.TestCase, _TestGetDate):
     def _decorate(self, context, val):
         context.startDate = val
 
+
 class TestGetEndDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_end_date
@@ -546,6 +554,7 @@ class TestGetEndDate(unittest.TestCase, _TestGetDate):
     def _decorate(self, context, val):
         context.endDate = val
 
+
 class TestGetPublicationDate(unittest.TestCase, _TestGetDate):
     def _callFUT(self, object, default):
         from karl.models.site import get_publication_date
@@ -553,6 +562,7 @@ class TestGetPublicationDate(unittest.TestCase, _TestGetDate):
 
     def _decorate(self, context, val):
         context.publication_date = val
+
 
 class TestGetPath(unittest.TestCase):
     def _callFUT(self, object, default):
@@ -563,6 +573,7 @@ class TestGetPath(unittest.TestCase):
         context = testing.DummyModel()
         result = self._callFUT(context, None)
         self.assertEqual(result, '/')
+
 
 class TestGetInterfaces(unittest.TestCase):
     def _callFUT(self, object, default):
@@ -582,6 +593,7 @@ class TestGetInterfaces(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(sorted(result), [Dummy1, Dummy2, Interface])
 
+
 class TestGetContainment(unittest.TestCase):
     def test_it(self):
         from karl.models.site import get_containment
@@ -598,6 +610,7 @@ class TestGetContainment(unittest.TestCase):
         root['foo'] = context
         result = get_containment(context, None)
         self.assertEqual(sorted(result), [Dummy1, Dummy2, Interface])
+
 
 class TestGetTitleFirstletter(unittest.TestCase):
     def _callFUT(self, object, default):
@@ -627,6 +640,7 @@ class TestGetTitleFirstletter(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(result, None)
 
+
 class TestGetName(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_name
@@ -638,7 +652,7 @@ class TestGetName(unittest.TestCase):
         context = Dummy()
         result = self._callFUT(context, None)
         self.assertEqual(result, None)
-        context.__name__= 'bar'
+        context.__name__ = 'bar'
         result = self._callFUT(context, None)
         self.assertEqual(result, 'bar')
 
@@ -664,6 +678,7 @@ class TestGetTitle(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(result, 'foobar')
 
+
 class TestGetACL(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_acl
@@ -677,6 +692,7 @@ class TestGetACL(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(result, 'foo')
 
+
 class TestGetAllowedToView(unittest.TestCase):
     def _callFUT(self, object, default):
         from karl.models.site import get_allowed_to_view
@@ -686,6 +702,7 @@ class TestGetAllowedToView(unittest.TestCase):
         context = testing.DummyModel()
         result = self._callFUT(context, None)
         self.assertEqual(result, ['system.Everyone'])
+
 
 class TestGetVirtual(unittest.TestCase):
     def _callFUT(self, object, default):
@@ -709,8 +726,10 @@ class TestGetVirtual(unittest.TestCase):
         data = self._callFUT(context, None)
         self.assertEqual(data, 'stuff')
 
+
 class DummyCache(dict):
     generation = None
+
 
 class DummyCatalog(object):
     @property
@@ -720,9 +739,11 @@ class DummyCatalog(object):
     def docid_for_address(self, addr):
         return 1
 
+
 class DummyUsers(object):
     def member_of_group(self, userid, group):
         return True
+
 
 class DummyArchive(object):
     def __init__(self, params):
