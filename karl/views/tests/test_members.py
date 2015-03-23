@@ -224,8 +224,11 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
 
     def test_form_fields_w_tos_and_privacy_statement_default(self):
         context = self._makeContext()
-        context['legal'] = DummyContent(text='Blah blah blah.')
-        context['privacy'] = DummyContent(text='Blah blah blah.')
+        context.settings = dict(
+            show_terms_and_conditions=True,
+            terms_and_conditions='Blah blah blah.',
+            show_privacy_statement=True,
+            privacy_statement='Blah blah blah.')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         fields = controller.form_fields()

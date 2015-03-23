@@ -1016,10 +1016,7 @@ class DefaultInvitationBoilerplate(object):
     privacy_statement = ''
 
     def __init__(self, context):
-        site = find_site(context)
-        legal = site.get('legal')
-        if legal is not None:
-            self.terms_and_conditions = legal.text
-        privacy = site.get('privacy')
-        if privacy is not None:
-            self.privacy_statement = privacy.text
+        if get_setting(context, 'show_terms_and_conditions'):
+            self.terms_and_conditions = get_setting(context, 'terms_and_conditions')
+        if get_setting(context, 'show_privacy_statement'):
+            self.privacy_statement = get_setting(context, 'privacy_statement')

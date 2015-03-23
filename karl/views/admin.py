@@ -1200,16 +1200,12 @@ class AuthenticationFormController(BaseSiteFormController):
             description="Enable 2 factor authentication")),
         ('two_factor_auth_code_valid_duration', schemaish.Integer(
             description="How long 2 factor auth codes are valid for"
-        )),
-        ('allow_request_accesss', schemaish.Boolean(
-            description="Allow people to request access to site")),
+        ))
     ]
 
     def form_defaults(self):
         return {
             'two_factor_enabled': self.context.settings.get('two_factor_enabled', False),
-            'allow_request_accesss': self.context.settings.get('allow_request_accesss',
-                                                               False),
             'two_factor_auth_code_valid_duration': self.context.settings.get(
                 'two_factor_auth_code_valid_duration', 300),
 
@@ -1218,13 +1214,54 @@ class AuthenticationFormController(BaseSiteFormController):
     def form_widgets(self, fields):
         return {
             'two_factor_enabled': formish.widgets.Checkbox(),
-            'allow_request_accesss': formish.widgets.Checkbox(),
             'two_factor_auth_code_valid_duration': formish.widgets.Input()
         }
 
     def handle_submit(self, converted):
         self.context.settings['two_factor_enabled'] = converted['two_factor_enabled']
         self.context.settings['allow_request_accesss'] = converted['allow_request_accesss']  # noqa
-        self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
+        location = resource_url(self.context, self.request, 'admin.html')
+        return HTTPFound(location=location)
+
+
+class RegistrationFormController(BaseSiteFormController):
+    page_title = 'Registration Settings'
+    fields = ('allow_request_accesss', 'show_terms_and_conditions',
+              'terms_and_conditions', 'show_privacy_statement',
+              'privacy_statement')
+
+    schema = [
+        ('allow_request_accesss', schemaish.Boolean(
+            description="Allow people to request access to site")),
+        ('show_terms_and_conditions', schemaish.Boolean(
+            description="Show terms and conditions")),
+        ('terms_and_conditions', schemaish.String()),
+        ('show_privacy_statement', schemaish.Boolean(
+            description="Show privacy statement")),
+        ('privacy_statement', schemaish.String())
+    ]
+
+    def form_defaults(self):
+        defaults = {}
+        for field in self.fields:
+            defaults[field] = self.context.settings.get(field, None)
+        return defaults
+
+    def form_widgets(self, fields):
+        return {
+            'allow_request_accesss': formish.widgets.Checkbox(),
+            'show_terms_and_conditions': formish.widgets.Checkbox(),
+            'terms_and_conditions': karlwidgets.RichTextWidget(empty=''),
+            'show_privacy_statement': formish.widgets.Checkbox(),
+            'privacy_statement': karlwidgets.RichTextWidget(empty=''),
+
+        }
+
+    def handle_submit(self, converted):
+        # to update
+        for field in ('allow_request_accesss', 'show_terms_and_conditions',
+                      'terms_and_conditions', 'show_privacy_statement',
+                      'privacy_statement'):
+            self.context.settings[field] = converted[field]
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)

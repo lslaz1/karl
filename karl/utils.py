@@ -102,8 +102,16 @@ def find_peopledirectory_catalog(context):
     return getattr(people, 'catalog', None)
 
 
-def get_setting(context, setting_name, default=None):
+_marker = object()
+
+
+def get_setting(context, setting_name, default=_marker):
     site = find_site(context)
+    if default is _marker:
+        try:
+            default = site._default_settings.get(setting_name, None)
+        except AttributeError:
+            default = None
     try:
         return site.settings.get(setting_name, default)
     except AttributeError:

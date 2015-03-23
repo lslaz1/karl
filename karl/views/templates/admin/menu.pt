@@ -32,6 +32,11 @@
               </a>
           </div>
           <div class="portlet-item">
+              <a href="${api.app_url}/edit_registration.html">
+                Registration Settings
+              </a>
+          </div>
+          <div class="portlet-item">
               <a href="${api.app_url}/edit_footer.html">
                 Edit Footer
               </a>

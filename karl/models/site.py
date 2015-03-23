@@ -423,7 +423,11 @@ class Site(Folder):
         selectable_groups='group.KarlStaff group.KarlUserAdmin group.KarlAdmin group.KarlCommunications',  # noqa
         date_format='en-US',
         recaptcha_api_site_key='',
-        recaptcha_api_secret_key=''
+        recaptcha_api_secret_key='',
+        show_terms_and_conditions=False,
+        terms_and_conditions=None,
+        show_privacy_statement=False,
+        privacy_statement=None
     )
     _repo = Uninitialized
 
