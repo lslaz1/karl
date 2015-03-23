@@ -247,7 +247,7 @@ def _guess_static_rev():
 
 def _get_egg_rev():
     import pkg_resources
-    pkg_resources.get_distribution("karl").version
+    return pkg_resources.get_distribution("karl").version
 
 
 def root_factory(request, name='site'):
