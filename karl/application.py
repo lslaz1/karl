@@ -246,17 +246,8 @@ def _guess_static_rev():
 
 
 def _get_egg_rev():
-    # Find folder that this module is contained in
-    module = sys.modules[__name__]
-    path = os.path.dirname(os.path.abspath(module.__file__))
-
-    # Walk up the tree until we find the parent folder of an EGG-INFO folder.
-    while path != '/':
-        egg_info = os.path.join(path, 'EGG-INFO')
-        if os.path.exists(egg_info):
-            rev = os.path.split(path)[1]
-            return 'r%d' % hash(rev)
-        path = os.path.dirname(path)
+    import pkg_resources
+    pkg_resources.get_distribution("karl").version
 
 
 def root_factory(request, name='site'):
