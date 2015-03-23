@@ -1,7 +1,7 @@
 karl package Changelog
 ======================
 
-5.0.0a4 (unreleased)
+5.0.0a4 (2015-03-23)
 --------------------
 
 - livesearch jquery ui fixes
