@@ -139,6 +139,11 @@ class TemplateAPI(object):
             self._snippets.doctype = xhtml
         return self._snippets
 
+    def render_header(self):
+        r = get_renderer('templates/header.pt')
+        imp = r.implementation()
+        return imp(api=self)
+
     def has_staff_acl(self, context):
         return getattr(context, 'security_state', 'inherits') in ('public', 'restricted')
 

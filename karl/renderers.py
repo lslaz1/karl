@@ -9,10 +9,6 @@ class AddonRendererFactoryFactory(object):
         self.packages = packages
 
     def __call__(self, info):
-        """
-        Only use the ux2 renderer or templates in this theme
-        """
-
         # Does this template exist
         name = info.name
         if ':' in name:

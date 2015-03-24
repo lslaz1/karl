@@ -25,7 +25,7 @@ from karl.models.site import get_weighted_textrepr
 from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
-from karl import addons
+from karl import renderers
 import karl.includes
 
 try:
@@ -375,7 +375,8 @@ class Application(object):
             configurer(config)
             config.commit()
 
-        config.add_renderer('.pt', addons.AddonRendererFactoryFactory(packages))
+        renderer = renderers.AddonRendererFactoryFactory(packages)
+        config.add_renderer('.pt', renderer)
 
         config.end()
 
@@ -396,6 +397,8 @@ class Application(object):
         self.path_prefix = settings.get('path_prefix', '/').rstrip('/')
         self.regprefix = re.compile("^%s(.*)$" % self.path_prefix)
         self.settings = settings
+        self.config.registry['application'] = self
+        self.renderer = renderer
 
     def _rewrite(self, environ):
         """
