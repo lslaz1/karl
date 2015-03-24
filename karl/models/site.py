@@ -63,6 +63,7 @@ from karl.models.interfaces import IUserAddedGroup
 from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
 from karl.models.interfaces import IVirtualData
+from karl.models.interfaces import DEFAULT_HOME_BEHAVIOR_OPTIONS
 from karl.models.profile import Profile
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
@@ -429,7 +430,8 @@ class Site(Folder):
         terms_and_conditions=None,
         show_privacy_statement=False,
         privacy_statement=None,
-        member_fields=list(Profile.additional_fields)
+        member_fields=list(Profile.additional_fields),
+        default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0]
     )
     _repo = Uninitialized
 

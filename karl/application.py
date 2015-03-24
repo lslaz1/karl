@@ -400,6 +400,11 @@ class Application(object):
         self.config.registry['application'] = self
         self.renderer = renderer
 
+        # copy some wsgi app attriutes over...
+        for attr in ('threadlocal_manager', 'logger', 'root_factory', 'routes_mapper',
+                     'request_factory', 'handle_request', 'root_policy', 'registry'):
+            setattr(self, attr, getattr(app, attr, None))
+
     def _rewrite(self, environ):
         """
         handle proxy headers and rewrite wsgi environment to work correctly

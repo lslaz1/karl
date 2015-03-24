@@ -36,6 +36,7 @@ from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IInvitation
 from karl.models.interfaces import ISiteInvitation
 from karl.models.interfaces import IProfile
+from karl.models.interfaces import DEFAULT_HOME_BEHAVIOR_OPTIONS
 from karl.models.adapters import TIMEAGO_FORMAT
 from karl.models.profile import Profile
 from karl.security.policy import ADMINISTER
@@ -1153,14 +1154,17 @@ class SiteSettingsFormController(BaseSiteFormController):
         'max_upload_size',
         'min_pw_length',
         'selectable_groups',
-        'date_format'
+        'date_format',
+        'default_home_behavior'
         )
     labels = {
         'title': 'Site title',
-        'min_pw_length': 'Minimum Password Length'
+        'min_pw_length': 'Minimum Password Length',
+        'default_home_behavior': 'Where user should be directed to by default'
     }
     required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
-                'site_url', 'min_pw_length', 'selectable_groups', 'date_format']
+                'site_url', 'min_pw_length', 'selectable_groups', 'date_format',
+                'default_home_behavior']
     ints = ['min_pw_length', 'max_upload_size']
 
     schema = []
@@ -1178,13 +1182,16 @@ class SiteSettingsFormController(BaseSiteFormController):
     def form_defaults(self):
         data = {}
         for field in self.fields:
-            data[field] = self.context.settings.get(field)
+            data[field] = self.context.settings.get(
+                field, self.context._default_settings.get(field))
         return data
 
     def form_widgets(self, fields):
         widgets = {}
         for field in self.fields:
             widgets[field] = formish.widgets.Input()
+        widgets['default_home_behavior'] = formish.widgets.SelectChoice(
+            DEFAULT_HOME_BEHAVIOR_OPTIONS)
         return widgets
 
     def handle_submit(self, converted):

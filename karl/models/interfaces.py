@@ -672,3 +672,9 @@ except ImportError:
         pass
     class IObjectVersion(Interface):
         pass
+
+
+DEFAULT_HOME_BEHAVIOR_OPTIONS = (
+    ('communities', 'Communities Area'),
+    ('one_community', 'If part of one community, go directly to it')
+)

@@ -298,13 +298,15 @@ def get_user_home(context, request):
     if home is not None:
         return home, extra_path
 
-    # If user is member of only one community, home is that community
     communities = find_communities(context)
-    community_names = get_user_community_names(context, request)
-    if len(community_names) == 1:
-        community = communities.get(community_names.pop(), None)
-        if community is not None:
-            return community, []
+    behavior = get_setting(context, 'default_home_behavior', 'one_community')
+    if behavior == 'one_community':
+        # If user is member of only one community, home is that community
+        community_names = get_user_community_names(context, request)
+        if len(community_names) == 1:
+            community = communities.get(community_names.pop(), None)
+            if community is not None:
+                return community, []
 
     return communities, []
 
