@@ -2,6 +2,7 @@ import datetime
 import os
 import sys
 import time
+import re
 
 from zope.component import queryUtility
 
@@ -318,73 +319,117 @@ def root_factory(request, name='site'):
 
 
 def main(global_config, **settings):
-    var = os.path.abspath(settings['var'])
-    if 'mail_queue_path' not in settings:
-        settings['mail_queue_path'] = os.path.join(var, 'mail_queue')
-    if 'error_monitor_dir' not in settings:
-        settings['error_monitor_dir'] = os.path.join(var, 'errors')
-    if 'blob_cache' not in settings:
-        settings['blob_cache'] = os.path.join(var, 'blob_cache')
-    if 'var_instance' not in settings:
-        settings['var_instance'] = os.path.join(var, 'instance')
-    if 'var_tmp' not in settings:
-        settings['var_tmp'] = os.path.join(var, 'tmp')
+    return Application(global_config, **settings)
 
-    # Configure timezone
-    tz = settings.get('timezone')
-    if tz is not None:
-        os.environ['TZ'] = tz
-        time.tzset()
 
-    # Find package and configuration
-    packages = []
-    configurers = []
-    for pkg_name in settings.get('packages', '').splitlines():
-        try:
-            __import__(pkg_name)
-            package = sys.modules[pkg_name]
-            packages.append(package)
-            configure_overrides = get_imperative_config(package)
-            if configure_overrides:
-                configurers.append(configure_overrides)
-        except ImportError:
-            pass
+class Application(object):
 
-    config = Configurator(
-        package=karl.includes,
-        settings=settings,
-        root_factory=root_factory,
-        autocommit=True
-        )
+    def __init__(self, global_config, **settings):
+        var = os.path.abspath(settings['var'])
+        if 'mail_queue_path' not in settings:
+            settings['mail_queue_path'] = os.path.join(var, 'mail_queue')
+        if 'error_monitor_dir' not in settings:
+            settings['error_monitor_dir'] = os.path.join(var, 'errors')
+        if 'blob_cache' not in settings:
+            settings['blob_cache'] = os.path.join(var, 'blob_cache')
+        if 'var_instance' not in settings:
+            settings['var_instance'] = os.path.join(var, 'instance')
+        if 'var_tmp' not in settings:
+            settings['var_tmp'] = os.path.join(var, 'tmp')
 
-    config.begin()
-    config.include('pyramid_tm')
-    config.include('pyramid_zodbconn')
+        # Configure timezone
+        tz = settings.get('timezone')
+        if tz is not None:
+            os.environ['TZ'] = tz
+            time.tzset()
 
-    configure_karl(config)
-    config.commit()
+        # Find package and configuration
+        packages = []
+        configurers = []
+        for pkg_name in settings.get('packages', '').splitlines():
+            try:
+                __import__(pkg_name)
+                package = sys.modules[pkg_name]
+                packages.append(package)
+                configure_overrides = get_imperative_config(package)
+                if configure_overrides:
+                    configurers.append(configure_overrides)
+            except ImportError:
+                pass
 
-    for configurer in configurers:
-        configurer(config)
+        config = Configurator(
+            package=karl.includes,
+            settings=settings,
+            root_factory=root_factory,
+            autocommit=True
+            )
+
+        config.begin()
+        config.include('pyramid_tm')
+        config.include('pyramid_zodbconn')
+
+        configure_karl(config)
         config.commit()
 
-    config.add_renderer('.pt', addons.AddonRendererFactoryFactory(packages))
+        for configurer in configurers:
+            configurer(config)
+            config.commit()
 
-    config.end()
+        config.add_renderer('.pt', addons.AddonRendererFactoryFactory(packages))
 
-    def closer():
-        registry = config.registry
-        dbs = getattr(registry, '_zodb_databases', None)
-        if dbs:
-            for db in dbs.values():
-                db.close()
-            del registry._zodb_databases
+        config.end()
 
-    app = config.make_wsgi_app()
-    app.config = settings
-    app.close = closer
+        def closer():
+            registry = config.registry
+            dbs = getattr(registry, '_zodb_databases', None)
+            if dbs:
+                for db in dbs.values():
+                    db.close()
+                del registry._zodb_databases
 
-    return app
+        app = config.make_wsgi_app()
+        app.config = settings
+        app.close = closer
+
+        self.app = app
+        self.config = config
+        self.path_prefix = settings.get('path_prefix', '/').rstrip('/')
+        self.regprefix = re.compile("^%s(.*)$" % self.path_prefix)
+        self.settings = settings
+
+    def _rewrite(self, environ):
+        """
+        handle proxy headers and rewrite wsgi environment to work correctly
+        with those headers
+        and handle a potential path_prefix value
+        """
+        url = environ['PATH_INFO']
+        url = re.sub(self.regprefix, r'\1', url)
+        if not url:
+            url = '/'
+        environ['PATH_INFO'] = url
+        environ['SCRIPT_NAME'] = self.path_prefix
+
+        if 'HTTP_X_FORWARDED_SERVER' in environ:
+            environ['SERVER_NAME'] = environ['HTTP_HOST'] = environ.pop(
+                'HTTP_X_FORWARDED_SERVER').split(',')[0]
+        if 'HTTP_X_FORWARDED_HOST' in environ:
+            environ['HTTP_HOST'] = environ.pop('HTTP_X_FORWARDED_HOST').split(',')[0]
+        if 'HTTP_X_FORWARDED_FOR' in environ:
+            environ['REMOTE_ADDR'] = environ.pop('HTTP_X_FORWARDED_FOR')
+
+        if self.settings.get('url_scheme') is not None:
+            environ['wsgi.url_scheme'] = self.settings.get('url_scheme')
+        elif 'HTTP_X_FORWARDED_SCHEME' in environ:
+            environ['wsgi.url_scheme'] = environ.pop('HTTP_X_FORWARDED_SCHEME')
+        elif 'HTTP_X_FORWARDED_PROTO' in environ:
+            environ['wsgi.url_scheme'] = environ.pop('HTTP_X_FORWARDED_PROTO')
+        elif 'HTTP_X_FORWARDED_PROTOCOL' in environ:
+            environ['wsgi.url_scheme'] = environ.pop('HTTP_X_FORWARDED_PROTOCOL')
+
+    def __call__(self, environ, start_response):
+        self._rewrite(environ)
+        return self.app(environ, start_response)
 
 
 def get_imperative_config(package):

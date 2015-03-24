@@ -11,6 +11,7 @@ from karl.application import is_normal_mode
 
 log = logging.getLogger(__name__)
 
+
 def digest(root, closer, registry, frequency):
     if not is_normal_mode(registry):
         log.info("Cannot send mails; running in maintenance mode.")
@@ -19,9 +20,10 @@ def digest(root, closer, registry, frequency):
     freq = frequency
     alerts.send_digests(root, freq)
 
+
 def main(argv=sys.argv):
     default_interval = 6 * 3600  # 6 hours
-    parser =  create_karl_argparser(
+    parser = create_karl_argparser(
         description='Send digest emails.'
         )
     parser.add_argument('-d', '--daemon', action='store_true',
@@ -29,8 +31,9 @@ def main(argv=sys.argv):
     parser.add_argument('-i', '--interval', type=int, default=default_interval,
                         help="Interval in seconds between executions in "
                         "daemon mode.  Default is %d." % default_interval)
-    parser.add_argument('-f', '--frequency', dest='frequency', default='daily',
-                      help='Digest frequency:  daily/weekly/biweekly.')
+    parser.add_argument(
+        '-f', '--frequency', dest='frequency', default='daily',
+        help='Digest frequency:  daily/weekly/biweekly.')
     args = parser.parse_args(argv[1:])
     env = args.bootstrap(args.config_uri)
     root, closer, registry = env['root'], env['closer'], env['registry']
