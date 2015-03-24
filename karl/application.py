@@ -173,9 +173,6 @@ def configure_karl(config, load_zcml=True):
     if isinstance(config, Configurator):
         # define css only if config is correct instance type
         # this caused some tests to fail...
-        config.define_css(
-            'tinymce-3.5.2.karl', static_path + '/tinymce/tinymce-3.5.2.karl.css',
-            always_include=True)
         config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
         config.define_css('karl-multifileupload',
                           static_path + '/karl-multifileupload.css')

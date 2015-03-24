@@ -32,7 +32,8 @@
     "selenium-html-js-converter": "*",
     "gulp-remove-use-strict": "*",
     "gulp-sourcemaps": "*",
-    "browser-sync": "*"
+    "browser-sync": "*",
+    "almond": "~0.2.9"
   },
   "scripts": {
     "install": "napa",

@@ -26,8 +26,17 @@
 
     <!-- Javascript resource composition -->
     <metal:resources define-macro="js_resources">
+
+      <!-- old style js needs to be included first -->
       <script tal:repeat="res python:api.resource_js('karl-ui')" src="${res}" type="text/javascript">//</script>
       <script tal:repeat="res python:api.resource_js('karl-custom')" src="${res}" type="text/javascript">//</script>
+
+      <!-- now new requirejs enabled js -->
+      <tal:devel tal:condition="api.is_resource_devel_mode">
+        <script src="${api.static_url}/dist/requirejs/require.js" type="text/javascript"></script> 
+        <script src="${api.static_url}/config.js" type="text/javascript"></script>
+      </tal:devel>
+
       <tal:resources condition="api.form_field_templates">
         <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
         <metal:resources use-macro="api.snippets.macros['js_extra_resources']"/>
@@ -53,7 +62,7 @@
     </metal:resources>
 
     <metal:resources define-macro="tinymce_js">
-      <script tal:repeat="res python:api.resource_js('tinymce-3.5.2.karl')" src="${res}" type="text/javascript">//</script>
+      <script src="${python:api.requirejs('tinymce')}" type="text/javascript"></script>
     </metal:resources>
 
     <!-- Javascript extra resource composition -->

@@ -32,6 +32,14 @@
   />
 
   <view
+    for="karl.models.interfaces.ISite"
+    view=".vocabulary.vocabulary_view"
+    name="vocabulary.json"
+    renderer='json'
+    permission="view"
+  />
+
+  <view
     for="*"
     view=".acl.acl_tree_view"
     name="acl_tree.html"

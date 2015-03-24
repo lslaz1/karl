@@ -11,10 +11,26 @@ var _ = require('lodash'),
     karma = require('karma').server,
     browserSync = require("browser-sync"),
     minifyCSS = require('gulp-minify-css'),
-    less = require('gulp-less');
+    less = require('gulp-less'),
+    rjs = require('gulp-requirejs');
 
   var LessPluginInlineUrls = require('less-plugin-inline-urls');
-
+  var requirejsOptions = require('./karl/views/static/config');
+  requirejsOptions.baseUrl = './karl/views/static/';
+  requirejsOptions.out = 'tinymce.min.js';
+  requirejsOptions.name = '../../../node_modules/almond/almond';
+  requirejsOptions.include = 'tinymce.js';
+  requirejsOptions.mainConfigFile = './karl/views/static/config.js';
+  requirejsOptions.stubModules = ['jquery'];
+  requirejsOptions.optimize = 'uglify';
+  /* fix tinymce plugin paths */
+  _.forEach(requirejsOptions.paths, function(path, name){
+    if(path.indexOf('/static/dist/tinymce-builded/js/tinymce/plugins') !== -1){
+      requirejsOptions.paths[name] = path.replace(
+        '/static/dist/tinymce-builded/js/tinymce/plugins',
+        'dist/tinymce-builded/js/tinymce/plugins');
+    }
+  });
 
 var res = require('./karl/views/static/resources.json');
 
@@ -30,7 +46,7 @@ function staticPaths(items) {
 function destPrefix(name) {
   // hardwire tinymce destination from here,
   // as it's simpler than putting it to the json file.
-  return name.indexOf('tinymce') === 0 ? res.tinymceMinPrefix : res.minPrefix;
+  return res.minPrefix;
 }
 
 function destFolder(name) {
@@ -41,20 +57,34 @@ gulp.task('stamp', function() {
   fs.writeFile(res.staticPrefix + 'dist/stampfile', _.template(stampfile)());
 });
 
+var tocopy = ['jquery', 'jquery-ui', 'tinymce-builded', 'lodash', 'patternslib',
+              'logging', 'jqtree', 'dropzone', 'mockup-core', 'select2', 'requirejs-text',
+              'requirejs', 'jquery-form', 'backbone', 'bootstrap'];
+
 gulp.task('copy', function() {
-  // jquery from napa
-  gulp.src(['./bower_components/jquery/jquery.js'])
-    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
-  // jquery-ui from napa
+  for(var i=0; i<tocopy.length; i++){
+    gulp.src(['./bower_components/' + tocopy[i] + '/**/*'])
+      .pipe(gulp.dest(res.staticPrefix + 'dist/' + tocopy[i]));
+  }
+
   gulp.src(['./bower_components/jquery-ui/ui/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
   gulp.src(['./bower_components/bgiframe/jquery.bgiframe.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
   gulp.src(['./bower_components/jquery-ui/themes/base/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
-  // tinymce from napa
-  gulp.src(['./node_modules/tinymce/jscripts/**/*'])
-    .pipe(gulp.dest(res.staticPrefix + 'dist/tinymce/jscripts/'));
+  gulp.src(['./bower_components/mockup/mockup/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/mockup/'));
+
+  /* fonts */
+  gulp.src(['./bower_components/tinymce-builded/js/tinymce/skins/lightgray/fonts/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'fonts/'));
+
+  /* select2 files */
+  gulp.src(['./bower_components/select2/select2-spinner.gif'])
+    .pipe(gulp.dest(res.staticPrefix));
+  gulp.src(['./bower_components/select2/select2.png'])
+    .pipe(gulp.dest(res.staticPrefix));
 });
 
 gulp.task('process-js', function () {
@@ -71,14 +101,13 @@ gulp.task('process-js', function () {
       .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(destFolder(name) + fullName));
   });
+  rjs(requirejsOptions)
+  .pipe(gulp.dest('./karl/views/static')); // pipe it to the output DIR 
 });
 
 gulp.task('process-css', function () {
   _.each(res.css, function(name) {
     var dest = res.staticPrefix;
-    if(name.indexOf('tinymce') !== -1){
-      dest += '/tinymce';
-    }
     gulp.src(res.staticPrefix + name + '.less')
       .pipe(less({
         plugins: [LessPluginInlineUrls]

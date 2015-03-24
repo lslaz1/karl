@@ -3,7 +3,7 @@
   "description": "",
   "private": true,
   "dependencies": {
-    "mockup": "v2.0.0",
+    "mockup": "v2.0.1",
     "jquery-ui": "1.9.2",
     "bgiframe": "3.0.1"
   },

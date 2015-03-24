@@ -504,7 +504,7 @@ class Site(Folder):
             'tags': TagIndex(self),
             'lastfirst': CatalogFieldIndex(get_lastfirst),
             'member_name': CatalogTextIndex(get_member_name),
-            'virtual': CatalogFieldIndex(get_virtual),
+            'virtual': CatalogFieldIndex(get_virtual)
         }
 
         for name, utility in getUtilitiesFor(IIndexFactory):

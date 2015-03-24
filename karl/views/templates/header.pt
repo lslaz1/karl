@@ -1,26 +1,24 @@
-<div define-macro="header">
-  <div id="header" class="shadow">
-    <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
+<div id="header" class="shadow">
+  <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
 
-    <div id="header-top">
-      <div class="content" id="top-controls">
-        <span id="logo">
-          <a href="${api.home_url}">
-            <img src="${api.logo_url}" alt=""/>
-          </a>
-        </span>
-        <div metal:use-macro="api.snippets.macros['livesearch_box']"/>
-      </div>
-      <div class="visualClear"></div>
-    </div>
-  </div>
-  <div id="spo-header">
-    <div id="spo-header-top">
-      <div class="content">
-        <div metal:use-macro="api.snippets.macros['header-menu']" />
-        <div metal:use-macro="api.snippets.macros['site-announcement']" />
-      </div>
+  <div id="header-top">
+    <div class="content" id="top-controls">
+      <span id="logo">
+        <a href="${api.home_url}">
+          <img src="${api.logo_url}" alt=""/>
+        </a>
+      </span>
+      <div metal:use-macro="api.snippets.macros['livesearch_box']"/>
     </div>
     <div class="visualClear"></div>
   </div>
+</div>
+<div id="spo-header">
+  <div id="spo-header-top">
+    <div class="content">
+      <div metal:use-macro="api.snippets.macros['header-menu']" />
+      <div metal:use-macro="api.snippets.macros['site-announcement']" />
+    </div>
+  </div>
+  <div class="visualClear"></div>
 </div>

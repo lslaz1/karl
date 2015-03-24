@@ -477,6 +477,15 @@ class TemplateAPI(object):
             result = ['%s/%s%s.min.js' % (self.static_url, prefix, name)]
         return result
 
+    def requirejs(self, name):
+        """
+        include requirejs bundle
+        """
+        if self.is_resource_devel_mode:
+            return '%s/%s.js' % (self.static_url, name)
+        else:
+            return '%s/%s.min.js' % (self.static_url, name)
+
     def get_css(self):
         registry = self.request.registry
         if 'css_resources' in registry:
