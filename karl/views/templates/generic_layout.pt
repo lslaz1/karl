@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal">
+
   <head>
     <metal:resources use-macro="api.snippets.macros['misc_headers']"/>
     <metal:resources use-macro="api.snippets.macros['css_resources']"/>
@@ -12,36 +13,13 @@
 
   <body class="generic-layout">
     <div class="visual-portal-wrapper">
-      <div id="header" class="shadow">
 
-        <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
+      <div tal:define="header load: header.pt" metal:use-macro="header" />
 
-        <div id="header-top">
-          <div class="content" id="top-controls">
-            <span id="logo">
-              <a href="${api.home_url}">
-                <img src="${api.logo_url}" alt=""/>
-              </a>
-            </span>
-            <div metal:use-macro="api.snippets.macros['livesearch_box']"/>
-          </div>
-          <div class="visualClear"></div>
-        </div>
-      </div>
-      <div id="spo-header">
-        <div id="spo-header-top">
-          <div class="content">
-            <div metal:use-macro="api.snippets.macros['header-menu']" />
-            <div metal:use-macro="api.snippets.macros['site-announcement']" />
-          </div>
-        </div>
-        <div class="visualClear"></div>
-      </div>
       <div id="main">
         <div class="rightcol"
              tal:define="my_communities my_communities|();
-                         tags tags|();
-                        ">
+                         tags tags|();">
 
             <metal:portlets define-slot="portlets"></metal:portlets>
 
