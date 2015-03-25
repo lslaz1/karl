@@ -256,7 +256,7 @@ def send_auth_code_view(context, request):
     mailer.send([profile.email], message)
 
     return {
-        'message': 'Authorization code has been sent'
+        'message': 'Authorization code has been sent. Check your email.'
     }
 
 
