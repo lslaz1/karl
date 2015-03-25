@@ -207,7 +207,7 @@ def block_webdav(event):
 
 
 def group_finder(identity, request):
-    # Might be repoze.who policy which uses an identity dict
+    # XXX Might be old repoze.who policy which uses an identity dict
     if isinstance(identity, dict):
         return identity['groups']
 

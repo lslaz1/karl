@@ -56,6 +56,12 @@ class HTML2Text(sgmllib.SGMLParser):
                     out_line.append(word)
                     len_out_line = len_out_line + len_word
                 else:
+                    try:
+                        out_para = out_para + indent_string + join(out_line, '') + '\n'
+                    except:
+                        # XXX ugly hack, is there a way aorund this?
+                        out_line = [unidecode(s).decode() for s in out_line]
+                        out_para = out_para + indent_string + join(out_line, '') + '\n'
                     out_line = [word]
                     len_out_line = len_word
 

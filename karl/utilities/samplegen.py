@@ -47,11 +47,11 @@ title_word_re = re.compile(r"([A-Z][a-z']+)")
 title_word_cache = {}  # filename: set(title_words)
 
 DEFAULT_ENV = {
-    'repoze.who.identity': {
-        'repoze.who.userid': 'admin',
+    'karl.identity': {
+        'id': 'admin',
         'groups': ('group.KarlStaff', 'group.KarlAdmin'),
         },
-    'repoze.browserid':'1',
+    'repoze.browserid': '1',
     }
 
 

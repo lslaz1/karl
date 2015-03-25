@@ -477,7 +477,7 @@ class DummyUsers:
             return self.get_by_login(login)
 
     def change_password(self, userid, password):
-        from repoze.who.plugins.zodb.users import get_sha_password
+        from karl.models.users import get_sha_password
         self._by_id[userid]["password"] = get_sha_password(password)
 
     def change_login(self, userid, new_login):

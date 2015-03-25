@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+5.0.2a1 (unreleased)
+--------------------
+
+- add events for login, failed and success attempts
+
+- remove use of repoze.who
+
 
 5.0.1a2 (2015-03-24)
 --------------------

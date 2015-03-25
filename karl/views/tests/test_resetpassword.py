@@ -102,7 +102,8 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         converted = {'email': 'me@example.com'}
         response = controller.handle_submit(converted)
         self.failIf(len(mailer))
-        self.assertEqual(response.location,
+        self.assertEqual(
+            response.location,
             'http://login.example.com/resetpassword?email=me%40example.com')
         self.assertEqual(request.session['came_from'],
                          'http://example.com/login.html')
@@ -118,7 +119,8 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         # go out this time
         context.users._by_id['me']['groups'] = []
         response = controller.handle_submit(converted)
-        self.assertEqual(response.location,
+        self.assertEqual(
+            response.location,
             'http://example.com/reset_sent.html?email=me%40example.com')
         profile = profile_search.profile
         self.failUnless(profile.password_reset_key)
@@ -356,7 +358,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.failUnless(profile.password_reset_key is None)
         self.failUnless(profile.password_reset_time is None)
         user = self.context.users.get(login='me')
-        from repoze.who.plugins.zodb.users import get_sha_password
+        from karl.models.users import get_sha_password
         self.assertEqual(user['password'], get_sha_password('secret'))
 
     def test_handle_submit_utf8_password(self):
@@ -384,7 +386,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.failUnless(profile.password_reset_key is None)
         self.failUnless(profile.password_reset_time is None)
         user = self.context.users.get(login='me')
-        from repoze.who.plugins.zodb.users import get_sha_password
+        from karl.models.users import get_sha_password
         self.assertEqual(user['password'], get_sha_password(password.encode('utf8')))
 
 

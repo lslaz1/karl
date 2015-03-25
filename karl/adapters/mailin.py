@@ -308,12 +308,15 @@ class MailinDispatcher(object):
             user = users.get_by_id(info['author'])
             if user is not None:
                 user = dict(user)
-                user['repoze.who.userid'] = info['author']
+                # XXX check this!
+                user['karl.identity'] = {
+                    'id': info['author']
+                }
 
             # BFG Security API always assumes http request, so we fabricate a
             # fake request.
             request = Request.blank('/')
-            request.environ['repoze.who.identity'] = user
+            request.environ['karl.identity'] = user
             request.context = self.context
 
             if not has_permission(permission, context, request):

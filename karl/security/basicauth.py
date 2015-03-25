@@ -9,7 +9,7 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import Everyone
 from pyramid.security import Authenticated
 
-from repoze.who.plugins.zodb.users import get_sha_password
+from karl.models.users import get_sha_password
 from karl.utils import find_users
 
 
@@ -20,18 +20,18 @@ def _get_basicauth_credentials(request):
     authorization = AUTHORIZATION(request.environ)
     try:
         authmeth, auth = authorization.split(' ', 1)
-    except ValueError: # not enough values to unpack
+    except ValueError:  # not enough values to unpack
         return None
     if authmeth.lower() == 'basic':
         try:
             auth = auth.strip().decode('base64')
-        except binascii.Error: # can't decode
+        except binascii.Error:  # can't decode
             return None
         try:
             login, password = auth.split(':', 1)
-        except ValueError: # not enough values to unpack
+        except ValueError:  # not enough values to unpack
             return None
-        return {'login':login, 'password':password}
+        return {'login': login, 'password': password}
 
     return None
 
@@ -74,7 +74,7 @@ class BasicAuthenticationPolicy(object):
         if credentials is None:
             return None
         principals = self.check(credentials, request)
-        if principals is not None: # is not None!
+        if principals is not None:  # is not None!
             return principals[0]
 
     def effective_principals(self, request):
@@ -83,7 +83,7 @@ class BasicAuthenticationPolicy(object):
         if credentials is None:
             return effective_principals
         principals = self.check(credentials, request)
-        if principals is None: # is None!
+        if principals is None:  # is None!
             return effective_principals
         effective_principals.append(Authenticated)
         effective_principals.extend(principals)

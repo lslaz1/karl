@@ -56,8 +56,6 @@ requires = [
     'repoze.postoffice',
     'repoze.sendmail',
     'repoze.session',
-    'repoze.who',
-    'repoze.whoplugins.zodb',
     'repoze.workflow',
     'setuptools',
     'simplejson',

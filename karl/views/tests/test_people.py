@@ -416,7 +416,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.get('is_active'), False)
 
     def test_handle_submit_normal(self):
-        from repoze.who.plugins.zodb.users import get_sha_password
+        from karl.models.users import get_sha_password
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -1550,10 +1550,11 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_submit(converted)
 
-        from repoze.who.plugins.zodb.users import get_sha_password
+        from karl.models.users import get_sha_password
         new_enc = get_sha_password('newnewnew')
         self.assertEqual(users.get_by_id('profile')['password'], new_enc)
-        self.assertEqual(response.location,
+        self.assertEqual(
+            response.location,
             'http://example.com/profiles/profile/'
             '?status_message=Password%20changed')
 

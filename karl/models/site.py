@@ -36,7 +36,7 @@ from repoze.folder import Folder
 from repoze.lemonade.content import create_content
 from repoze.lemonade.content import IContent
 from repoze.session.manager import SessionDataManager
-from repoze.who.plugins.zodb.users import Users
+from karl.models.users import Users
 from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface.declarations import Declaration

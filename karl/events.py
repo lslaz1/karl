@@ -17,6 +17,9 @@
 
 from karl.models.interfaces import IObjectModifiedEvent
 from karl.models.interfaces import IObjectWillBeModifiedEvent
+from karl.models.interfaces import ILoginAttempt
+from karl.models.interfaces import ILoginSuccess
+from karl.models.interfaces import ILoginFailed
 
 from zope.interface import implements
 
@@ -31,3 +34,21 @@ class ObjectWillBeModifiedEvent(object):
     implements(IObjectWillBeModifiedEvent)
     def __init__(self, object):
         self.object = object
+
+
+class LoginAttempt(object):
+    implements(ILoginAttempt)
+
+    def __init__(self, site, request, login, password):
+        self.site = site
+        self.request = request
+        self.login = login
+        self.password = password
+
+
+class LoginFailed(LoginAttempt):
+    implements(ILoginFailed)
+
+
+class LoginSuccess(LoginAttempt):
+    implements(ILoginSuccess)

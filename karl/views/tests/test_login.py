@@ -227,45 +227,6 @@ class TestLoginView(unittest.TestCase):
 
 _marker = object()
 
-class TestLogoutView(unittest.TestCase):
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
-    def _callFUT(self, context, request, reason=_marker):
-        from karl.views.login import logout_view
-        if reason is not _marker:
-            return logout_view(context, request, reason)
-        return logout_view(context, request)
-
-    @mock.patch('karl.views.login.forget')
-    def test_w_default_reason(self, forget):
-        request = testing.DummyRequest()
-        plugin = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
-        context = makeRoot()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
-        headers = dict(response.headers)
-        self.assertEqual(
-            headers['Location'],
-            'http://example.com/login.html?reason=Logged+out')
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
-        forget.assert_called_once_with(request)
-
-    def test_w_explicit_reason(self):
-        request = testing.DummyRequest()
-        context = makeRoot()
-        response = self._callFUT(context, request, reason='testing')
-        self.assertEqual(response.status, '302 Found')
-        headers = dict(response.headers)
-        self.assertEqual(
-            headers['Location'],
-            'http://example.com/login.html?reason=testing')
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
-
 
 class DummyAuthenticationPlugin(object):
     _auth_called = _remember_called = _forget_called = _userid = None

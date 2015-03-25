@@ -73,8 +73,7 @@ class ExtractDescriptionTests(unittest.TestCase):
                  'Apparently the Craigslist Foundation '
                  'is going to build a knowledge sharing '
                  'tool/community/platform - it\'s a bit unclear '
-                 'at this point.'
-                )
+                 'at this point.')
         summary = self._callFUT(HTML)
         self.assertEqual(summary, WORDS)
 

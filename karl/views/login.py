@@ -23,7 +23,7 @@ from urlparse import urljoin
 import re
 import requests
 
-from repoze.who.plugins.zodb.users import get_sha_password
+from karl.models.users import get_sha_password
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
@@ -43,10 +43,12 @@ from karl.utils import make_random_code
 from karl.utils import strings_differ
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
+from karl import events
 
 from karl.views.api import TemplateAPI
 
 from zope.component import getUtility
+from zope.event import notify
 from repoze.sendmail.interfaces import IMailDelivery
 from repoze.postoffice.message import Message
 
@@ -74,6 +76,9 @@ def login_view(context, request):
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
+
+        notify(events.LoginAttempt(context, request, login, password))
+
         if login is None or password is None:
             return HTTPFound(location='%s/login.html' % request.application_url)
         max_age = request.POST.get('max_age')
@@ -91,6 +96,7 @@ def login_view(context, request):
 
         # if not successful, try again
         if not userid:
+            notify(events.LoginFailed(context, request, login, password))
             redirect = request.resource_url(
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
@@ -101,6 +107,7 @@ def login_view(context, request):
                 redirect = request.resource_url(
                     request.root, 'login.html',
                     query={'reason': 'No authentication code provided'})
+                notify(events.LoginFailed(context, request, login, password))
                 return HTTPFound(location=redirect)
             profiles = find_profiles(context)
             profile = profiles.get(userid)
@@ -108,11 +115,13 @@ def login_view(context, request):
             now = datetime.utcnow()
             if (strings_differ(code, profile.current_auth_code) or
                     now > (profile.current_auth_code_time_stamp + timedelta(seconds=window))):  # noqa
+                notify(events.LoginFailed(context, request, login, password))
                 redirect = request.resource_url(
                     request.root, 'login.html', query={'reason': 'Invalid authorization code'})  # noqa
                 return HTTPFound(location=redirect)
 
         # else, remember
+        notify(events.LoginSuccess(context, request, login, password))
         return remember_login(context, request, userid, max_age)
 
     # Log in user seamlessly with kerberos if enabled
@@ -131,7 +140,6 @@ def login_view(context, request):
         if request.authorization and request.authorization[0] == 'Negotiate':
             try_kerberos = False
 
-    # Per #366377, don't say what screen
     page_title = 'Login to %s' % get_setting(context, 'title')
     api = TemplateAPI(context, request, page_title)
 

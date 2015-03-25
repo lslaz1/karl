@@ -3,7 +3,8 @@ import schemaish
 from zope.testing.cleanup import cleanUp
 
 from pyramid import testing
-from repoze.who.plugins.zodb.users import get_sha_password
+from karl.models.users import get_sha_password
+
 
 class TestTagsWidget(unittest.TestCase):
     def _makeOne(self, **kw):
@@ -11,7 +12,7 @@ class TestTagsWidget(unittest.TestCase):
         return TagsWidget(**kw)
 
     def test_json_taginfo(self):
-        widget = self._makeOne(tagdata={'records':[{'tag':'a'}]})
+        widget = self._makeOne(tagdata={'records': [{'tag': 'a'}]})
         result = widget.json_taginfo(['a', 'b'])
         self.assertEqual(
             result,
@@ -86,7 +87,6 @@ class TestNotOneOfValidator(unittest.TestCase):
 
     def test_fail(self):
         from validatish.error import Invalid
-        container = testing.DummyModel()
         validator = self._makeOne(('a', 'b'))
         self.assertRaises(Invalid, validator, 'a')
 
@@ -302,7 +302,7 @@ class TestZODBFileStore(unittest.TestCase):
         return ZODBFileStore(mapping)
 
     def test_get_present(self):
-        mapping = {'a':([], '', DummyBlob())}
+        mapping = {'a': ([], '', DummyBlob())}
         filestore = self._makeOne(mapping)
         result = filestore.get('a')
         self.assertEqual(result, ('', [], True))
@@ -336,7 +336,7 @@ class TestZODBFileStore(unittest.TestCase):
         self.assertEqual(blobfile.open('r').read(), 'the data')
 
     def test_delete_exists(self):
-        mapping = {'a':1}
+        mapping = {'a': 1}
         filestore = self._makeOne(mapping)
         filestore.delete('a')
         self.failIf('a' in mapping)
@@ -361,7 +361,7 @@ class TestFileUpload2(unittest.TestCase):
         filestore = DummyFileStore()
         widget = self._makeOne(filestore)
         field = DummyField()
-        result = widget.from_request_data(field, {'name':[''], 'remove':[True]})
+        result = widget.from_request_data(field, {'name': [''], 'remove': [True]})
         self.assertEqual(result.__class__, SchemaFile)
         self.assertEqual(result.metadata, {'default': None, 'name': '',
                                            'remove': True})
@@ -372,33 +372,32 @@ class TestFileUpload2(unittest.TestCase):
         widget = self._makeOne(filestore)
         field = DummyField()
         result = widget.from_request_data(field,
-                                          {'name':['abc'], 'default':['abc']})
+                                          {'name': ['abc'], 'default': ['abc']})
         self.assertEqual(result.__class__, SchemaFile)
         self.assertEqual(result.metadata, {})
         self.assertEqual(result.filename, None)
 
     def test_from_request_edit_data_name_eq_default_no_upload(self):
-        from schemaish.type import File as SchemaFile
         filestore = DummyFileStore()
         filestore['abc'] = ('tag', [], 'file')
         widget = self._makeOne(filestore)
         field = DummyField()
         result = widget.from_request_data(field,
-                                          {'name':['abc'],
-                                           'default':['abc'],
-                                           'file':[u'']})
+                                          {'name': ['abc'],
+                                           'default': ['abc'],
+                                           'file': [u'']})
         self.assertEqual(result, None)
 
     def test_from_request_data_name_equals_default_with_upload(self):
         from schemaish.type import File as SchemaFile
         filestore = DummyFileStore()
-        filestore['abc'] = ('tag', [('Filename', 'abc'), ('Content-Type',
-                                     'content-type')], 'file')
+        filestore['abc'] = (
+            'tag', [('Filename', 'abc'), ('Content-Type', 'content-type')], 'file')
         widget = self._makeOne(filestore)
         field = DummyField()
         storage = DummyFieldStorage()
         result = widget.from_request_data(field,
-                                          {'name':['abc'], 'default':['abc'],
+                                          {'name': ['abc'], 'default': ['abc'],
                                            'file': [storage]})
         self.assertEqual(result.__class__, SchemaFile)
         self.assertEqual(result.metadata, {})
@@ -409,18 +408,18 @@ class TestFileUpload2(unittest.TestCase):
         widget = self._makeOne(filestore)
         field = DummyField()
         result = widget.from_request_data(field,
-                                          {'name':['abc'], 'default':['def']})
+                                          {'name': ['abc'], 'default': ['def']})
         self.assertEqual(result, None)
 
     def test_from_request_data_name_notequal_default(self):
         from schemaish.type import File as SchemaFile
         filestore = DummyFileStore()
-        filestore['abc'] = ('tag', [('Filename', 'filename'), ('Content-Type',
-                                     'content-type')], 'file')
+        filestore['abc'] = (
+            'tag', [('Filename', 'filename'), ('Content-Type', 'content-type')], 'file')
         widget = self._makeOne(filestore)
         field = DummyField()
         result = widget.from_request_data(field,
-                                          {'name':['abc'], 'default':['def']})
+                                          {'name': ['abc'], 'default': ['def']})
         self.assertEqual(result.__class__, SchemaFile)
         self.assertEqual(result.file, 'file')
         self.assertEqual(result.filename, 'filename')
@@ -437,7 +436,7 @@ class TestFileUpload2(unittest.TestCase):
         filestore = DummyFileStore()
         widget = self._makeOne(filestore)
         field = DummyField()
-        data = {'remove':[True]}
+        data = {'remove': [True]}
         result = widget.pre_parse_incoming_request_data(field, data)
         self.assertEqual(result['name'], [''])
         self.assertEqual(result['mimetype'], [''])
@@ -447,7 +446,7 @@ class TestFileUpload2(unittest.TestCase):
         widget = self._makeOne(filestore)
         field = DummyField()
         storage = DummyFieldStorage()
-        data = {'file':[storage]}
+        data = {'file': [storage]}
         result = widget.pre_parse_incoming_request_data(field, data)
         self.assertEqual(result['name'], ['bar.txt'])
         self.assertEqual(result['mimetype'], ['type'])
@@ -458,7 +457,7 @@ class TestFileUpload2(unittest.TestCase):
         field = DummyField()
         storage = DummyFieldStorage()
         storage.filename = '/home/chris/get\nout\tof town.txt'
-        data = {'file':[storage]}
+        data = {'file': [storage]}
         result = widget.pre_parse_incoming_request_data(field, data)
         self.assertEqual(result['name'], ['get out of town.txt'])
         self.assertEqual(result['mimetype'], ['type'])
@@ -523,13 +522,13 @@ class Test_get_filestore(unittest.TestCase):
     def test_it_present(self):
         from karl.views.forms.filestore import ZODBFileStore
         sessions = DummySessions()
-        sessions['1'] = {'formid':{'a':1}}
+        sessions['1'] = {'formid': {'a': 1}}
         context = testing.DummyModel(sessions=sessions)
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         result = self._callFUT(context, request, 'formid')
         self.assertEqual(result.__class__, ZODBFileStore)
-        self.assertEqual(result.persistent_map, {'a':1})
+        self.assertEqual(result.persistent_map, {'a': 1})
 
     def test_it_missing(self):
         from karl.views.forms.filestore import ZODBFileStore
@@ -577,8 +576,8 @@ class Test_KarlDateTimeToStringConverter(unittest.TestCase):
         from datetime import datetime
         converter = self._makeOne()
         dt = datetime(2010, 3, 14, 1, 59, 26)
-        converted = converter.from_type(dt,
-            converter_options={'datetime_format': datetime_format},
+        converted = converter.from_type(
+            dt, converter_options={'datetime_format': datetime_format},
         )
         self.assertEqual(converted, '14/03/2010 01:45')
 
@@ -586,24 +585,30 @@ class Test_KarlDateTimeToStringConverter(unittest.TestCase):
         datetime_format = '%d/%m/%Y %H:%M'
         from datetime import datetime
         converter = self._makeOne()
-        converted = converter.to_type('14/03/2010 01:45',
+        converted = converter.to_type(
+            '14/03/2010 01:45',
             converter_options={'datetime_format': datetime_format},
         )
         self.assertEqual(converted, datetime(2010, 3, 14, 1, 45, 0, 0))
         from convertish.convert import ConvertError
-        self.assertRaises(ConvertError, converter.to_type, 'bo/gus/val',
+        self.assertRaises(
+            ConvertError, converter.to_type, 'bo/gus/val',
             converter_options={'datetime_format': datetime_format},
         )
-        self.assertRaises(ConvertError, converter.to_type, '12/12',
+        self.assertRaises(
+            ConvertError, converter.to_type, '12/12',
             converter_options={'datetime_format': datetime_format},
         )
-        self.assertRaises(ConvertError, converter.to_type, '21/12/2012 1212',
+        self.assertRaises(
+            ConvertError, converter.to_type, '21/12/2012 1212',
             converter_options={'datetime_format': datetime_format},
         )
-        self.assertRaises(ConvertError, converter.to_type, '40/10/2012',
+        self.assertRaises(
+            ConvertError, converter.to_type, '40/10/2012',
             converter_options={'datetime_format': datetime_format},
         )
-        self.assertRaises(ConvertError, converter.to_type, '10/14/2012',
+        self.assertRaises(
+            ConvertError, converter.to_type, '10/14/2012',
             converter_options={'datetime_format': datetime_format},
         )
 
@@ -630,7 +635,6 @@ class DummyFieldStorage(object):
 
 class DummySessions(dict):
     def get(self, name, default=None):
-        if not name in self:
+        if name not in self:
             self[name] = {}
         return self[name]
-

@@ -3,7 +3,7 @@ import re
 
 from lxml.html.clean import clean_html
 from pyramid.traversal import find_resource
-from repoze.who.plugins.zodb.users import get_sha_password
+from karl.models.users import get_sha_password
 from validatish import validate
 from validatish.validator import Validator
 from validatish.error import Invalid
@@ -72,7 +72,7 @@ class PathExists(Validator):
         site = find_site(self.context)
         try:
             target = find_resource(site, v)
-        except KeyError, e:
+        except KeyError:
             raise Invalid("Path not found: %s" % v)
         else:
             if target is site:
@@ -93,7 +93,7 @@ class CorrectUserPassword(Validator):
         self.user = user
 
     def __call__(self, v):
-        # XXX: repoze.who.plugins.zodb.interfaces.IUsers
+        # XXX: karl.who.IUsers
         # really should have a check_password(id, password)
         # method.  We shouldn't have to use get_sha_password
         # directly.
@@ -138,13 +138,13 @@ class UniqueShortAddress(Validator):
             root = find_site(context)
             if v in root.list_aliases:
                 raise Invalid(
-                 "'short_address' is already in use by another mailing list.")
+                    "'short_address' is already in use by another mailing list.")
 
 class HTML(Validator):
     def __call__(self, v):
         if v:
             try:
-                clean = clean_html(v)
+                clean_html(v)
             except:
                 raise Invalid('Unable to parse the provided HTML')
 
@@ -157,7 +157,7 @@ class WebURL(Validator):
                 v = 'http://%s' % v
             try:
                 validate.is_url(v, with_scheme=True)
-            except Invalid, e:
+            except Invalid:
                 msg = u"Must start with 'http://', 'https://', or 'www.'"
                 raise Invalid(msg, validator=self)
 
