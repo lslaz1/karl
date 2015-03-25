@@ -24,3 +24,12 @@ Not all but these are what are specific to the karl app(excluding used plugins)
 - statistics_folder
 - kerberos
 - forgot_password_url
+
+
+Cronjobs/processes to setup
+---------------------------
+
+- send mail from mail directory
+- send digest emails
+- consume mail
+- statistics
