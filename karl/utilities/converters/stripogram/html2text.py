@@ -73,7 +73,12 @@ class HTML2Text(sgmllib.SGMLParser):
                 out_para = out_para + indent_string + join(out_line, '') + '\n'
             out_paras.append(out_para)
 
-        self.result = join(out_paras, '\n\n')
+        try:
+            self.result = join(out_paras, '\n\n')
+        except:
+            # XXX ugly hack, is there a way aorund this?
+            out_paras = [unidecode(s).decode() for s in out_paras]
+            self.result = join(out_paras, '\n\n')
 
     def mod_indent(self, i):
         self.indent = self.indent + i
