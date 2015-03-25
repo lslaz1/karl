@@ -1,12 +1,12 @@
 
 
-def get_tinymce_options(context, request):
+def get_tinymce_options(api):
     return {
         # disable tinymce upload tab, do not have time to implement
         'upload': None,
         'tiny': {
             'browser_spellcheck': True,
-            'content_css': '/static/dist/tinymce-builded/js/tinymce/skins/lightgray/content.min.css',  # noqa
+            'content_css': api.resource_css('karl-theme').path,  # noqa
             'theme': '-modern',
             'plugins': [
                 'advlist autolink lists charmap print preview anchor',

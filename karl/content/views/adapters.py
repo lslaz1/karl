@@ -555,6 +555,7 @@ class NonBlogAlert(Alert):
             attachments=attachment_links,
             attachment_hrefs=attachment_hrefs,
             profile=profile,
+            profiles=self.profiles,
             creator=self.creator,
             content_type=self._content_type_name,
             digest=self.digest,

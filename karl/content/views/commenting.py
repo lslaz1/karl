@@ -50,6 +50,7 @@ from repoze.lemonade.content import create_content
 from karl.models.interfaces import IComment
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForumTopic
+from karl.content.interfaces import ICommunityFile
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import get_show_sendalert
 from karl.content.views.utils import sendalert_default
@@ -103,6 +104,9 @@ def show_comment_view(context, request):
     if container is None:
         # Comments can also be in forum topics
         container = find_interface(context, IForumTopic)
+    if container is None:
+        # Comments can also be files
+        container = find_interface(context, ICommunityFile)
     backto = {
         'href': resource_url(container, request),
         'title': container.title,

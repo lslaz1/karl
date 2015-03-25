@@ -506,5 +506,5 @@ class TemplateAPI(object):
     def body_attriubtes(self):
         return {
             'data-pat-tinymce': json.dumps(
-                patterns.get_tinymce_options(self.context, self.request))
+                patterns.get_tinymce_options(self))
         }
