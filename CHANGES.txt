@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.0.2a3 (2015-03-25)
+--------------------
+
+- provide way to generate static resource directory urls
+
 5.0.2a2 (2015-03-25)
 --------------------
 
