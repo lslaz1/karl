@@ -7,62 +7,65 @@
 # $Id: html2text.py 1072 2005-05-01 12:05:51Z ajung $
 
 import sgmllib
-from string import lower, replace, split, join
+from string import lower, replace, join
+from unidecode import unidecode
+
 
 class HTML2Text(sgmllib.SGMLParser):
 
-    from htmlentitydefs import entitydefs # replace entitydefs from sgmllib
+    # replace entitydefs from sgmllib
+    from htmlentitydefs import entitydefs  # noqa 
 
     def __init__(self, ignore_tags=(), indent_width=4, page_width=80):
         sgmllib.SGMLParser.__init__(self)
         self.result = ""
         self.indent = 0
         self.ol_number = 0
-        self.page_width=page_width
-        self.inde_width=indent_width
-        self.lines=[]
-        self.line=[]
+        self.page_width = page_width
+        self.inde_width = indent_width
+        self.lines = []
+        self.line = []
         self.ignore_tags = ignore_tags
 
-    def add_text(self,text):
+    def add_text(self, text):
         # convert text into words
         self.line.append(replace(text, '\n', ' '))
 
     def add_break(self):
-        self.lines.append((self.indent,self.line))
-        self.line=[]
+        self.lines.append((self.indent, self.line))
+        self.line = []
 
     def generate(self):
         # join lines with indents
         indent_width = self.inde_width
         page_width = self.page_width
-        out_paras=[]
-        for indent,line in self.lines+[(self.indent,self.line)]:
+        out_paras = []
+        for indent, line in self.lines + [(self.indent, self.line)]:
 
-            i=indent*indent_width
-            indent_string = i*' '
+            i = indent*indent_width
+            indent_string = i * ' '
             line_width = page_width-i
 
-            out_para=''
-            out_line=[]
-            len_out_line=0
+            out_para = ''
+            out_line = []
+            len_out_line = 0
             for word in line:
+                word = unidecode(word).decode()
                 len_word = len(word)
-                if len_out_line+len_word<line_width:
+                if len_out_line+len_word < line_width:
                     out_line.append(word)
                     len_out_line = len_out_line + len_word
                 else:
                     out_para = out_para + indent_string + join(out_line, '') + '\n'
-                    out_line=[word]
-                    len_out_line=len_word
+                    out_line = [word]
+                    len_out_line = len_word
 
             out_para = out_para + indent_string + join(out_line, '')
             out_paras.append(out_para)
 
-        self.result = join(out_paras,'\n\n')
+        self.result = join(out_paras, '\n\n')
 
-
-    def mod_indent(self,i):
+    def mod_indent(self, i):
         self.indent = self.indent + i
         if self.indent < 0:
             self.indent = 0
@@ -76,11 +79,11 @@ class HTML2Text(sgmllib.SGMLParser):
         tag = lower(tag)
 
         if tag and tag not in self.ignore_tags:
-            if tag[0]=='h' or tag in ['br','pre','p','hr']:
+            if tag[0] == 'h' or tag in ['br', 'pre', 'p', 'hr']:
                 # insert a blank line
                 self.add_break()
 
-            elif tag =='img':
+            elif tag == 'img':
                 # newline, text, newline
                 src = ''
 
@@ -91,7 +94,7 @@ class HTML2Text(sgmllib.SGMLParser):
                 self.add_break()
                 self.add_text('Image: ' + src)
 
-            elif tag =='li':
+            elif tag == 'li':
                 self.add_break()
                 if self.ol_number:
                     # num - text
@@ -101,16 +104,16 @@ class HTML2Text(sgmllib.SGMLParser):
                     # - text
                     self.add_text('- ')
 
-            elif tag in ['dd','dt']:
+            elif tag in ['dd', 'dt']:
                 self.add_break()
                 # increase indent
                 self.mod_indent(+1)
 
-            elif tag in ['ul','dl','ol']:
+            elif tag in ['ul', 'dl', 'ol']:
                 # blank line
                 # increase indent
                 self.mod_indent(+1)
-                if tag=='ol':
+                if tag == 'ol':
                     self.ol_number = 1
 
     def unknown_endtag(self, tag):
@@ -118,22 +121,21 @@ class HTML2Text(sgmllib.SGMLParser):
         tag = lower(tag)
 
         if tag and tag not in self.ignore_tags:
-            if tag[0]=='h' or tag in ['pre']:
+            if tag[0] == 'h' or tag in ['pre']:
                 # newline, text, newline
                 self.add_break()
 
-            elif tag =='li':
+            elif tag == 'li':
                 self.add_break()
 
-            elif tag in ['dd','dt']:
+            elif tag in ['dd', 'dt']:
                 self.add_break()
                 # descrease indent
                 self.mod_indent(-1)
 
-            elif tag in ['ul','dl','ol']:
+            elif tag in ['ul', 'dl', 'ol']:
                 # blank line
                 self.add_break()
                 # decrease indent
                 self.mod_indent(-1)
                 self.ol_number = 0
-
