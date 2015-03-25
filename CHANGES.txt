@@ -1,7 +1,7 @@
 karl package Changelog
 ======================
 
-5.0.1a1 (unreleased)
+5.0.1a1 (2015-03-24)
 --------------------
 
 - integrate mockup tinymce js(eventually more hopefully)
