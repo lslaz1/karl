@@ -306,12 +306,14 @@ class UserSync(object):
             password = data.pop('password', info['password'])
             groups = data.pop('groups', info['groups'])
             login = data.pop('login', info['login'])
+            salt = data.pop('salt', info.get('salt'))
             users.remove(username)
 
         elif activate:  # reactivate
             log.info("Reactivating user: %s", username)
             login = data.pop('login', username)
             password = data.pop('password', None)
+            salt = data.pop('salt', None)
             groups = data.pop('groups', [])
             if not password:
                 raise ValueError(
@@ -319,7 +321,12 @@ class UserSync(object):
                     "reactivate user")
 
         if activate:
-            users.add(username, login, password, groups, encrypted=True)
+            users.add(username, login, password, groups)
+            user = users.data[username]
+            user['password'] = password
+            if salt:
+                user['salt'] = salt
+            users.data[username] = user
 
         if security_state != getattr(profile, 'security_state', None):
             workflow = get_workflow(IProfile, 'security', profile)

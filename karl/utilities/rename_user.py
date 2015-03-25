@@ -51,7 +51,12 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
 
         if old_user is not None:
             users.add(new_name, new_name, old_user['password'],
-                      old_user['groups'], encrypted=True)
+                      old_user['groups'])
+            new_user = users.data[new_name]
+            new_user['password'] = old_user['password']
+            if 'salt' in old_user:
+                new_user['salt'] = old_user['salt']
+            users.data[new_name] = new_user  # persistence
             users.remove(old_name)
 
         profile = profiles[old_name]

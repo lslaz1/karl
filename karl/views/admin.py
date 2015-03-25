@@ -729,11 +729,9 @@ class UploadUsersView(object):
         groups = row.pop('groups', '')
         groups = set(groups.split())
         if 'sha_password' in row:
-            users.add(username, login, row.pop('sha_password'),
-                      groups, encrypted=True)
+            users.add(username, login, row.pop('sha_password'), groups)
         else:
-            users.add(username, login, row.pop('password'),
-                      groups)
+            users.add(username, login, row.pop('password'), groups)
         decoded = {}
         for k, v in row.items():
             if isinstance(v, str):

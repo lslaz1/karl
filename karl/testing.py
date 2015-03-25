@@ -407,13 +407,12 @@ class DummyUsers:
         self.community = community
         self._by_id = {}
         self._by_login = {}
+        self.data = {}
         if encrypt is None:
             encrypt = lambda password: password
         self.encrypt = encrypt
 
-    def add(self, userid, login, password, groups, encrypted=False):
-        if not encrypted:
-            password = self.encrypt(password)
+    def add(self, userid, login, password, groups=[]):
         self.added = (userid, login, password, groups)
         userinfo = {
             "id": userid,
@@ -424,6 +423,7 @@ class DummyUsers:
             }
         self._by_login[login] = userinfo
         self._by_id[userid] = userinfo
+        self.data[userid] = userinfo
 
         if (self.community is not None and
                 hasattr(self.community, "moderators_group_name") and
