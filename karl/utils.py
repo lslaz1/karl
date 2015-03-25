@@ -300,3 +300,15 @@ def strings_differ(string1, string2):
 
 def strings_same(string1, string2):
     return not strings_differ(string1, string2)
+
+
+_egg_version_cache = {}
+
+
+def get_egg_rev(distribution='karl'):
+    if distribution in _egg_version_cache:
+        return _egg_version_cache[distribution]
+    import pkg_resources
+    version = pkg_resources.get_distribution(distribution).version
+    _egg_version_cache[distribution] = version
+    return version

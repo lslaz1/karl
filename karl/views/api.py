@@ -44,6 +44,7 @@ from karl.utils import find_site
 from karl.utils import get_settings
 from karl.utils import get_config_settings
 from karl.utils import support_attachments
+from karl.utils import get_egg_rev
 from karl.views.utils import convert_to_script
 
 from karl.models.interfaces import ICommunityContent
@@ -95,8 +96,7 @@ class TemplateAPI(object):
         self.view_url = resource_url(context, request, request.view_name)
         self.resource_devel_mode = asbool(self.settings.get('resource_devel_mode', None))
         self.read_only = not is_normal_mode(request.registry)
-        self.static_url = '%s/static/%s' % (
-            app_url, request.registry.settings.get('static_rev'))
+        self.static_url = '%s/static/%s' % (app_url, get_egg_rev('karl'))
         self.browser_upgrade_url = request.registry.settings.get(
             'browser_upgrade_url', '')
 

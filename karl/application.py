@@ -25,6 +25,7 @@ from karl.models.site import get_weighted_textrepr
 from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
+from karl.utils import get_egg_rev
 from karl import renderers
 import karl.includes
 import perfmetrics
@@ -107,6 +108,26 @@ class Configurator(BaseConfigurator):
         self.registry['css_resources'].add(name, path, **kwargs)
 
 
+def add_versioned_static_resource(config, path, resource, package='karl'):
+    settings = config.registry.settings
+    static_rev = get_egg_rev(package)
+    settings['static_rev'] = static_rev
+    static_path = '%s/%s' % (path, static_rev)
+    config.add_static_view(
+        static_path, resource,
+        cache_max_age=60 * 60 * 24 * 365)
+    # Add a redirecting static view to all _other_ revisions.
+    def _expired_static_predicate(info, request):
+        # We add a redirecting route to all static/*,
+        # _except_ if it starts with the active revision segment.
+        path = info['match']['path']
+        return path and path[0] != static_rev
+    config.add_route(
+        'expired-static', '%s/*path' % path,
+        custom_predicates=(_expired_static_predicate, ))
+    return static_path, static_rev
+
+
 def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
@@ -118,23 +139,9 @@ def configure_karl(config, load_zcml=True):
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
     # Static tree revisions routing
-    static_rev = settings.get('static_rev')
-    if not static_rev:
-        static_rev = _guess_static_rev()
-        settings['static_rev'] = static_rev
-    static_path = '/static/%s' % static_rev
-    config.add_static_view(
-        static_path, 'karl.views:static',
-        cache_max_age=60 * 60 * 24 * 365)
-    # Add a redirecting static view to all _other_ revisions.
-    def _expired_static_predicate(info, request):
-        # We add a redirecting route to all static/*,
-        # _except_ if it starts with the active revision segment.
-        path = info['match']['path']
-        return path and path[0] != static_rev
-    config.add_route(
-        'expired-static', '/static/*path',
-        custom_predicates=(_expired_static_predicate, ))
+
+    static_path, rev = add_versioned_static_resource(
+        config, '/static', 'karl.views:static')
 
     # Need a session if using Velruse
     config.set_session_factory(Session(settings['who_secret']))
@@ -213,35 +220,6 @@ def group_finder(identity, request):
         return None
     request.environ['karl.identity'] = user  # cache for later
     return user['groups']
-
-
-def _guess_static_rev():
-    """Guess an appropriate static revision number.
-
-    This is only used when no deployment tool set the static_rev
-    for us.  Deployment tools should set static_rev because
-    karl can only guess what static revisions are appropriate,
-    while deployment tools can set a system-wide revision number
-    that encompasses all relevant system changes.
-    """
-    # If Karl is installed as an egg, we can try to get the Karl version
-    # number from the egg and use that.
-    _static_rev = _get_egg_rev()
-
-    if _static_rev is not None:
-        return _static_rev
-
-    # Fallback to just using a timestamp.  This is guaranteed not to fail
-    # but will create different revisions for each process, resulting in
-    # some extra static resource downloads
-    _static_rev = 'r%d' % int(time.time())
-
-    return _static_rev
-
-
-def _get_egg_rev():
-    import pkg_resources
-    return pkg_resources.get_distribution("karl").version
 
 
 def root_factory(request, name='site'):
