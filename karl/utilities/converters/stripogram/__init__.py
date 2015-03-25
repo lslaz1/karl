@@ -1,5 +1,5 @@
 # Copyright (c) 2001 Chris Withers
-#
+
 # This Software is released under the MIT License:
 # http://www.opensource.org/licenses/mit-license.html
 # See license.txt for more details.
@@ -24,4 +24,3 @@ def html2safehtml(s, valid_tags=('b', 'a', 'i', 'br', 'p')):
     parser.close()
     parser.cleanup()
     return parser.result
-

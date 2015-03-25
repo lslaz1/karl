@@ -214,51 +214,6 @@ class TestACLPathCache(unittest.TestCase):
         self.assertEqual(aces[2], (Deny, Everyone, 'testing'))
         self.assertEqual(len(cache._index), 2)
 
-class TestACLChecker(unittest.TestCase):
-    def _getTargetClass(self):
-        from karl.security.policy import ACLChecker
-        return ACLChecker
-
-    def _makeOne(self, principals, permission):
-        return self._getTargetClass()(principals, permission)
-
-    def test_it(self):
-        from pyramid.security import Allow, Deny, Everyone
-        from karl.security.policy import ALL
-        acl_one = ((Allow, 'a', 'view'), (Allow, 'b', 'view'))
-        acl_two = ((Allow, 'c', 'view'), (Allow, 'd', 'view'),)
-        acl_three = ((Allow, 'd', ALL), (Allow, 'e', 'view'),
-                     (Deny, Everyone, ALL),)
-        from BTrees.IFBTree import IFSet
-        data = []
-        data.append([(0, [acl_one],), IFSet([0])])
-        data.append([(1, [acl_one, acl_two]), IFSet([1,2,3])])
-        data.append([(2, [acl_one, acl_two, acl_three]), IFSet([4,5,6])])
-        data.append([(3, [acl_one]), IFSet()])
-
-        checker = self._makeOne(('a', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [0, 1, 2, 3])
-
-        checker = self._makeOne(('b', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [0, 1, 2, 3])
-
-        checker = self._makeOne(('c', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [1, 2, 3])
-
-        checker = self._makeOne(('d', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [1, 2, 3, 4, 5, 6])
-
-        checker = self._makeOne(('e', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [4,5,6])
-
-        checker = self._makeOne(('nobody', Everyone), 'view')
-        result = checker(data)
-        self.assertEqual(list(result), [])
 
 class TestSecuredStateMachine(unittest.TestCase):
     def _getTargetClass(self):

@@ -28,11 +28,12 @@ from BTrees.Length import Length
 
 LARGE_RESULT_SET = 500
 
+
 class CachingCatalog(Catalog):
     implements(ICatalog)
 
-    os = os # for unit tests
-    generation = None # b/c
+    os = os  # for unit tests
+    generation = None  # b/c
 
     def __init__(self):
         super(CachingCatalog, self).__init__()
@@ -196,7 +197,7 @@ def reindex_catalog(context, path_re=None, commit_interval=200, dry_run=False,
                 catalog[index].reindex_doc(docid, model)
         if i % commit_interval == 0:
             commit_or_abort()
-        i+=1
+        i += 1
     commit_or_abort()
 
 
@@ -232,7 +233,7 @@ class GranularIndex(CatalogFieldIndex):
         self._num_docs = Length(0)
         # self._granular_indexes: [(level, BTree(value -> IFSet([docid])))]
         self._granular_indexes = [(level, self.family.IO.BTree())
-            for level in self._levels]
+                                  for level in self._levels]
 
     def index_doc(self, docid, obj):
         if callable(self.discriminator):

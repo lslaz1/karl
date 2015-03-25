@@ -1,5 +1,4 @@
 import json
-from karl.models.interfaces import ICatalogSearch
 import itertools
 from karl.content.interfaces import IImage, ICommunityFile
 from repoze.folder.interfaces import IFolder
@@ -8,6 +7,8 @@ from pyramid.url import resource_url
 from pyramid.traversal import resource_path
 from karl.utils import find_catalog
 from pyramid.traversal import find_resource
+from repoze.catalog.query import (
+    NotEq, And, Eq, Any)
 
 
 DEFAULT_BATCH = {
@@ -15,33 +16,44 @@ DEFAULT_BATCH = {
     'size': 20
 }
 
-type_name_mapping = {
+_type_name_mapping = {
     'Image': IImage,
     'File': ICommunityFile,
     'Folder': IFolder
 }
+_image_mimetypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+_index_mapping = {
+    'SearchableText': 'texts',
+    'Title': 'title'
+}
+_attribute_mapping = {
+    'id': '__name__',
+    'Title': 'title',
+    'Description': 'description'
+}
 
-image_mimetypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
 
-def parse_query(query):
+def normalize_query(query):
     result = {}
     for criteria in query['criteria']:
-        name = criteria['i']
-        value = criteria['v']
+        result[criteria['i']] = criteria['v']
+    return result
+
+
+def parse_query(query):
+    result = []
+    for name, value in query.items():
         if name == 'Type':
             new_value = []
             if type(value) not in (list, tuple):
                 value = [value]
             for v in value:
-                if v in type_name_mapping:
-                    new_value.append(type_name_mapping[v])
+                if v in _type_name_mapping:
+                    new_value.append(_type_name_mapping[v])
             value = new_value
-            name = 'interfaces'
             if IImage in value:
-                result['mimetype'] = {
-                    'query': image_mimetypes,
-                    'operator': 'or'
-                }
+                result.append(Any(_image_mimetypes))
+            query = Any('interfaces', value)
         elif name == 'path':
             split = value.split('::')
             if len(split) == 2:
@@ -50,19 +62,18 @@ def parse_query(query):
             else:
                 path = value
                 depth = 1
-            value = {
+            query = Eq(name, {
                 'query': path,
-                'depth': depth
-            }
-        result[name] = value
+                'depth': int(depth)
+            })
+        elif name in _index_mapping:
+            name = _index_mapping[name]
+            query = Eq(name, value)
+        else:
+            query = Eq(name, value)
+        result.append(query)
     return result
 
-
-_attribute_mapping = {
-    'id': '__name__',
-    'Title': 'title',
-    'Description': 'description'
-}
 
 def ResovlerFactory(context):
     catalog = find_catalog(context)
@@ -92,11 +103,11 @@ def vocabulary_view(context, request):
     except:
         batch = DEFAULT_BATCH
 
-    query = json.loads(request.params['query'])
+    query = normalize_query(json.loads(request.params['query']))
     criteria = parse_query(query)
 
-    if 'UID' in criteria:
-        resolver = ResovlerFactory(context)
+    resolver = ResovlerFactory(context)
+    if 'UID' in query:
         docids = criteria['UID']
         if type(docids) not in (list, tuple):
             docids = [docids]
@@ -110,12 +121,13 @@ def vocabulary_view(context, request):
         docids = new_docids
         numdocs = len(docids)
     else:
-        criteria['allowed'] = {
-            'query': effective_principals(request),
-            'operator': 'or'
-        }
-        searcher = ICatalogSearch(context)
-        numdocs, docids, resolver = searcher(**criteria)
+        criteria.append(Any('allowed', effective_principals(request)))
+        if 'title' not in query:
+            # we default to requiring a title in these results or
+            # else we get a bunch of junky results
+            criteria.append(NotEq('title', ''))
+        catalog = find_catalog(context)
+        numdocs, docids = catalog.query(And(*criteria))
 
     if batch and ('size' not in batch or 'page' not in batch):
         batch = DEFAULT_BATCH
