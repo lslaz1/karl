@@ -11,9 +11,9 @@ from karl.utils import strings_same
 try:
     from hashlib import pbkdf2_hmac
 except ImportError:
-    import passlib
+    import passlib.utils.pbkdf2
     def pbkdf2_hmac(_type, password, salt, rounds):
-        return passlib.utils.pbkdf2(password, salt, rounds, 'hmac-' + _type)
+        return passlib.utils.pbkdf2.pbkdf2(password, salt, rounds, None, 'hmac-' + _type)
 
 
 def pbkdf2(password, salt):
