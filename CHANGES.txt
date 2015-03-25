@@ -4,6 +4,8 @@ karl package Changelog
 5.0.2a2 (unreleased)
 --------------------
 
+- fix issue using original scale with images
+
 - change manage communities wording and email link
 
 - do not use relative urls in tinymce
