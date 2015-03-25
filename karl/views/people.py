@@ -582,7 +582,7 @@ def get_profile_actions(profile, request):
     elif same_user:
         actions.append(('Edit', '%sedit_profile.html' % profile_url))
     if same_user:
-        actions.append(('Manage Communities', 'manage_communities.html'))
+        actions.append(('Community Alerts and Memberships', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
     if has_permission('administer', profile, request):
         actions.append(('Advanced', '%sadvanced.html' % profile_url))
@@ -760,7 +760,7 @@ def may_leave(userid, community):
 
 
 def manage_communities_view(context, request):
-    page_title = 'Manage Communities'
+    page_title = 'Community Alerts and Memberships'
     api = TemplateAPI(context, request, page_title)
 
     users = find_users(context)
@@ -901,7 +901,7 @@ class ChangePasswordFormController(object):
     def form_fields(self):
         users = find_users(self.context)
         userid = self.context.__name__
-        user = users.get_by_id(userid)
+        users.get_by_id(userid)
         old_password_field = schemaish.String(
             title="Old Password",
             validator=validator.All(
