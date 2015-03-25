@@ -11,7 +11,7 @@
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
 
-  <body class="community-layout">
+  <body class="community-layout" tal:attributes="api.body_attriubtes">
     <div class="visual-portal-wrapper">
 
       <div tal:replace="structure python: api.render_header()" />

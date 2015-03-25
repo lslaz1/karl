@@ -59,6 +59,8 @@ from karl.views.interfaces import ISidebar
 from karl.views.utils import get_user_home
 from karl.views.utils import get_user_date_format
 
+from karl import patterns
+
 from pyramid.traversal import find_interface
 
 xhtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
@@ -499,3 +501,10 @@ class TemplateAPI(object):
         registry = self.request.registry
         if 'css_resources' in registry:
             self.request.registry['css_resources'].require(self.request, name)
+
+    @property
+    def body_attriubtes(self):
+        return {
+            'data-pat-tinymce': json.dumps(
+                patterns.get_tinymce_options(self.context, self.request))
+        }
