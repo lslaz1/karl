@@ -91,7 +91,7 @@ def ResovlerFactory(context):
 
 def vocabulary_view(context, request):
     try:
-        attributes = json.loads(request.params.get('attributes', '["title", ""]'))
+        attributes = json.loads(request.params.get('attributes', '["title", "id"]'))
     except:
         attributes = ['title', 'id']
     if 'UID' in attributes:

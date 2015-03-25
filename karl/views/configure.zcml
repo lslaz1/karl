@@ -1284,15 +1284,6 @@
      view=".members.accept_invitation_photo_view"
      />
 
-  <!-- XXX This accompanies site.py and stays in karl.views -->
-  <view
-    for="karl.models.interfaces.ISite"
-    view=".spellcheck.tinymce_spellcheck_view"
-    permission="view"
-    name="tinymce_spellcheck"
-    renderer="json"
-  />
-
   <!-- XXX This accompanies site.py (...no...) and stays in karl.views -->
   <!-- XXX ... now, it is callable on each content! -->
   <view
@@ -1944,28 +1935,6 @@
     view="karl.views.admin.postoffice_quarantined_message_view"
     permission="administer"
     />
-
-  <!-- imagedrawer ajax  -->
-  <view
-    for="zope.interface.Interface"
-    view=".imagedrawer.drawer_dialog_view"
-    permission="view"
-    name="drawer_dialog_view.html"
-  />
-
-  <view
-    for="zope.interface.Interface"
-    view=".imagedrawer.drawer_data_view"
-    permission="view"
-    name="drawer_data_view.html"
-  />
-
-  <view
-    for="zope.interface.Interface"
-    view=".imagedrawer.drawer_upload_view"
-    permission="create"
-    name="drawer_upload_view.html"
-  />
 
   <view
     for="karl.models.interfaces.ISite"

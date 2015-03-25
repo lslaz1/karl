@@ -53,9 +53,6 @@ class IRandomId(Interface):
     def __call__(size=6):
         """ Return the ranomly generated string of ``size`` characters"""
 
-class ISpellChecker(Interface):
-    """ A utility that provides a wrapper for interacting with an
-        external Aspell spell checker subprocess. """
 
 #XXX Does this go here?
 class IAlert(Interface):

@@ -24,6 +24,3 @@ Not all but these are what are specific to the karl app(excluding used plugins)
 - statistics_folder
 - kerberos
 - forgot_password_url
-- aspell_executable
-- aspell_max_words
-- aspell_languages

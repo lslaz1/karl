@@ -50,13 +50,18 @@ class HTML2Text(sgmllib.SGMLParser):
             out_line = []
             len_out_line = 0
             for word in line:
-                word = unidecode(word).decode()
+                word = word
                 len_word = len(word)
                 if len_out_line+len_word < line_width:
                     out_line.append(word)
                     len_out_line = len_out_line + len_word
                 else:
-                    out_para = out_para + indent_string + join(out_line, '') + '\n'
+                    try:
+                        out_para = out_para + indent_string + join(out_line, '') + '\n'
+                    except:
+                        # XXX ugly hack, is there a way aorund this?
+                        out_line = [unidecode(s).decode() for s in out_line]
+                        out_para = out_para + indent_string + join(out_line, '') + '\n'
                     out_line = [word]
                     len_out_line = len_word
 

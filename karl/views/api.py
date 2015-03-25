@@ -470,10 +470,7 @@ class TemplateAPI(object):
         if self.is_resource_devel_mode:
             result = ['%s/%s' % (self.static_url, n) for n in files]
         else:
-            if name.startswith('tinymce'):
-                prefix = self.resources['tinymceMinPrefix']
-            else:
-                prefix = self.resources['minPrefix']
+            prefix = self.resources['minPrefix']
             result = ['%s/%s%s.min.js' % (self.static_url, prefix, name)]
         return result
 
