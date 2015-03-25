@@ -5,6 +5,7 @@ def get_tinymce_options(context, request):
         # disable tinymce upload tab, do not have time to implement
         'upload': None,
         'tiny': {
+            'browser_spellcheck': True,
             'content_css': '/static/dist/tinymce-builded/js/tinymce/skins/lightgray/content.min.css',  # noqa
             'theme': '-modern',
             'plugins': [
@@ -50,5 +51,5 @@ def get_tinymce_options(context, request):
                 'part': '768x768.gif',
                 'name': 'large',
                 'label': 'Large(768x768)'
-            }]
+            }],
     }
