@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+
+5.0.1a2 (2015-03-24)
+--------------------
+
+- quick vocabulary view fix for images
+
 5.0.1a1 (2015-03-24)
 --------------------
 

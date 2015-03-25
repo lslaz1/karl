@@ -52,7 +52,7 @@ def parse_query(query):
                     new_value.append(_type_name_mapping[v])
             value = new_value
             if IImage in value:
-                result.append(Any(_image_mimetypes))
+                result.append(Any('mimetype', _image_mimetypes))
             query = Any('interfaces', value)
         elif name == 'path':
             split = value.split('::')
