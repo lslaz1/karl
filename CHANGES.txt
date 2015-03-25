@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.0.2a2 (unreleased)
+--------------------
+
+- do not use relative urls in tinymce
+
 5.0.2a1 (2015-03-15)
 --------------------
 

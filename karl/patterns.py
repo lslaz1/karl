@@ -1,10 +1,10 @@
 
-
 def get_tinymce_options(api):
     return {
         # disable tinymce upload tab, do not have time to implement
         'upload': None,
         'tiny': {
+            'relative_urls': False,
             'browser_spellcheck': True,
             'content_css': api.resource_css('karl-theme').path,  # noqa
             'theme': '-modern',
