@@ -2,12 +2,18 @@
 # and there is no repository information
 from persistent import Persistent
 from zope.interface import implements
-import hashlib
+from hashlib import sha1
 import binascii
 from BTrees.OOBTree import OOBTree
 from karl.models.interfaces import IUsers
 from karl.utils import get_random_string
 from karl.utils import strings_same
+try:
+    from hashlib import pbkdf2_hmac
+except ImportError:
+    import passlib
+    def pbkdf2_hmac(_type, password, salt, rounds):
+        return passlib.utils.pbkdf2(password, salt, rounds, 'hmac-' + _type)
 
 
 def pbkdf2(password, salt):
@@ -16,13 +22,13 @@ def pbkdf2(password, salt):
             password = password.encode('utf8')
         except:
             pass
-    return 'pbkdf2:' + binascii.hexlify(hashlib.pbkdf2_hmac('sha512', password, salt, 64))
+    return 'pbkdf2:' + binascii.hexlify(pbkdf2_hmac('sha512', password, salt, 64))
 
 
 def get_sha_password(password):
     if isinstance(password, unicode):
         password = password.encode('UTF-8')
-    return 'SHA1:' + hashlib.sha1(password).hexdigest()
+    return 'SHA1:' + sha1(password).hexdigest()
 
 
 class Users(Persistent):

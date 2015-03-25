@@ -66,6 +66,8 @@ tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
 if version < '2.7':
     requires.append('argparse')
     tests_require.append('unittest2')
+if version < '2.7.8':
+    requires.append('passlib')
 
 extras_require = {
     'tests': tests_require,
