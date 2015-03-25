@@ -30,7 +30,7 @@
             <textarea id="site-announcement-input"
                       name="site-announcement-input"
                       rows="1" cols="40"
-		      class="mceEditor karlrichtextfield">
+            		      class="pat-tinymce">
               ${api.site_announcement}
             </textarea>
           </fieldset>

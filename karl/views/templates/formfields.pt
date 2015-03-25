@@ -42,8 +42,7 @@
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input type="hidden" name="text_text_format" value="text/html" />
       <textarea id="text" name="text" rows="1" cols="40"
-		class="mceEditor karlrichtextfield"></textarea>
-      <!-- wiring from karl-tiny-wire.js -->
+    		class="pat-tinymce"></textarea>
     </fieldset>
 
     <fieldset metal:define-macro="message-field"
@@ -519,8 +518,7 @@
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input type="hidden" name="text_text_format" value="text/html" />
       <textarea id="biography" name="biography" rows="1" cols="40"
-		class="mceEditor karlrichtextfield"></textarea>
-      <!-- wiring from karl-tiny-wire.js -->
+    		class="pat-tinymce"></textarea>
     </fieldset>
 
     <fieldset metal:define-macro="photo-field"
