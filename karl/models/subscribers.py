@@ -45,6 +45,7 @@ from karl.utils import find_repo
 from karl.utils import find_site
 from karl.utils import find_tags
 from karl.utils import find_users
+from karl.lockout import LockoutManager
 
 log = logging.getLogger(__name__)
 
@@ -438,3 +439,19 @@ class QueryLogger(object):
         self._log(ts, duration, num_results, query, fname=fn)
 
 log_query = QueryLogger()
+
+
+def login_failed(event):
+    # we are only going to log attempts for valid users
+    users = find_users(event.site)
+    user = users and users.get(login=event.login)
+    if not user:
+        return
+
+    mng = LockoutManager(event.site, event.login)
+    mng.add_attempt()
+
+
+def login_success(event):
+    mng = LockoutManager(event.site, event.login)
+    mng.clear()

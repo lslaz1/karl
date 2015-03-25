@@ -4,6 +4,9 @@ karl package Changelog
 5.0.2a1 (unreleased)
 --------------------
 
+- implement login failure lockout policy to prevent brute force
+  login attempts
+
 - upgrade passwords to be salted and use better encryption
 
 - add events for login, failed and success attempts

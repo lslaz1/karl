@@ -42,6 +42,7 @@ from karl.utils import strings_differ
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl import events
+from karl.lockout import LockoutManager
 
 from karl.views.api import TemplateAPI
 
@@ -64,6 +65,16 @@ def _fixup_came_from(request, came_from):
     return came_from
 
 
+def login_locked_out(context, login):
+    users = find_users(context)
+    user = users and users.get(login=login)
+    if not user:
+        return False
+
+    mng = LockoutManager(context, login)
+    return mng.maxed_number_of_attempts()
+
+
 def login_view(context, request):
     settings = request.registry.settings
     came_from = request.session.get('came_from', request.url)
@@ -74,6 +85,12 @@ def login_view(context, request):
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
+
+        if login_locked_out(context, login):
+            redirect = request.resource_url(
+                request.root, 'login.html', query={
+                    'reason': 'User locked out. Too many failed login attempts.'})
+            return HTTPFound(location=redirect)
 
         notify(events.LoginAttempt(context, request, login, password))
 

@@ -146,6 +146,14 @@
       for=".interfaces.ICatalogQueryEvent"
       handler=".subscribers.log_query"/>
 
+  <subscriber
+      for="karl.models.interfaces.ILoginFailed"
+      handler=".subscribers.login_failed"/>
+
+  <subscriber
+      for="karl.models.interfaces.ILoginSuccess"
+      handler=".subscribers.login_success"/>
+
   <adapter
       for=".interfaces.IProfile"
       provides=".interfaces.ILetterManager"

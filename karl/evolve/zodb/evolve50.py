@@ -1,4 +1,5 @@
+from BTrees.OOBTree import OOBTree
 
 
-def evolve(context):
-    pass
+def evolve(site):
+    site.failed_login_attempts = OOBTree()

@@ -1208,7 +1208,13 @@ class AuthenticationFormController(BaseSiteFormController):
             description="Enable 2 factor authentication")),
         ('two_factor_auth_code_valid_duration', schemaish.Integer(
             description="How long 2 factor auth codes are valid for"
-        ))
+        )),
+        ('failed_login_attempt_window', schemaish.Integer(
+            description="Window in seconds to track login attempts"
+        )),
+        ('max_failed_login_attempts', schemaish.Integer(
+            description="Max number of failed login attempts over window"
+        )),
     ]
 
     def form_defaults(self):
@@ -1216,18 +1222,26 @@ class AuthenticationFormController(BaseSiteFormController):
             'two_factor_enabled': self.context.settings.get('two_factor_enabled', False),
             'two_factor_auth_code_valid_duration': self.context.settings.get(
                 'two_factor_auth_code_valid_duration', 300),
+            'failed_login_attempt_window': self.context.settings.get(
+                'failed_login_attempt_window', 3600),
+            'max_failed_login_attempts': self.context.settings.get(
+                'max_failed_login_attempts', 15),
 
         }
 
     def form_widgets(self, fields):
         return {
             'two_factor_enabled': formish.widgets.Checkbox(),
-            'two_factor_auth_code_valid_duration': formish.widgets.Input()
+            'two_factor_auth_code_valid_duration': formish.widgets.Input(),
+            'max_failed_login_attempts': formish.widgets.Input(),
+            'failed_login_attempt_window': formish.widgets.Input()
         }
 
     def handle_submit(self, converted):
         self.context.settings['two_factor_enabled'] = converted['two_factor_enabled']
         self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
+        self.context.settings['max_failed_login_attempts'] = converted['max_failed_login_attempts']  # noqa
+        self.context.settings['failed_login_attempt_window'] = converted['failed_login_attempt_window']  # noqa
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 

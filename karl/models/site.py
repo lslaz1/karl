@@ -430,7 +430,9 @@ class Site(Folder):
         show_privacy_statement=False,
         privacy_statement=None,
         member_fields=list(Profile.additional_fields),
-        default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0]
+        default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0],
+        failed_login_attempt_window=3600,
+        max_failed_login_attempts=15
     )
     _repo = Uninitialized
 
@@ -453,6 +455,7 @@ class Site(Folder):
         self.list_aliases = OOBTree()
         self.settings = OOBTree(self._default_settings)
         self.access_requests = OOBTree()
+        self.failed_login_attempts = OOBTree()
         self['invitations'] = create_content(IInvitationsFolder)
 
     @property

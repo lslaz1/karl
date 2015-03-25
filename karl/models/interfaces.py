@@ -451,7 +451,7 @@ class IUserRemovedGroup(Interface):
 class ILoginAttempt(Interface):
     site = Attribute('the site object')
     request = Attribute('the request object')
-    login = Attribute('login attempt')
+    login = Attribute('login name')
     password = Attribute('password used')
 
 
