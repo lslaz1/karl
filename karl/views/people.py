@@ -906,7 +906,7 @@ class ChangePasswordFormController(object):
             title="Old Password",
             validator=validator.All(
                 validator.Required(),
-                karlvalidators.CorrectUserPassword(user),
+                karlvalidators.CorrectUserPassword(users, userid),
                 )
             )
         new_password_field = schemaish.String(

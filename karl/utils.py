@@ -296,3 +296,7 @@ def strings_differ(string1, string2):
         invalid_bits += a != b
 
     return invalid_bits != 0
+
+
+def strings_same(string1, string2):
+    return not strings_differ(string1, string2)

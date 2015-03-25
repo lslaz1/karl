@@ -420,6 +420,7 @@ class DummyUsers:
             "login": login,
             "password": password,
             "groups": groups,
+            "salt": "salt"
             }
         self._by_login[login] = userinfo
         self._by_id[userid] = userinfo
@@ -477,8 +478,8 @@ class DummyUsers:
             return self.get_by_login(login)
 
     def change_password(self, userid, password):
-        from karl.models.users import get_sha_password
-        self._by_id[userid]["password"] = get_sha_password(password)
+        from karl.models.users import pbkdf2
+        self._by_id[userid]["password"] = pbkdf2(password, 'salt')
 
     def change_login(self, userid, new_login):
         if new_login == 'raise_value_error':

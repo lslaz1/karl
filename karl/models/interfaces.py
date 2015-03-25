@@ -683,8 +683,7 @@ class IUsers(Interface):
     def get(userid=None, login=None):
         """ Return a user dictionary or None based on user id or login """
 
-    def add(userid, login, cleartext_password=None, groups=None,
-            encrypted_password=None):
+    def add(userid, login, cleartext_password, groups=None):
         """ Add a user.  If ``groups`` is non-None, it must be a
         sequence of group names.  One of cleartext_password or
         encrypted_password needs to be supplied."""
@@ -715,6 +714,9 @@ class IUsers(Interface):
 
     def users_in_group(group):
         """ Return a set of userids in the group """
+
+    def check_password(password, userid=None, login=None):
+        pass
 
 # Reproduce repozitory interfaces here in order to be able to hedge instances
 # where repozitory is not available.

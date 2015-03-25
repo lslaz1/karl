@@ -110,9 +110,8 @@ class KARLUsers(Users):
         super(KARLUsers, self).__init__()
         self.site = site
 
-    def add(self, id, login, password, groups=None, encrypted=False):
-        super(KARLUsers, self).add(id, login, password, groups,
-                                   encrypted=encrypted)
+    def add(self, id, login, password, groups=None):
+        super(KARLUsers, self).add(id, login, password, groups)
         notify(UserAddedEvent(self.site, id, login, groups))
 
     def remove(self, id):

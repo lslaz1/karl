@@ -3,20 +3,27 @@
 from persistent import Persistent
 from zope.interface import implements
 import hashlib
+import binascii
 from BTrees.OOBTree import OOBTree
 from karl.models.interfaces import IUsers
+from karl.utils import get_random_string
+from karl.utils import strings_same
 
 
-_hashing = {
-    'SHA1': hashlib.sha1,
-    'SHA512': hashlib.sha512
-}
+def pbkdf2(password, salt):
+    if isinstance(password, unicode):
+        try:
+            password = password.encode('utf8')
+        except:
+            pass
+    return 'pbkdf2:' + binascii.hexlify(hashlib.pbkdf2_hmac('sha512', password, salt, 64))
 
 
 def get_sha_password(password):
     if isinstance(password, unicode):
         password = password.encode('UTF-8')
-    return 'SHA1:' + _hashing['SHA1'](password).hexdigest()
+    return 'SHA1:' + hashlib.sha1(password).hexdigest()
+
 
 class Users(Persistent):
     implements(IUsers)
@@ -79,21 +86,10 @@ class Users(Persistent):
 
         raise ValueError('Either userid or login must be supplied')
 
-    def add(self, userid, login, cleartext_password=None, groups=None,
-            encrypted_password=None, encrypted=False):
+    def add(self, userid, login, cleartext_password, groups=None):
         self._upgrade()
-        if cleartext_password is None and encrypted_password is None:
-            raise ValueError('Either cleartext_password or encrypted_password '
-                             'must be supplied')
-        if cleartext_password is not None and encrypted_password is not None:
-            raise ValueError('Only one of cleartext_password or '
-                             'encrypted_password may be supplied.')
-        # "encrypted" is for b/c
-        if encrypted:
-            encrypted_password = cleartext_password
-            cleartext_password = None
-        if cleartext_password is not None:
-            encrypted_password = get_sha_password(cleartext_password)
+        salt = get_random_string()
+        encrypted_password = pbkdf2(cleartext_password, salt)
         if groups is None:
             groups = []
         newgroups = set()
@@ -102,8 +98,12 @@ class Users(Persistent):
             newgroups.add(group)
         userid = self._convert(userid)
         login = self._convert(login)
-        info = {'login': login, 'id': userid, 'password': encrypted_password,
-                'groups': newgroups}
+        info = {
+            'login': login,
+            'id': userid,
+            'salt': salt,
+            'password': encrypted_password,
+            'groups': newgroups}
         if userid in self.data:
             raise ValueError('User ID "%s" already exists' % userid)
         if login in self.logins:
@@ -133,8 +133,10 @@ class Users(Persistent):
         self._upgrade()
         userid = self._convert(userid)
         info = self.data[userid]
+        if 'salt' not in info:
+            info['salt'] = get_random_string()
         self.data[userid] = info  # trigger persistence
-        info['password'] = get_sha_password(password)
+        info['password'] = pbkdf2(password, info['salt'])
 
     def change_login(self, userid, login):
         self._upgrade()
@@ -208,3 +210,33 @@ class Users(Persistent):
     def users_in_group(self, group):
         self._upgrade()
         return self.groups.get(group, set())
+
+    def check_password(self, password, userid=None, login=None):
+        if userid is None and login is None:
+            raise ValueError("Must provide userid or login")
+        if userid is not None:
+            user = self.get(userid=userid)
+        else:
+            login = self._convert(login)
+            userid = self.logins.get(login)
+            user = self.get(login=login)
+
+        if user['password'].startswith('SHA1:'):
+            # old style password, need to upgrade but will check it first
+            enc_password = get_sha_password(password)
+            if strings_same(enc_password, user['password']):
+                # upgrade this password...
+                salt = get_random_string()
+                user.update({
+                    'password': pbkdf2(password, salt),
+                    'salt': salt
+                })
+                self.data[userid] = user  # trigger persistence
+                return True
+            else:
+                return False
+        else:
+            # should be 'pbkdf2' encrypted now
+            return strings_same(
+                pbkdf2(password, user['salt']),
+                user['password'])

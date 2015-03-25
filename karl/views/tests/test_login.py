@@ -35,7 +35,7 @@ class TestLoginView(unittest.TestCase):
         return login_view(context, request)
 
     def test_GET_came_from_endswith_login_html_relative(self):
-        request = testing.DummyRequest(session={'came_from':'/login.html'})
+        request = testing.DummyRequest(session={'came_from': '/login.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -43,8 +43,8 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_login_html_absolute(self):
-        request = testing.DummyRequest(session={'came_from':
-                                            'http://example.com/login.html'})
+        request = testing.DummyRequest(
+            session={'came_from': 'http://example.com/login.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -52,7 +52,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_relative(self):
-        request = testing.DummyRequest(session={'came_from':'/logout.html'})
+        request = testing.DummyRequest(session={'came_from': '/logout.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -60,8 +60,8 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_absolute(self):
-        request = testing.DummyRequest(session={'came_from':
-                                            'http://example.com/logout.html'})
+        request = testing.DummyRequest(
+            session={'came_from': 'http://example.com/logout.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -69,7 +69,7 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_relative(self):
-        request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
+        request = testing.DummyRequest(session={'came_from': '/somewhere.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -78,8 +78,8 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_absolute(self):
-        request = testing.DummyRequest(session={'came_from':
-                                         'http://example.com/somewhere.html'})
+        request = testing.DummyRequest(
+            session={'came_from': 'http://example.com/somewhere.html'})
         context = makeRoot()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
@@ -89,7 +89,7 @@ class TestLoginView(unittest.TestCase):
 
     @mock.patch('karl.views.login.forget')
     def test_GET_forget_headers_when_auth_tkt_not_None(self, forget):
-        request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
+        request = testing.DummyRequest(session={'came_from': '/somewhere.html'})
         context = makeRoot()
         karl.testing.registerDummyRenderer('templates/login.pt')
         forget.return_value = [('a', '1')]
@@ -119,16 +119,11 @@ class TestLoginView(unittest.TestCase):
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com/login.html')
 
-    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
     @mock.patch('karl.views.login.remember')
     def test_POST_w_plugins_miss(self, remember):
         from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
-        try:
-            from urlparse import parse_qsl
-            parse_qsl # stfu pyflakes
-        except ImportError: # Python < 2.6
-            from cgi import parse_qsl
+        from urlparse import parse_qsl
         request = testing.DummyRequest()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
@@ -143,7 +138,6 @@ class TestLoginView(unittest.TestCase):
         query = dict(parse_qsl(query, 1, 1))
         self.assertEqual(query['reason'], 'Bad username or password')
 
-    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
     @mock.patch('karl.views.login.remember')
     def test_POST_w_profile(self, remember):
         from datetime import datetime
@@ -167,7 +161,6 @@ class TestLoginView(unittest.TestCase):
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
         self.failUnless(before <= profile.last_login_time <= after)
 
-    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
     @mock.patch('karl.views.login.remember')
     def test_POST_w_max_age_unicode(self, remember):
         from pyramid.httpexceptions import HTTPFound
@@ -187,7 +180,6 @@ class TestLoginView(unittest.TestCase):
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
-    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
     @mock.patch('karl.views.login.remember')
     def test_POST_impersonate(self, remember):
         from pyramid.httpexceptions import HTTPFound
@@ -206,7 +198,6 @@ class TestLoginView(unittest.TestCase):
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
-    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
     @mock.patch('karl.views.login.remember')
     def test_POST_impersonate_no_admin_user(self, remember):
         from pyramid.httpexceptions import HTTPFound
@@ -263,3 +254,7 @@ class DummyUsers(object):
             return self.data.get(userid)
         else:
             return self.data.get(login)
+
+    def check_password(self, password, userid=None, login=None):
+        user = self.data[userid or login]
+        return user['password'] == password

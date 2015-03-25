@@ -3,7 +3,6 @@ import schemaish
 from zope.testing.cleanup import cleanUp
 
 from pyramid import testing
-from karl.models.users import get_sha_password
 
 
 class TestTagsWidget(unittest.TestCase):
@@ -154,8 +153,10 @@ class TestCorrectUserPassword(unittest.TestCase):
     password = 'foofoofoo'
     def _makeOne(self):
         from karl.views.forms.validators import CorrectUserPassword
-        user = {'password': get_sha_password(self.password)}
-        return CorrectUserPassword(user)
+        from karl.models.users import Users
+        users = Users()
+        users.add('foo', 'foo', self.password)
+        return CorrectUserPassword(users, 'foo')
 
     def test_fail(self):
         from validatish.error import Invalid

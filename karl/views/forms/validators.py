@@ -3,7 +3,6 @@ import re
 
 from lxml.html.clean import clean_html
 from pyramid.traversal import find_resource
-from karl.models.users import get_sha_password
 from validatish import validate
 from validatish.validator import Validator
 from validatish.error import Invalid
@@ -89,16 +88,12 @@ class PasswordLength(Validator):
             raise Invalid(msg, v)
 
 class CorrectUserPassword(Validator):
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, users, userid):
+        self.users = users
+        self.userid = userid
 
     def __call__(self, v):
-        # XXX: karl.who.IUsers
-        # really should have a check_password(id, password)
-        # method.  We shouldn't have to use get_sha_password
-        # directly.
-        enc = get_sha_password(v)
-        if enc != self.user['password']:
+        if not self.users.check_password(v, userid=self.userid):
             raise Invalid('Incorrect password', v)
 
 class UniqueEmail(Validator):

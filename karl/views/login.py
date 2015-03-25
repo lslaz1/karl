@@ -23,8 +23,6 @@ from urlparse import urljoin
 import re
 import requests
 
-from karl.models.users import get_sha_password
-
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid.security import forget
@@ -336,7 +334,7 @@ def request_access_view(context, request):
 
 def password_authenticator(users, login, password):
     user = users.get(login=login)
-    if user and not strings_differ(user['password'], get_sha_password(password)):
+    if user and users.check_password(password, login=login):
         return user['id']
 
 

@@ -416,7 +416,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.assertEqual(response.get('is_active'), False)
 
     def test_handle_submit_normal(self):
-        from karl.models.users import get_sha_password
+        from karl.models.users import pbkdf2
         controller = self._makeOne(self.context, self.request)
         converted = {}
         converted['home_path'] = '/home_path'
@@ -427,7 +427,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         context = self.context
         self.assertEqual(context.home_path, '/home_path')
         user = self.users.get_by_id('profile')
-        self.assertEqual(user['password'], get_sha_password('secret'))
+        self.assertEqual(user['password'], pbkdf2('secret', user['salt']))
         self.assertEqual(user['login'], 'newlogin')
         self.assertEqual(self.users.added_groups,
                          [('profile', 'group.KarlAdmin')])
@@ -1550,9 +1550,10 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         controller = self._makeOne(self.context, self.request)
         response = controller.handle_submit(converted)
 
-        from karl.models.users import get_sha_password
-        new_enc = get_sha_password('newnewnew')
-        self.assertEqual(users.get_by_id('profile')['password'], new_enc)
+        from karl.models.users import pbkdf2
+        user = users.get_by_id('profile')
+        new_enc = pbkdf2('newnewnew', user['salt'])
+        self.assertEqual(user['password'], new_enc)
         self.assertEqual(
             response.location,
             'http://example.com/profiles/profile/'

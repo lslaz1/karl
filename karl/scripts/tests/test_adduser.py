@@ -30,10 +30,12 @@ class Test_adduser(unittest.TestCase):
         root = self.root
         users = root.users
         self.fut()(root, 'chris', 'secret')
-        self.assertEqual(users.get_by_id('chris'), {
+        user = users.get_by_id('chris')
+        self.assertEqual(user, {
             'id': 'chris',
             'login': 'chris',
             'password': 'secret',
+            'salt': user['salt'],
             'groups': ['group.KarlAdmin']
         })
 

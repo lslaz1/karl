@@ -817,6 +817,7 @@ class TestUploadUsersView(unittest.TestCase):
             'login': 'hello sir',
             'password': 'sha:pass1234',
             'groups': set(['group.KarlAdmin', 'group.community.moderator']),
+            'salt': 'salt'
         })
 
         self.assertEqual(users.get_by_id('user2'), {
@@ -824,6 +825,7 @@ class TestUploadUsersView(unittest.TestCase):
             'login': 'user2',
             'password': 'sha:pass1234',
             'groups': set(),
+            'salt': 'salt'
         })
 
         profile = self.site['profiles']['user1']
@@ -884,6 +886,7 @@ class TestUploadUsersView(unittest.TestCase):
             'login': 'hello sir',
             'password': 'sha:pass1234',
             'groups': set(['group.KarlAdmin', 'group.community.moderator']),
+            'salt': 'salt'
         })
 
         self.assertEqual(users.get_by_id('user2'), {
@@ -891,6 +894,7 @@ class TestUploadUsersView(unittest.TestCase):
             'login': 'user2',
             'password': 'sha:pass1234',
             'groups': set(),
+            'salt': 'salt'
         })
 
         profile = self.site['profiles']['user1']

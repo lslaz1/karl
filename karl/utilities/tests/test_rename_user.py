@@ -89,10 +89,12 @@ class Test_rename_user(unittest.TestCase):
         self.failIf('chris' in profiles)
         self.failUnless('rodrigo' in profiles)
         self.assertEqual(users.removed_users, ['chris'])
-        self.assertEqual(users.get_by_id('rodrigo'),
-                         {'id': 'rodrigo', 'login': 'rodrigo',
-                           'password': 'password', 'groups':
-                           set(('group1', 'group2'))})
+        user = users.get_by_id('rodrigo')
+        self.assertEqual(user, {
+            'id': 'rodrigo', 'login': 'rodrigo',
+            'password': 'password',
+            'salt': user['salt'],
+            'groups': set(('group1', 'group2'))})
 
         catalog = self.root.catalog
         self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])

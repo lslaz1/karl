@@ -358,8 +358,8 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.failUnless(profile.password_reset_key is None)
         self.failUnless(profile.password_reset_time is None)
         user = self.context.users.get(login='me')
-        from karl.models.users import get_sha_password
-        self.assertEqual(user['password'], get_sha_password('secret'))
+        from karl.models.users import pbkdf2
+        self.assertEqual(user['password'], pbkdf2('secret', user['salt']))
 
     def test_handle_submit_utf8_password(self):
         password = u'password\xe1'
@@ -386,8 +386,8 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         self.failUnless(profile.password_reset_key is None)
         self.failUnless(profile.password_reset_time is None)
         user = self.context.users.get(login='me')
-        from karl.models.users import get_sha_password
-        self.assertEqual(user['password'], get_sha_password(password.encode('utf8')))
+        from karl.models.users import pbkdf2
+        self.assertEqual(user['password'], pbkdf2(password, user['salt']))
 
 
 class DummyProfileSearch:
