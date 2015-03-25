@@ -27,20 +27,13 @@ from karl.utils import find_users
 from karl.utils import asbool
 from karl import renderers
 import karl.includes
+import perfmetrics
 
 try:
     import pyramid_debugtoolbar
     pyramid_debugtoolbar  # pyflakes stfu
 except ImportError:
     pyramid_debugtoolbar = None
-
-
-try:
-    import perfmetrics
-    perfmetrics  # ode to pyflakes
-except ImportError:
-    perfmetrics = None
-
 
 try:
     import slowlog
