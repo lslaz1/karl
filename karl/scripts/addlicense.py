@@ -69,10 +69,8 @@ def main(argv=sys.argv):
     license = OSI_LICENSE
 
     skip_names = [
-        'ez_setup.py',
         'karl/static/extjs/examples/locale/create_languages_js.py',
         'karl/converters/stripogram',
-        'karl/static/kukit.js',
         'karl/docs',
         'karl.content/docs'
         ]

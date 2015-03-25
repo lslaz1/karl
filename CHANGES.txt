@@ -6,7 +6,8 @@ karl package Changelog
 
 - add events for login, failed and success attempts
 
-- remove use of repoze.who
+- remove repoze.who, repoze.whoplugins.zodb, repoze.monty, simplejson
+  repoze.errorlog, supervisor dependencies
 
 
 5.0.1a2 (2015-03-24)

@@ -1,5 +1,5 @@
 import os
-from simplejson import JSONEncoder
+import json
 import formish
 from formish.widgets import Widget
 from formish.widgets import Grid
@@ -71,7 +71,7 @@ class TagsWidget(Widget):
 
     def json_taginfo(self, tags):
         tagdata = self._get_tagdata(tags)
-        return JSONEncoder().encode(tagdata)
+        return json.dumps(tagdata)
 
     def to_request_data(self, field, data):
         """

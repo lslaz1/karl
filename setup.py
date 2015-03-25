@@ -52,20 +52,14 @@ requires = [
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',
-    'repoze.monty',
     'repoze.postoffice',
     'repoze.sendmail',
     'repoze.session',
     'repoze.workflow',
-    'setuptools',
-    'simplejson',
     'ZODB3',
-    # Not really a code depdencency, but used by most buildouts
-    # XXX Move to eggs in buildout?
-    'repoze.errorlog',
-    'supervisor',
     'requests',
-    'unidecode'
+    'unidecode',
+    'setuptools'
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']

@@ -43,10 +43,10 @@ from karl.content.interfaces import IPhoto
 
 from karl.views.forms.filestore import get_filestore
 
-from simplejson import JSONEncoder
 from textwrap import dedent
 from pyramid.response import Response
 import transaction
+import json
 
 _convert_to_dashes = re.compile(r"""[\s/:"']""")  # ' damn you emacs
 _safe_char_check = re.compile(r"[\w.-]+$")
@@ -206,8 +206,7 @@ def basename_of_filepath(title):
 
 def convert_to_script(data, var_name='_karl_client_data'):
     if data:
-        ##print data
-        result = JSONEncoder().encode(data)
+        result = json.dumps(data)
         script = dedent("""\
             <script type="text/javascript">
             window.%s = %s;
