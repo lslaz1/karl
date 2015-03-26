@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+
+5.0.2a5 (unreleased)
+--------------------
+
+- tweak tinymce controls on comments
+
 5.0.2a4 (2015-03-26)
 --------------------
 
