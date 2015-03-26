@@ -6,6 +6,15 @@
 (function() {
   'use strict';
 
+  var getBaseUrl = function(){
+    try{
+      // won't work in generator scripts
+      return $('#karl-static-url').attr('content');
+    }catch(e){
+      return '/static';
+    }
+  }
+  var baseUrl = getBaseUrl();
   var tinymcePlugins = [
     'advlist', 'anchor', 'autolink', 'autoresize', 'autosave', 'bbcode',
     'charmap', 'code', 'colorpicker', 'contextmenu', 'directionality',
@@ -17,7 +26,7 @@
   ];
 
   var requirejsOptions = {
-    baseUrl: '/static/',
+    baseUrl: baseUrl,
     optimize: 'none',
     paths: {
       'backbone': 'dist/backbone/backbone',
@@ -80,7 +89,7 @@
   };
   for(var i=0; i<tinymcePlugins.length; i=i+1){
     var plugin = tinymcePlugins[i];
-    requirejsOptions.paths['tinymce-' + plugin] = '/static/dist/tinymce-builded/js/tinymce/plugins/' + plugin + '/plugin';
+    requirejsOptions.paths['tinymce-' + plugin] = baseUrl + '/dist/tinymce-builded/js/tinymce/plugins/' + plugin + '/plugin';
     requirejsOptions.shim['tinymce-' + plugin] = {
       deps: ['tinymce']
     };

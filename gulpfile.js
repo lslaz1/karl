@@ -14,6 +14,7 @@ var _ = require('lodash'),
     less = require('gulp-less'),
     rjs = require('gulp-requirejs');
 
+  var livereload = require('gulp-livereload');
   var LessPluginInlineUrls = require('less-plugin-inline-urls');
   var requirejsOptions = require('./karl/views/static/config');
   requirejsOptions.baseUrl = './karl/views/static/';
@@ -107,15 +108,22 @@ gulp.task('process-js', function () {
 
 gulp.task('process-css', function () {
   _.each(res.css, function(name) {
-    var dest = res.staticPrefix;
     gulp.src(res.staticPrefix + name + '.less')
       .pipe(less({
         plugins: [LessPluginInlineUrls]
       }))
       .pipe(minifyCSS())
-      .pipe(gulp.dest(dest));
+      .pipe(gulp.dest(res.staticPrefix))
+      .pipe(livereload());
     util.log('Producing', util.colors.green(res.staticPrefix + name));
   });
+});
+
+gulp.task('watch-css', function() {
+  _.each(res.css, function(name) {
+    gulp.watch(res.staticPrefix + name + '.less', ['process-css']);
+  });
+  gulp.watch(res.staticPrefix + '/dist/mockup/patterns/**/*.less', ['process-css']);
 });
 
 gulp.task('unit', function (done) {

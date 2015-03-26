@@ -108,7 +108,7 @@ def vocabulary_view(context, request):
 
     resolver = ResovlerFactory(context)
     if 'UID' in query:
-        docids = criteria['UID']
+        docids = query['UID']
         if type(docids) not in (list, tuple):
             docids = [docids]
         # convert to ints

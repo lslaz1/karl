@@ -26,3 +26,5 @@ js:
 css:
 	$(GULP) process-css
 
+watch-css:
+	$(GULP) watch-css
