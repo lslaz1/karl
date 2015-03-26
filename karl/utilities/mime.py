@@ -107,7 +107,7 @@ def mime_info(mime_type):
         info = {
             'small_icon_name': 'files_file_small.png',
             'large_icon_name': 'files_file_big.png',
-            'title':title,
+            'title': title,
             'viewable': False,
         }
 

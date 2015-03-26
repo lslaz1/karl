@@ -33,26 +33,6 @@ class Test_redirect_up_view(unittest.TestCase):
         self.assertEqual(response.location, "http://example.com/foo/")
 
 
-class Test_redirect_favicon_view(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def _callFUT(self, context, request):
-        from karl.views.redirects import redirect_favicon
-        return redirect_favicon(context, request)
-
-    def test_it(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        request.registry.settings['static_rev'] = 'rev'
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location,
-                         "http://example.com/static/rev/images/favicon.ico")
-
-
 class Test_redirect_rss_view_xml(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.redirects import redirect_rss_view_xml
@@ -62,34 +42,3 @@ class Test_redirect_rss_view_xml(unittest.TestCase):
         context = testing.DummyModel()
         response = self._callFUT(context, testing.DummyRequest())
         self.assertEqual(response.location, "http://example.com/atom.xml")
-
-
-class TestRedirectExpiredStatic(unittest.TestCase):
-    def _callFUT(self, context, request):
-        from karl.views.site import expired_static
-        return expired_static(context, request)
-
-    def test_it(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        request.matchdict = dict(path=('r1234567', 'foo', 'bar.png'))
-        request.registry.settings['static_rev'] = 'r1234'
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/static/r1234/foo/bar.png")
-
-    def test_norevision(self):
-        # It also works if the revision is just omitted.
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        request.matchdict = dict(path=('foo', 'bar.png'))
-        request.registry.settings['static_rev'] = 'r1234'
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/static/r1234/foo/bar.png")
-
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
-        request.matchdict = dict(path=('r1234notarev', 'foo', 'bar.png'))
-        request.registry.settings['static_rev'] = 'r1234'
-        response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/static/r1234/r1234notarev/foo/bar.png")
-

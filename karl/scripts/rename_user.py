@@ -31,9 +31,11 @@ def main():
     parser = OptionParser(description=__doc__,
                           usage="%prog [options] old_name new_name")
 
-    parser.add_option('-C', '--config', dest='config', default=None,
+    parser.add_option(
+        '-C', '--config', dest='config', default=None,
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
-    parser.add_option('-d', '--dry-run', dest='dry_run',
+    parser.add_option(
+        '-d', '--dry-run', dest='dry_run',
         action="store_true", default=False,
         help="Don't commit the transactions")
     parser.add_option('-M', '--merge', dest='merge', action='store_true',

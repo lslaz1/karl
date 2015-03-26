@@ -37,6 +37,7 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import get_egg_rev
 
 from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IPhoto
@@ -645,8 +646,7 @@ def convert_entities(s):
 def get_static_url(request):
     # to avoid cyclical imports
     app_url = request.application_url
-    static_rev = request.registry.settings.get('static_rev')
-    static_url = '%s/static/%s' % (app_url, static_rev)
+    static_url = '%s/static/%s' % (app_url, get_egg_rev('karl'))
     return static_url
 
 
