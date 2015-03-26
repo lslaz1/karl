@@ -24,7 +24,7 @@ def get_tinymce_options(api):
             # UID attribute is required here since we're working with related items
             'batchSize': 20,
             'basePath': '/',
-            'vocabularyUrl': '/vocabulary.json',
+            'vocabularyUrl': api.request.application_url + '/vocabulary.json',
             'width': 400,
             'placeholder': 'Search for item on site...'
         },
