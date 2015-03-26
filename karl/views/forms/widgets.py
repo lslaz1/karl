@@ -18,6 +18,9 @@ class RichTextWidget(Widget):
     template = 'field.KarlTinyMCE'
     type = 'Input'
 
+    def pattern_options(self):
+        return json.dumps({})
+
     def to_request_data(self, field, data):
         """
         Before the widget is rendered, the data is converted to a string
@@ -46,6 +49,21 @@ class RichTextWidget(Widget):
 class CommentWidget(RichTextWidget):
     show_label = False
     show_description = False
+
+    def pattern_options(self):
+        return json.dumps({
+            'tiny': {
+                'height': 100,
+                'plugins': [
+                    'advlist autolink lists visualblocks code ',
+                    'contextmenu paste',
+                ],
+                'menubar': '',
+                'toolbar': 'undo redo | styleselect | bold italic | '
+                           'alignleft aligncenter alignright alignjustify | '
+                           'bullist numlist outdent indent'
+            }
+        })
 
 
 class TagsWidget(Widget):
