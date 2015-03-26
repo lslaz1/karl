@@ -1,5 +1,5 @@
-recursive-include karl/views/static *.js
-recursive-include karl/views/static *.css
+include karl/views/static/*.js
+include karl/views/static/*.css
 recursive-include karl/views/static/fonts *
 recursive-include karl/views/static/images *
 recursive-include karl/views/static/min *
