@@ -1,2 +1,2 @@
-recursive-exclude karl/views/static/dist *
 recursive-include karl/views/static *
+recursive-exclude karl/views/static/dist *
