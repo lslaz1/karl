@@ -14,7 +14,7 @@ def get_tinymce_options(api):
                 'insertdatetime media table contextmenu paste plonelink ploneimage',
             ],
             'menubar': 'edit table format tools view insert',
-            'toolbar': 'undo redo | styleselect | bold italic | '
+            'toolbar': 'styleselect | bold italic | '
                        'alignleft aligncenter alignright alignjustify | '
                        'bullist numlist outdent indent | '
                        'unlink plonelink ploneimage',

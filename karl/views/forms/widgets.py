@@ -56,12 +56,12 @@ class CommentWidget(RichTextWidget):
                 'height': 100,
                 'plugins': [
                     'advlist autolink lists visualblocks code ',
-                    'contextmenu paste',
+                    'contextmenu paste plonelink',
                 ],
                 'menubar': '',
-                'toolbar': 'undo redo | styleselect | bold italic | '
+                'toolbar': 'styleselect | bold italic | '
                            'alignleft aligncenter alignright alignjustify | '
-                           'bullist numlist outdent indent'
+                           'bullist numlist outdent indent | unlink plonelink'
             }
         })
 
