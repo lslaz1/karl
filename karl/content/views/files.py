@@ -935,8 +935,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sort_index=sort_on,
         reverse=reverse)
 
-    entries = [getMultiAdapter((item, request), IFileInfo)
+    entries = [queryMultiAdapter((item, request), IFileInfo)
                for item in info['entries']]
+    entries = [i for i in entries if i]  # filter out missing
 
     records = []
     for entry in entries:

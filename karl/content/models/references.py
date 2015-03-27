@@ -23,6 +23,10 @@ from zope.interface import implements
 from karl.content.interfaces import IOrdering
 from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
+from karl.models.interfaces import IObjectVersion
+
+from pyramid.traversal import resource_path
+
 
 class Ordering(Persistent):
     """ Store information about the ordering of items within a folder.
@@ -50,7 +54,6 @@ class Ordering(Persistent):
                 # end.
                 self._items.append(entry_name)
 
-
     def moveUp(self, name):
         # Move the item with __name__ == name up a position.  If at
         # the beginning, move to last position.
@@ -75,7 +78,6 @@ class Ordering(Persistent):
             self._items.insert(0, name)
         else:
             self._items.insert(position + 1, name)
-
 
     def add(self, name):
         # When a new item is added to a folder, put it at the end.
@@ -131,3 +133,23 @@ class ReferenceSection(_ReferenceSectionBase):
 
 class ReferenceManual(_ReferenceSectionBase):
     implements(IReferenceManual)
+
+
+class ReferenceSectionObjectVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, section):
+        self.title = section.title
+        self.description = section.description
+        self.created = section.created
+        self.modified = section.modified_by
+        self.docid = section.docid
+        self.path = resource_path(section)
+        self.attrs = dict((name, getattr(section, name)) for name in [
+            'creator'
+        ])
+        self.klass = section.__class__  # repozitory can't detect we are a shim
+        self.user = section.modified_by
+        if self.user is None:
+            self.user = section.creator
+        self.comment = None

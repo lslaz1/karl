@@ -2,6 +2,12 @@ karl package Changelog
 ======================
 
 
+5.0.2a6 (unreleased)
+--------------------
+
+- fix use of sub folder file types versioning
+
+
 5.0.2a5 (2015-03-27)
 --------------------
 

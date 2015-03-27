@@ -19,6 +19,9 @@ from zope.interface import implements
 from repoze.folder import Folder
 from karl.content.interfaces import INewsItem
 from karl.content.models.attachments import AttachmentsFolder
+from karl.models.interfaces import IObjectVersion
+from pyramid.traversal import resource_path
+
 
 class NewsItem(Folder):
     implements(INewsItem)
@@ -43,3 +46,24 @@ class NewsItem(Folder):
 
     def get_attachments(self):
         return self['attachments']
+
+
+class NewsItemVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, page):
+        self.title = page.title
+        self.created = page.created
+        self.modified = page.modified
+        self.docid = page.docid
+        self.path = resource_path(page)
+
+        self.attrs = dict((name, getattr(page, name)) for name in [
+            'text', 'creator'
+        ])
+        self.klass = page.__class__  # repozitory can't detect we are a shim
+        self.user = page.modified_by
+        if self.user is None:
+            self.user = page.creator
+        self.comment = None
+        self.description = None

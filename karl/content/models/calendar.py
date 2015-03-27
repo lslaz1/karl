@@ -32,6 +32,7 @@ from karl.content.models.attachments import AttachmentsFolder
 
 from karl.models.tool import ToolFactory
 from karl.models.interfaces import IToolFactory
+from karl.models.interfaces import IObjectVersion
 
 
 class Calendar(Folder):
@@ -104,3 +105,24 @@ class CalendarToolFactory(ToolFactory):
         del context['calendar']
 
 calendar_tool_factory = CalendarToolFactory()
+
+
+class CalendarEventVersion(object):
+    implements(IObjectVersion)
+
+    def __init__(self, page):
+        self.title = page.title
+        self.description = page.description
+        self.created = page.created
+        self.modified = page.modified
+        self.docid = page.docid
+        self.path = resource_path(page)
+
+        self.attrs = dict((name, getattr(page, name)) for name in [
+            'text', 'creator', 'description'
+        ])
+        self.klass = page.__class__  # repozitory can't detect we are a shim
+        self.user = page.modified_by
+        if self.user is None:
+            self.user = page.creator
+        self.comment = None

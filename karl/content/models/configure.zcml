@@ -197,6 +197,24 @@
       factory=".files.CommunityFolderObjectVersion"
      />
 
+  <adapter
+      for="karl.content.interfaces.IReferenceSection"
+      provides="karl.models.interfaces.IObjectVersion"
+      factory=".files.CommunityFolderObjectVersion"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICalendarEvent"
+      provides="karl.models.interfaces.IObjectVersion"
+      factory=".calendar.CalendarEventVersion"
+     />
+
+  <adapter
+      for="karl.content.interfaces.INewsItem"
+      provides="karl.models.interfaces.IObjectVersion"
+      factory=".news.NewsItemVersion"
+     />
+
   <lemonade:content
       factory=".wiki.Wiki"
       type="karl.content.interfaces.IWiki"

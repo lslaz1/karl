@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import datetime
 import re
 import htmlentitydefs
 import urllib
@@ -29,7 +28,6 @@ from karl.models.interfaces import IObjectVersion
 from repoze.folder import Folder
 from zope.interface import implements
 
-from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 
 from karl.models.tool import ToolFactory
@@ -39,15 +37,18 @@ from karl.content.models.adapters import extract_text_from_html
 from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 
-pattern = re.compile(r'\(\(([\w\W]+?)\)\)') # wicked-style
+
+pattern = re.compile(r'\(\(([\w\W]+?)\)\)')  # wicked-style
 WICKED = '((%s))'
 
-def _ijoin(a,b):
+
+def _ijoin(a, b):
     """yield a0,b0,a1,b1.. if len(a) = len(b)+1"""
     yield(a[0])
-    for i in range(1,len(a)):
+    for i in range(1, len(a)):
         yield(b[i-1])
         yield(a[i])
+
 
 class Wiki(Folder):
     implements(IWiki)
@@ -103,8 +104,9 @@ def _unescape(text):
                 text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
             except KeyError:
                 pass
-        return text # leave as is
+        return text  # leave as is
     return re.sub("&#?\w+;", fixup, text)
+
 
 class WikiPage(Folder):
     implements(IWikiPage)
@@ -148,7 +150,7 @@ class WikiPage(Folder):
     def cook(self, request):
 
         chunks = pattern.split(self.text)
-        if len(chunks) == 1: # fastpath
+        if len(chunks) == 1:  # fastpath
             return self.text
 
         subs = []
@@ -164,7 +166,7 @@ class WikiPage(Folder):
             else:
                 quoted = urllib.quote(cleaned.encode('UTF-8'))
                 subs.append(ADD_WIKIPAGE_LINK % (
-                        wikilink, quoted))
+                            wikilink, quoted))
 
         # Now join the two lists (knowing that len(text) == subs+1)
         return u''.join(_ijoin(chunks[::2], subs))
@@ -218,12 +220,12 @@ This is the front page of your wiki.
 """
 
 ADD_WIKIPAGE_LINK = (
-u'<span class="wicked_unresolved">%s</span> '
- '<a href="../add_wikipage.html?title=%s">+</a>'
+    u'<span class="wicked_unresolved">%s</span> '
+    '<a href="../add_wikipage.html?title=%s">+</a>'
 )
 
 WIKI_LINK = (
-u'<a href="%s"><span class="wicked_resolved">%s</span></a>'
+    u'<a href="%s"><span class="wicked_resolved">%s</span></a>'
 )
 
 class WikiToolFactory(ToolFactory):
@@ -256,7 +258,7 @@ class WikiPageVersion(object):
             'creator',
         ])
         self.attachments = None
-        self.klass = page.__class__ # repozitory can't detect we are a shim
+        self.klass = page.__class__  # repozitory can't detect we are a shim
         self.user = page.modified_by
         if self.user is None:
             self.user = page.creator
