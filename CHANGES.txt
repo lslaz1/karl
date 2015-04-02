@@ -2,8 +2,10 @@ karl package Changelog
 ======================
 
 
-5.0.2a6 (unreleased)
+5.0.2a6 (2015-04-01)
 --------------------
+
+- provide site override css option
 
 - fix use of sub folder file types versioning
 

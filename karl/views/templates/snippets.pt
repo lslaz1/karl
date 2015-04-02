@@ -78,6 +78,9 @@
       <tal:resources tal:repeat="resource python: api.get_css()">
         <link rel="stylesheet" href="" type="text/css" tal:replace="structure python: resource.render(request)" />
       </tal:resources>
+      <style>
+        ${structure: api.get_setting('site_override_css', '')}
+      </style>
     </metal:resources>
 
     <div metal:define-macro="letter_box" class="kalphabetlisting">

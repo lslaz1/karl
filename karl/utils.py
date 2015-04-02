@@ -125,7 +125,8 @@ def get_settings(context):
     try:
         return site.settings
     except AttributeError:
-        return {}
+        from karl.models.site import Site
+        return Site._default_settings
 
 
 def get_config_setting(setting_name, default=None):

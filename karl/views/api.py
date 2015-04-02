@@ -42,6 +42,7 @@ from karl.consts import cultures
 from karl.utils import asbool
 from karl.utils import find_site
 from karl.utils import get_settings
+from karl.utils import get_setting
 from karl.utils import get_config_settings
 from karl.utils import support_attachments
 from karl.utils import get_egg_rev
@@ -140,6 +141,9 @@ class TemplateAPI(object):
             self._snippets = r.implementation()
             self._snippets.doctype = xhtml
         return self._snippets
+
+    def get_setting(self, name, default=None):
+        return get_setting(self.site, name, default)
 
     def render_header(self):
         r = get_renderer('templates/header.pt')

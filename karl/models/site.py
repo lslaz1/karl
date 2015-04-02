@@ -432,7 +432,8 @@ class Site(Folder):
         member_fields=list(Profile.additional_fields),
         default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0],
         failed_login_attempt_window=3600,
-        max_failed_login_attempts=15
+        max_failed_login_attempts=15,
+        site_override_css="""/* provide custom override css here */"""
     )
     _repo = Uninitialized
 
