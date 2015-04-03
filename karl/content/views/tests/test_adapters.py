@@ -409,7 +409,6 @@ class TestBlogCommentAlert(unittest.TestCase):
         self.assertEqual(alert.message["reply-to"],
                          u'"Dummy Communit\xe0" <community+blog-7FFFFFFF'
                          u'@karl3.example.com>')
-        self.assertEqual(renderer.history, ([], 0))
 
     def test_long_history(self):
         from repoze.postoffice.message import Message

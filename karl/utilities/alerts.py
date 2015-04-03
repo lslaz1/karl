@@ -60,7 +60,9 @@ class Alerts(object):
             return  # Will be true for a mailin test trace
         profiles = find_profiles(context)
         all_names = community.member_names | community.moderator_names
+
         threaded = get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True')  # noqa
+        mailer = getUtility(IMailDelivery)
         if threaded:
             mailer = ThreadedGeneratorMailDelivery()
         queue = []
