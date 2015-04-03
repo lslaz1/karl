@@ -17,6 +17,9 @@ from pyramid.events import NewRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.exceptions import NotFound
+from ZODB.POSException import ReadOnlyError
 
 from pyramid_zodbconn import get_connection
 
@@ -156,6 +159,12 @@ def configure_karl(config, load_zcml=True):
     debug = asbool(settings.get('debug', 'false'))
     if not debug:
         config.add_view('karl.errorpage.errorpage', context=Exception,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=HTTPNotFound,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=NotFound,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=ReadOnlyError,
                         renderer="karl.views:templates/errorpage.pt")
 
     debugtoolbar = asbool(settings.get('debugtoolbar', 'false'))

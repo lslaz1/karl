@@ -5,6 +5,10 @@ karl package Changelog
 5.0.2a7 (unreleased)
 --------------------
 
+- Ensure that NotFound/HTTPNotFound/ReadOnlyError causes karl.errorpage
+  view to be invoked
+  [mcdonc]
+
 - be able to disable reply to text in email
   alerts
 
