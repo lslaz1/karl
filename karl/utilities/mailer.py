@@ -9,6 +9,15 @@ from repoze.sendmail.interfaces import IMailDelivery
 
 from karl.utils import get_config_settings
 
+from transaction.interfaces import IDataManager
+import transaction
+
+from email.utils import formatdate
+from email.utils import make_msgid
+from email.header import Header
+from repoze.sendmail.maildir import Maildir
+import threading
+
 
 def boolean(s):
     s = s.lower()
@@ -121,3 +130,89 @@ class WhiteListMailDelivery(object):
         if '<' in addr:
             addr = addr[addr.index('<') + 1:addr.rindex('>')]
         return unicode(addr.strip()).lower()
+
+
+class ThreadedGeneratorMailDataManager(object):
+    implements(IDataManager)
+
+    def __init__(self, mailer, callable, args=()):
+        self.callable = callable
+        self.mailer = mailer
+        self.args = args
+        self.transaction_manager = transaction.manager
+
+    def commit(self, transaction):
+        pass
+
+    def abort(self, transaction):
+        # just do nothing here
+        pass
+
+    def sortKey(self):
+        return id(self)
+
+    # No subtransaction support.
+    def abort_sub(self, transaction):
+        pass
+
+    commit_sub = abort_sub
+
+    def beforeCompletion(self, transaction):
+        pass
+
+    afterCompletion = beforeCompletion
+
+    def tpc_begin(self, transaction, subtransaction=False):
+        assert not subtransaction
+
+    def tpc_vote(self, transaction):
+        pass
+
+    def tpc_finish(self, transaction):
+        thread = threading.Thread(target=self.callable, args=self.args)
+        thread.start()
+
+    tpc_abort = abort
+
+
+class ThreadedGeneratorMailDelivery(KarlMailDelivery):
+    """
+    High performance mail delivery class.
+
+    The purpose of this is being able to use a generator
+    in a different for all messages you want to send that won't be
+    generated until the transaction has finished.
+    """
+
+    def __init__(self, settings=None):
+        if settings is None:
+            settings = get_config_settings()
+        super(ThreadedGeneratorMailDelivery, self).__init__(settings)
+
+    def send(self, mto, message):
+        """
+        keep in mind...
+        This is only called inside another thread, after
+        transaction has completed
+        """
+        try:
+            from repoze.sendmail import encoding
+            encoding.cleanup_message(message)
+        except ImportError:
+            pass
+        messageid = message['Message-Id']
+        if messageid is None:
+            messageid = message['Message-Id'] = make_msgid('repoze.sendmail')
+        if message['Date'] is None:
+            message['Date'] = formatdate()
+
+        message['X-Actually-From'] = Header(self.mfrom, 'utf-8')
+        message['X-Actually-To'] = Header(','.join(mto), 'utf-8')
+        maildir = Maildir(self.queuePath, True)
+        tx_message = maildir.add(message)
+        tx_message.commit()
+        return messageid
+
+    def sendGenerator(self, generator, *args):
+        transaction.get().join(
+            ThreadedGeneratorMailDataManager(self, generator, args))

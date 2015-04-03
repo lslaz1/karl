@@ -248,6 +248,7 @@ class Alert(object):
     message = None
     digest = False
     _attachments_folder = None
+    _template = None
 
     def __init__(self, context, profile, request):
         self.context = context
@@ -256,6 +257,10 @@ class Alert(object):
 
         self.profiles = profiles = find_profiles(context)
         self.creator = profiles[context.creator]
+        if self._template:
+            self.template = get_renderer(self._template).implementation()
+        else:
+            self.template = None
 
     @property
     def mto(self):
@@ -350,7 +355,6 @@ class BlogAlert(Alert):
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
-        body_template = get_renderer(self._template).implementation()
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
         msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
@@ -358,7 +362,7 @@ class BlogAlert(Alert):
         msg["Reply-to"] = reply_to
         msg["Subject"] = self._subject
         msg["Precedence"] = 'bulk'
-        body_text = body_template(
+        body_text = self.template(
             context=self.context,
             community=community,
             community_href=community_href,
@@ -538,14 +542,13 @@ class NonBlogAlert(Alert):
 
         attachments, attachment_links, attachment_hrefs = self.attachments
 
-        body_template = get_renderer(self._template).implementation()
         from_name = "%s | %s" % (self.creator.title, system_name)
         msg = MIMEMultipart() if attachments else Message()
         msg["From"] = '"%s" <%s>' % (from_name, self.mfrom)
         msg["To"] = '"%s" <%s>' % (community.title, profile.email)
         msg["Subject"] = self._subject
         msg["Precedence"] = 'bulk'
-        body_text = body_template(
+        body_text = self.template(
             context=self.context,
             community=community,
             community_href=community_href,

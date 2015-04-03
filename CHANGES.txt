@@ -2,6 +2,13 @@ karl package Changelog
 ======================
 
 
+5.0.2a7 (unreleased)
+--------------------
+
+- be able to send mail in different thread
+  to speed up sending email with lots of users
+
+
 5.0.2a6 (2015-04-01)
 --------------------
 

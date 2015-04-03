@@ -39,8 +39,15 @@ from karl.utilities.interfaces import IAlert
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import get_setting
+from karl.utils import get_config_setting
+from karl.utilities.mailer import ThreadedGeneratorMailDelivery
 
 log = logging.getLogger(__name__)
+
+
+def _send_alert_queue(mailer, alerts):
+    for alert in alerts:
+        mailer.send(alert.mto, alert.message)
 
 
 class Alerts(object):
@@ -53,23 +60,32 @@ class Alerts(object):
             return  # Will be true for a mailin test trace
         profiles = find_profiles(context)
         all_names = community.member_names | community.moderator_names
+        threaded = get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True')  # noqa
+        if threaded:
+            mailer = ThreadedGeneratorMailDelivery()
+        queue = []
+
         for profile in [profiles[name] for name in all_names]:
+            alert = getMultiAdapter((context, profile, request), IAlert)
             preference = profile.get_alerts_preference(community.__name__)
+            alert = getMultiAdapter((context, profile, request), IAlert)
             if preference == IProfile.ALERT_IMMEDIATELY:
-                self._send_immediately(context, profile, request)
+                if threaded:
+                    queue.append(alert)
+                else:
+                    self._send_immediately(mailer, alert)
             elif preference in (IProfile.ALERT_DAILY_DIGEST,
                                 IProfile.ALERT_WEEKLY_DIGEST,
                                 IProfile.ALERT_BIWEEKLY_DIGEST):
-                self._queue_digest(context, profile, request,
-                                   community.__name__)
+                self._queue_digest(alert, profile, community.__name__)
 
-    def _send_immediately(self, context, profile, request):
-        mailer = getUtility(IMailDelivery)
-        alert = getMultiAdapter((context, profile, request), IAlert)
+        if queue:
+            mailer.sendGenerator(_send_alert_queue, mailer, queue)
+
+    def _send_immediately(self, mailer, alert):
         mailer.send(alert.mto, alert.message)
 
-    def _queue_digest(self, context, profile, request, community):
-        alert = getMultiAdapter((context, profile, request), IAlert)
+    def _queue_digest(self, alert, profile, community):
         alert.digest = True
         message = alert.message
 

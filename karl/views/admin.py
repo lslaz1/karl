@@ -43,6 +43,7 @@ from karl.security.policy import ADMINISTER
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
 from karl.utilities.interfaces import IRandomId
+from karl.utilities.mailer import ThreadedGeneratorMailDelivery
 
 from karl.utils import asbool
 from karl.utils import find_communities
@@ -360,6 +361,19 @@ def site_announcement_view(context, request):
         )
 
 
+def _send_email(mailer, subject, body, addressed_to, from_email):
+    for addressed in addressed_to:
+        message = Message()
+        message['From'] = from_email
+        message['To'] = '%s <%s>' % (addressed['name'], addressed['email'])
+        message['Subject'] = subject
+        body_html = u'<html><body>%s</body></html>' % body
+        message.set_payload(body_html.encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
+
+        mailer.send([addressed['email']], message)
+
+
 class EmailUsersView(object):
     # The groups are a pretty obvious customization point, so we make this view
     # a class so that customization packages can subclass this and override
@@ -372,6 +386,15 @@ class EmailUsersView(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+
+    def send_email(self, subject, body, addressed_to, from_email):
+        if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
+            mailer = ThreadedGeneratorMailDelivery()
+            mailer.sendGenerator(
+                _send_email, mailer, subject, body, addressed_to, from_email)
+        else:
+            mailer = getUtility(IMailDelivery)
+            _send_email(mailer, subject, body, addressed_to, from_email)
 
     def __call__(self):
         context, request = self.context, self.request
@@ -386,12 +409,15 @@ class EmailUsersView(object):
         ]
 
         if 'send_email' in request.params or 'submit' in request.params:
-            mailer = getUtility(IMailDelivery)
+            from_email = from_emails[1][1]
+            if request.params['from_email'] == 'self':
+                from_email = from_emails[0][1]
             group = request.params['to_group']
             users = find_users(context)
             search = ICatalogSearch(context)
             count, docids, resolver = search(interfaces=[IProfile])
             n = 0
+            addressed_to = []
             for docid in docids:
                 profile = resolver(docid)
                 if getattr(profile, 'security_state', None) == 'inactive':
@@ -399,22 +425,14 @@ class EmailUsersView(object):
                 userid = profile.__name__
                 if group and not users.member_of_group(userid, group):
                     continue
-
-                message = Message()
-                if request.params['from_email'] == 'self':
-                    message['From'] = from_emails[0][1]
-                else:
-                    message['From'] = from_emails[1][1]
-                message['To'] = '%s <%s>' % (profile.title, profile.email)
-                message['Subject'] = request.params['subject']
-                body = u'<html><body>%s</body></html>' % (
-                    request.params['text']
-                )
-                message.set_payload(body.encode('UTF-8'), 'UTF-8')
-                message.set_type('text/html')
-
-                mailer.send([profile.email], message)
+                addressed_to.append({
+                    'name': profile.title,
+                    'email': profile.email
+                })
                 n += 1
+            self.send_email(
+                request.params['subject'], request.params['text'],
+                addressed_to, from_email)
 
             status_message = "Sent message to %d users." % n
             if has_permission(ADMINISTER, context, request):
