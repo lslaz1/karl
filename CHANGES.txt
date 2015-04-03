@@ -2,7 +2,7 @@ karl package Changelog
 ======================
 
 
-5.0.2a7 (unreleased)
+5.0.2a7 (2015-04-03)
 --------------------
 
 - Ensure that NotFound/HTTPNotFound/ReadOnlyError causes karl.errorpage
