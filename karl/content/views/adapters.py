@@ -247,6 +247,7 @@ class Alert(object):
     mfrom = None
     message = None
     digest = False
+    reply_enabled = True
     _attachments_folder = None
     _template = None
 
@@ -377,6 +378,7 @@ class BlogAlert(Alert):
             digest=self.digest,
             alert=self,
             history=self._history,
+            reply_enabled=self.reply_enabled
         )
 
         if self.digest:
@@ -491,6 +493,8 @@ class CommentAlert(Alert):
     @property
     def message(self):
         if self.alert:
+            self.alert.digest = self.digest
+            self.alert.reply_enabled = self.reply_enabled
             return self.alert.message
 
 
@@ -564,7 +568,8 @@ class NonBlogAlert(Alert):
             digest=self.digest,
             alert=self,
             resource_url=resource_url,
-            request=request
+            request=request,
+            reply_enabled=self.reply_enabled
         )
 
         if self.digest:

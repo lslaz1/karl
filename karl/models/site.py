@@ -433,7 +433,8 @@ class Site(Folder):
         default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0],
         failed_login_attempt_window=3600,
         max_failed_login_attempts=15,
-        site_override_css="""/* provide custom override css here */"""
+        site_override_css="""/* provide custom override css here */""",
+        reply_by_email_enabled=True
     )
     _repo = Uninitialized
 

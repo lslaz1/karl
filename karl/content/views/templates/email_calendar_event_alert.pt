@@ -43,8 +43,8 @@
       </div>
     </p>
 
-    <div tal:condition="not digest">----</div>
-    <p tal:condition="not digest">
+    <div tal:condition="not digest and reply_enabled">----</div>
+    <p tal:condition="not digest and reply_enabled">
       PLEASE DO NOT REPLY TO THIS EMAIL.<br/>
       To view this community, visit: ${community_href}<br/>
       To stop these alerts, visit: ${manage_preferences_href}<br/>

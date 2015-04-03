@@ -65,10 +65,15 @@ class Alerts(object):
             mailer = ThreadedGeneratorMailDelivery()
         queue = []
 
+        reply_enabled = get_setting(context, 'reply_by_email_enabled', True)
+
         for profile in [profiles[name] for name in all_names]:
             alert = getMultiAdapter((context, profile, request), IAlert)
             preference = profile.get_alerts_preference(community.__name__)
             alert = getMultiAdapter((context, profile, request), IAlert)
+
+            alert.reply_enabled = reply_enabled
+
             if preference == IProfile.ALERT_IMMEDIATELY:
                 if threaded:
                     queue.append(alert)

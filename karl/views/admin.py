@@ -1163,6 +1163,7 @@ class SiteSettingsFormController(BaseSiteFormController):
         'title',
         'recaptcha_api_site_key',
         'recaptcha_api_secret_key',
+        'reply_by_email_enabled',
         'admin_email',
         'system_list_subdomain',
         'system_email_domain',
@@ -1177,12 +1178,14 @@ class SiteSettingsFormController(BaseSiteFormController):
     labels = {
         'title': 'Site title',
         'min_pw_length': 'Minimum Password Length',
-        'default_home_behavior': 'Where user should be directed to by default'
+        'default_home_behavior': 'Where user should be directed to by default',
+        'reply_by_email_enabled': 'Requires additional configuration'
     }
     required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
                 'site_url', 'min_pw_length', 'selectable_groups', 'date_format',
                 'default_home_behavior']
     ints = ['min_pw_length', 'max_upload_size']
+    bools = ['reply_by_email_enabled']
 
     schema = []
     for field in fields:
@@ -1194,6 +1197,8 @@ class SiteSettingsFormController(BaseSiteFormController):
         FieldClass = schemaish.String
         if field in ints:
             FieldClass = schemaish.Integer
+        if field in bools:
+            FieldClass = schemaish.Boolean
         schema.append((field, FieldClass(**args)))
 
     def form_defaults(self):
@@ -1210,6 +1215,7 @@ class SiteSettingsFormController(BaseSiteFormController):
         widgets['default_home_behavior'] = formish.widgets.SelectChoice(
             DEFAULT_HOME_BEHAVIOR_OPTIONS)
         widgets['site_override_css'] = formish.widgets.TextArea()
+        widgets['reply_by_email_enabled'] = formish.widgets.Checkbox()
         return widgets
 
     def handle_submit(self, converted):

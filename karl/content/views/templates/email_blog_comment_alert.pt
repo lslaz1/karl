@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal">
   <body>
-    <p tal:condition="not digest">
+    <p tal:condition="not digest and reply_enabled">
       --- Reply ABOVE THIS LINE to post a comment ---
     </p>
 
@@ -64,8 +64,8 @@
       </div>
     </div>
 
-    <div tal:condition="not digest">----</div>
-    <p tal:condition="not digest">
+    <div tal:condition="not digest and reply_enabled">----</div>
+    <p tal:condition="not digest and reply_enabled">
       REPLIES TO THIS MESSAGE WILL BE SENT TO THE COMMUNITY<br/>
       To view this community, visit: ${community_href}<br/>
       To stop these alerts, visit: ${manage_preferences_href}<br/>
