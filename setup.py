@@ -35,7 +35,7 @@ requires = [
     'Chameleon>=2.22',
     'feedparser',
     'icalendar',
-    'lxml>3',
+    'lxml>3.0.0',
     'cssselect',
     'markdown2',
     'perfmetrics>=2.0',
@@ -46,7 +46,7 @@ requires = [
     'pyramid_formish',
     'pyramid_tm',
     'pyramid_zcml',
-    'formish<0.9',
+    'formish',
     'repoze.browserid',
     'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
     'repoze.depinj',
