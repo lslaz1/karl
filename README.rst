@@ -33,3 +33,28 @@ Cronjobs/processes to setup
 - send digest emails
 - consume mail
 - statistics
+
+
+Workflow
+========
+
+Full Access:
+
+ - Admins can administer, delete community, email, view, comment, edit, create and delete
+ - Moderators can moderate, view, comment, edit, create and delete
+ - Members can view, comment, edit, create and delete
+ - Authenticated can view, comment, edit, create and delete
+
+Public View:
+
+ - Admins can administer, delete community, email, view, comment, edit, create and delete
+ - Moderators can moderate, view, comment, edit, create and delete
+ - Members can view, comment, edit, create and delete
+ - Staff can view, comment, edit, create and delete
+ - Authenticated can view and comment
+
+Private:
+
+ - Admins can administer, delete community, email, view, comment, edit, create and delete
+ - Moderators can moderate, view, comment, edit, create and delete
+ - Members can view, comment, edit, create and delete
