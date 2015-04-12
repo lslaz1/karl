@@ -4,6 +4,8 @@ karl package Changelog
 5.0.2a8 (unreleased)
 --------------------
 
+- be able to login with email address also
+
 - do not pre-select content to be deleted or moved
 
 - can now send alerts when adding forums and topics

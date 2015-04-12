@@ -23,7 +23,8 @@
         </span>
         <div class="compound-field">
           <input name="login" type="text" id="username" value="" size="30"
-             tal:attributes="value username|None" />
+             tal:attributes="value username|None"
+             placeholder="or email address"/>
           <div class="send-auth-code" tal:condition="two_factor" style="display:none">
             <button type="button">Send Authentication Code</button>
           </div>

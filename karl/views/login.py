@@ -105,7 +105,7 @@ def login_view(context, request):
         reason = 'Bad username or password'
         users = find_users(context)
         for authenticate in (password_authenticator, impersonate_authenticator):
-            userid = authenticate(users, login, password)
+            userid = authenticate(context, users, login, password)
             if userid:
                 break
 
@@ -349,21 +349,37 @@ def request_access_view(context, request):
         request=request)
 
 
-def password_authenticator(users, login, password):
+def _get_valid_login(context, users, login):
+    """ could be username or email """
     user = users.get(login=login)
-    if user and users.check_password(password, login=login):
+    if user:
+        return user
+    # now try to see if email
+    search = ICatalogSearch(context)
+    count, docids, resolver = search(
+        interfaces=[IProfile], email=login.lower()
+    )
+    if count == 1:
+        profile = resolver(docids[0])
+        if profile.security_state != 'inactive':
+            return users.get(userid=profile.__name__)
+
+
+def password_authenticator(context, users, login, password):
+    user = _get_valid_login(context, users, login)
+    if user and users.check_password(password, login=user['login']):
         return user['id']
 
 
-def impersonate_authenticator(users, login, password):
+def impersonate_authenticator(context, users, login, password):
     if ':' not in password:
         return
 
     admin_login, password = password.split(':', 1)
     admin = users.get(login=admin_login)
-    user = users.get(login=login)
+    user = _get_valid_login(context, users, login)
     if user and admin and 'group.KarlAdmin' in admin['groups']:
-        if password_authenticator(users, admin_login, password):
+        if password_authenticator(context, users, admin_login, password):
             log.info("Superuser %s is impersonating %s", admin['id'],
                      user['id'])
             return user['id']
