@@ -4,6 +4,8 @@ karl package Changelog
 5.0.2a8 (unreleased)
 --------------------
 
+- can now send alerts when adding forums and topics
+
 - Allow a forum to be private--only members of community can see
 
 - send email when access request is denied

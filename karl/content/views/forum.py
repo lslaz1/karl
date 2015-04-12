@@ -26,6 +26,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+from zope.component import queryUtility
 from zope.component.event import objectEventNotify
 
 from pyramid.renderers import render_to_response
@@ -56,9 +57,12 @@ from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import support_attachments
+from karl.content.views.utils import sendalert_default
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
 from karl.utilities.image import relocate_temp_images
+from karl.utilities.interfaces import IAlerts
+from karl.utilities.alerts import Alerts
 
 from karl.views.api import TemplateAPI
 
@@ -222,6 +226,8 @@ description_field = schemaish.String(
                  "results and on the community listing page. Please "
                  "limit your description to 100 words or less.")
     )
+sendalert_field = schemaish.Boolean(
+    title='Send email alert to community members?')
 
 
 class AddForumFormController(object):
@@ -236,7 +242,9 @@ class AddForumFormController(object):
     def form_defaults(self):
         defaults = {
             'title': '',
-            'description': ''}
+            'description': '',
+            'sendalert': sendalert_default(self.context,
+                                           self.request)}
 
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
@@ -246,6 +254,7 @@ class AddForumFormController(object):
         fields = []
         fields.append(('title', title_field))
         fields.append(('description', description_field))
+        fields.append(('sendalert', sendalert_field))
         security_states = self._get_security_states()
         if security_states:
             fields.append(('security_state', security_field))
@@ -255,6 +264,7 @@ class AddForumFormController(object):
         widgets = {
             'title': formish.Input(empty=''),
             'description': formish.TextArea(cols=60, rows=10, empty=''),
+            'sendalert': karlwidgets.SendAlertCheckbox()
             }
         security_states = self._get_security_states()
         schema = dict(fields)
@@ -295,6 +305,9 @@ class AddForumFormController(object):
                 workflow.transition_to_state(forum, request,
                                              converted['security_state'])
 
+        if converted['sendalert']:
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(forum, request)
         location = resource_url(forum, request)
         return HTTPFound(location=location)
 
@@ -514,6 +527,8 @@ class AddForumTopicFormController(object):
             'tags': [],
             'text': '',
             'attachments': [],
+            'sendalert': sendalert_default(self.context,
+                                           self.request),
             }
 
         if self.workflow is not None:
@@ -532,6 +547,7 @@ class AddForumTopicFormController(object):
         fields.append(('tags', tags_field))
         fields.append(('text', text_field))
         fields.append(('attachments', attachments_field))
+        fields.append(('sendalert', sendalert_field))
         security_states = self._get_security_states()
         if security_states:
             fields.append(('security_state', security_field))
@@ -545,6 +561,7 @@ class AddForumTopicFormController(object):
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),
+            'sendalert': karlwidgets.SendAlertCheckbox()
             }
         security_states = self._get_security_states()
         schema = dict(fields)
@@ -603,6 +620,9 @@ class AddForumTopicFormController(object):
             upload_attachments(converted['attachments'], topic['attachments'],
                                creator, request)
 
+        if converted['sendalert']:
+            alerts = queryUtility(IAlerts, default=Alerts())
+            alerts.emit(topic, request)
         location = resource_url(topic, request)
         return HTTPFound(location=location)
 

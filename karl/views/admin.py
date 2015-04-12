@@ -404,8 +404,8 @@ class EmailUsersView(object):
         profiles = find_profiles(context)
         admin = profiles[authenticated_userid(request)]
         from_emails = [
-            ('self', '%s <%s>' % (admin.title, admin.email)),
             ('admin', '%s Administrator <%s>' % (system_name, admin_email)),
+            ('self', '%s <%s>' % (admin.title, admin.email))
         ]
 
         if 'send_email' in request.params or 'submit' in request.params:

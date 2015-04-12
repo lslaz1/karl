@@ -1029,6 +1029,22 @@
       factory=".adapters.CommunityFileAlert"
       />
 
+  <adapter
+      for="karl.content.interfaces.IForum
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.ForumAlert"
+      />
+
+  <adapter
+      for="karl.content.interfaces.IForumTopic
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.TopicAlert"
+      />
+
   <!-- ux1 -->
   <view
     for="karl.content.interfaces.ICommunityRootFolder"

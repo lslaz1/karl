@@ -38,11 +38,12 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
 from karl.models.interfaces import IComment
 from karl.models.interfaces import ICommunity
-from karl.content.interfaces import IForumTopic
 from karl.content.interfaces import IReferencesFolder
 from karl.content.interfaces import IReferenceManual
 from karl.content.interfaces import IReferenceSection
 from karl.content.interfaces import IWikiPage
+from karl.content.interfaces import IForum
+from karl.content.interfaces import IForumTopic
 from karl.content.views.interfaces import INetworkEventsMarker
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.interfaces import ICommunityFile
@@ -600,6 +601,18 @@ class WikiPageAlert(NonBlogAlert):
     _template = "templates/email_wikipage_alert.pt"
     _interface = IWikiPage
     _content_type_name = 'Wiki Page'
+
+
+class ForumAlert(NonBlogAlert):
+    _template = "templates/email_forum_alert.pt"
+    _interface = IForum
+    _content_type_name = 'Forum'
+
+
+class TopicAlert(NonBlogAlert):
+    _template = "templates/email_topic_alert.pt"
+    _interface = IForumTopic
+    _content_type_name = 'Topic'
 
 
 class CommunityFileAlert(NonBlogAlert):
