@@ -488,8 +488,8 @@ class TestEmailUsersView(unittest.TestCase):
         result = view()
         self.assertEqual(result['to_groups'], view.to_groups)
         self.assertEqual(result['from_emails'], [
-            ('self', 'Barney Rubble <barney@example.com>'),
             ('admin', 'karl3test Administrator <admin@example.com>'),
+            ('self', 'Barney Rubble <barney@example.com>'),
         ])
 
     def test_email_everyone(self):
@@ -534,7 +534,7 @@ class TestEmailUsersView(unittest.TestCase):
         msg = self.mailer[0].msg
         self.assertEqual(msg['Subject'], 'Exciting news!')
         self.assertEqual(msg['From'],
-                         'karl3test Administrator <admin@example.com>')
+                         u'Barney Rubble <barney@example.com>')
         self.assertEqual(msg['To'], 'Fred Flintstone <fred@example.com>')
         body = msg.get_payload(decode=True)
         self.failUnless('Foo walked into a bar' in body, body)

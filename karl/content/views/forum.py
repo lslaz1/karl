@@ -305,7 +305,7 @@ class AddForumFormController(object):
                 workflow.transition_to_state(forum, request,
                                              converted['security_state'])
 
-        if converted['sendalert']:
+        if 'sendalert' in converted and converted['sendalert']:
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(forum, request)
         location = resource_url(forum, request)
@@ -620,7 +620,7 @@ class AddForumTopicFormController(object):
             upload_attachments(converted['attachments'], topic['attachments'],
                                creator, request)
 
-        if converted['sendalert']:
+        if 'sendalert' in converted and converted['sendalert']:
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(topic, request)
         location = resource_url(topic, request)

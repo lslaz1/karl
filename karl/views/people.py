@@ -232,7 +232,8 @@ class EditProfileFormController(object):
         request = self.request
         objectEventNotify(ObjectWillBeModifiedEvent(context))
         _normalize_websites(converted)
-        converted['email'] = converted['email'].lower()
+        if 'email' in converted:
+            converted['email'] = converted['email'].lower()
         # Handle the easy ones
         for name in self.simple_field_names:
             setattr(context, name, converted.get(name))
@@ -475,7 +476,8 @@ class AddUserFormController(EditProfileFormController):
         context = self.context
         request = self.request
         userid = converted['login']
-        converted['email'] = converted['email'].lower()
+        if 'email' in converted:
+            converted['email'] = converted['email'].lower()
         users = self.users
         if (users.get_by_id(userid) is not None or
                 users.get_by_login(userid) is not None):

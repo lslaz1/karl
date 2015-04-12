@@ -240,11 +240,13 @@ class DummyUsers(object):
         self.data = {
             'login': {
                 'password': 'password',
-                'id': 'userid'},
+                'id': 'userid',
+                'login': 'login'},
             'admin': {
                 'password': 'admin',
                 'groups': ['group.KarlAdmin'],
-                'id': 'admin'}
+                'id': 'admin',
+                'login': 'admin'}
         }
 
     def get(self, userid=None, login=None):
