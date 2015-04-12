@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.0.2a8 (unreleased)
+--------------------
+
+- allow any user to see tag cloud
+
 
 5.0.2a7 (2015-04-03)
 --------------------
