@@ -37,7 +37,7 @@
         <tbody>
           <tr tal:repeat="item filtered_content">
             <td>
-              <input type="checkbox" name="selected_content" checked=""
+              <input type="checkbox" name="selected_content"
                      value="${item['path']}"/>
             </td>
             <td>
