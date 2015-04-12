@@ -1068,6 +1068,25 @@ def send_invitation_email(request, context, invitation):
     mailer.send([invitation.email], msg)
 
 
+def _send_access_request_denied(context, request, access_request):
+    mailer = getUtility(IMailDelivery)
+    message = Message()
+    message['Subject'] = 'Access Request to %s has been denied' % (
+        get_setting(context, 'title'))
+    message['From'] = get_setting(context, 'admin_email')
+    body = u'''<html><body>
+<p>Hello %s,</p>
+<p>Your access request has been denied. Please read the guidelines on
+   requesting access to %s</p>
+</body></html>''' % (
+        access_request['fullname'],
+        get_setting(context, 'title')
+    )
+    message.set_payload(body.encode('UTF-8'), 'UTF-8')
+    message.set_type('text/html')
+    message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+    mailer.send([access_request['email']], message)
+
 def review_access_requests_view(context, request):
     if request.method == 'POST' and request.POST.get('form.submitted'):
         data = request.POST.dict_of_lists()
@@ -1101,6 +1120,8 @@ def review_access_requests_view(context, request):
 
         for email in data.get('decline', []):
             if email in context.access_requests:
+                _send_access_request_denied(
+                    context, request, context.access_requests[email])
                 del context.access_requests[email]
     return {
         'api': AdminTemplateAPI(context, request),

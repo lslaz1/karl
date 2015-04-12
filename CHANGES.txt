@@ -4,6 +4,8 @@ karl package Changelog
 5.0.2a8 (unreleased)
 --------------------
 
+- send email when access request is denied
+
 - allow any user to see tag cloud
 
 
