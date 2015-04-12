@@ -233,6 +233,24 @@ def forum_to_inherits(ob, info):
     return msg
 
 
+def forum_to_private(ob, info):
+    community = find_community(ob)
+    acl = [(Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS)]
+    acl.append((Allow, ob.creator, MEMBER_PERMS))
+    moderators_group_name = community.moderators_group_name
+    members_group_name = community.members_group_name
+    acl.append((Allow, moderators_group_name, MODERATOR_PERMS))
+    acl.append((Allow, members_group_name, GUEST_PERMS))
+    acl.append(NO_INHERIT)
+    msg = None
+    added, removed = acl_diff(ob, acl)
+    if added or removed:
+        ob.__acl__ = acl
+        msg = ts('forum-private', resource_path(ob), added, removed)
+    _reindex(ob)
+    return msg
+
+
 def forum_topic_to_inherits(ob, info):
     acl = [
         (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),

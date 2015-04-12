@@ -112,7 +112,18 @@
             state_attr="security_state">
 
       <state name="inherits" title="Default"
-             callback="karl.workflow.forum_to_inherits"/>
+             callback="karl.workflow.forum_to_inherits">
+           <alias name="public"/> <!-- b/c -->
+      </state>
+      <state name="private" title="Private"
+             callback="karl.workflow.forum_to_private"/>
+
+      <transition name="inherits_to_private"
+                  to_state="private"
+                  from_state="inherits"/>
+      <transition name="private_to_inherits"
+                  to_state="inherits"
+                  from_state="private"/>
 
   </workflow>
 
