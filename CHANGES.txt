@@ -1,6 +1,14 @@
 karl package Changelog
 ======================
 
+5.0.2a9 (2015-04-14)
+--------------------
+
+- fix spelling error
+
+- change tinymce to use domain absolute urls instead of just absolute urls
+
+
 5.0.2a8 (2015-04-14)
 --------------------
 
