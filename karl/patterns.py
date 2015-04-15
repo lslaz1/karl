@@ -1,10 +1,16 @@
 
 def get_tinymce_options(api):
+    document_base_url = api.request.application_url
+    # tinymce requires that the base url end with a '/'
+    if document_base_url[-1] != '/':
+        document_base_url += '/'
     return {
         # disable tinymce upload tab, do not have time to implement
         'upload': None,
         'tiny': {
             'relative_urls': False,
+            'remove_script_host': False,
+            'document_base_url': document_base_url,
             'browser_spellcheck': True,
             'content_css': api.resource_css('karl-theme').path,  # noqa
             'theme': '-modern',
