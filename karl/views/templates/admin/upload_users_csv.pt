@@ -37,7 +37,7 @@
       out in the header.</p>
 
       <p>The user's password is required.  The password may be specified either
-      in plain text, using the <i>password</i> column, or already SHA encryped
+      in plain text, using the <i>password</i> column, or already SHA encrypted
       (preferred) using the <i>sha_password</i> column.  One or the other of
       these columns must be present but not both.</p>
 
