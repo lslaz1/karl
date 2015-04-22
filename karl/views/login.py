@@ -306,33 +306,32 @@ class RequestAccessView(object):
         self.fields = get_access_request_fields(self.context)
 
     def validate(self):
-        if self.request.params.get('form.submitted', None) is not None:
-            email = self.request.POST.get('email', '').lower()
-            self.data = {
-                'email': email,
-                'date_requested': datetime.utcnow()
-            }
-            if not email or not EMAIL_RE.match(email):
-                self.errors.append('Must provide valid email')
-            if email in self.context.access_requests:
-                self.errors.append('You have already requested access')
+        email = self.request.POST.get('email', '').lower()
+        self.data = {
+            'email': email,
+            'date_requested': datetime.utcnow()
+        }
+        if not email or not EMAIL_RE.match(email):
+            self.errors.append('Must provide valid email')
+        if email in self.context.access_requests:
+            self.errors.append('You have already requested access')
 
-            search = ICatalogSearch(self.context)
-            total, docids, resolver = search(email=email,
-                                             interfaces=[IProfile])
-            if total:
-                self.errors.append('You have already have access to system')
+        search = ICatalogSearch(self.context)
+        total, docids, resolver = search(email=email,
+                                         interfaces=[IProfile])
+        if total:
+            self.errors.append('You have already have access to system')
 
-            for field in self.fields:
-                val = self.request.POST.get(field['id'], '')
-                if not val:
-                    self.errors.append('Must provide %s' % field['label'])
-                else:
-                    self.data[field['id']] = val
+        for field in self.fields:
+            val = self.request.POST.get(field['id'], '')
+            if not val:
+                self.errors.append('Must provide %s' % field['label'])
+            else:
+                self.data[field['id']] = val
 
-            if not verify_recaptcha(self.context, self.request,
-                                    self.request.POST.get('g-recaptcha-response', '')):
-                self.errors.append('Invalid recaptcha')
+        if not verify_recaptcha(self.context, self.request,
+                                self.request.POST.get('g-recaptcha-response', '')):
+            self.errors.append('Invalid recaptcha')
         return len(self.errors) == 0
 
     def create_access_request(self):
@@ -393,8 +392,9 @@ class RequestAccessView(object):
         if not self.context.settings.get('allow_request_accesss', False):
             raise NotFound
 
-        if self.validate():
-            self.create_access_request()
+        if self.request.params.get('form.submitted', None):
+            if self.validate():
+                self.create_access_request()
 
         page_title = 'Request access to %s' % get_setting(self.context, 'title')
         api = TemplateAPI(self.context, self.request, page_title)
