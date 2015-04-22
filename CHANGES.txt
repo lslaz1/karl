@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+
+5.0.2a10 (2015-04-22)
+---------------------
+
+- be able to customize access request fields
+
+- be able to customize access request user email
+
+- fix clearing existing access requests
+
 5.0.2a9 (2015-04-14)
 --------------------
 
