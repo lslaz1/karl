@@ -106,15 +106,26 @@
     </h1>
 
     <div metal:define-macro="status_message" class="portalMessage"
-         tal:condition="api.status_message"><span
-         tal:replace="api.status_message" /></div>
+         tal:condition="api.status_messages">
+      <ul tal:condition="python: len(api.status_messages) > 1">
+        <tal:sm tal:repeat="m api.status_messages">
+          <li>${m}</li>
+        </tal:sm>
+      </ul>
+      <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
+    </div>
 
     <!-- status box that works together with ui.karlstatusbox -->
     <div metal:define-macro="karl_status_message"
          class="statusbox">
-      <div class="portalMessage"
-         tal:condition="api.status_message"><span
-         tal:replace="api.status_message" /></div>
+      <div class="portalMessage" tal:condition="api.status_messages">
+        <ul tal:condition="python: len(api.status_messages) > 1">
+          <tal:sm tal:repeat="m api.status_messages">
+            <li>${m}</li>
+          </tal:sm>
+        </ul>
+        <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
+      </div>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         $(document).ready(function() {

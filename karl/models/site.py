@@ -415,6 +415,11 @@ class Site(Folder):
         two_factor_enabled=False,
         two_factor_auth_code_valid_duration=300,
         allow_request_accesss=False,
+        request_access_fields=[
+            'fullname|Full Name'
+        ],
+        request_access_user_message="""<p>Hello %(fullname)s,</p>
+    <p>Your request to access the %(system_name)s Portal has been submitted.</p>""",
         admin_email='foo@bar.com',
         system_list_subdomain='',
         system_email_domain='karl3.example.com',

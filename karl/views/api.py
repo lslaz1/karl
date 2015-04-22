@@ -264,16 +264,33 @@ class TemplateAPI(object):
                 self._form_field_templates = []
         return self._form_field_templates
 
-    _status_message = None
+    _status_messages = []
     def get_status_message(self):
-        if self._status_message:
-            return self._status_message
+        if len(self._status_messages) > 0:
+            return '\n'.join(self._status_messages)
         return self.request.params.get("status_message", None)
 
     def set_status_message(self, value):
-        self._status_message = value
+        if value:
+            self._status_messages = [value]
+        else:
+            self._status_messages = []
 
     status_message = property(get_status_message, set_status_message)
+
+    # be able to set multiple status messages
+    def get_status_messages(self):
+        if len(self._status_messages) > 0:
+            return self._status_messages
+        sm = self.request.params.get("status_message", None)
+        if sm:
+            return [sm]
+        return []
+
+    def set_status_messages(self, value):
+        self._status_messages = value
+
+    status_messages = property(get_status_messages, set_status_messages)
 
     _error_message = None
     def get_error_message(self):

@@ -19,12 +19,16 @@
         </span>
         <input name="email" type="text" id="email" value="${python: request.POST.get('email', '')}" size="30">
       </fieldset>
-      <fieldset class="field">
-        <span class="loginLabelWrapper">
-          <label for="fullname">Full Name</label>
-        </span>
-        <input name="fullname" type="text" id="fullname" size="30" value="${python: request.POST.get('fullname', '')}">
-      </fieldset>
+
+      <tal:field tal:repeat="field fields">
+        <fieldset class="field">
+          <span class="loginLabelWrapper">
+            <label for="${field['id']}">${field['label']}</label>
+          </span>
+          <input name="${field['id']}" type="text" id="${field['id']}" size="30"
+                 value="${python: request.POST.get(field['id'], '')}" />
+        </fieldset>
+      </tal:field>
 
       <fieldset class="field">
         <span class="loginLabelWrapper">

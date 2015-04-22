@@ -956,7 +956,7 @@
   <view
     for="karl.models.interfaces.ISite"
     name="login.html"
-    view=".login.login_view"
+    view=".login.LoginView"
   />
 
   <view
@@ -975,7 +975,7 @@
   <view
     for="karl.models.interfaces.ISite"
     name="request_access.html"
-    view=".login.request_access_view"
+    view=".login.RequestAccessView"
   />
 
   <formish:form
@@ -1839,7 +1839,7 @@
 
   <view
     for="karl.models.interfaces.ISite"
-    view="karl.views.admin.review_access_requests_view"
+    view="karl.views.admin.ReviewAccessRequestView"
     renderer="templates/admin/review_access_requests.pt"
     permission="administer"
     name="review_access_requests.html"

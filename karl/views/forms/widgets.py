@@ -342,7 +342,7 @@ class SequenceTextAreaWidget(formish.TextArea):
     def from_request_data(self, field, request_data):
         data = []
         for datum in request_data:
-            data.extend(datum.split())
+            data.extend(datum.splitlines())
         return data
 
     def to_request_data(self, field, data):

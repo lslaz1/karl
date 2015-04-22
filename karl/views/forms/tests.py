@@ -513,7 +513,7 @@ class TestSequenceTextAreaWidget(unittest.TestCase):
     def test_from_request_data(self):
         fut = self._makeOne().from_request_data
         self.assertEqual(fut(None, [u'foo bar', u'baz']),
-                         [u'foo', u'bar', u'baz'])
+                         [u'foo bar', u'baz'])
 
 class Test_get_filestore(unittest.TestCase):
     def _callFUT(self, context, request, form_id):

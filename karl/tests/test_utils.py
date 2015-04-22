@@ -135,6 +135,13 @@ class TestUtilFunctions(unittest.TestCase):
         context.repo = '1'
         self.assertEqual(find_repo(context), '1')
 
+    def test_get_member_fields_setting(self):
+        from karl.utils import get_setting
+        from karl.models.profile import Profile
+        context = karl.testing.DummyRoot()
+        member_fields = list(Profile.additional_fields)
+        self.assertEqual(get_setting(context, 'member_fields'), member_fields)
+
 
 class TestDebugSearch(unittest.TestCase):
     def setUp(self):

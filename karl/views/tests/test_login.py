@@ -31,8 +31,8 @@ class TestLoginView(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.views.login import login_view
-        return login_view(context, request)
+        from karl.views.login import LoginView
+        return LoginView(context, request)()
 
     def test_GET_came_from_endswith_login_html_relative(self):
         request = testing.DummyRequest(session={'came_from': '/login.html'})

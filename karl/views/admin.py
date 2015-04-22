@@ -45,6 +45,8 @@ from karl.utilities.rename_user import rename_user
 from karl.utilities.interfaces import IRandomId
 from karl.utilities.mailer import ThreadedGeneratorMailDelivery
 
+from karl.registration import get_access_request_fields
+
 from karl.utils import asbool
 from karl.utils import find_communities
 from karl.utils import find_community
@@ -1043,65 +1045,71 @@ def debug_converters(request):
             }
 
 
-def send_invitation_email(request, context, invitation):
-    mailer = getUtility(IMailDelivery)
-    body_template = get_renderer(
-        'templates/admin/email_invite_new.pt').implementation()
+class ReviewAccessRequestView(object):
 
-    msg = Message()
-    msg['From'] = '%s <%s>' % (
-        context.title,
-        get_setting(context, 'system_email_domain'))
-    msg['To'] = invitation.email
-    msg['Subject'] = 'Please join %s' % context.title
-    body = body_template(
-        system_name=get_setting(context, 'title'),
-        invitation_url=resource_url(invitation.__parent__, request,
-                                    invitation.__name__)
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.random_id = getUtility(IRandomId)
+        self.invitations = self.context['invitations']
+        self.search = ICatalogSearch(self.context)
+
+    def invite(self, invitation):
+        mailer = getUtility(IMailDelivery)
+        body_template = get_renderer(
+            'templates/admin/email_invite_new.pt').implementation()
+
+        msg = Message()
+        msg['From'] = '%s <%s>' % (
+            get_setting(self.context, 'title'),
+            get_setting(self.context, 'system_email_domain'))
+        msg['To'] = invitation.email
+        msg['Subject'] = 'Please join %s' % get_setting(self.context, 'title')
+        body = body_template(
+            system_name=get_setting(self.context, 'title'),
+            invitation_url=resource_url(invitation.__parent__, self.request,
+                                        invitation.__name__)
+            )
+
+        if isinstance(body, unicode):
+            body = body.encode("UTF-8")
+
+        msg.set_payload(body, "UTF-8")
+        msg.set_type('text/html')
+        mailer.send([invitation.email], msg)
+
+    def deny(self, email):
+        access_request = self.context.access_requests[email]
+        mailer = getUtility(IMailDelivery)
+        message = Message()
+        message['Subject'] = 'Access Request to %s has been denied' % (
+            get_setting(self.context, 'title'))
+        message['From'] = get_setting(self.context, 'admin_email')
+        body = u'''<html><body>
+    <p>Hello %(name)s,</p>
+    <p>Your access request has been denied. Please read the guidelines on
+       requesting access to %(system_name)s</p>
+    </body></html>''' % (
+            access_request['fullname'],
+            get_setting(self.context, 'title')
         )
+        message.set_payload(body.encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
+        message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+        mailer.send([access_request['email']], message)
 
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
+    def delete_request(self, email):
+        if email in self.context.access_requests:
+            del self.context.access_requests[email]
 
-    msg.set_payload(body, "UTF-8")
-    msg.set_type('text/html')
-    mailer.send([invitation.email], msg)
-
-
-def _send_access_request_denied(context, request, access_request):
-    mailer = getUtility(IMailDelivery)
-    message = Message()
-    message['Subject'] = 'Access Request to %s has been denied' % (
-        get_setting(context, 'title'))
-    message['From'] = get_setting(context, 'admin_email')
-    body = u'''<html><body>
-<p>Hello %s,</p>
-<p>Your access request has been denied. Please read the guidelines on
-   requesting access to %s</p>
-</body></html>''' % (
-        access_request['fullname'],
-        get_setting(context, 'title')
-    )
-    message.set_payload(body.encode('UTF-8'), 'UTF-8')
-    message.set_type('text/html')
-    message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
-    mailer.send([access_request['email']], message)
-
-def review_access_requests_view(context, request):
-    if request.method == 'POST' and request.POST.get('form.submitted'):
-        data = request.POST.dict_of_lists()
-
-        invitations = context['invitations']
-        search = ICatalogSearch(context)
-        random_id = getUtility(IRandomId)
-        html_body = '''
-<p>Your access request has been approved<p>'''
-        for email in data.get('approve', []):
-            total, docids, resolver = search(email=email.lower(),
-                                             interfaces=[IProfile])
-
-            if total:
-                continue
+    def get_invitation(self, email):
+        html_body = '''<p>Your access request has been approved<p>'''
+        total, docids, resolver = self.search(email=email.lower(),
+                                              interfaces=[IInvitation])
+        if total:
+            # already have invite, re-use
+            invitation = resolver(docids[0])
+        else:
             # Invite new user to Karl
             invitation = create_content(
                 ISiteInvitation,
@@ -1109,27 +1117,50 @@ def review_access_requests_view(context, request):
                 html_body
             )
             while 1:
-                name = random_id()
-                if name not in invitations:
-                    invitations[name] = invitation
+                name = self.random_id(20)
+                if name not in self.invitations:
+                    self.invitations[name] = invitation
                     break
+        return invitation
 
-            send_invitation_email(request, context, invitation)
-            if email in context.access_requests:
-                del context.access_requests[email]
+    def __call__(self):
+        messages = []
+        if self.request.method == 'POST' and self.request.POST.get('form.submitted'):
+            data = self.request.POST.dict_of_lists()
 
-        for email in data.get('decline', []):
-            if email in context.access_requests:
-                _send_access_request_denied(
-                    context, request, context.access_requests[email])
-                del context.access_requests[email]
-    return {
-        'api': AdminTemplateAPI(context, request),
-        'page_title': 'Review Access Requests',
-        'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
-        'menu': _menu_macro(),
-        'access_requests': context.access_requests.values()
-    }
+            for email in data.get('approve', []):
+                total, docids, resolver = self.search(email=email.lower(),
+                                                      interfaces=[IProfile])
+
+                if total:
+                    messages.append("%s already a user on system, deleting" % email)
+                    self.delete_request(email)
+                    continue
+
+                invitation = self.get_invitation(email)
+                self.invite(invitation)
+                self.delete_request(email)
+                messages.append("Approved: %s" % email)
+
+            for email in data.get('decline', []):
+                if email in self.context.access_requests:
+                    self.deny(email)
+                    self.delete_request(email)
+                    messages.append("Denied: %s" % email)
+            for email in data.get('clear', []):
+                self.delete_request(email)
+                messages.append("Clear access request: %s" % email)
+        api = AdminTemplateAPI(self.context, self.request)
+        api.status_messages = messages
+        return {
+            'api': api,
+            'page_title': 'Review Access Requests',
+            'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
+            'menu': _menu_macro(),
+            'access_requests': reversed(sorted(self.context.access_requests.values(),
+                                        key=lambda r: r['date_requested'])),
+            'fields': get_access_request_fields(self.context)
+        }
 
 
 class BaseSiteFormController(object):
@@ -1293,13 +1324,20 @@ class AuthenticationFormController(BaseSiteFormController):
 
 class RegistrationFormController(BaseSiteFormController):
     page_title = 'Registration Settings'
-    fields = ('allow_request_accesss', 'show_terms_and_conditions',
+    fields = ('allow_request_accesss', 'request_access_fields',
+              'request_access_user_message', 'show_terms_and_conditions',
               'terms_and_conditions', 'show_privacy_statement',
               'privacy_statement', 'member_fields')
 
     schema = [
         ('allow_request_accesss', schemaish.Boolean(
             description="Allow people to request access to site")),
+        ('request_access_fields', schemaish.Sequence(
+            schemaish.String(),
+            description="Field access request form should present to user. "
+                        "One per line.")),
+        ('request_access_user_message', schemaish.String(
+            description='Message to send user after access requested')),
         ('show_terms_and_conditions', schemaish.Boolean(
             description="Show terms and conditions")),
         ('terms_and_conditions', schemaish.String()),
@@ -1318,12 +1356,14 @@ class RegistrationFormController(BaseSiteFormController):
     def form_widgets(self, fields):
         return {
             'allow_request_accesss': formish.widgets.Checkbox(),
+            'request_access_fields': karlwidgets.SequenceTextAreaWidget(),
             'show_terms_and_conditions': formish.widgets.Checkbox(),
             'terms_and_conditions': karlwidgets.RichTextWidget(empty=''),
             'show_privacy_statement': formish.widgets.Checkbox(),
             'privacy_statement': karlwidgets.RichTextWidget(empty=''),
             'member_fields': formish.widgets.CheckboxMultiChoice(
-                [(f, f) for f in Profile.additional_fields])
+                [(f, f) for f in Profile.additional_fields]),
+            'request_access_user_message': karlwidgets.RichTextWidget(empty='')
 
         }
 

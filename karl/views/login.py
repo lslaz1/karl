@@ -39,10 +39,12 @@ from karl.utils import get_setting
 from karl.utils import get_config_setting
 from karl.utils import make_random_code
 from karl.utils import strings_differ
+from karl.utils import SafeDict
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl import events
 from karl.lockout import LockoutManager
+from karl.registration import get_access_request_fields
 
 from karl.views.api import TemplateAPI
 
@@ -65,28 +67,34 @@ def _fixup_came_from(request, came_from):
     return came_from
 
 
-def login_locked_out(context, login):
-    users = find_users(context)
-    user = users and users.get(login=login)
-    if not user:
-        return False
+class LoginView(object):
 
-    mng = LockoutManager(context, login)
-    return mng.maxed_number_of_attempts()
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.settings = request.registry.settings
+        came_from = request.session.get('came_from', request.url)
+        came_from = _fixup_came_from(request, came_from)
+        request.session['came_from'] = came_from
+        self.came_from = came_from
 
+    def login_locked_out(self, login):
+        users = find_users(self.context)
+        user = users and users.get(login=login)
+        if not user:
+            return False
 
-def login_view(context, request):
-    settings = request.registry.settings
-    came_from = request.session.get('came_from', request.url)
-    came_from = _fixup_came_from(request, came_from)
-    request.session['came_from'] = came_from
+        mng = LockoutManager(self.context, login)
+        return mng.maxed_number_of_attempts()
 
-    if request.params.get('form.submitted', None) is not None:
+    def login(self):
+        context = self.context
+        request = self.request
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
 
-        if login_locked_out(context, login):
+        if self.login_locked_out(login):
             redirect = request.resource_url(
                 request.root, 'login.html', query={
                     'reason': 'User locked out. Too many failed login attempts.'})
@@ -139,50 +147,58 @@ def login_view(context, request):
         notify(events.LoginSuccess(context, request, login, password))
         return remember_login(context, request, userid, max_age)
 
-    # Log in user seamlessly with kerberos if enabled
-    try_kerberos = request.GET.get('try_kerberos', None)
-    if try_kerberos:
-        try_kerberos = asbool(try_kerberos)
-    else:
-        try_kerberos = asbool(get_config_setting('kerberos', 'False'))
-    if try_kerberos:
-        from karl.security.kerberos_auth import get_kerberos_userid
-        userid = get_kerberos_userid(request)
-        if userid:
-            return remember_login(context, request, userid, None)
+    def __call__(self):
+        if self.request.params.get('form.submitted', None) is not None:
+            resp = self.login()
+            if resp:
+                # if this returned with something, we deal with it
+                return resp
 
-        # Break infinite loop if kerberos authorization fails
-        if request.authorization and request.authorization[0] == 'Negotiate':
-            try_kerberos = False
+        # Log in user seamlessly with kerberos if enabled
+        try_kerberos = self.request.GET.get('try_kerberos', None)
+        if try_kerberos:
+            try_kerberos = asbool(try_kerberos)
+        else:
+            try_kerberos = asbool(get_config_setting('kerberos', 'False'))
+        if try_kerberos:
+            from karl.security.kerberos_auth import get_kerberos_userid
+            userid = get_kerberos_userid(self.request)
+            if userid:
+                return remember_login(self.context, self.request, userid, None)
 
-    page_title = 'Login to %s' % get_setting(context, 'title')
-    api = TemplateAPI(context, request, page_title)
+            # Break infinite loop if kerberos authorization fails
+            if (self.request.authorization and
+                    self.request.authorization[0] == 'Negotiate'):
+                try_kerberos = False
 
-    sso_providers = []
-    sso = settings.get('sso')
-    if sso:
-        # importing here rather than in global scope allows to only require
-        # velruse be installed for systems using it.
-        from velruse import login_url
-        for name in sso.split():
-            provider = settings.get('sso.%s.provider' % name)
-            title = settings.get('sso.%s.title' % name)
-            sso_providers.append({'title': title, 'name': name,
-                                  'url': login_url(request, provider)})
+        page_title = 'Login to %s' % get_setting(self.context, 'title')
+        api = TemplateAPI(self.context, self.request, page_title)
 
-    api.status_message = request.params.get('reason', None)
-    response = render_to_response(
-        'templates/login.pt',
-        dict(
-            api=api,
-            nothing='',
-            try_kerberos=try_kerberos,
-            sso_providers=sso_providers,
-            app_url=request.application_url),
-        request=request)
-    forget_headers = forget(request)
-    response.headers.extend(forget_headers)
-    return response
+        sso_providers = []
+        sso = self.settings.get('sso')
+        if sso:
+            # importing here rather than in global scope allows to only require
+            # velruse be installed for systems using it.
+            from velruse import login_url
+            for name in sso.split():
+                provider = self.settings.get('sso.%s.provider' % name)
+                title = self.settings.get('sso.%s.title' % name)
+                sso_providers.append({'title': title, 'name': name,
+                                      'url': login_url(self.request, provider)})
+
+        api.status_message = self.request.params.get('reason', None)
+        response = render_to_response(
+            'templates/login.pt',
+            dict(
+                api=api,
+                nothing='',
+                try_kerberos=try_kerberos,
+                sso_providers=sso_providers,
+                app_url=self.request.application_url),
+            request=self.request)
+        forget_headers = forget(self.request)
+        response.headers.extend(forget_headers)
+        return response
 
 
 def remember_login(context, request, userid, max_age):
@@ -276,77 +292,123 @@ def verify_recaptcha(site, request, code):
         return False
 
 
-def request_access_view(context, request):
-    if not context.settings.get('allow_request_accesss', False):
-        raise NotFound
+_email_field_tmp = '<b>%s</b>: %s'
 
-    error = None
-    submitted = False
-    if request.params.get('form.submitted', None) is not None:
-        email = request.POST.get('email', '')
-        name = request.POST.get('fullname', '')
-        if not email or not EMAIL_RE.match(email):
-            error = 'Must provide valid email'
-        if not name:
-            error = 'Must provide full name'
-        if email in context.access_requests:
-            error = 'You have already requested access'
 
-        if not verify_recaptcha(context, request,
-                                request.POST.get('g-recaptcha-response', '')):
-            error = 'Invalid recaptcha'
+class RequestAccessView(object):
 
-        if not error:
-            # add access request
-            context.access_requests[email] = {
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.errors = []
+        self.submitted = False
+        self.data = {}
+        self.fields = get_access_request_fields(self.context)
+
+    def validate(self):
+        if self.request.params.get('form.submitted', None) is not None:
+            email = self.request.POST.get('email', '').lower()
+            self.data = {
                 'email': email,
-                'fullname': name,
                 'date_requested': datetime.utcnow()
             }
-            mailer = getUtility(IMailDelivery)
-            message = Message()
-            message['Subject'] = '%s Access Request(%s)' % (
-                context.title, name)
-            message['From'] = get_setting(context, 'admin_email')
-            body = u'''<html><body>
+            if not email or not EMAIL_RE.match(email):
+                self.errors.append('Must provide valid email')
+            if email in self.context.access_requests:
+                self.errors.append('You have already requested access')
+
+            search = ICatalogSearch(self.context)
+            total, docids, resolver = search(email=email,
+                                             interfaces=[IProfile])
+            if total:
+                self.errors.append('You have already have access to system')
+
+            for field in self.fields:
+                val = self.request.POST.get(field['id'], '')
+                if not val:
+                    self.errors.append('Must provide %s' % field['label'])
+                else:
+                    self.data[field['id']] = val
+
+            if not verify_recaptcha(self.context, self.request,
+                                    self.request.POST.get('g-recaptcha-response', '')):
+                self.errors.append('Invalid recaptcha')
+        return len(self.errors) == 0
+
+    def create_access_request(self):
+        email = self.data.get('email')
+        system_name = get_setting(self.context, 'title')
+        self.context.access_requests[email] = self.data
+        mailer = getUtility(IMailDelivery)
+        message = Message()
+        message['Subject'] = '%s Access Request(%s)' % (
+            system_name, self.data.get('fullname'))
+        message['From'] = get_setting(self.context, 'admin_email')
+        body = u'''<html><body>
 <p>New access request has been submitted for the site %s</p>
 <p><b>Email</b>: %s <br />
-   <b>Name</b>: %s <br />
+%s
 </p>
 </body></html>''' % (
-                request.application_url,
-                email,
-                name
-            )
-            message.set_payload(body.encode('UTF-8'), 'UTF-8')
-            message.set_type('text/html')
-            # send mail to all admins
-            users = find_users(context)
-            search = ICatalogSearch(context)
-            count, docids, resolver = search(interfaces=[IProfile])
-            for docid in docids:
-                profile = resolver(docid)
-                if getattr(profile, 'security_state', None) == 'inactive':
-                    continue
-                userid = profile.__name__
-                if not users.member_of_group(userid, 'group.KarlAdmin'):
-                    continue
-                message['To'] = '%s <%s>' % (profile.title, profile.email)
-                mailer.send([profile.email], message)
-            submitted = True
-            error = 'Successfully requested access'
+            self.request.application_url,
+            email,
+            '<br />'.join([_email_field_tmp % (f['label'], self.data.get(f['id'], ''))
+                           for f in self.fields])
+        )
+        message.set_payload(body.encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
 
-    page_title = 'Request access to %s' % context.title
-    api = TemplateAPI(context, request, page_title)
-    api.status_message = error
-    return render_to_response(
-        'templates/request_access.pt',
-        dict(
-            api=api,
-            nothing='',
-            submitted=submitted,
-            app_url=request.application_url),
-        request=request)
+        # First, send mail to all admins
+        users = find_users(self.context)
+        search = ICatalogSearch(self.context)
+        count, docids, resolver = search(interfaces=[IProfile])
+        for docid in docids:
+            profile = resolver(docid)
+            if getattr(profile, 'security_state', None) == 'inactive':
+                continue
+            userid = profile.__name__
+            if not users.member_of_group(userid, 'group.KarlAdmin'):
+                continue
+            message['To'] = '%s <%s>' % (profile.title, profile.email)
+            mailer.send([profile.email], message)
+
+        # next, send to person that submitted
+        message = Message()
+        message['Subject'] = 'Access Request to %s' % system_name
+        message['From'] = get_setting(self.context, 'admin_email')
+        user_message = get_setting(self.context, 'request_access_user_message', '') % (
+            SafeDict(self.data, {
+                'system_name': system_name
+                }))
+        body = u'<html><body>%s</body></html>' % user_message
+        message.set_payload(body.encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
+        message['To'] = '%s <%s>' % (self.data.get('fullname', ''), email)
+        mailer.send([email], message)
+
+        self.submitted = True
+        self.errors.append('Successfully requested access')
+
+    def __call__(self):
+        if not self.context.settings.get('allow_request_accesss', False):
+            raise NotFound
+
+        if self.validate():
+            self.create_access_request()
+
+        page_title = 'Request access to %s' % get_setting(self.context, 'title')
+        api = TemplateAPI(self.context, self.request, page_title)
+        api.status_messages = self.errors
+
+        return render_to_response(
+            'templates/request_access.pt',
+            dict(
+                api=api,
+                nothing='',
+                submitted=self.submitted,
+                fields=self.fields,
+                app_url=self.request.application_url),
+            request=self.request)
 
 
 def _get_valid_login(context, users, login):

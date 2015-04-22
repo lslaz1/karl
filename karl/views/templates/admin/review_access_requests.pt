@@ -14,10 +14,6 @@ jQuery(document).ready(function($) {
 </metal:block>
 </head>
 
-  <div metal:fill-slot="portlets">
-    <div metal:use-macro="menu"/>
-  </div>
-  
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
@@ -25,22 +21,28 @@ jQuery(document).ready(function($) {
     <h1 class="kscreentitle">Review Access Requests</h1>
 
     <form method="POST" class="access-request-review">
-      <table>
+      <table class="table table-striped table-bordered table-hover">
         <thead>
-          <th>Name</th>
+          <tal:fields tal:repeat="field fields">
+            <th>${field['label']}</th>
+          </tal:fields>
           <th>Email</th>
           <th>Date Requested</th>
           <th>Approve</th>
           <th>Decline</th>
+          <th>Clear</th>
         </thead>
         <tbody>
           <tal:req tal:repeat="req access_requests">
             <tr tal:define="date python: format_date(req['date_requested'])">
-              <td>${python: req['fullname']}</td>
+              <tal:fields tal:repeat="field fields">   
+                <td>${python: req.get(field['id'])}</td>
+              </tal:fields>
               <td>${python: req['email']}</td>
               <td><abbr class="timeago" title=${date}>${date}</abbr></td>
               <td><input type="checkbox" name="approve" value="${python: req['email']}" /></td>
               <td><input type="checkbox" name="decline" value="${python: req['email']}" /></td>
+              <td><input type="checkbox" name="clear" value="${python: req['email']}" /></td>
             </tr>
           </tal:req>
         </tbody>

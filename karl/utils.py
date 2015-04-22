@@ -49,6 +49,9 @@ except NotImplementedError:
 from hashlib import sha256 as sha
 
 
+_marker = object()
+
+
 def find_site(context):
     site = find_interface(context, ISite)
     if site is None:
@@ -100,9 +103,6 @@ def find_peopledirectory_catalog(context):
     if not people:
         return None
     return getattr(people, 'catalog', None)
-
-
-_marker = object()
 
 
 def get_setting(context, setting_name, default=_marker):
@@ -313,3 +313,33 @@ def get_egg_rev(distribution='karl'):
     version = pkg_resources.get_distribution(distribution).version
     _egg_version_cache[distribution] = version
     return version
+
+
+class SafeDict(object):
+    def __init__(self, *dicts):
+        self.overrides = {}
+        self.dicts = [self.overrides] + list(dicts)
+
+    def __getitem__(self, name, default=u''):
+        for dd in self.dicts:
+            val = dd.get(name, _marker)
+            if val != _marker:
+                if not isinstance(val, basestring):
+                    try:
+                        val = str(val)
+                    except:
+                        val = repr(val)
+                return val
+        return default
+
+    def get(self, name, default=u''):
+        for dd in self.dicts:
+            val = dd.get(name, _marker)
+            if val != _marker:
+                return val
+
+    def __setitem__(self, name, value):
+        self.overrides[name] = value
+
+    def copy(self):
+        return SafeDict(*self.dicts)

@@ -571,7 +571,6 @@ class TestSyslogView(unittest.TestCase):
         self.assertEqual(len(entries), 0)
         self.assertEqual(result['instance'], '_any')
 
-
     def test_no_filter(self):
         request = testing.DummyRequest()
         result = self.fut(testing.DummyModel(), request)
@@ -790,7 +789,8 @@ class TestUploadUsersView(unittest.TestCase):
         return fut()
 
     def _file_upload(self, fname):
-        import os, sys
+        import os
+        import sys
         here = os.path.dirname(sys.modules[__name__].__file__)
         return DummyUpload(None, path=os.path.join(here, fname))
 
@@ -961,8 +961,9 @@ class TestUploadUsersView(unittest.TestCase):
         result = self._call_fut(self.site, request)
 
         api = result['api']
-        self.assertEqual(api.error_message,
-                "Malformed CSV: line 2 has an empty username.")
+        self.assertEqual(
+            api.error_message,
+            "Malformed CSV: line 2 has an empty username.")
         self.assertEqual(api.status_message, None)
 
     def test_null_byte_in_row(self):
@@ -1124,8 +1125,7 @@ class TestUploadUsersView(unittest.TestCase):
         CSV = '\n'.join([
             '"username","firstname","lastname","email","password","groups"',
             '"user1","%s","","test@example.com","pass1234","KarlStaff"'
-                        % FIRSTNAME.encode('utf8'),
-        ])
+                        % FIRSTNAME.encode('utf8')])
         request = testing.DummyRequest({
             'csv': DummyUpload(CSV),
         })
