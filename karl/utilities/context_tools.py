@@ -24,6 +24,6 @@ def context_tools(context, request):
         'url': request.resource_url(members),
         'selected': in_members,
         'title': 'Members',
-        'name':'members'})
+        'name': 'members'})
 
     return tools

@@ -54,7 +54,6 @@ class IRandomId(Interface):
         """ Return the ranomly generated string of ``size`` characters"""
 
 
-#XXX Does this go here?
 class IAlert(Interface):
     """An alert message, suitable for emailing or digesting."""
 
@@ -64,6 +63,7 @@ class IAlert(Interface):
                         "to be mailed.")
     digest = Attribute("""Boolean, can be set by caller to indicate alert
                        should be formatted for digest.""")
+
 
 class IAlerts(Interface):
     """A utility which emits activity alerts to community members.
@@ -97,3 +97,7 @@ class IAlerts(Interface):
 
 class IContextTools(Interface):
     """ Which tabs should appear in the context tools panel """
+
+
+class IUserLinks(Interface):
+    """ Links for the user(Admin, Home, Communities, Logout) """

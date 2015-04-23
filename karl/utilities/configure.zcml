@@ -34,6 +34,11 @@
     provides=".interfaces.IContextTools"
   />
 
+  <utility
+    component=".user_links.user_links"
+    provides=".interfaces.IUserLinks"
+  />
+
   <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"

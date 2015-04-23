@@ -4,6 +4,8 @@ karl package Changelog
 5.0.2a11 (unreleased)
 ---------------------
 
+- move user links into utility so it can be customized and overridden
+
 - fixed validate method for access request
 
 5.0.2a10 (2015-04-22)

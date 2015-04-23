@@ -22,6 +22,7 @@ import json
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
+from zope.component import getUtility
 
 from pyramid.decorator import reify
 from pyramid.url import resource_url
@@ -46,6 +47,7 @@ from karl.utils import get_setting
 from karl.utils import get_config_settings
 from karl.utils import support_attachments
 from karl.utils import get_egg_rev
+from karl.utilities.interfaces import IUserLinks
 from karl.views.utils import convert_to_script
 
 from karl.models.interfaces import ICommunityContent
@@ -529,3 +531,7 @@ class TemplateAPI(object):
             'data-pat-tinymce': json.dumps(
                 patterns.get_tinymce_options(self))
         }
+
+    def get_user_links(self):
+        util = getUtility(IUserLinks)
+        return util(self)
