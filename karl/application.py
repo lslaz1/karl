@@ -440,7 +440,6 @@ class Application(object):
         request.invoke_subrequest = self.invoke_subrequest
 
         try:
-
             try:
                 response = self.handle_request(request)
 
@@ -449,11 +448,9 @@ class Application(object):
 
                 has_listeners and notify(NewResponse(request, response))
                 return response
-
             finally:
                 if request.finished_callbacks:
                     request._process_finished_callbacks()
-
         finally:
             manager.pop()
 
