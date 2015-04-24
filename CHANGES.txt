@@ -1,7 +1,7 @@
 karl package Changelog
 ======================
 
-5.0.2a12 (unreleased)
+5.0.2a12 (2015-04-24)
 ---------------------
 
 - send email now embeds images into urls
