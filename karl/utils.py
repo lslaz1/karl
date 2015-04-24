@@ -36,6 +36,8 @@ from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
 
+from lxml.html import fromstring, tostring
+
 import time
 from datetime import datetime
 import hashlib
@@ -47,7 +49,7 @@ except NotImplementedError:
     using_sysrandom = False
 
 from hashlib import sha256 as sha
-
+from urllib2 import unquote
 
 _marker = object()
 
@@ -343,3 +345,37 @@ class SafeDict(object):
 
     def copy(self):
         return SafeDict(*self.dicts)
+
+
+def mailify_html(request, html):
+    xml = fromstring(html)
+    app = request.registry['application']
+    import pdb; pdb.set_trace()
+    for img in xml.cssselect('img'):
+        src = img.attrib.get('src', '')
+        if src.startswith(request.application_url):
+            path = unquote(src[len(request.application_url):])
+            resp = app.invoke_subrequest(request, path)
+
+            if resp.status_int != 200:
+                img.attrib['src'] = ''
+                continue
+            try:
+                split = resp.headers.get('content-type', '').split('charset=')
+                encoding = None
+                ctype = split[0]
+                if len(split) > 1:
+                    encoding = split[1]
+                ctype = ctype.split(';')[0]
+                # pisa only likes ascii css
+                data = resp.body
+                if encoding:
+                    data = data.decode(encoding).encode('ascii', errors='ignore')
+            except ValueError:
+                ctype = resp.headers.get('content-type', '').split(';')[0]
+                data = resp.body
+
+            data = data.encode("base64").replace("\n", "")
+            data_uri = 'data:{0};base64,{1}'.format(ctype, data)
+            img.attrib['src'] = data_uri
+    return tostring(xml)

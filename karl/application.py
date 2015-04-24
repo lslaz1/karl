@@ -19,6 +19,8 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.exceptions import NotFound
+from pyramid.events import NewResponse
+
 from ZODB.POSException import ReadOnlyError
 
 from pyramid_zodbconn import get_connection
@@ -30,6 +32,7 @@ from karl.utils import find_users
 from karl.utils import asbool
 from karl.utils import get_egg_rev
 from karl import renderers
+from karl.request import Request
 import karl.includes
 import perfmetrics
 
@@ -338,6 +341,7 @@ class Application(object):
             package=karl.includes,
             settings=settings,
             root_factory=root_factory,
+            request_factory=Request,
             autocommit=True
             )
 
@@ -415,6 +419,43 @@ class Application(object):
     def __call__(self, environ, start_response):
         self._rewrite(environ)
         return self.app(environ, start_response)
+
+    def invoke_subrequest(self, existing_request, path):
+        """
+        pulled out of pyramid(backport)
+        """
+        # create a new environ object copied from the original
+        # so we can auth, etc
+        request = Request.blank(path)
+        for key in ['AUTH_TYPE', 'REMOTE_USER_TOKENS', 'repoze.browserid', 'HTTP_COOKIE',
+                    'karl.identity', 'paste.cookies', 'webob._parsed_cookies']:
+            request.environ[key] = existing_request.environ.get(key)
+        registry = self.registry
+        has_listeners = self.registry.has_listeners
+        notify = self.registry.notify
+        threadlocals = {'registry': registry, 'request': request}
+        manager = self.threadlocal_manager
+        manager.push(threadlocals)
+        request.registry = registry
+        request.invoke_subrequest = self.invoke_subrequest
+
+        try:
+
+            try:
+                response = self.handle_request(request)
+
+                if request.response_callbacks:
+                    request._process_response_callbacks(response)
+
+                has_listeners and notify(NewResponse(request, response))
+                return response
+
+            finally:
+                if request.finished_callbacks:
+                    request._process_finished_callbacks()
+
+        finally:
+            manager.pop()
 
 
 def get_imperative_config(package):

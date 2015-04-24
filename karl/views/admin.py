@@ -55,6 +55,7 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.utils import get_config_setting
+from karl.utils import mailify_html
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 from karl.views.batch import get_fileline_batch
@@ -390,6 +391,7 @@ class EmailUsersView(object):
         self.request = request
 
     def send_email(self, subject, body, addressed_to, from_email):
+        body = mailify_html(self.request, body)
         if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
             mailer = ThreadedGeneratorMailDelivery()
             mailer.sendGenerator(
