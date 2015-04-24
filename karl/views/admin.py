@@ -411,9 +411,9 @@ class EmailUsersView(object):
         ]
 
         if 'send_email' in request.params or 'submit' in request.params:
-            from_email = from_emails[1][1]
+            from_email = from_emails[0][1]
             if request.params['from_email'] == 'self':
-                from_email = from_emails[0][1]
+                from_email = from_emails[1][1]
             group = request.params['to_group']
             users = find_users(context)
             search = ICatalogSearch(context)
