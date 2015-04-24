@@ -1,8 +1,10 @@
 karl package Changelog
 ======================
 
-5.0.2a11 (unreleased)
+5.0.2a11 (2015-04-24)
 ---------------------
+
+- fix send email from address
 
 - move user links into utility so it can be customized and overridden
 
