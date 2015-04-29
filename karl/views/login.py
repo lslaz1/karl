@@ -243,7 +243,7 @@ def send_auth_code_view(context, request):
             'message': 'Must provide a username'
         }
     users = find_users(context)
-    user = users.get_by_login(username)
+    user = _get_valid_login(context, users, username)
     if user is None:
         return {
             'message': 'Not a valid username to send auth code to'
