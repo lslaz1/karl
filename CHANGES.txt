@@ -6,6 +6,8 @@ karl package Changelog
 
 - let's try fixing sending emails with images again. In a trickier way.
 
+- upgrade tinymce to be able to select default scale
+
 
 5.0.2a13 (2015-04-29)
 ---------------------
