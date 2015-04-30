@@ -55,7 +55,7 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.utils import get_config_setting
-from karl.utils import mailify_html
+from karl.utils import create_message
 from karl.views.api import TemplateAPI
 from karl.views.utils import make_unique_name
 from karl.views.batch import get_fileline_batch
@@ -364,16 +364,9 @@ def site_announcement_view(context, request):
         )
 
 
-def _send_email(mailer, subject, body, addressed_to, from_email):
+def _send_email(mailer, message, addressed_to):
     for addressed in addressed_to:
-        message = Message()
-        message['From'] = from_email
         message['To'] = '%s <%s>' % (addressed['name'], addressed['email'])
-        message['Subject'] = subject
-        body_html = u'<html><body>%s</body></html>' % body
-        message.set_payload(body_html.encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
-
         mailer.send([addressed['email']], message)
 
 
@@ -391,14 +384,14 @@ class EmailUsersView(object):
         self.request = request
 
     def send_email(self, subject, body, addressed_to, from_email):
-        body = mailify_html(self.request, body)
+        message = create_message(self.request, subject, body, from_email)
         if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
             mailer = ThreadedGeneratorMailDelivery()
             mailer.sendGenerator(
-                _send_email, mailer, subject, body, addressed_to, from_email)
+                _send_email, mailer, message, addressed_to)
         else:
             mailer = getUtility(IMailDelivery)
-            _send_email(mailer, subject, body, addressed_to, from_email)
+            _send_email(mailer, message, addressed_to)
 
     def __call__(self):
         context, request = self.context, self.request

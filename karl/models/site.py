@@ -72,6 +72,7 @@ from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_tags
 from karl.utils import find_users
+from karl.models.emails import EmailFolder
 
 try:
     from repozitory.archive import Archive
@@ -463,6 +464,7 @@ class Site(Folder):
         self.settings = OOBTree(self._default_settings)
         self.access_requests = OOBTree()
         self.failed_login_attempts = OOBTree()
+        self['email_images'] = EmailFolder()
         self['invitations'] = create_content(IInvitationsFolder)
 
     @property

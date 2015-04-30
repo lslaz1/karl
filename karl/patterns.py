@@ -38,6 +38,7 @@ def get_tinymce_options(api):
         'linkableTypes': ['Image', 'File', 'Folder', 'Page'],
         'prependToScalePart': '/thumb/',
         'appendToOriginalScalePart': '/dl',
+        'defaultScale': 'large',
         'scales': [{
                 'part': '32x32.gif',
                 'name': 'icon',

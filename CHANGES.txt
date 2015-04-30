@@ -4,7 +4,8 @@ karl package Changelog
 5.0.2a14 (unreleased)
 ---------------------
 
-- another fix
+- let's try fixing sending emails with images again. In a trickier way.
+
 
 5.0.2a13 (2015-04-29)
 ---------------------

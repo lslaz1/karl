@@ -978,6 +978,11 @@
     view=".login.RequestAccessView"
   />
 
+  <view
+    for="karl.models.emails.EmailImage"
+    view=".emails.email_image_view"
+    />
+
   <formish:form
      for="karl.models.interfaces.IProfile"
      controller=".people.EditProfileFormController"

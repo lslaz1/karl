@@ -17,6 +17,7 @@
 
 import calendar
 import copy
+import transaction
 
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
@@ -25,6 +26,7 @@ from zope.component import queryUtility
 from pyramid.interfaces import ISettings
 from pyramid.traversal import find_root
 from pyramid.traversal import find_interface
+from pyramid.url import resource_url
 from repoze.lemonade.content import get_content_type
 
 from karl.models.interfaces import ICatalogSearch
@@ -35,8 +37,13 @@ from karl.models.interfaces import IPeopleDirectory
 from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
+from karl.models.emails import EmailFolder, EmailImage
+
+from repoze.postoffice.message import MIMEMultipart
 
 from lxml.html import fromstring, tostring
+
+from email.MIMEText import MIMEText
 
 import time
 from datetime import datetime
@@ -347,34 +354,70 @@ class SafeDict(object):
         return SafeDict(*self.dicts)
 
 
-def mailify_html(request, html):
+def mailify_html(request, html, message):
+    """
+    sigh.... okay...
+    In order to be able to embed images, we need to provide
+    a url where images are publicly accessible.
+
+    To do this, we sub-request these and then save them back
+    to the database on a publicly accessible url
+    """
     xml = fromstring(html)
     app = request.registry['application']
+
+    base_im_url = request.application_url
+
     for img in xml.cssselect('img'):
         src = img.attrib.get('src', '')
         if src.startswith(request.application_url):
-            path = unquote(src[len(request.application_url):])
+            path = unquote(src[len(base_im_url):])
+            # sub requests screw up with transactions...
+            # so things get a bit weird here...
             resp = app.invoke_subrequest(request, path)
-
             if resp.status_int != 200:
                 img.attrib['src'] = ''
                 continue
             try:
-                split = resp.headers.get('content-type', '').split('charset=')
-                encoding = None
-                ctype = split[0]
-                if len(split) > 1:
-                    encoding = split[1]
-                ctype = ctype.split(';')[0]
-                # pisa only likes ascii css
-                data = resp.body
-                if encoding:
-                    data = data.decode(encoding).encode('ascii', errors='ignore')
-            except ValueError:
-                ctype = resp.headers.get('content-type', '').split(';')[0]
-                data = resp.body
+                site = find_site(request.context)
+                if 'email_images' not in site:
+                    site['email_images'] = EmailFolder()
+                email_images = site['email_images']
+                ctype = resp.headers.get('content-type')
+                size = resp.headers.get('content-length')
 
-            data = data.encode("base64").replace("\n", "")
-            data_uri = 'data:{0};base64,{1}'.format(ctype, data)
-            img.attrib['src'] = data_uri
-    return tostring(xml)
+                image = email_images.find_image(path)
+                if image is None:
+                    image = EmailImage(path, ctype, size)
+                    email_images.add_image(image)
+                else:
+                    image.ct = ctype
+                    image.size = size
+
+                blobfi = image.blob.open('w')
+                blobfi.write(resp.body)
+                blobfi.close()
+                img.attrib['src'] = resource_url(email_images, request,
+                                                 image.__name__)
+                # remember, subrequests reset transaction
+                transaction.commit()
+            except:
+                # XXX with this image, ignore?
+                pass
+    html = tostring(xml)
+    body_html = u'<html><body>%s</body></html>' % html
+    message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
+    return message
+
+
+def create_message(request, subject, html, from_email, mailify=True):
+    message = MIMEMultipart()
+    message['From'] = from_email
+    message['Subject'] = subject
+
+    if mailify:
+        mailify_html(request, html, message)
+    else:
+        body_html = u'<html><body>%s</body></html>' % html
+        message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
+    return message
