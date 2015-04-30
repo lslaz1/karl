@@ -282,6 +282,14 @@ def get_available_tools(context, request):
 
 
 class AddCommunityFormController(object):
+    _form_defaults = {
+        'title': '',
+        'tags': [],
+        'description': '',
+        'text': '',
+        'sendalert_default': True
+    }
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -290,14 +298,8 @@ class AddCommunityFormController(object):
         self.tools = [(x['name'], x['title']) for x in self.available_tools]
 
     def form_defaults(self):
-        defaults = {
-            'title': '',
-            'tags': [],
-            'description': '',
-            'text': '',
-            'tools': [t[0] for t in self.tools],
-            'sendalert_default': True,
-        }
+        defaults = self._form_defaults.copy()
+        defaults['tools'] = [t[0] for t in self.tools]
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
