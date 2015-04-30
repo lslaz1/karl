@@ -350,7 +350,6 @@ class SafeDict(object):
 def mailify_html(request, html):
     xml = fromstring(html)
     app = request.registry['application']
-    import pdb; pdb.set_trace()
     for img in xml.cssselect('img'):
         src = img.attrib.get('src', '')
         if src.startswith(request.application_url):
