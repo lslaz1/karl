@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.0.2a15 (unreleased)
+---------------------
+
+- fix issue sending email to multiple users
+
 5.0.2a14 (2015-04-30)
 ---------------------
 

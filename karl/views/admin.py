@@ -366,6 +366,10 @@ def site_announcement_view(context, request):
 
 def _send_email(mailer, message, addressed_to):
     for addressed in addressed_to:
+        # clear headers for sending multiple times...
+        for header in ['To', 'X-Actually-From', 'X-Actually-To']:
+            if header in message:
+                del message[header]
         message['To'] = '%s <%s>' % (addressed['name'], addressed['email'])
         mailer.send([addressed['email']], message)
 
