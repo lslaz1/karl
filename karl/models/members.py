@@ -33,6 +33,7 @@ from karl.models.interfaces import IInvitationsFolder
 from karl.models.interfaces import ISiteInvitation
 from pyramid.interfaces import ILocation
 from persistent import Persistent
+from datetime import datetime
 
 
 class InvitationsFolder(Folder):
@@ -46,6 +47,7 @@ class Invitation(Persistent):
         Persistent.__init__(self)
         self.email = unicode(email)
         self.message = unicode(message)
+        self.created_on = datetime.utcnow()
 
 
 class SiteInvitation(Invitation):

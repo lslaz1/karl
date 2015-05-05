@@ -5,6 +5,8 @@ karl package Changelog
 5.0.2a16 (unreleased)
 ---------------------
 
+- be able to review invitations
+
 - use admin email in a few areas instead
 
 

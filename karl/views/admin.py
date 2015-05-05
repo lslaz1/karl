@@ -12,6 +12,7 @@ import transaction
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
+from datetime import datetime
 
 from zope.component import getUtility
 
@@ -1044,6 +1045,65 @@ def debug_converters(request):
             }
 
 
+def _send_invite(context, request, invitation):
+    mailer = getUtility(IMailDelivery)
+    body_template = get_renderer(
+        'templates/admin/email_invite_new.pt').implementation()
+
+    msg = Message()
+    msg['From'] = '%s <%s>' % (
+        get_setting(context, 'title'),
+        get_setting(context, 'admin_email'))
+    msg['To'] = invitation.email
+    msg['Subject'] = 'Please join %s' % get_setting(context, 'title')
+    body = body_template(
+        system_name=get_setting(context, 'title'),
+        invitation_url=resource_url(invitation.__parent__, request,
+                                    invitation.__name__)
+        )
+
+    if isinstance(body, unicode):
+        body = body.encode("UTF-8")
+
+    msg.set_payload(body, "UTF-8")
+    msg.set_type('text/html')
+    mailer.send([invitation.email], msg)
+
+
+class ReviewSiteInvitations(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.invitations = self.context['invitations']
+
+    def __call__(self):
+        messages = []
+        if self.request.method == 'POST' and self.request.POST.get('form.submitted'):
+            data = self.request.POST.dict_of_lists()
+
+            for invite_id in data.get('delete', []):
+                if invite_id in self.invitations:
+                    invitation = self.invitations[invite_id]
+                    messages.append("Approved: %s" % invitation.email)
+                    del self.invitations[invite_id]
+
+            for invite_id in data.get('resend', []):
+                if invite_id in self.invitations:
+                    invitation = self.invitations[invite_id]
+                    invitation.created_on = datetime.utcnow()
+                    _send_invite(self.context, self.request, invitation)
+                    messages.append("Re-sent invite: %s" % invitation.email)
+        api = AdminTemplateAPI(self.context, self.request)
+        api.status_messages = messages
+        return {
+            'api': api,
+            'page_title': 'Review Invitations',
+            'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
+            'menu': _menu_macro(),
+            'invitations': self.invitations.values()
+        }
+
+
 class ReviewAccessRequestView(object):
 
     def __init__(self, context, request):
@@ -1052,30 +1112,6 @@ class ReviewAccessRequestView(object):
         self.random_id = getUtility(IRandomId)
         self.invitations = self.context['invitations']
         self.search = ICatalogSearch(self.context)
-
-    def invite(self, invitation):
-        mailer = getUtility(IMailDelivery)
-        body_template = get_renderer(
-            'templates/admin/email_invite_new.pt').implementation()
-
-        msg = Message()
-        msg['From'] = '%s <%s>' % (
-            get_setting(self.context, 'title'),
-            get_setting(self.context, 'admin_email'))
-        msg['To'] = invitation.email
-        msg['Subject'] = 'Please join %s' % get_setting(self.context, 'title')
-        body = body_template(
-            system_name=get_setting(self.context, 'title'),
-            invitation_url=resource_url(invitation.__parent__, self.request,
-                                        invitation.__name__)
-            )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        msg.set_payload(body, "UTF-8")
-        msg.set_type('text/html')
-        mailer.send([invitation.email], msg)
 
     def deny(self, email):
         access_request = self.context.access_requests[email]
@@ -1137,7 +1173,7 @@ class ReviewAccessRequestView(object):
                     continue
 
                 invitation = self.get_invitation(email)
-                self.invite(invitation)
+                _send_invite(self.context, self.request, invitation)
                 self.delete_request(email)
                 messages.append("Approved: %s" % email)
 

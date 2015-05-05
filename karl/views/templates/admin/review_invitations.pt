@@ -18,31 +18,24 @@ jQuery(document).ready(function($) {
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
 
-    <h1 class="kscreentitle">Review Access Requests</h1>
+    <h1 class="kscreentitle">Review Invitations</h1>
 
+    <p>These are invitations to sent out to join the portal that have not been acted on.</p>
     <form method="POST" class="access-request-review">
       <table class="table table-striped table-bordered table-hover">
         <thead>
-          <tal:fields tal:repeat="field fields">
-            <th>${field['label']}</th>
-          </tal:fields>
           <th>Email</th>
-          <th>Date Requested</th>
-          <th>Approve</th>
-          <th>Decline</th>
-          <th>Clear</th>
+          <th>Date Sent</th>
+          <th>Delete</th>
+          <th>Re-send</th>
         </thead>
         <tbody>
-          <tal:req tal:repeat="req access_requests">
-            <tr tal:define="date python: format_date(req['date_requested'])">
-              <tal:fields tal:repeat="field fields">   
-                <td>${python: req.get(field['id'])}</td>
-              </tal:fields>
-              <td>${python: req['email']}</td>
+          <tal:req tal:repeat="invite invitations">
+            <tr tal:define="date python: format_date(invite.created_on)">
+              <td>${python: invite.email }</td>
               <td><abbr class="timeago" title=${date}>${date}</abbr></td>
-              <td><input type="checkbox" name="approve" value="${python: req['email']}" /></td>
-              <td><input type="checkbox" name="decline" value="${python: req['email']}" /></td>
-              <td><input type="checkbox" name="clear" value="${python: req['email']}" /></td>
+              <td><input type="checkbox" name="delete" value="${python: invite.__name__}" /></td>
+              <td><input type="checkbox" name="resend" value="${python: invite.__name__}" /></td>
             </tr>
           </tal:req>
         </tbody>
@@ -56,10 +49,6 @@ jQuery(document).ready(function($) {
       </div>
     </form>
 
-
-    <a href="${api.app_url}/review_invitations.html">
-      Review Outstanding Site Invitations
-    </a>
     <script>
     jQuery(document).ready(function(){
       $('.access-request-review input').change(function(){
