@@ -1061,7 +1061,7 @@ class ReviewAccessRequestView(object):
         msg = Message()
         msg['From'] = '%s <%s>' % (
             get_setting(self.context, 'title'),
-            get_setting(self.context, 'system_email_domain'))
+            get_setting(self.context, 'admin_email'))
         msg['To'] = invitation.email
         msg['Subject'] = 'Please join %s' % get_setting(self.context, 'title')
         body = body_template(

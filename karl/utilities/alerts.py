@@ -127,8 +127,7 @@ class Alerts(object):
         mailer = getUtility(IMailDelivery)
 
         system_name = get_setting(context, "title", "KARL")
-        system_email_domain = get_setting(context, "system_email_domain")
-        sent_from = "%s@%s" % (system_name, system_email_domain)
+        sent_from = get_setting(context, "admin_email")
         from_addr = "%s <%s>" % (system_name, sent_from)
         subject = "[%s] Your alerts digest" % system_name
 
