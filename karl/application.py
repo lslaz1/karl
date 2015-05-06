@@ -138,9 +138,13 @@ def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
     authentication_policy = AuthTktAuthenticationPolicy(
-        settings['who_secret'],
+        settings.get('auth_secret', settings.get('who_secret', 'secret')),
         callback=group_finder,
-        cookie_name=settings['who_cookie']
+        cookie_name=settings.get('auth_cookie_name', settings.get('who_cookie', 'pnutbtr')),  # noqa
+        timeout=int(settings.get('auth_timeout', 600)),
+        reissue_time=int(settings.get('auth_reissue_time', 120)),
+        max_age=int(settings.get('auth_max_age', 172800)),
+        secure=settings.get('auth_secure', 'false') in (True, 'true', 'True')
     )
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
