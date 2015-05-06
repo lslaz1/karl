@@ -154,7 +154,8 @@ def configure_karl(config, load_zcml=True):
         config, '/static', 'karl.views:static')
 
     # Need a session if using Velruse
-    config.set_session_factory(Session(settings['who_secret']))
+    config.set_session_factory(
+        Session(settings.get('auth_secret', settings.get('who_secret', 'secret'))))
 
     config.include('karl.security.sso')
 
