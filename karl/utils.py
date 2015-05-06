@@ -354,7 +354,7 @@ class SafeDict(object):
         return SafeDict(*self.dicts)
 
 
-def mailify_html(request, html, message):
+def make_public_images_from_html(request, html):
     """
     sigh.... okay...
     In order to be able to embed images, we need to provide
@@ -363,11 +363,11 @@ def mailify_html(request, html, message):
     To do this, we sub-request these and then save them back
     to the database on a publicly accessible url
     """
-    xml = fromstring(html)
     app = request.registry['application']
 
     base_im_url = request.application_url
 
+    xml = fromstring(html)
     for img in xml.cssselect('img'):
         src = img.attrib.get('src', '')
         if src.startswith(request.application_url):
@@ -404,7 +404,16 @@ def mailify_html(request, html, message):
             except:
                 # XXX with this image, ignore?
                 pass
-    html = tostring(xml)
+    return tostring(xml)
+
+
+def mailify_html(request, html, message):
+
+    if 'application' in request.registry:
+        # if we do not have an application object, we can not
+        # do the sub requests we need
+        html = make_public_images_from_html(request, html)
+
     body_html = u'<html><body>%s</body></html>' % html
     message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
     return message

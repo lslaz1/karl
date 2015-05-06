@@ -511,7 +511,7 @@ class TestEmailUsersView(unittest.TestCase):
 
         msg = self.mailer[0].msg
         self.assertEqual(msg['Subject'], 'Exciting news!')
-        body = msg.get_payload(decode=True)
+        body = msg._payload[0].get_payload(decode=True)
         self.failUnless('Foo walked into a bar' in body, body)
 
     def test_email_staff(self):
@@ -534,9 +534,9 @@ class TestEmailUsersView(unittest.TestCase):
         msg = self.mailer[0].msg
         self.assertEqual(msg['Subject'], 'Exciting news!')
         self.assertEqual(msg['From'],
-                         u'Barney Rubble <barney@example.com>')
+                         u'karl3test Administrator <admin@example.com>')
         self.assertEqual(msg['To'], 'Fred Flintstone <fred@example.com>')
-        body = msg.get_payload(decode=True)
+        body = msg._payload[0].get_payload(decode=True)
         self.failUnless('Foo walked into a bar' in body, body)
 
 class TestSyslogView(unittest.TestCase):
@@ -1011,9 +1011,9 @@ class TestUploadUsersView(unittest.TestCase):
     def test_test_unknown_field(self):
         request = testing.DummyRequest({
             'csv': DummyUpload(
-            '"username","firstname","lastname","email","sha_password","wut"\n'
-            '"user1","User","One","test@example.com","pass1234","wut"\n'
-            ),
+                '"username","firstname","lastname","email","sha_password","wut"\n'
+                '"user1","User","One","test@example.com","pass1234","wut"\n'
+                ),
         })
         result = self._call_fut(self.site, request)
 
@@ -1064,8 +1064,8 @@ class TestUploadUsersView(unittest.TestCase):
         api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message,
-                          'Skipping user: user1: User already exists.\n'
-                          'Created 1 users.')
+                         'Skipping user: user1: User already exists.\n'
+                         'Created 1 users.')
 
     def test_skip_existing_user_in_profiles(self):
         self.site['profiles']['user1'] = testing.DummyModel(
@@ -1082,8 +1082,8 @@ class TestUploadUsersView(unittest.TestCase):
         api = result['api']
         self.assertEqual(api.error_message, None)
         self.assertEqual(api.status_message,
-                          'Skipping user: user1: User already exists.\n'
-                          'Created 1 users.')
+                         'Skipping user: user1: User already exists.\n'
+                         'Created 1 users.')
 
     def test_skip_existing_user_by_login(self):
         self.site.users.add('foo', 'user1', 'password', set())
@@ -1098,9 +1098,10 @@ class TestUploadUsersView(unittest.TestCase):
 
         api = result['api']
         self.assertEqual(api.error_message, None)
-        self.assertEqual(api.status_message,
-                'Skipping user: user1: User already exists with login: user1\n'
-                'Created 1 users.')
+        self.assertEqual(
+            api.status_message,
+            'Skipping user: user1: User already exists with login: user1\n'
+            'Created 1 users.')
 
     def test_user_with_groups(self):
         # See https://bugs.launchpad.net/karl3/+bug/598246
@@ -1141,8 +1142,8 @@ class TestUploadUsersView(unittest.TestCase):
         FIRSTNAME = u'Phr\xE9d'
         CSV = '\n'.join([
             '"username","firstname","lastname","email","password","groups"',
-            '"user1","%s","","test@example.com","pass1234","KarlStaff"'
-                        % FIRSTNAME.encode('latin1'),
+            '"user1","%s","","test@example.com","pass1234","KarlStaff"' % (
+                FIRSTNAME.encode('latin1'))
         ])
         request = testing.DummyRequest({
             'csv': DummyUpload(CSV),
@@ -1164,7 +1165,8 @@ class TestUploadUsersView(unittest.TestCase):
         })
         result = self._call_fut(self.site, request)
         api = result['api']
-        self.assertEqual(api.error_message,
+        self.assertEqual(
+            api.error_message,
             'Malformed CSV: line 2 has an empty email address.')
 
     def test_email_matches_active_user(self):
@@ -1181,7 +1183,8 @@ class TestUploadUsersView(unittest.TestCase):
         })
         result = self._call_fut(self.site, request)
         api = result['api']
-        self.assertEqual(api.error_message,
+        self.assertEqual(
+            api.error_message,
             'An active user already exists with email address: foo@bar.org.')
 
     def test_email_matches_inactive_user(self):
@@ -1198,7 +1201,8 @@ class TestUploadUsersView(unittest.TestCase):
         })
         result = self._call_fut(self.site, request)
         api = result['api']
-        self.assertEqual(api.error_message,
+        self.assertEqual(
+            api.error_message,
             'A previously deactivated user exists with email address: '
             'foo@bar.org.  Consider checking the "Reactivate user" checkbox '
             'to reactivate the user.')
@@ -1427,8 +1431,8 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
     def test_rename_user(self):
         request = testing.DummyRequest(
             params={
-            'old_username': 'harry',
-            'new_username': 'henry'
+                'old_username': 'harry',
+                'new_username': 'henry'
             },
         )
         request.context = testing.DummyModel()
@@ -1445,9 +1449,9 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
     def test_merge_user(self):
         request = testing.DummyRequest(
             params={
-            'old_username': 'harry',
-            'new_username': 'henry',
-            'merge': '1',
+                'old_username': 'harry',
+                'new_username': 'henry',
+                'merge': '1',
             },
         )
         request.context = testing.DummyModel()
@@ -1464,9 +1468,9 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
     def test_error_in_rename_user(self):
         request = testing.DummyRequest(
             params={
-            'old_username': 'harry',
-            'new_username': 'henry',
-            'merge': '1',
+                'old_username': 'harry',
+                'new_username': 'henry',
+                'merge': '1',
             },
         )
         request.context = testing.DummyModel()
@@ -1524,17 +1528,13 @@ class Test_debug_converters(unittest.TestCase):
         self.assertEqual(info['converters'],
                          [{'name': 'always',
                            'command': 'n/a',
-                           'available': 'always',
-                          },
+                           'available': 'always'},
                           {'name': 'missing',
                            'command': 'missing',
-                           'available': 'no',
-                          },
+                           'available': 'no'},
                           {'name': 'present',
                            'command': 'present',
-                           'available': 'yes',
-                          },
-                         ])
+                           'available': 'yes'}])
 
 
 class DummyProfiles(testing.DummyModel):
