@@ -2,7 +2,7 @@ karl package Changelog
 ======================
 
 
-5.0.2a16 (unreleased)
+5.0.2a16 (2015-05-06)
 ---------------------
 
 - pay attention to more auth settings
