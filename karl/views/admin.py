@@ -1100,7 +1100,8 @@ class ReviewSiteInvitations(object):
             'page_title': 'Review Invitations',
             'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
             'menu': _menu_macro(),
-            'invitations': self.invitations.values()
+            'invitations': reversed(sorted(
+                self.invitations.values(), key=lambda r: r.created_on.isoformat())),
         }
 
 
