@@ -18,7 +18,7 @@
 
       <div class="peopledir-report-description"
         tal:repeat="description descriptions"
-        tal:content="structure description"></div>
+        tal:content="structure python: api.clean_html(description)"></div>
 
       <div>
         <a class="rightFloatLink" title="Show table"

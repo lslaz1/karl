@@ -25,12 +25,12 @@
 			<div class="kbyline globalize-full-date">${entry['byline_info'].posted_date}</div>
 
         	<tal:block condition="entry['description']">
-        		<div tal:content="structure entry['description']"/>
+        		<div tal:content="structure python: api.clean_html(entry['description'])"/>
         	</tal:block>
 
 			<div class="kbyline">Posted
 	  	by <a href="${entry['byline_info'].author_url}">${entry['byline_info'].author_name}</a>
-	  	| <span tal:replace="structure entry['comments_blurb']"/>
+	  	| <span tal:replace="structure python: api.clean_html(entry['comments_blurb'])"/>
 			</div>
       	</div>
     </div>

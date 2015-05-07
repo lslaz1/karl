@@ -19,7 +19,7 @@
     <div metal:use-macro="api.snippets.macros['list_tags']"/>    
     <div class="koverview_body" 
 	 tal:condition="api.context.text != u''">
-      <span tal:replace="structure api.context.text"/>
+      <span tal:replace="structure python: api.clean_html(api.context.text)"/>
     </div>
     <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper" tal:define="default_batch_size string:10">

@@ -589,7 +589,7 @@
         <a class="dialogLink" href="#">Terms and Conditions</a>
       </label>
       <div title="Terms and Conditions" class="dialogContent"
-	   tal:content="structure terms_text" />
+	   tal:content="structure python: api.clean_html(terms_text)" />
       <script language="javascript" type="text/javascript">
         $(document).ready(function() {
             // create the dialog from the embedded content
@@ -628,7 +628,7 @@
         <a class="dialogLink" href="#">Privacy Policy</a>
       </label>
       <div title="Privacy Policy" class="dialogContent"
-	   tal:content="structure privacy_text" />
+	   tal:content="structure python: api.clean_html(privacy_text)" />
       <script language="javascript" type="text/javascript">
         $(document).ready(function() {
             // create the dialog from the embedded content

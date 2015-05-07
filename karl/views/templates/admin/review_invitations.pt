@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
 
     <h1 class="kscreentitle">Review Invitations</h1>
 
-    <p>These are invitations to sent out to join the portal that have not been acted on.</p>
+    <p>These are invitations that were sent out to join the portal but have not been acted on.</p>
     <form method="POST" class="access-request-review">
       <table class="table table-striped table-bordered table-hover">
         <thead>

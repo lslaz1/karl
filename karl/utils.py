@@ -58,6 +58,9 @@ except NotImplementedError:
 from hashlib import sha256 as sha
 from urllib2 import unquote
 
+from lxml.html.clean import Cleaner
+
+
 _marker = object()
 
 
@@ -430,3 +433,12 @@ def create_message(request, subject, html, from_email, mailify=True):
         body_html = u'<html><body>%s</body></html>' % html
         message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
     return message
+
+
+_cleaner = Cleaner(scripts=True, javascript=True, page_structure=False,
+                   processing_instructions=False, frames=True)
+
+def clean_html(context, html):
+    if not get_setting(context, 'safe_html'):
+        return html
+    return _cleaner.clean_html(html)

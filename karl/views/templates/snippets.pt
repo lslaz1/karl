@@ -460,7 +460,7 @@
           on
           <span class="globalize-full-date">${comment['date']}</span></strong>
 
-        <div class="commentText" tal:content="structure comment['text']" />
+        <div class="commentText" tal:content="structure python: api.clean_html(comment['text'])" />
 
         <div class="blogAttachments">
           <span tal:repeat="attachment comment['attachments']">
@@ -729,7 +729,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     <div class="sras-result" metal:define-macro="searchresults_generic">
       <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
 
-      <p class="sras-summary" tal:content="structure r['description']">
+      <p class="sras-summary" tal:content="structure python: api.clean_html(r['description'])">
         Contextual summary.
       </p>
 
@@ -789,7 +789,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       <div class="sras-people-location"
            tal:content="' - '.join(filter(None, [doc.organization, doc.location]))" />
 
-      <div tal:content="structure result_display.display_data['contact_html']" />
+      <div tal:content="structure python: api.clean_html(result_display.display_data['contact_html'])" />
     </div>
 
     <div class="sras-result" metal:define-macro="searchresults_event">
@@ -833,7 +833,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     <div class="sras-result" metal:define-macro="searchresults_file">
       <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
 
-      <p class="sras-summary" tal:content="structure r['description']">
+      <p class="sras-summary" tal:content="structure python: api.clean_html(r['description'])">
         Contextual summary.
       </p>
 
@@ -921,7 +921,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       <li>
         <strong>${item['title']}</strong>
         <div class="kbody">
-          <span tal:replace="structure item['html']"/>
+          <span tal:replace="structure python: api.clean_html(item['html'])"/>
         </div>
         <tal:setup tal:define="ol_type_index ol_type_index + 1;">
         <ol type="${ol_types[ol_type_index]}"

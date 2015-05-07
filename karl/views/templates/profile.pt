@@ -98,7 +98,7 @@ jQuery(document).ready(function($) {
           </p>
         </div>
 
-        <div class="profileBio" tal:content="structure profile.biography" />
+        <div class="profileBio" tal:content="structure python: api.clean_html(profile.biography)" />
         <h3> Content Added Recently </h3>
         <table class="content-listing" id="staffprofile-content"
                style="clear: none">

@@ -440,7 +440,8 @@ class Site(Folder):
         failed_login_attempt_window=3600,
         max_failed_login_attempts=15,
         site_override_css="""/* provide custom override css here */""",
-        reply_by_email_enabled=True
+        reply_by_email_enabled=True,
+        safe_html=True
     )
     _repo = Uninitialized
 

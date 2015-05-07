@@ -22,9 +22,8 @@
 
     <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
-    <div class="kbody"
-	 tal:condition="api.context.text">
-      <span tal:replace="structure api.context.text"/>
+    <div class="kbody" tal:condition="api.context.text">
+      <span tal:replace="structure python: api.clean_html(api.context.text)"/>
     </div>
 
     <div metal:use-macro="api.snippets.macros['show_attachments']"/>

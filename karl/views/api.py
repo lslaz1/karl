@@ -47,6 +47,7 @@ from karl.utils import get_setting
 from karl.utils import get_config_settings
 from karl.utils import support_attachments
 from karl.utils import get_egg_rev
+from karl.utils import clean_html
 from karl.utilities.interfaces import IUserLinks
 from karl.views.utils import convert_to_script
 
@@ -535,3 +536,6 @@ class TemplateAPI(object):
     def get_user_links(self):
         util = getUtility(IUserLinks)
         return util(self)
+
+    def clean_html(self, html):
+        return clean_html(self.site, html)

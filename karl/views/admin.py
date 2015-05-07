@@ -1260,7 +1260,8 @@ class SiteSettingsFormController(BaseSiteFormController):
         'selectable_groups',
         'date_format',
         'default_home_behavior',
-        'site_override_css'
+        'site_override_css',
+        'safe_html'
         )
     labels = {
         'title': 'Site title',
@@ -1272,7 +1273,7 @@ class SiteSettingsFormController(BaseSiteFormController):
                 'site_url', 'min_pw_length', 'selectable_groups', 'date_format',
                 'default_home_behavior']
     ints = ['min_pw_length', 'max_upload_size']
-    bools = ['reply_by_email_enabled']
+    bools = ['reply_by_email_enabled', 'safe_html']
 
     schema = []
     for field in fields:
@@ -1302,7 +1303,8 @@ class SiteSettingsFormController(BaseSiteFormController):
         widgets['default_home_behavior'] = formish.widgets.SelectChoice(
             DEFAULT_HOME_BEHAVIOR_OPTIONS)
         widgets['site_override_css'] = formish.widgets.TextArea()
-        widgets['reply_by_email_enabled'] = formish.widgets.Checkbox()
+        for bfield in self.bools:
+            widgets[bfield] = formish.widgets.Checkbox()
         return widgets
 
     def handle_submit(self, converted):

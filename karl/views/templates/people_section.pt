@@ -21,7 +21,7 @@
         <tbody>
         <tr>
         <td valign="top" width="${column['width']}%" tal:repeat="column columns"
-            tal:content="structure column['html']">
+            tal:content="structure python: api.clean_html(column['html'])">
         </td>
         </tr>
         </tbody>
