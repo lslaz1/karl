@@ -1125,10 +1125,10 @@ class ReviewAccessRequestView(object):
     <p>Hello %(name)s,</p>
     <p>Your access request has been denied. Please read the guidelines on
        requesting access to %(system_name)s</p>
-    </body></html>''' % (
-            access_request['fullname'],
-            get_setting(self.context, 'title')
-        )
+    </body></html>''' % {
+            'name': access_request['fullname'],
+            'system_name': get_setting(self.context, 'title')
+        }
         message.set_payload(body.encode('UTF-8'), 'UTF-8')
         message.set_type('text/html')
         message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
