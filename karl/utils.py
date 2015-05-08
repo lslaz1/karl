@@ -42,6 +42,7 @@ from karl.models.emails import EmailFolder, EmailImage
 from repoze.postoffice.message import MIMEMultipart
 
 from lxml.html import fromstring, tostring
+from lxml.etree import XMLSyntaxError
 
 from email.MIMEText import MIMEText
 
@@ -441,4 +442,13 @@ _cleaner = Cleaner(scripts=True, javascript=True, page_structure=False,
 def clean_html(context, html):
     if not get_setting(context, 'safe_html'):
         return html
-    return _cleaner.clean_html(html)
+    if html is None:
+        return ''
+    try:
+        return _cleaner.clean_html(html)
+    except XMLSyntaxError:
+        # try wrapping it...
+        try:
+            return _cleaner.clean_html('<div>' + html + '</div>')
+        except XMLSyntaxError:
+            return '<div class="parse-error">Error parsing</div>'
