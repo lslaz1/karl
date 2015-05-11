@@ -32,5 +32,5 @@ class TestForbidden(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(request.response.status, '200 OK')
         self.assertEqual(response['login_form_url'],
-                         'http://example.com/login.html?reason=Not+logged+in')
+            'http://example.com/login.html?reason=Not+logged+in&came_from=http%3A%2F%2Fexample.com')  # noqa
         self.assertEqual(request.session['came_from'], 'http://example.com')
