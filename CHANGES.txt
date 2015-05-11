@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+5.0.2a21 (2015-05-11)
+---------------------
+
+- redirect user to where they originally requested if they
+  accessed a site when not logged in
+
 5.0.2a20 (2015-05-08)
 ---------------------
 

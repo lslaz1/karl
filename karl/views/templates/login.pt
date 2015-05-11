@@ -16,6 +16,7 @@
           id="formLogin"
           tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)">
 
+      <input type="hidden" name="came_from" value="${came_from}" />
       <fieldset class="field">
 
         <span class="loginLabelWrapper">

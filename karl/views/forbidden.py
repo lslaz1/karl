@@ -12,8 +12,12 @@ def forbidden(context, request):
     if api.userid:
         login_url = resource_url(site, request, 'login.html')
     else:
+        query = {
+            'came_from': request.url,
+            'reason': 'Not logged in'
+        }
         login_url = resource_url(
-            site, request, 'login.html', query={'reason': 'Not logged in'})
+            site, request, 'login.html', query=query)
     return {
         'api': api,
         'login_form_url': login_url,

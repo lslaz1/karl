@@ -194,6 +194,7 @@ class LoginView(object):
                 nothing='',
                 try_kerberos=try_kerberos,
                 sso_providers=sso_providers,
+                came_from=self.request.params.get('came_from', ''),
                 app_url=self.request.application_url),
             request=self.request)
         forget_headers = forget(self.request)
@@ -214,7 +215,8 @@ def remember_login(context, request, userid, max_age):
                 profile.last_login_time = datetime.utcnow()
 
     # and redirect
-    came_from = request.session.pop('came_from')
+    came_from = (request.session.pop('came_from', '') or
+                 request.params.pop('came_from', ''))
     if 'logout' in came_from:
         came_from = request.application_url
     return HTTPFound(headers=remember_headers, location=came_from)
