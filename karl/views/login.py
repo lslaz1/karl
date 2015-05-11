@@ -215,8 +215,8 @@ def remember_login(context, request, userid, max_age):
                 profile.last_login_time = datetime.utcnow()
 
     # and redirect
-    came_from = (request.session.pop('came_from', '') or
-                 request.params.pop('came_from', ''))
+    came_from = (request.params.get('came_from', '') or
+                 request.session.pop('came_from', ''))
     if 'logout' in came_from:
         came_from = request.application_url
     return HTTPFound(headers=remember_headers, location=came_from)
