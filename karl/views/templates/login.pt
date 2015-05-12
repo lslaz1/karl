@@ -26,7 +26,7 @@
           <input name="login" type="text" id="username" value="" size="30"
              tal:attributes="value username|None"
              placeholder="or email address"/>
-          <div class="send-auth-code" tal:condition="two_factor" style="display:none">
+          <div class="send-auth-code" tal:condition="two_factor">
             <button type="button">Send Authentication Code</button>
           </div>
         </div>
@@ -75,6 +75,9 @@
 
             $authCodeBtn.click(function(e){
               e.preventDefault();
+              if($authCode.size() == 1 && $username.val().length < 5){
+                $('.statusbox').karlstatusbox('clearAndAppend', 'Please enter username first');
+              }
               $('.statusbox').karlstatusbox('clearAndAppend', 'Sending authentication code...');
               $.ajax({
                 url: $('#karl-app-url').attr('content') + '/send_auth_code.json',
@@ -92,13 +95,6 @@
                 }
               })
             });
-            if($code.length > 0){
-              $username.keyup(function(e){
-                if($username.val().length > 3){
-                  $authCode.fadeIn();
-                }
-              });
-            }
             $('#signin').click(function(e) {
               var error = false;
               $('.statusbox').karlstatusbox('clear');
