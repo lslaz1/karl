@@ -846,7 +846,7 @@
      controller=".members.ManageMembersFormController"
      permission="moderate"
      name="manage.html"
-     renderer="karl.views.forms:templates/community_formish_form.pt"
+     renderer="karl.views.forms:templates/members_formish_form.pt"
      >
 
      <formish:action

@@ -107,13 +107,13 @@ def _get_common_email_info(community, community_href):
     return info
 
 
-def _member_profile_batch(context, request):
+def _member_profile_batch(context, request, batch_size=12):
     community = find_interface(context, ICommunity)
     member_names = community.member_names
     profiles_path = resource_path(find_profiles(context))
     batch = get_catalog_batch(
         context, request,
-        batch_size=12,
+        batch_size=batch_size,
         interfaces=[IProfile],
         path={'query': profiles_path, 'depth': 1},
         allowed={'query': effective_principals(request), 'operator': 'or'},
@@ -248,6 +248,8 @@ def _send_moderators_changed_email(community,
 
 
 class ManageMembersFormController(object):
+    member_batch = None
+
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -264,52 +266,59 @@ class ManageMembersFormController(object):
     def form_defaults(self):
         records = []
         community = self.community
-        profiles = self.profiles
-        member_names = community.member_names
+
+        profiles = find_profiles(self.context)
         moderator_names = community.moderator_names
-        for mod_name in moderator_names:
-            profile = profiles[mod_name]
-            sortkey = (0, '%s, %s' % (profile.lastname, profile.firstname))
-            record = {
-                'sortkey': sortkey,
-                'name': mod_name,
-                'title': profile.title,
-                'moderator': True,
-                'member': True,
-                'resend': False,
-                'remove': False,
-                'invite': False,
-                }
-            records.append(record)
-        for mem_name in member_names:
-            if mem_name in moderator_names:
-                continue
-            profile = profiles[mem_name]
-            sortkey = (1, '%s, %s' % (profile.lastname, profile.firstname))
-            record = {
-                'sortkey': sortkey,
-                'name': mem_name,
-                'title': profile.title,
-                'member': True,
-                'moderator': False,
-                'resend': False,
-                'remove': False,
-                'invite': False,
-                }
-            records.append(record)
-        for invitation in self._getInvitations():
-            sortkey = (2, invitation.email)
-            record = {
-                'sortkey': sortkey,
-                'title': invitation.email,
-                'name': invitation.__name__,
-                'member': False,
-                'moderator': False,
-                'resend': False,
-                'remove': False,
-                'invite': True,
-                }
-            records.append(record)
+
+        view_type = self.request.GET.get('type', 'moderators')
+
+        if view_type == 'moderators':
+            for mod_name in moderator_names:
+                profile = profiles[mod_name]
+                sortkey = (0, '%s, %s' % (profile.lastname, profile.firstname))
+                record = {
+                    'sortkey': sortkey,
+                    'name': mod_name,
+                    'title': profile.title,
+                    'moderator': True,
+                    'member': True,
+                    'resend': False,
+                    'remove': False,
+                    'invite': False,
+                    }
+                records.append(record)
+        if view_type == 'members':
+            member_batch = self.member_batch = _member_profile_batch(
+                self.context, self.request, 100)
+            member_entries = member_batch['entries']
+            for i in range(len(member_entries)):
+                profile = member_entries[i]
+                sortkey = (1, '%s, %s' % (profile.lastname, profile.firstname))
+                record = {
+                    'sortkey': sortkey,
+                    'name': profile.__name__,
+                    'title': profile.title,
+                    'member': True,
+                    'moderator': False,
+                    'resend': False,
+                    'remove': False,
+                    'invite': False,
+                    }
+                records.append(record)
+        if view_type == 'invitations':
+            for invitation in self._getInvitations():
+                sortkey = (2, invitation.email)
+                record = {
+                    'sortkey': sortkey,
+                    'title': invitation.email,
+                    'name': invitation.__name__,
+                    'member': False,
+                    'moderator': False,
+                    'resend': False,
+                    'remove': False,
+                    'invite': True,
+                    }
+                records.append(record)
         records.sort(key=lambda x: x['sortkey'])
         return {'members': records}
 
@@ -352,7 +361,8 @@ class ManageMembersFormController(object):
         return {'api': api,
                 'actions': actions,
                 'page_title': page_title,
-                'page_description': desc}
+                'page_description': desc,
+                'batch_info': self.member_batch}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
