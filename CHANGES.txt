@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.0.5 (unreleased)
+------------------
+
+- paging managing community members
+
 5.0.4 (2015-05-12)
 ------------------
 
