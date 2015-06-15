@@ -508,12 +508,12 @@ class ManageMembersFormControllerTests(unittest.TestCase):
 
     def test_form_defaults(self):
         context = self._makeCommunity()
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(params={'type': 'moderators'})
         controller = self._makeOne(context, request)
 
         defaults = controller.form_defaults()
         members = defaults['members']
-        self.assertEqual(len(members), 4)
+        self.assertEqual(len(members), 2)
 
         self.assertEqual(members[0]['member'], True)
         self.assertEqual(members[0]['name'], 'c')
@@ -522,14 +522,6 @@ class ManageMembersFormControllerTests(unittest.TestCase):
         self.assertEqual(members[1]['member'], True)
         self.assertEqual(members[1]['name'], 'b')
         self.assertEqual(members[1]['moderator'], True)
-
-        self.assertEqual(members[2]['member'], True)
-        self.assertEqual(members[2]['name'], 'a')
-        self.assertEqual(members[2]['moderator'], False)
-
-        self.assertEqual(members[3]['member'], False)
-        self.assertEqual(members[3]['name'], 'invitation')
-        self.assertEqual(members[3]['moderator'], False)
 
     def test_form_fields(self):
         context = self._makeCommunity()

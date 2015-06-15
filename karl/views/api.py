@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import time
-import os
 import json
 
 from zope.component import getAdapter
@@ -40,14 +39,14 @@ from repoze.lemonade.listitem import get_listitems
 from karl.application import is_normal_mode
 from karl.consts import countries
 from karl.consts import cultures
-from karl.utils import asbool
 from karl.utils import find_site
 from karl.utils import get_settings
 from karl.utils import get_setting
-from karl.utils import get_config_settings
 from karl.utils import support_attachments
-from karl.utils import get_egg_rev
 from karl.utils import clean_html
+from karl.utils import get_config_settings
+from karl.utils import get_static_url
+from karl.utils import is_resource_devel_mode
 from karl.utilities.interfaces import IUserLinks
 from karl.views.utils import convert_to_script
 
@@ -89,7 +88,7 @@ class TemplateAPI(object):
 
     def __init__(self, context, request, page_title=None):
         self.settings = dict(get_settings(context))
-        self.settings.update(get_config_settings())
+        self.settings.update(self.config_settings)
         self.site = site = find_site(context)
         self.context = context
         self.request = request
@@ -98,9 +97,9 @@ class TemplateAPI(object):
         self.profile_url = app_url + '/profiles/%s' % self.userid
         self.here_url = self.context_url = resource_url(context, request)
         self.view_url = resource_url(context, request, request.view_name)
-        self.resource_devel_mode = asbool(self.settings.get('resource_devel_mode', None))
         self.read_only = not is_normal_mode(request.registry)
-        self.static_url = '%s/static/%s' % (app_url, get_egg_rev('karl'))
+        self.static_url = get_static_url(request)
+        self.resource_devel_mode = is_resource_devel_mode()
         self.browser_upgrade_url = request.registry.settings.get(
             'browser_upgrade_url', '')
 
@@ -476,55 +475,17 @@ class TemplateAPI(object):
                 if item['component'].livesearch]
         return self._livesearch_options
 
-    @property
-    def is_resource_devel_mode(self):
-        return self.resource_devel_mode in ('true', 'True', True)
-
-    @property
-    def resources(self):
-        # never cache in devmode.
-        if self.is_resource_devel_mode or self._resources is None:
-            path = os.path.join(os.path.dirname(__file__), 'static', 'resources.json')
-            self._resources = json.load(open(path))
-        return self._resources
-
-    def resource_js(self, name):
-        try:
-            files = self.resources['js'][name]
-        except KeyError:
-            raise RuntimeError('JS resource "%s" must be defined as a key in resources.json.')  # noqa
-        if self.is_resource_devel_mode:
-            result = ['%s/%s' % (self.static_url, n) for n in files]
-        else:
-            prefix = self.resources['minPrefix']
-            result = ['%s/%s%s.min.js' % (self.static_url, prefix, name)]
-        return result
-
-    def requirejs(self, name):
-        """
-        include requirejs bundle
-        """
-        if self.is_resource_devel_mode:
-            return '%s/%s.js' % (self.static_url, name)
-        else:
-            return '%s/%s.min.js' % (self.static_url, name)
+    def get_javascript(self):
+        registry = self.request.registry
+        if 'javascript_resources' in registry:
+            return registry['javascript_resources'].get_all(self.request)
+        return []
 
     def get_css(self):
         registry = self.request.registry
         if 'css_resources' in registry:
             return registry['css_resources'].get_all(self.request)
         return []
-
-    def resource_css(self, name):
-        registry = self.request.registry
-        if 'css_resources' in registry:
-            return registry['css_resources'].get(name)
-        return None
-
-    def require_css(self, name):
-        registry = self.request.registry
-        if 'css_resources' in registry:
-            self.request.registry['css_resources'].require(self.request, name)
 
     @property
     def body_attriubtes(self):
@@ -539,3 +500,37 @@ class TemplateAPI(object):
 
     def clean_html(self, html):
         return clean_html(self.site, html)
+
+    @reify
+    def config_settings(self):
+        return get_config_settings()
+
+    def require_css(self, name):
+        registry = self.request.registry
+        if 'css_resources' in registry:
+            self.request.registry['css_resources'].require(self.request, name)
+
+    def require_javascript(self, name):
+        registry = self.request.registry
+        if 'javascript_resources' in registry:
+            self.request.registry['javascript_resources'].require(self.request, name)
+
+    def get_js_resource(self, name):
+        if 'javascript_resources' in self.request.registry:
+            return self.request.registry['javascript_resources'].get(name)
+
+    def get_css_resource(self, name):
+        if 'css_resources' in self.request.registry:
+            return self.request.registry['css_resources'].get(name)
+
+    def render_js_resource(self, name):
+        resource = self.get_js_resource(name)
+        if resource:
+            return resource.render(self.request)
+        return '<!-- could not render resource %s -->' % name
+
+    def render_css_resource(self, name):
+        resource = self.get_css_resource(name)
+        if resource:
+            return resource.render(self.request)
+        return '<!-- could not render resource %s -->' % name

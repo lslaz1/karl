@@ -27,15 +27,16 @@
     <!-- Javascript resource composition -->
     <metal:resources define-macro="js_resources">
 
-      <!-- old style js needs to be included first -->
-      <script tal:repeat="res python:api.resource_js('karl-ui')" src="${res}" type="text/javascript">//</script>
-      <script tal:repeat="res python:api.resource_js('karl-custom')" src="${res}" type="text/javascript">//</script>
-
       <!-- now new requirejs enabled js -->
-      <tal:devel tal:condition="api.is_resource_devel_mode">
+      <tal:devel tal:condition="api.resource_devel_mode">
         <script src="${api.static_url}/dist/requirejs/require.js" type="text/javascript"></script> 
         <script src="${api.static_url}/config.js" type="text/javascript"></script>
       </tal:devel>
+
+      <!-- JavaScript resources -->
+      <tal:resources tal:repeat="resource python: api.get_javascript()">
+        <script tal:replace="structure python: resource.render(request)"></script>
+      </tal:resources>
 
       <tal:resources condition="api.form_field_templates">
         <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
@@ -62,7 +63,7 @@
     </metal:resources>
 
     <metal:resources define-macro="tinymce_js">
-      <script src="${python:api.requirejs('tinymce')}" type="text/javascript"></script>
+      <tal:script tal:replace="structure python: api.render_js_resource('tinymce')" />
     </metal:resources>
 
     <!-- Javascript extra resource composition -->
@@ -706,10 +707,10 @@
     </div>
 
     <metal:announcement define-macro="site-announcement">
-      <!--[if IE 6]>
+      <!--[if lt IE 9]>
       <div class="ie-announcement portalMessage">
-You are currently accessing KARL with Internet Explorer 6. This is an old browser which we are no longer fully supporting, and you may find that some features do not work properly. We recommend that you use another browser: you can
-          <a href="http://www.microsoft.com/windows/internet-explorer">click here</a> to download a newer version of Internet Explorer. If you cannot install software on your computer, please contact your local IT support.
+You are currently accessing KARL with Internet Explorer 8 or less. This is an old browser which we are no longer fully supporting, and you may find that some features do not work properly. We recommend that you use another browser: you can
+      <a href="http://www.microsoft.com/windows/internet-explorer">click here</a> to download a newer version of Internet Explorer. If you cannot install software on your computer, please contact your local IT support.
       </div>
       <![endif]-->
 

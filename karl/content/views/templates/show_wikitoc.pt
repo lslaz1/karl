@@ -7,7 +7,6 @@
     <link rel="alternate" type="application/atom+xml"
 	  title="${api.page_title}" href="${feed_url}"
 	  />
-    <script tal:repeat="res python:api.resource_js('karl-wikitoc')" src="${res}" type="text/javascript">//</script>
   </span>
 
   <div metal:fill-slot="content">

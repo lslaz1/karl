@@ -17,6 +17,9 @@
 
 import calendar
 import copy
+import json
+import os
+import threading
 import transaction
 
 from zope.component import queryAdapter
@@ -61,6 +64,7 @@ from urllib2 import unquote
 
 from lxml.html.clean import Cleaner
 
+_local = threading.local()
 
 _marker = object()
 
@@ -452,3 +456,25 @@ def clean_html(context, html):
             return _cleaner.clean_html('<div>' + html + '</div>')
         except XMLSyntaxError:
             return '<div class="parse-error">Error parsing</div>'
+
+
+def get_static_resources_data():
+    try:
+        return _local.resources
+    except AttributeError:
+        path = os.path.join(os.path.dirname(__file__), 'views', 'static', 'resources.json')
+        _local.resources = json.load(open(path))
+        return _local.resources
+
+
+def get_static_url(request):
+    return '%s/static/%s' % (request.application_url, get_egg_rev('karl'))
+
+
+def is_resource_devel_mode():
+    try:
+        return _local.resource_devel_mode
+    except AttributeError:
+        _local.resource_devel_mode = asbool(
+            get_config_settings().get('resource_devel_mode', None))
+        return _local.resource_devel_mode

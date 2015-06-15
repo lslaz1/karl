@@ -12,7 +12,7 @@ def get_tinymce_options(api):
             'remove_script_host': False,
             'document_base_url': document_base_url,
             'browser_spellcheck': True,
-            'content_css': api.resource_css('karl-theme').path,  # noqa
+            'content_css': api.get_css_resource('karl-theme').path,  # noqa
             'theme': '-modern',
             'plugins': [
                 'advlist autolink lists charmap print preview anchor',

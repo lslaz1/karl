@@ -33,6 +33,8 @@ from karl.utils import asbool
 from karl.utils import get_egg_rev
 from karl import renderers
 from karl.request import Request
+from karl.resources import Resources
+from karl.resources import JavaScriptResource
 import karl.includes
 import perfmetrics
 
@@ -49,69 +51,19 @@ except ImportError:
     slowlog = None
 
 
-class CSSFile(object):
-
-    def __init__(self, path, always_include=False, ie_expression=None):
-        self.path = path
-        self.ie_expression = ie_expression
-        self.always_include = always_include
-
-    def render(self, request):
-        full_path = '%s/%s' % (
-            request.application_url.rstrip('/'),
-            self.path.lstrip('/'))
-        if self.ie_expression:
-            return '''<!--[if %s]> <style type="text/css" media="all">@import
-  url(%s);</style>
-<![endif]-->''' % (self.ie_expression, full_path)
-        else:
-            return '''<link rel="stylesheet"
-href="%s" type="text/css"/>''' % full_path
-
-
-class CSSResources(object):
-
-    def __init__(self):
-        self.data = {}
-        self.order = []
-
-    def add(self, name, path, **kwargs):
-        self.data[name] = CSSFile(path, **kwargs)
-        if name not in self.order:
-            self.order.append(name)
-
-    def get(self, name):
-        return self.data.get(name)
-
-    def get_all(self, request):
-        files = []
-        included_here = request.environ.get('required_css', [])
-        for name in self.order:
-            resource = self.data[name]
-            if resource.always_include or name in included_here:
-                files.append(resource)
-        return files
-
-    def require(self, request, name):
-        if 'required_css' not in request.environ:
-            request.environ['required_css'] = set([])
-        request.environ['required_css'].add(name)
-
-    def disable(self, request, name):
-        if 'required_css' not in request.environ:
-            request.environ['required_css'] = set([])
-        if name in request.environ['required_css']:
-            request.environ['required_css'].remove(name)
-
-
 class Configurator(BaseConfigurator):
 
     def __init__(self, *args, **kwargs):
         super(Configurator, self).__init__(*args, **kwargs)
-        self.registry['css_resources'] = CSSResources()
+        self.registry['css_resources'] = Resources('required_css')
+        self.registry['javascript_resources'] = Resources(
+            'required_javascript', factory=JavaScriptResource)
 
-    def define_css(self, name, path, **kwargs):
-        self.registry['css_resources'].add(name, path, **kwargs)
+    def define_css(self, _name, *args, **kwargs):
+        self.registry['css_resources'].add(_name, *args, **kwargs)
+
+    def define_javascript(self, _name, *args, **kwargs):
+        self.registry['javascript_resources'].add(_name, *args, **kwargs)
 
 
 def add_versioned_static_resource(config, path, resource, package='karl'):
@@ -208,6 +160,15 @@ def configure_karl(config, load_zcml=True):
         config.define_css(
             'karl-ie9', static_path + '/karl_ie9.css',
             always_include=True, ie_expression='gte IE 9')
+
+        config.define_javascript(
+            'karl-ui', resource_name='karl-ui', always_include=True)
+        config.define_javascript(
+            'karl-custom', resource_name='karl-custom', always_include=True)
+        config.define_javascript(
+            'karl-multifileupload', resource_name='karl-multifileupload')
+        config.define_javascript('karl-wikitoc', resource_name='karl-wikitoc')
+        config.define_javascript('tinymce', name='tinymce')
 
 
 def block_webdav(event):

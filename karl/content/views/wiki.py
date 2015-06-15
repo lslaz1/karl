@@ -319,7 +319,6 @@ def preview_wikipage_view(context, request, WikiPage=WikiPage, tz=None):
 
 
 def show_wikitoc_view(context, request):
-
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
@@ -335,6 +334,7 @@ def show_wikitoc_view(context, request):
     actions = []
 
     api = TemplateAPI(context, request, page_title)
+    api.require_javascript('karl-wikitoc')
     api.require_css('karl-wikitoc')
 
     wikitoc_data = get_wikitoc_data(context, request)
