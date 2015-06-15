@@ -1,8 +1,10 @@
 karl package Changelog
 ======================
 
-5.0.5 (unreleased)
+5.1.0 (unreleased)
 ------------------
+
+- implement plivo API for 2-factor auth with text messages
 
 - refactor some of the resource inclusion code and now have it work
   with javascript

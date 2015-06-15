@@ -16,6 +16,10 @@ copy:
 	$(GULP) copy
 
 
+clean:
+	rm -rf bower_components
+	rm -rf node_modules
+
 bower:
 	NODE_PATH=$(NODE_PATH) $(BOWER) install --config.interactive=0
 	$(GULP) copy

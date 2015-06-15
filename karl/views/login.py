@@ -18,7 +18,6 @@
 import logging
 
 from datetime import datetime
-from datetime import timedelta
 from urlparse import urljoin
 import re
 import requests
@@ -37,14 +36,13 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 from karl.utils import get_config_setting
-from karl.utils import make_random_code
-from karl.utils import strings_differ
 from karl.utils import SafeDict
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IProfile
 from karl import events
 from karl.lockout import LockoutManager
 from karl.registration import get_access_request_fields
+from karl.twofactor import TwoFactor
 
 from karl.views.api import TemplateAPI
 
@@ -124,7 +122,9 @@ class LoginView(object):
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
 
-        if context.settings.get('two_factor_enabled', False):
+        tf = TwoFactor(context, request)
+
+        if tf.enabled:
             code = request.POST.get('code')
             if not code:
                 redirect = request.resource_url(
@@ -132,12 +132,7 @@ class LoginView(object):
                     query={'reason': 'No authentication code provided'})
                 notify(events.LoginFailed(context, request, login, password))
                 return HTTPFound(location=redirect)
-            profiles = find_profiles(context)
-            profile = profiles.get(userid)
-            window = context.settings.get('two_factor_auth_code_valid_duration', 300)
-            now = datetime.utcnow()
-            if (strings_differ(code, profile.current_auth_code) or
-                    now > (profile.current_auth_code_time_stamp + timedelta(seconds=window))):  # noqa
+            if tf.validate(userid, code):  # noqa
                 notify(events.LoginFailed(context, request, login, password))
                 redirect = request.resource_url(
                     request.root, 'login.html', query={'reason': 'Invalid authorization code'})  # noqa
@@ -253,28 +248,10 @@ def send_auth_code_view(context, request):
     profiles = find_profiles(context)
     profile = profiles.get(user['id'])
 
-    # get and set current auth code
-    profile.current_auth_code = make_random_code(8)
-    profile.current_auth_code_time_stamp = datetime.utcnow()
-
-    mailer = getUtility(IMailDelivery)
-    message = Message()
-    message['From'] = get_setting(context, 'admin_email')
-    message['To'] = '%s <%s>' % (profile.title, profile.email)
-    message['Subject'] = '%s Authorization Request' % context.title
-    body = u'''<html><body>
-<p>An authorization code has been requested for the site %s.</p>
-<p>Authorization Code: <b>%s</b></p>
-</body></html>''' % (
-        request.application_url,
-        profile.current_auth_code
-    )
-    message.set_payload(body.encode('UTF-8'), 'UTF-8')
-    message.set_type('text/html')
-    mailer.send([profile.email], message)
+    tf = TwoFactor(context, request)
 
     return {
-        'message': 'Authorization code has been sent. Check your email.'
+        'message': tf.send_code(profile)
     }
 
 

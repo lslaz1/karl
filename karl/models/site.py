@@ -415,6 +415,9 @@ class Site(Folder):
         footer_html='Edit footer in <a href="/edit_footer.html">admin area</a>.',
         two_factor_enabled=False,
         two_factor_auth_code_valid_duration=300,
+        two_factor_plivo_auth_id='',
+        two_factor_plivo_auth_token='',
+        two_factor_src_phone_number='',
         allow_request_accesss=False,
         request_access_fields=[
             'fullname|Full Name'

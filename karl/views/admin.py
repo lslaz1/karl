@@ -1320,6 +1320,13 @@ class AuthenticationFormController(BaseSiteFormController):
     schema = [
         ('two_factor_enabled', schemaish.Boolean(
             description="Enable 2 factor authentication")),
+        ('two_factor_src_phone_number', schemaish.String(
+            description="Source phone number for sending SMS auth codes. "
+                        "Must include country code")),
+        ('two_factor_plivo_auth_id', schemaish.String(
+            description="Plivo auth id to allow users to get auth code sent to their phone")),
+        ('two_factor_plivo_auth_token', schemaish.String(
+            description="Plivo auth token")),
         ('two_factor_auth_code_valid_duration', schemaish.Integer(
             description="How long 2 factor auth codes are valid for"
         )),
@@ -1336,11 +1343,16 @@ class AuthenticationFormController(BaseSiteFormController):
             'two_factor_enabled': self.context.settings.get('two_factor_enabled', False),
             'two_factor_auth_code_valid_duration': self.context.settings.get(
                 'two_factor_auth_code_valid_duration', 300),
+            'two_factor_src_phone_number': self.context.settings.get(
+                'two_factor_src_phone_number', ''),
+            'two_factor_plivo_auth_id': self.context.settings.get(
+                'two_factor_plivo_auth_id', ''),
+            'two_factor_plivo_auth_token': self.context.settings.get(
+                'two_factor_plivo_auth_token', ''),
             'failed_login_attempt_window': self.context.settings.get(
                 'failed_login_attempt_window', 3600),
             'max_failed_login_attempts': self.context.settings.get(
                 'max_failed_login_attempts', 15),
-
         }
 
     def form_widgets(self, fields):
@@ -1348,7 +1360,10 @@ class AuthenticationFormController(BaseSiteFormController):
             'two_factor_enabled': formish.widgets.Checkbox(),
             'two_factor_auth_code_valid_duration': formish.widgets.Input(),
             'max_failed_login_attempts': formish.widgets.Input(),
-            'failed_login_attempt_window': formish.widgets.Input()
+            'failed_login_attempt_window': formish.widgets.Input(),
+            'two_factor_plivo_auth_id': formish.widgets.Input(),
+            'two_factor_plivo_auth_token': formish.widgets.Input(),
+            'two_factor_src_phone_number': formish.widgets.Input(),
         }
 
     def handle_submit(self, converted):
@@ -1356,6 +1371,9 @@ class AuthenticationFormController(BaseSiteFormController):
         self.context.settings['two_factor_auth_code_valid_duration'] = converted['two_factor_auth_code_valid_duration']  # noqa
         self.context.settings['max_failed_login_attempts'] = converted['max_failed_login_attempts']  # noqa
         self.context.settings['failed_login_attempt_window'] = converted['failed_login_attempt_window']  # noqa
+        self.context.settings['two_factor_plivo_auth_id'] = converted['two_factor_plivo_auth_id']  # noqa
+        self.context.settings['two_factor_plivo_auth_token'] = converted['two_factor_plivo_auth_token']  # noqa
+        self.context.settings['two_factor_src_phone_number'] = converted['two_factor_src_phone_number']  # noqa
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 

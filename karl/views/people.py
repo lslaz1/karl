@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import uuid
+import string
 
 import formish
 from pyramid.renderers import get_renderer
@@ -47,12 +48,14 @@ from karl.models.interfaces import IInvitation
 from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
 from karl.utilities.image import thumb_url
+from karl.twofactor import TwoFactor
 from karl.utils import find_communities
 from karl.utils import find_peopledirectory
 from karl.utils import find_tags
 from karl.utils import find_users
 from karl.utils import get_layout_provider
 from karl.utils import get_setting
+from karl.utils import make_random_code
 from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.batch import get_catalog_batch
@@ -710,10 +713,14 @@ def show_profile_view(context, request):
         recent_items.append(adapted)
     recent_url = request.resource_url(context, 'recent_content.html')
 
+    same_user = (authenticated_userid(request) == context.__name__)
     return dict(
         api=api,
+        context=context,
         profile=profile,
         actions=get_profile_actions(context, request),
+        same_user=same_user,
+        tf=TwoFactor(context, request),
         photo=photo,
         head_data=convert_to_script(client_json_data),
         communities=communities,
@@ -722,6 +729,55 @@ def show_profile_view(context, request):
         tags=tags,
         recent_items=recent_items,
         recent_url=recent_url)
+
+
+def configure_twofactor_view(context, request):
+    page_title = "Profile: %s" % context.title
+    api = TemplateAPI(context, request, page_title)
+
+    tf = TwoFactor(context, request)
+    if (not tf.enabled or not tf.phone_factor_enabled or
+            not authenticated_userid(request) == context.__name__):
+        return HTTPFound(request.resource_url(context))
+
+    form = 'number'
+    number = ''
+    if request.method == 'POST':
+        number = request.POST.get('phonenumber', '')
+        if 'form.verifyemail.submitted' in request.POST:
+            number = ''.join(n for n in number if n in string.digits)
+            if len(number) == 10:
+                context.two_factor_phone = number
+                code = context._two_factor_verify_code = make_random_code(6)
+                msg = "%s phone verification code: %s" % (
+                    get_setting(context, 'title'),
+                    code)
+                tf.send_text_to_number(number, msg)
+                api.set_status_message('Verification code sent to phone number: %s' % number)
+                form = 'verify'
+            else:
+                api.set_status_message('Invalid phone number')
+        elif 'form.verifycode.submitted' in request.POST:
+            form = 'verify'
+            code = request.POST['code']
+            if code == context._two_factor_verify_code:
+                context._two_factor_verify_code = ''
+                context.two_factor_verified = True
+                form = 'success'
+            else:
+                api.set_status_message('Invalid verification code')
+    return dict(
+        api=api,
+        form=form,
+        number=number,
+        context=context)
+
+
+def disable_twofactor_view(context, request):
+    if authenticated_userid(request) == context.__name__:
+        context.two_factor_verified = False
+        context.two_factor_phone = ''
+    return HTTPFound(request.resource_url(context))
 
 
 def profile_thumbnail(context, request):

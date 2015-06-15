@@ -37,6 +37,9 @@ class Profile(Folder):
 
     alert_attachments = 'link'
     fax = ''  # BBB
+    two_factor_phone = ''  # BBB
+    two_factor_verified = False
+    _two_factor_verify_code = ''  # BBB
     _websites = ()
     last_login_time = None  # BBB
     date_format = None  # BBB
@@ -75,7 +78,8 @@ class Profile(Folder):
                  fax='', department='', position='', organization='', location='',
                  country='US', websites=None, languages='', office='', room_no='',
                  biography='', date_format='en-US', data=None, home_path=None,
-                 preferred_communities=None):
+                 preferred_communities=None, two_factor_phone='', two_factor_verified=False,
+                 ):
         super(Profile, self).__init__(data)
         self.firstname = firstname
         self.lastname = lastname
@@ -107,6 +111,8 @@ class Profile(Folder):
         self.password_reset_time = None
         self.preferred_communities = preferred_communities
         self.last_login_time = None
+        self.two_factor_phone = two_factor_phone
+        self.two_factor_verified = two_factor_verified
 
     @property
     def creator(self):

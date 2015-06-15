@@ -1,0 +1,62 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+<body>
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">Please verify your phone number</h1>
+
+    <form name="formTwoFactor" method="post" action="${api.here_url}phone-factor.html"
+          tal:condition="python: form == 'number'">
+
+      <fieldset class="field">
+
+        <label for="phonenumber">Phone Number</label>
+        <div class="compound-field">
+          <input name="phonenumber" type="phone" id="phonenumber" value="" size="50"
+             required="true"
+             tal:attributes="value number|None"
+             placeholder="Valid US Phone Number"/>
+        </div>
+      </fieldset>
+      <div class="formControlls">
+        <input type="hidden" name="form.verifyemail.submitted" value="1" />
+
+        <div class="buttons clearafter">
+          <button name="image" type="submit" id="verify" class="button primary_button"><span>Send text</span></button>
+        </div>
+      </div>
+    </form>
+
+    <form name="formTwoFactor" method="post" action="${api.here_url}phone-factor.html"
+          tal:condition="python: form == 'verify'">
+      <input name="phonenumber" type="hidden" tal:attributes="value number|None" />
+
+      <fieldset class="field">
+
+        <label for="code">Code</label>
+        <div class="compound-field">
+          <input name="code" type="text" id="code" value="" size="30"
+             required="true"
+             placeholder="Code that was texted to you"/>
+        </div>
+      </fieldset>
+      <div class="formControlls">
+        <input type="hidden" name="form.verifycode.submitted" value="1" />
+
+        <div class="buttons clearafter">
+          <button name="image" type="submit" id="verify" class="button primary_button"><span>Verify</span></button>
+        </div>
+      </div>
+    </form>
+
+    <div tal:condition="python: form == 'success'">
+      <p>You have successfully verified your phone number. </p>
+      <p>Continue to <a href="${api.here_url}">your profile</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

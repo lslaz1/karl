@@ -20,9 +20,17 @@ jQuery(document).ready(function($) {
 
     <h1 class="kscreentitle">${profile.title}</h1>
 
+    <tal:tf-activate tal:condition="python: same_user and tf.enabled and tf.phone_factor_enabled">
+      <div class="portalMessage" tal:condition="python: not context.two_factor_verified">
+        <a href="${api.here_url}phone-factor.html">Configure your phone number</a> for Two Factor Authentication.</div>
+      <div class="portalMessage" tal:condition="python: context.two_factor_verified">
+        <p>The phone number "${context.two_factor_phone}" is configured for Two Factor Authentication.</p>
+        <p>You can <a href="${api.here_url}phone-factor.html">configure a different phone number</a>. Or
+           <a href="${api.here_url}disable-phone-factor.html">disable this phone</a> for Two Factor Authentication.</p>
+      </div>
+    </tal:tf-activate>
+
     <div metal:use-macro="api.snippets.macros['list_tags']"/>
-
-
 
 
     <div class="profile_page_body">

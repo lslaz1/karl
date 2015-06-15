@@ -1150,6 +1150,21 @@
 
   <view
     for="karl.models.interfaces.IProfile"
+    view=".people.configure_twofactor_view"
+    permission="administer"
+    name="phone-factor.html"
+    renderer="templates/configure_twofactor.pt"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view=".people.disable_twofactor_view"
+    permission="administer"
+    name="disable-phone-factor.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IProfile"
     view=".people.profile_thumbnail"
     name="profile_thumbnail"
     permission="view"
