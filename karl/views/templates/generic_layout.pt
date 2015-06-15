@@ -68,5 +68,6 @@
       <tal:footer content="structure api.render_footer()" />
 
     </div>
+    <metal:resources use-macro="api.snippets.macros['analytics']"/>
   </body>
 </html>

@@ -444,7 +444,8 @@ class Site(Folder):
         max_failed_login_attempts=15,
         site_override_css="""/* provide custom override css here */""",
         reply_by_email_enabled=True,
-        safe_html=True
+        safe_html=True,
+        google_analytics_id=''
     )
     _repo = Uninitialized
 

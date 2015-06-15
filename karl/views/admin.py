@@ -1262,7 +1262,8 @@ class SiteSettingsFormController(BaseSiteFormController):
         'date_format',
         'default_home_behavior',
         'site_override_css',
-        'safe_html'
+        'safe_html',
+        'google_analytics_id'
         )
     labels = {
         'title': 'Site title',
