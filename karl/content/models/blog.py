@@ -33,6 +33,8 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.models.commenting import CommentsFolder
 from karl.content.models.attachments import AttachmentsFolder
 
+import colander
+
 
 class Blog(Folder):
     implements(IBlog)

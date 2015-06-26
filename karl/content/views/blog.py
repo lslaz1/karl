@@ -19,27 +19,13 @@ import calendar
 import datetime
 import os
 
+import colander
+import deform
 import formish
-import schemaish
-from validatish import validator
-from schemaish.type import File as SchemaFile
-
-from pyramid.httpexceptions import HTTPFound
-from zope.component.event import objectEventNotify
-from zope.component import getMultiAdapter
-from zope.component import getUtility
-from zope.component import queryUtility
-from zope.interface import implements
-
-from pyramid.renderers import render
-from pyramid.security import authenticated_userid
-from pyramid.security import has_permission
-from pyramid.url import resource_url
-from repoze.workflow import get_workflow
-from repoze.lemonade.content import create_content
-
 from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
+from karl.content.views.commenting import get_comment_data
+from karl.content.views.commenting import get_comment_form
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import fetch_attachments
@@ -47,28 +33,40 @@ from karl.content.views.utils import sendalert_default
 from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
+from karl.forms import widgets
 from karl.security.workflow import get_security_states
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
+from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
-from karl.utils import coarse_datetime_repr
 from karl.views.api import TemplateAPI
-from karl.views.interfaces import ISidebar
-from karl.views.tags import set_tags
-from karl.views.tags import get_tags_client_data
-from karl.views.utils import convert_to_script
-from karl.views.utils import make_unique_name
-
 from karl.views.batch import get_container_batch
-
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
-from karl.content.views.commenting import get_comment_data
-from karl.content.views.commenting import get_comment_form
+from karl.views.interfaces import ISidebar
+from karl.views.tags import get_tags_client_data
+from karl.views.tags import set_tags
+from karl.views.utils import convert_to_script
+from karl.views.utils import make_unique_name
+from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
+from repoze.lemonade.content import create_content
+from repoze.workflow import get_workflow
+import schemaish
+from schemaish.type import File as SchemaFile
+from validatish import validator
+from zope.component import getMultiAdapter
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.component.event import objectEventNotify
+from zope.interface import implements
 
 
 def show_blog_view(context, request):
@@ -230,6 +228,15 @@ attachments_field = schemaish.Sequence(schemaish.File(),
                                        title='Attachments',
                                        )
 
+class BlobEntrySchema(colander.MappingSchema):
+    title = colander.SchemaNode(
+        colander.String(),
+        validator=colander.Range(1, 100))
+    text = colander.SchemaNode(
+        colander.String(),
+        widget=widgets.RichTextWidget())
+    tags = colander.SchemaNode(colander.List())
+
 
 class AddBlogEntryFormController(object):
     def __init__(self, context, request):
@@ -295,7 +302,11 @@ class AddBlogEntryFormController(object):
         api = TemplateAPI(self.context, self.request, page_title)
         api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload=True)
-        return {'api': api, 'actions': ()}
+        return {
+            'api': api,
+            'actions': (),
+            'form': deform.Form(BlobEntrySchema(), buttons=('submit',)),
+            'data': {}}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

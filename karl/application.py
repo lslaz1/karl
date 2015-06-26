@@ -104,6 +104,7 @@ def configure_karl(config, load_zcml=True):
 
     static_path, rev = add_versioned_static_resource(
         config, '/static', 'karl.views:static')
+    config.add_static_view('deform-static', 'deform:static')
 
     # Need a session if using Velruse
     config.set_session_factory(
@@ -166,9 +167,14 @@ def configure_karl(config, load_zcml=True):
         config.define_javascript(
             'karl-custom', resource_name='karl-custom', always_include=True)
         config.define_javascript(
+            'deform',
+            path='deform-static/scripts/deform.js',
+            always_include=True)
+        config.define_javascript(
             'karl-multifileupload', resource_name='karl-multifileupload')
         config.define_javascript('karl-wikitoc', resource_name='karl-wikitoc')
-        config.define_javascript('tinymce', name='tinymce')
+        config.define_javascript(
+            'patterns', name='patterns', always_include=True)
 
 
 def block_webdav(event):
