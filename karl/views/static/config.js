@@ -22,7 +22,8 @@
     'insertdatetime', 'layer', 'legacyoutput', 'link', 'lists', 'media',
     'nonbreaking', 'noneditable', 'pagebreak', 'paste', 'preview', 'print',
     'save', 'searchreplace', 'spellchecker', 'tabfocus', 'table', 'template',
-    'textcolor', 'textpattern', 'visualblocks', 'visualchars', 'wordcount'
+    'textcolor', 'textpattern', 'visualblocks', 'visualchars', 'wordcount',
+    'compat3x'
   ];
 
   var requirejsOptions = {
@@ -30,7 +31,7 @@
     optimize: 'none',
     paths: {
       'backbone': 'dist/backbone/backbone',
-      'dropzone': 'dist/dropzone/downloads/dropzone-amd-module',
+      'dropzone': 'dist/dropzone/dist/dropzone-amd-module',
       'jqtree': 'dist/jqtree/tree.jquery',
       'jquery': 'dist/jquery/jquery',
       'jquery.cookie': 'dist/jquery.cookie/jquery.cookie',

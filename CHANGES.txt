@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+5.1.1 (2015-07-27)
+------------------
+
+- fixed linking external in tinymce
+
 5.1.0 (2015-06-15)
 ------------------
 
