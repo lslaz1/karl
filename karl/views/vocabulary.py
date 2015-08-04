@@ -43,7 +43,7 @@ def normalize_query(query):
 def parse_query(query):
     result = []
     for name, value in query.items():
-        if name == 'Type':
+        if name in ('Type', 'portal_type'):
             new_value = []
             if type(value) not in (list, tuple):
                 value = [value]
@@ -160,7 +160,7 @@ def vocabulary_view(context, request):
             attr = attribute
             if attribute in _attribute_mapping:
                 attr = _attribute_mapping[attribute]
-            if attr == 'Type':
+            if attr in ('Type', 'portal_type'):
                 value = 'Page'
                 if IImage.providedBy(result):
                     value = 'Image'
