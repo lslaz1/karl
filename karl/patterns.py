@@ -17,7 +17,7 @@ def get_tinymce_options(api):
             'plugins': [
                 'advlist autolink lists charmap print preview anchor',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table contextmenu paste plonelink ploneimage',
+                'insertdatetime media table contextmenu plonelink ploneimage',
             ],
             'menubar': 'edit table format tools view insert',
             'toolbar': 'styleselect | bold italic | '
