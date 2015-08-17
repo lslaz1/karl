@@ -7,7 +7,7 @@ from karl.utils import find_site
 def forbidden(context, request):
     site = find_site(context)
     request.session['came_from'] = request.url
-    api = TemplateAPI(context, request, 'Forbidden')
+    api = TemplateAPI(context, request, 'Secure Login')
     request.response.status = '200 OK'
     if api.userid:
         login_url = resource_url(site, request, 'login.html')
