@@ -447,10 +447,10 @@ class Site(Folder):
         safe_html=True,
         google_analytics_id='',
         navigation_list="\n".join([
-            "TAGS|/tagcloud.html",
-            "PEOPLE|/people",
-            "COMMUNITIES|/communities",
-            "FEEDS|/contentfeeds.html",
+            "Tags|/tagcloud.html",
+            "People|/people",
+            "Communities|/communities",
+            "Feeds|/contentfeeds.html",
         ]),
     )
     _repo = Uninitialized
