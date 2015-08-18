@@ -445,7 +445,13 @@ class Site(Folder):
         site_override_css="""/* provide custom override css here */""",
         reply_by_email_enabled=True,
         safe_html=True,
-        google_analytics_id=''
+        google_analytics_id='',
+        navigation_list="\n".join([
+            "TAGS|/tagcloud.html",
+            "PEOPLE|/people",
+            "COMMUNITIES|/communities",
+            "FEEDS|/contentfeeds.html",
+        ]),
     )
     _repo = Uninitialized
 

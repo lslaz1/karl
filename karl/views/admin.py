@@ -1263,13 +1263,19 @@ class SiteSettingsFormController(BaseSiteFormController):
         'default_home_behavior',
         'site_override_css',
         'safe_html',
-        'google_analytics_id'
+        'google_analytics_id',
+        'navigation_list',
         )
     labels = {
         'title': 'Site title',
         'min_pw_length': 'Minimum Password Length',
         'default_home_behavior': 'Where user should be directed to by default',
-        'reply_by_email_enabled': 'Requires additional configuration'
+        'reply_by_email_enabled': 'Requires additional configuration',
+        'navigation_list':
+            'List of links to display on every page. Must be in the format '
+            '`Display Name|/url`. The "Display Name" is a human readable '
+            'name, the "/url" is a full, absolute, or relative URL. Both are '
+            'separated by a pipe ("|") character',
     }
     required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
                 'site_url', 'min_pw_length', 'selectable_groups', 'date_format',
@@ -1305,6 +1311,7 @@ class SiteSettingsFormController(BaseSiteFormController):
         widgets['default_home_behavior'] = formish.widgets.SelectChoice(
             DEFAULT_HOME_BEHAVIOR_OPTIONS)
         widgets['site_override_css'] = formish.widgets.TextArea()
+        widgets['navigation_list'] = formish.widgets.TextArea()
         for bfield in self.bools:
             widgets[bfield] = formish.widgets.Checkbox()
         return widgets
