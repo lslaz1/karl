@@ -17,6 +17,7 @@
 
 import time
 import json
+from urlparse import urljoin, urlparse, urlunsplit
 
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
@@ -534,3 +535,26 @@ class TemplateAPI(object):
         if resource:
             return resource.render(self.request)
         return '<!-- could not render resource %s -->' % name
+
+    def get_header_menu_items(self):
+        navlist = []
+        navitems = self.settings['navigation_list'].splitlines()
+        for item in navitems:
+            itemparts = item.split("|")
+            if len(itemparts) != 2:
+                continue
+            if itemparts[1].startswith("http://") or itemparts[1].startswith("https://"):
+                url = itemparts[1]
+            else:
+                # normalize the url
+                new = urlparse(urljoin(self.app_url, itemparts[1]).lower())
+                url = urlunsplit((
+                    new.scheme,
+                    new.netloc,
+                    new.path,
+                    new.query,
+                    '')
+                )
+            navlist.append(dict(display=itemparts[0], url=url))
+        navlist.reverse()
+        return navlist

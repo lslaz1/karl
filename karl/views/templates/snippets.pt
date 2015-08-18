@@ -865,17 +865,8 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
     </div>
 
     <ul id="header-menu" metal:define-macro="header-menu">
-        <li>
-          <a href="${api.app_url}/contentfeeds.html">Feeds</a>
-        </li>
-        <li id="header-communities">
-          <a href="${api.app_url}/communities">Communities</a>
-        </li>
-        <li id="header-people">
-          <a href="${api.people_url}">People</a>
-        </li>
-        <li id="header-tags">
-          <a href="${api.app_url}/tagcloud.html">Tags</a>
+        <li tal:repeat="item python:api.get_header_menu_items()">
+            <a href="${item['url']}">${item['display']}</a>
         </li>
     </ul>
 
