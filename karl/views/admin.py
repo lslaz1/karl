@@ -1273,9 +1273,12 @@ class SiteSettingsFormController(BaseSiteFormController):
         'reply_by_email_enabled': 'Requires additional configuration',
         'navigation_list':
             'List of links to display on every page. Must be in the format '
-            '`Display Name|/url`. The "Display Name" is a human readable '
-            'name, the "/url" is a full, absolute, or relative URL. Both are '
-            'separated by a pipe ("|") character',
+            '`Display Name|/url|CSS Class List`. The "Display Name" is a human readable '
+            'name, the "/url" is a full, absolute, or relative URL. The "CSS '
+            'Class List" is a space separated list of CSS class names that '
+            'will be added to each header menu link. All three are '
+            'separated by a pipe ("|") character and the "CSS Class List" may '
+            'optionally be present.',
     }
     required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
                 'site_url', 'min_pw_length', 'selectable_groups', 'date_format',

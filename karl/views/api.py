@@ -541,7 +541,7 @@ class TemplateAPI(object):
         navitems = self.settings['navigation_list'].splitlines()
         for item in navitems:
             itemparts = item.split("|")
-            if len(itemparts) != 2:
+            if len(itemparts) != 2 and len(itemparts) != 3:
                 continue
             if itemparts[1].startswith("http://") or itemparts[1].startswith("https://"):
                 url = itemparts[1]
@@ -555,6 +555,9 @@ class TemplateAPI(object):
                     new.query,
                     '')
                 )
-            navlist.append(dict(display=itemparts[0], url=url))
+            extra_css = ''
+            if len(itemparts) == 3:
+                extra_css = itemparts[2]
+            navlist.append(dict(display=itemparts[0], url=url, extra_css=extra_css))
         navlist.reverse()
         return navlist

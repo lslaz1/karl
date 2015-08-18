@@ -866,7 +866,7 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
 
     <ul id="header-menu" metal:define-macro="header-menu">
         <li tal:repeat="item python:api.get_header_menu_items()">
-            <a href="${item['url']}">${item['display']}</a>
+            <a href="${item['url']}" class="${item['extra_css']}">${item['display']}</a>
         </li>
     </ul>
 
