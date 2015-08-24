@@ -44,12 +44,14 @@
               <label>All Active Site Announcements</label>
               <ul>
                   <li tal:repeat="item python:api.site_announcements">
-                      <button name="remove-site-announcement" type="submit" class="button"
-                              tal:attributes="value python:item['hash']">
-                          <span>remove</span>
-                      </button>
-                      <span>(added on ${item.added.strftime("%x")})</span>
-                      <span tal:content="structure python:item['content']" />
+                      <blockquote tal:content="structure python:item['content']" />
+                      <div>
+                          <span class='date'>(added on ${item.added.strftime("%x")})</span>
+                          <button name="remove-site-announcement" type="submit" class="button"
+                                  tal:attributes="value python:item['hash']">
+                              <span>remove</span>
+                          </button>
+                      </div>
                   </li>
               </ul>
           <fieldset>
