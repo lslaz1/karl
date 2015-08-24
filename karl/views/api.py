@@ -24,6 +24,8 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 
+from persistent.list import PersistentList
+
 from pyramid.decorator import reify
 from pyramid.url import resource_url
 from pyramid.security import effective_principals
@@ -124,7 +126,7 @@ class TemplateAPI(object):
         self.can_administer = has_permission('administer', site, request)
         self.can_email = has_permission('email', site, request)
         self.admin_url = resource_url(site, request, 'admin.html')
-        self.site_announcement = getattr(site, 'site_announcement', '')
+        self.site_announcements = getattr(site, 'site_announcements', PersistentList())
         date_format = get_user_date_format(context, request)
         self.karl_client_data['date_format'] = date_format
         # XXX XXX XXX This will never work from peoples formish templates
