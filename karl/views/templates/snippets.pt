@@ -715,16 +715,16 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
       <![endif]-->
 
       <div class="site-announcement portalMessage" id="site-announcement"
-           tal:condition="python: len(api.site_announcements) == 1"
-           tal:content="structure python:api.site_announcements[0]['content']">
+           tal:condition="python: len(api.unseen_site_announcements) == 1"
+           tal:content="structure python:api.unseen_site_announcements[0]['content']">
       </div>
       <div class="site-announcement portalMessage" id="site-announcement"
-           tal:condition="python: len(api.site_announcements) > 1 and len(api.site_announcements) < 11"
-           tal:define="announce_num python:len(api.site_announcements)">
+           tal:condition="python: len(api.unseen_site_announcements) > 1 and len(api.unseen_site_announcements) < 11"
+           tal:define="announce_num python:len(api.unseen_site_announcements)">
            <a href='${api.request.application_url}/announcements.html'>You have ${announce_num} alerts!</a>
       </div>
       <div class="site-announcement portalMessage" id="site-announcement"
-           tal:condition="python: len(api.site_announcements) > 10">
+           tal:condition="python: len(api.unseen_site_announcements) > 10">
           You have many alerts!
       </div>
       <div class="site-announcement portalMessage" id="site-announcement"

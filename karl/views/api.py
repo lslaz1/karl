@@ -24,8 +24,6 @@ from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import getUtility
 
-from persistent.list import PersistentList
-
 from pyramid.decorator import reify
 from pyramid.url import resource_url
 from pyramid.security import effective_principals
@@ -43,6 +41,7 @@ from karl.application import is_normal_mode
 from karl.consts import countries
 from karl.consts import cultures
 from karl.utils import find_site
+from karl.utils import find_profiles
 from karl.utils import get_settings
 from karl.utils import get_setting
 from karl.utils import support_attachments
@@ -126,7 +125,6 @@ class TemplateAPI(object):
         self.can_administer = has_permission('administer', site, request)
         self.can_email = has_permission('email', site, request)
         self.admin_url = resource_url(site, request, 'admin.html')
-        self.site_announcements = getattr(site, 'site_announcements', PersistentList())
         date_format = get_user_date_format(context, request)
         self.karl_client_data['date_format'] = date_format
         # XXX XXX XXX This will never work from peoples formish templates
@@ -138,6 +136,16 @@ class TemplateAPI(object):
         if hasattr(request, 'form') and getattr(request.form, 'errors', False):
             # This is a failed form submission request, specify an error message
             self.error_message = u'Please correct the indicated errors.'
+
+        self.site_announcements = getattr(self.site, "site_announcements", [])
+        profiles = find_profiles(self.site)
+        profile = profiles.get(self.userid, None)
+        self.unseen_site_announcements = []
+        if profile is not None and hasattr(profile, "_seen_announcements") \
+                and hasattr(site, "site_announcements"):
+            for item in site.site_announcements:
+                if item['hash'] not in profile._seen_announcements:
+                    self.unseen_site_announcements.append(item)
 
     @property
     def snippets(self):
