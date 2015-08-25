@@ -721,7 +721,7 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
       <div class="site-announcement portalMessage" id="site-announcement"
            tal:condition="python: len(api.site_announcements) > 1 and len(api.site_announcements) < 11"
            tal:define="announce_num python:len(api.site_announcements)">
-          You have ${announce_num} alerts!
+           <a href='${api.request.application_url}/announcements.html'>You have ${announce_num} alerts!</a>
       </div>
       <div class="site-announcement portalMessage" id="site-announcement"
            tal:condition="python: len(api.site_announcements) > 10">
