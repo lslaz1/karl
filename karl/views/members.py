@@ -213,20 +213,18 @@ def show_members_view(context, request):
 
 
 def announcements_view(context, request):
-    page_title = 'Announcements'
+    page_title = 'Site Announcements'
     api = TemplateAPI(context, request, page_title)
 
     userid = authenticated_userid(request)
     if userid is None:
-        # TODO: better handling of invalid user id?
-        raise Exception()
+        raise Exception("User must be logged in")
 
     site = api.site
     profiles = find_profiles(site)
     profile = profiles.get(userid, None)
     if profile is None:
-        # TODO: better handling of a lack of profile?
-        raise Exception()
+        raise Exception("User must have a profile")
 
     seen = Set()
     if hasattr(profile, "_seen_announcements"):
