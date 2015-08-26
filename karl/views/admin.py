@@ -453,7 +453,18 @@ class EmailUsersView(object):
                     'email': profile.email
                 })
                 n += 1
-
+            # parse additional to email
+            if request.params['more_to']:
+                more_to = request.params['more_to'].split(",")
+                for to_email in more_to:
+                    emailparts = to_email.split("@")
+                    if len(emailparts) != 2:
+                        continue
+                    # could validate email more here
+                    addressed_to.append({
+                        'name': emailparts[0],
+                        'email': to_email
+                    })
             self.send_email(
                 request.params['subject'], request.params['text'],
                 addressed_to, from_email)
