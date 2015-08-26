@@ -8,6 +8,7 @@ from repoze.postoffice.message import Message
 import os
 import re
 import time
+import shutil
 import transaction
 from paste.fileapp import FileApp
 from pyramid.response import Response
@@ -388,8 +389,8 @@ class EmailUsersView(object):
         self.context = context
         self.request = request
 
-    def send_email(self, subject, body, addressed_to, from_email):
-        message = create_message(self.request, subject, body, from_email)
+    def send_email(self, subject, body, addressed_to, from_email, attachments):
+        message = create_message(self.request, subject, body, from_email, attachments)
         if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
             mailer = ThreadedGeneratorMailDelivery()
             mailer.sendGenerator(
@@ -432,9 +433,19 @@ class EmailUsersView(object):
                     'email': profile.email
                 })
                 n += 1
+            email_attachments = {}
+            for k in request.params:
+                if str(k).startswith("attachment"):
+                    print('tmp', k)
+                    tmpfilename = request.params[k].filename
+                    tmpfile = request.params[k].file
+                    file_path = os.path.join('/users/jmartens/tmp', tmpfilename)
+                    with open(file_path, 'wb') as output_file:
+                        shutil.copyfileobj(tmpfile, output_file)
+                    email_attachments[tmpfilename] = file_path
             self.send_email(
                 request.params['subject'], request.params['text'],
-                addressed_to, from_email)
+                addressed_to, from_email, email_attachments)
 
             status_message = "Sent message to %d users." % n
             if has_permission(ADMINISTER, context, request):
