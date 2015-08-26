@@ -428,7 +428,7 @@ def mailify_html(request, html, message):
     return message
 
 
-def create_message(request, subject, html, from_email, attachments, mailify=True):
+def create_message(request, subject, html, from_email, mailify=True):
     message = MIMEMultipart()
     message['From'] = from_email
     message['Subject'] = subject

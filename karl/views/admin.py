@@ -406,8 +406,8 @@ class EmailUsersView(object):
         self.context = context
         self.request = request
 
-    def send_email(self, subject, body, addressed_to, from_email, attachments):
-        message = create_message(self.request, subject, body, from_email, attachments)
+    def send_email(self, subject, body, addressed_to, from_email):
+        message = create_message(self.request, subject, body, from_email)
         if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
             mailer = ThreadedGeneratorMailDelivery()
             mailer.sendGenerator(
@@ -483,7 +483,7 @@ class EmailUsersView(object):
 
             self.send_email(
                 request.params['subject'], request.params['text'],
-                addressed_to, from_email, email_attachments)
+                addressed_to, from_email)
 
             status_message = "Sent message to %d users." % n
             if has_permission(ADMINISTER, context, request):
