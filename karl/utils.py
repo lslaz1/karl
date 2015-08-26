@@ -427,7 +427,7 @@ def mailify_html(request, html, message):
     return message
 
 
-def create_message(request, subject, html, from_email, attachments, mailify=True):
+def create_message(request, subject, html, from_email, mailify=True):
     message = MIMEMultipart()
     message['From'] = from_email
     message['Subject'] = subject
@@ -438,13 +438,15 @@ def create_message(request, subject, html, from_email, attachments, mailify=True
         body_html = u'<html><body>%s</body></html>' % html
         message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
 
-    for filename, fullfile in attachments.iteritems():
-        f = file(fullfile)
-        attachment = MIMEText(f.read())
-        attachment.add_header('Content-Disposition',
-                              'attachment',
-                              filename=filename)
-        message.attach(attachment)
+    for k in request.params:
+        if str(k).startswith("attachment"):
+            tmpattachment = request.params[k]
+            if tmpattachment.filename:
+                attachment = MIMEText(tmpattachment.value)
+                attachment.add_header('Content-Disposition',
+                                      'attachment',
+                                      filename=tmpattachment.filename)
+                message.attach(attachment)
 
     return message
 
