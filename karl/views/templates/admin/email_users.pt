@@ -19,7 +19,7 @@
       <h1 class="kscreentitle">Admin Section: Email Users</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users">
+        <form method="POST" name="email_users" enctype="multipart/form-data">
           <b>From</b><br/>
           <select name="from_email">
             <option tal:repeat="from_email from_emails"
@@ -37,6 +37,33 @@
           <br/>
           <metal:input use-macro="api.formfields.macros['text-field']"/>
           <br/>
+          
+          <fieldset id="attachment-field"
+			      metal:define-macro="attachment-field"
+			      tal:define="error fielderrors['attachment']|None"
+		              tal:condition="api.support_attachments"
+			      class="${error and 'fieldError' or ''}">
+		      <label>Attachment</label>
+		      <div class="fieldHelp"></div>
+		      <div tal:condition="error" class="errorMessage">${error}</div>
+		      <div class="muf-widget">
+		        <div class="muf-stub">
+		          <input type="file" value="true" name="attachment"/>
+		          <a href="#" class="muf-closebutton">Remove</a>
+		        </div>
+		        <a href="#" class="muf-addbutton">Attach another file</a>
+		      </div>
+		      <script language="javascript" type="text/javascript">
+		        $(document).ready(function() {
+		            // create the widget
+		            $('#attachment-field .muf-widget')
+		                .karlmultiupload({
+		                });
+		        });
+		      </script>
+		    </fieldset>
+          
+          
           <input type="submit" name="send_email" value="Send Email"/>
         </form>
       </div>
