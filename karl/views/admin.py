@@ -401,7 +401,6 @@ class EmailUsersView(object):
     # a class so that customization packages can subclass this and override
     # the groups.
 
-
     def __init__(self, context, request):
         self.context = context
         self.request = request
