@@ -88,6 +88,8 @@ class Users(Persistent):
         if login is not None:
             login = self._convert(login)
             userid = self.logins.get(login)
+            if userid is None:
+                return None
             return self.data.get(userid)
 
         raise ValueError('Either userid or login must be supplied')
