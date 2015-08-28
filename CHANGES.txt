@@ -5,6 +5,7 @@ karl package Changelog
 ------------------
 
 - make header-links configurable through site settings
+- change site-announcement to handle multiple announcements
 
 5.1.2 (2015-08-04)
 ------------------

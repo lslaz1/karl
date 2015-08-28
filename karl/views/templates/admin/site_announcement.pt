@@ -16,13 +16,13 @@
     <div metal:use-macro="api.snippets.macros['error_message']"/>
 
     <div class="admin_page_body">
-      <h1 class="kscreentitle">Admin Section: Site Announcement</h1>
+      <h1 class="kscreentitle">Admin Section: Site Announcements</h1>
 
       <div class="koverview_body">
         <form method="POST" name="select_content">
           <fieldset tal:define="error fielderrors['site-announcement-input']|None"
-	            class="${error and 'fieldError' or ''}"
-	            id="site-announcement-input-field">
+                    class="${error and 'fieldError' or ''}"
+                    id="site-announcement-input-field">
             <label>Text</label>
             <div class="fieldHelp" tal:content="help['site-announcement-input']|''"></div>
             <div tal:condition="error" class="errorMessage">${error}</div>
@@ -30,19 +30,31 @@
             <textarea id="site-announcement-input"
                       name="site-announcement-input"
                       rows="1" cols="40"
-            		      class="pat-tinymce">
-              ${api.site_announcement}
+                      class="pat-tinymce">
             </textarea>
           </fieldset>
           <br />
           <div class="buttons">
               <button name="submit-site-announcement" type="submit" class="button primary_button">
-                  <span>Set Site Announcement</span>
-              </button>
-              <button name="remove-site-announcement" type="submit" class="button normal_button">
-                  <span>Remove Site Announcement</span>
+                  <span>Add Site Announcement</span>
               </button>
           </div>
+
+          <fieldset class="site-announcement-list">
+              <label>All Active Site Announcements</label>
+              <ul>
+                  <li tal:repeat="item python:api.site_announcements">
+                      <blockquote tal:content="structure python:item['content']" />
+                      <div>
+                          <span class='date'>(added on ${item.added.strftime("%x")})</span>
+                          <button name="remove-site-announcement" type="submit" class="button"
+                                  tal:attributes="value python:item['hash']">
+                              <span>remove</span>
+                          </button>
+                      </div>
+                  </li>
+              </ul>
+          <fieldset>
         </form>
 
       </div>
