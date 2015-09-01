@@ -46,9 +46,9 @@ class Profile(Folder):
     current_auth_code = None
     current_auth_code_time_stamp = datetime.utcnow()
     additional_fields = ('phone', 'extension', 'fax', 'department', 'position',
-                         'organization', 'location', 'country', 'websites',
-                         'languages', 'office', 'room_no', 'biography', 'date_format',
-                         'home_path')
+                         'organization', 'industry', 'location', 'country',
+                         'websites', 'languages', 'office', 'room_no',
+                         'biography', 'date_format', 'home_path')
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -74,11 +74,14 @@ class Profile(Folder):
 
     websites = property(_get_websites, _set_websites)
 
-    def __init__(self, firstname='', lastname='', email='', phone='', extension='',
-                 fax='', department='', position='', organization='', location='',
-                 country='US', websites=None, languages='', office='', room_no='',
-                 biography='', date_format='en-US', data=None, home_path=None,
-                 preferred_communities=None, two_factor_phone='', two_factor_verified=False,
+    def __init__(self,
+                 firstname='', lastname='', email='', phone='', extension='',
+                 fax='', department='', position='', organization='',
+                 industry='', location='', country='US', websites=None,
+                 languages='', office='', room_no='', biography='',
+                 date_format='en-US', data=None, home_path=None,
+                 preferred_communities=None, two_factor_phone='',
+                 two_factor_verified=False,
                  ):
         super(Profile, self).__init__(data)
         self.firstname = firstname
@@ -90,6 +93,7 @@ class Profile(Folder):
         self.department = department
         self.position = position
         self.organization = organization
+        self.industry = industry
         self.location = location
         if country not in countries.as_dict:
             country = 'XX'
@@ -146,8 +150,8 @@ class CaseInsensitiveOOBTree(OOBTree):
         return super(CaseInsensitiveOOBTree, self).__getitem__(name.lower())
 
     def __setitem__(self, name, value):
-        return super(CaseInsensitiveOOBTree, self).__setitem__(name.lower(),
-                                                               value)
+        return super(CaseInsensitiveOOBTree, self).__setitem__(name.lower(), value)  # noqa
+
     def get(self, name, default=None):
         return super(CaseInsensitiveOOBTree, self).get(name.lower(), default)
 
@@ -171,9 +175,10 @@ class ProfilesFolder(Folder):
 def profile_textindexdata(profile):
     """Provides info for the text index"""
     text = []
-    for attr in ('__name__', "firstname", "lastname", "email", "phone", "extension",
-                 "department", "position", "organization", "location", "country",
-                 "website", "languages", "office", "room_no", "biography"):
+    for attr in ('__name__', "firstname", "lastname", "email", "phone",
+                 "extension", "department", "position", "organization",
+                 "industry", "location", "country", "website", "languages",
+                 "office", "room_no", "biography"):
         v = getattr(profile, attr, None)
         if v:
             if isinstance(v, str):
