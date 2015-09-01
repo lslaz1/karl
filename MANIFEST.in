@@ -3,3 +3,6 @@ include karl/views/static/*.css
 recursive-include karl/views/static/fonts *
 recursive-include karl/views/static/images *
 recursive-include karl/views/static/min *
+recursive-include karl *.zcml
+recursive-include karl *.pt
+recursive-include karl *.json
