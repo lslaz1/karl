@@ -548,7 +548,7 @@ class TemplateAPI(object):
 
     def get_header_menu_items(self):
         navlist = []
-        navitems = self.settings['navigation_list'].splitlines()
+        navitems = self.settings.get('navigation_list', "").splitlines()
         for item in navitems:
             itemparts = item.split("|")
             if len(itemparts) != 2 and len(itemparts) != 3:
