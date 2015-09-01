@@ -13,9 +13,10 @@ def evolve(site):
         if not hasattr(profile, 'industry'):
             profile.industry = ''
 
-    site.settings['navigation_list'] = "\n".join([
-        "Tags|/tagcloud.html",
-        "People|/people",
-        "Communities|/communities",
-        "Feeds|/contentfeeds.html",
-    ])
+    if 'navigation_list' not in site.settings:
+        site.settings['navigation_list'] = "\n".join([
+            "Tags|/tagcloud.html",
+            "People|/people",
+            "Communities|/communities",
+            "Feeds|/contentfeeds.html",
+        ])
