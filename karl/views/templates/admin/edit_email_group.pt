@@ -24,8 +24,8 @@
           <input name="group_name" size="60" required/><br/>
           <br/>
           <b>Email Addresses</b><br/>
-          <textarea name="email_address" rows="10" cols="78" required></textarea>
-          <br/>
+          <textarea name="email_address" rows="10" cols="78" required></textarea><br/>
+          <b>Type email addresses (one per line) of people you would like to add to this group.</b><br/>
           <br/>
           <input type="submit" name="save" value="Save"/>
         </form>
