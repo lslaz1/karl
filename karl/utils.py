@@ -437,6 +437,17 @@ def create_message(request, subject, html, from_email, mailify=True):
     else:
         body_html = u'<html><body>%s</body></html>' % html
         message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
+
+    for k in request.params:
+        if str(k).startswith("attachment"):
+            tmpattachment = request.params[k]
+            if tmpattachment.filename:
+                attachment = MIMEText(tmpattachment.value)
+                attachment.add_header('Content-Disposition',
+                                      'attachment',
+                                      filename=tmpattachment.filename)
+                message.attach(attachment)
+
     return message
 
 

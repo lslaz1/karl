@@ -19,7 +19,7 @@
       <h1 class="kscreentitle">Admin Section: Email Users</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users">
+        <form method="POST" name="email_users" enctype="multipart/form-data">
           <b>From</b><br/>
           <select name="from_email">
             <option tal:repeat="from_email from_emails"
@@ -36,6 +36,9 @@
           <input name="subject" size="60"/><br/>
           <br/>
           <metal:input use-macro="api.formfields.macros['text-field']"/>
+          <br/>
+          
+          <metal:input use-macro="api.formfields.macros['attachment-field']"/>
           <br/>
           <input type="submit" name="send_email" value="Send Email"/>
         </form>

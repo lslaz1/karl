@@ -9,6 +9,7 @@ import hashlib
 import os
 import re
 import time
+import shutil
 import transaction
 from paste.fileapp import FileApp
 from pyramid.response import Response
@@ -400,6 +401,7 @@ class EmailUsersView(object):
     # a class so that customization packages can subclass this and override
     # the groups.
     to_groups = [
+        ('none', 'None'),
         ('group.KarlStaff', 'Staff'),
         ('', 'Everyone'),
     ]
@@ -440,18 +442,32 @@ class EmailUsersView(object):
             count, docids, resolver = search(interfaces=[IProfile])
             n = 0
             addressed_to = []
-            for docid in docids:
-                profile = resolver(docid)
-                if getattr(profile, 'security_state', None) == 'inactive':
-                    continue
-                userid = profile.__name__
-                if group and not users.member_of_group(userid, group):
-                    continue
-                addressed_to.append({
-                    'name': profile.title,
-                    'email': profile.email
-                })
-                n += 1
+            if group != 'none':
+                for docid in docids:
+                    profile = resolver(docid)
+                    if getattr(profile, 'security_state', None) == 'inactive':
+                        continue
+                    userid = profile.__name__
+                    if group and not users.member_of_group(userid, group):
+                        continue
+                    addressed_to.append({
+                        'name': profile.title,
+                        'email': profile.email
+                    })
+                    n += 1
+            # parse additional to email addresses
+            if request.params['more_to']:
+                more_to = request.params['more_to'].split(",")
+                for to_email in more_to:
+                    emailparts = to_email.split("@")
+                    if len(emailparts) != 2:
+                        continue
+                    # could validate email more here
+                    addressed_to.append({
+                        'name': emailparts[0],
+                        'email': to_email
+                    })
+                    n += 1
             self.send_email(
                 request.params['subject'], request.params['text'],
                 addressed_to, from_email)
