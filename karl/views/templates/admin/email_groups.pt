@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
+  </span>
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Email Groups</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="email_groups" enctype="multipart/form-data">
+          
+          <div class="EmailGroupsWrapper">
+	        <table class="content-listing">
+	          <thead>
+	            <tr>
+	              <th class="clgroup">Email Group</th>
+	            </tr>
+	          </thead>
+	          <tbody>
+	            <tr tal:repeat="eg email_groups">
+	              <td class="clgroup">${eg}</td>
+	            </tr>
+	          </tbody>
+	        </table>
+	      </div>
+          
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</html>
