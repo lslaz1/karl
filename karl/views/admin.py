@@ -472,6 +472,67 @@ class EmailUsersView(object):
         )
 
 
+class AddEmailGroup(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
+
+        if 'save' in request.params or 'submit' in request.params:
+            all_groups = self.context.settings.get('email-groups', [])
+            group_name = request.params['group_name']
+            emails = request.params['email_address'].split()
+            email_list = []
+            for email in emails:
+                print email
+                email_list.append(dict([('name', ''), ('email', email)]))
+            self.context.settings['email-groups'][group_name] = email_list
+            status_message = ''
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_groups.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            menu=_menu_macro(),
+        )
+
+
+class EmailGroupsView(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Email Groups')
+
+        actions = []
+        actions.append(
+            ('Add Email Group',
+             request.resource_url(context, 'add_email_group.html')),
+            )
+        email_groups = self.context.settings.get('email-groups', [])
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            email_groups=email_groups,
+        )
+
+
 def syslog_view(context, request):
     syslog_path = get_config_setting('syslog_view')
     instances = get_config_setting('syslog_view_instances', ['karl'])

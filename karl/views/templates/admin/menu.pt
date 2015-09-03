@@ -74,6 +74,11 @@
                 Email Users
               </a>
           </div>
+          <div class="portlet-item" tal:condition="api.can_email">
+	          <a href="${api.app_url}/email_groups.html">
+	            Configure Email Groups
+	          </a>
+	      </div>
           <div class="portlet-item" tal:condition="api.can_administer and api.has_mailin">
               <a href="${api.quarantine_url}">
                 View mailin quarantine
