@@ -483,14 +483,15 @@ class AddEmailGroup(object):
         api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
 
         if 'save' in request.params or 'submit' in request.params:
-            all_groups = self.context.settings.get('email-groups', [])
+            all_groups = self.context.settings.get('email_groups', {})
             group_name = request.params['group_name']
             emails = request.params['email_address'].split()
             email_list = []
             for email in emails:
                 print email
                 email_list.append(dict([('name', ''), ('email', email)]))
-            self.context.settings['email-groups'][group_name] = email_list
+            all_groups[group_name] = email_list
+            self.context.settings['email_groups'] = all_groups
             status_message = ''
             if has_permission(ADMINISTER, context, request):
                 redirect_to = resource_url(
@@ -506,8 +507,57 @@ class AddEmailGroup(object):
         return dict(
             api=api,
             menu=_menu_macro(),
+            group_name='',
+            email_address='',
         )
 
+class EditEmailGroup(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
+        thisgroup = request.subpath
+        thisgroup = thisgroup[0]
+        all_groups = self.context.settings.get('email_groups', {})
+        alladdresses = all_groups.get(thisgroup,[])
+        display_email = ''
+        for entry in alladdresses:
+            tmpemail = entry.get('email','')
+            display_email = display_email + tmpemail + "\n"
+
+        if 'save' in request.params or 'submit' in request.params:
+            print ('all_groups', all_groups)
+            group_name = request.params['group_name']
+            emails = request.params['email_address'].split()
+            email_list = []
+            for email in emails:
+                print email
+                email_list.append(dict([('name', ''), ('email', email)]))
+            all_groups[group_name] = email_list
+            self.context.settings['email_groups'] = all_groups
+            self.context.settings._p_changed = True 
+            status_message = ''
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_groups.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            menu=_menu_macro(),
+            group_name=thisgroup,
+            email_address=display_email,
+        )
 
 class EmailGroupsView(object):
     def __init__(self, context, request):
@@ -523,7 +573,12 @@ class EmailGroupsView(object):
             ('Add Email Group',
              request.resource_url(context, 'add_email_group.html')),
             )
-        email_groups = self.context.settings.get('email-groups', [])
+
+        if 'email_groups' in self.context.settings:
+            email_groups = self.context.settings.get('email_groups')
+        else:
+            email_groups = {}
+            self.context.settings['email_groups'] = email_groups
 
         return dict(
             api=api,

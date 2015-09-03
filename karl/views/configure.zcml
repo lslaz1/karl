@@ -1875,6 +1875,14 @@
     
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EditEmailGroup"
+    renderer="templates/admin/edit_email_group.pt"
+    permission="email"
+    name="email_group"
+    />
+    
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.ReviewSiteInvitations"
     renderer="templates/admin/review_invitations.pt"
     permission="administer"

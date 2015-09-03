@@ -21,11 +21,11 @@
       <div class="koverview_body">
         <form method="POST" name="email_users" enctype="multipart/form-data">
           <b>Email Group Name</b><br/>
-          <input name="group_name" size="60" required/><br/>
+          <input name="group_name" size="60" value="${group_name}" required/><br/>
           <br/>
           <b>Email Addresses</b><br/>
-          <textarea name="email_address" rows="10" cols="78" required></textarea><br/>
-          <b>Type email addresses (one per line) of people you would like to add to this group.</b><br/>
+          Type email addresses (one per line) of people you would like to add to this group<br/>
+          <textarea name="email_address" rows="10" cols="78" required>${email_address}</textarea><br/>
           <br/>
           <input type="submit" name="save" value="Save"/>
         </form>
