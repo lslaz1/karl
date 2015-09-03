@@ -14,19 +14,9 @@
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
-<<<<<<< HEAD
-
-
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Email Groups</h1>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
-=======
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
-
-    <div class="admin_page_body">
-      <h1 class="kscreentitle">Admin Section: Email Groups</h1>
->>>>>>> adding templates for email groups
-
       <div class="koverview_body">
         <form method="POST" name="email_groups" enctype="multipart/form-data">
           
@@ -39,13 +29,9 @@
 	          </thead>
 	          <tbody>
 	            <tr tal:repeat="eg email_groups">
-<<<<<<< HEAD
 	              <td class="clgroup">
                         <a href="email_group/${eg}">${eg}</a>
                       </td>
-=======
-	              <td class="clgroup">${eg}</td>
->>>>>>> adding templates for email groups
 	            </tr>
 	          </tbody>
 	        </table>
