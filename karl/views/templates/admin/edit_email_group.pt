@@ -21,19 +21,18 @@
       <div class="koverview_body">
         <form method="POST" name="email_users" enctype="multipart/form-data">
           <b>Email Group Name</b><br/>
-<<<<<<< HEAD
           <input name="group_name" size="60" value="${group_name}" required/><br/>
           <br/>
           <b>Email Addresses</b><br/>
           Type email addresses (one per line) of people you would like to add to this group<br/>
-          <textarea name="email_address" rows="10" cols="78" required>${email_address}</textarea><br/>
-=======
-          <input name="group_name" size="60" required/><br/>
+          <textarea name="email_address" rows="10" cols="78">${email_address}</textarea><br/>
           <br/>
-          <b>Email Addresses</b><br/>
-          <textarea name="email_address" rows="10" cols="78" required></textarea>
-          <br/>
->>>>>>> adding templates for email groups
+          <b>Existing Members</b><br/>
+          <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
+            <option tal:repeat="profile peoplelist"
+                tal:attributes="selected python: profile.selected is True"
+                value="${profile.login}">${profile.name}</option>    
+          </select>
           <br/>
           <input type="submit" name="save" value="Save"/>
         </form>
