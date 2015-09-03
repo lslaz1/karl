@@ -1864,7 +1864,23 @@
     permission="email"
     name="email_users.html"
     />
-
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EmailGroupsView"
+    renderer="templates/admin/email_groups.pt"
+    permission="email"
+    name="email_groups.html"
+    />
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.AddEmailGroup"
+    renderer="templates/admin/edit_email_group.pt"
+    permission="email"
+    name="add_email_group.html"
+    />
+    
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.ReviewSiteInvitations"
