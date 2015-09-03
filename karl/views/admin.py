@@ -431,6 +431,9 @@ class EmailUsersView(object):
             ('admin', '%s Administrator <%s>' % (system_name, admin_email)),
             ('self', '%s <%s>' % (admin.title, admin.email))
         ]
+        all_groups = self.context.settings.get('email_groups', {})
+        for (k, v) in all_groups.iteritems():
+            self.to_groups.append(('group-' + k, k))
 
         if 'send_email' in request.params or 'submit' in request.params:
             from_email = from_emails[0][1]
@@ -442,7 +445,7 @@ class EmailUsersView(object):
             count, docids, resolver = search(interfaces=[IProfile])
             n = 0
             addressed_to = []
-            if group != 'none':
+            if group == 'group.KarlStaff' or group == '':
                 for docid in docids:
                     profile = resolver(docid)
                     if getattr(profile, 'security_state', None) == 'inactive':
@@ -453,6 +456,14 @@ class EmailUsersView(object):
                     addressed_to.append({
                         'name': profile.title,
                         'email': profile.email
+                    })
+                    n += 1
+            if group.startswith('group-'):
+                alladdresses = all_groups.get(group, [])
+                for entry in alladdresses:
+                    addressed_to.append({
+                        'name': '',
+                        'email': entry.get('email', '')
                     })
                     n += 1
             # parse additional to email addresses
