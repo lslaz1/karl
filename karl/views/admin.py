@@ -435,6 +435,7 @@ class EmailUsersView(object):
         for (k, v) in all_groups.iteritems():
             to_groups.append(('group-' + k, k))
 
+
         if 'send_email' in request.params or 'submit' in request.params:
             from_email = from_emails[0][1]
             if request.params['from_email'] == 'self':
