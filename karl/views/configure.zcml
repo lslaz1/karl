@@ -1888,6 +1888,7 @@
     permission="email"
     name="email_group"
     />
+    
 
   <view
     for="karl.models.interfaces.ISite"
