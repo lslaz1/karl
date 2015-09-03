@@ -605,7 +605,6 @@ class EmailGroupsView(object):
             ('Add Email Group',
              request.resource_url(context, 'add_email_group.html')),
             )
-
         if 'email_groups' in self.context.settings:
             email_groups = self.context.settings.get('email_groups')
         else:
