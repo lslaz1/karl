@@ -380,11 +380,7 @@ class EmailUsersView(object):
     # The groups are a pretty obvious customization point, so we make this view
     # a class so that customization packages can subclass this and override
     # the groups.
-    to_groups = [
-        ('none', 'None'),
-        ('group.KarlStaff', 'Staff'),
-        ('', 'Everyone'),
-    ]
+
 
     def __init__(self, context, request):
         self.context = context
@@ -412,8 +408,13 @@ class EmailUsersView(object):
             ('self', '%s <%s>' % (admin.title, admin.email))
         ]
         all_groups = self.context.settings.get('email_groups', {})
+        to_groups = [
+            ('none', 'None'),
+            ('group.KarlStaff', 'Staff'),
+            ('', 'Everyone'),
+        ]
         for (k, v) in all_groups.iteritems():
-            self.to_groups.append(('group-' + k, k))
+            to_groups.append(('group-' + k, k))
 
         if 'send_email' in request.params or 'submit' in request.params:
             from_email = from_emails[0][1]
@@ -478,7 +479,7 @@ class EmailUsersView(object):
         return dict(
             api=api,
             menu=_menu_macro(),
-            to_groups=self.to_groups,
+            to_groups=to_groups,
             from_emails=from_emails,
         )
 
