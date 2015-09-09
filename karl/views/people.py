@@ -93,6 +93,7 @@ fax_field = schemaish.String(title='Fax Number')
 department_field = schemaish.String()
 position_field = schemaish.String()
 organization_field = schemaish.String()
+industry_field = schemaish.String()
 location_field = schemaish.String()
 country_field = schemaish.String(validator=validator.Required())
 websites_field = schemaish.Sequence(
@@ -116,6 +117,7 @@ class EditProfileFormController(object):
         'department': department_field,
         'position': position_field,
         'organization': organization_field,
+        'industry': industry_field,
         'location': location_field,
         'country': country_field,
         'websites': websites_field,
@@ -169,6 +171,7 @@ class EditProfileFormController(object):
                    'department': formish.Input(empty=''),
                    'position': formish.Input(empty=''),
                    'organization': formish.Input(empty=''),
+                   'industry': formish.Input(empty=''),
                    'location': formish.Input(empty=''),
                    'country': formish.SelectChoice(options=countries),
                    'websites': formish.TextArea(
@@ -198,6 +201,7 @@ class EditProfileFormController(object):
                     'department': context.department,
                     'position': context.position,
                     'organization': context.organization,
+                    'industry': context.industry,
                     'location': context.location,
                     'country': context.country,
                     'websites': context.websites,

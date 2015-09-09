@@ -1223,6 +1223,14 @@
     renderer="json"
   />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.members.announcements_view"
+    renderer="templates/announcements.pt"
+    permission="view"
+    name="announcements.html"
+    />
+
   <formish:form
      controller=".members.AddExistingUserFormController"
      name="add_existing.html"

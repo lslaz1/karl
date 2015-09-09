@@ -5,6 +5,7 @@ from cStringIO import StringIO
 import csv
 from _csv import Error
 from repoze.postoffice.message import Message
+import hashlib
 import os
 import re
 import time
@@ -16,6 +17,9 @@ from pyramid.httpexceptions import HTTPFound
 from datetime import datetime
 
 from zope.component import getUtility
+
+from persistent.list import PersistentList
+from persistent.mapping import PersistentMapping
 
 from pyramid.renderers import get_renderer
 from pyramid.exceptions import NotFound
@@ -344,8 +348,7 @@ def site_announcement_view(context, request):
     every page for every user of the site.
     """
     site = find_site(context)
-    if ('submit-site-announcement' in request.params) or (
-            'submit' in request.params):
+    if ('submit-site-announcement' in request.params) or ('submit' in request.params):
         annc = request.params.get('site-announcement-input', '').strip()
         if annc:
             # we only take the content of the first <p> tag, with
@@ -353,15 +356,32 @@ def site_announcement_view(context, request):
             paramatcher = re.compile('<[pP]\\b[^>]*>(.*?)</[pP]>')
             match = paramatcher.search(annc)
             if match is not None:
-                annc = match.groups()[0]
-            site.site_announcement = annc
+                anncontent = match.groups()[0]
+            if not hasattr(site, 'site_announcements'):
+                site.site_announcements = PersistentList()
+            annc = PersistentMapping()
+            annc["content"] = anncontent
+            annc["added"] = datetime.now()
+            annc["hash"] = hashlib.md5("{}{}".format(anncontent, annc["added"]).encode()).hexdigest()
+            site.site_announcements.insert(0, annc)
+
     if 'remove-site-announcement' in request.params:
-        site.site_announcement = u''
+        hsh = request.params['remove-site-announcement']
+        try:
+            for item in site.site_announcements:
+                if item['hash'] == hsh:
+                    site.site_announcements.remove(item)
+                    break
+            #site.site_announcements.pop(int(idx))
+        except ValueError:
+            pass
+        except IndexError:
+            pass
     api = AdminTemplateAPI(context, request, 'Admin UI: Site Announcement')
-    announcement = getattr(site, 'site_announcement', '')
+    announcements = getattr(site, 'site_announcements', PersistentList())
     return dict(
         api=api,
-        site_announcement=announcement,
+        site_announcements=announcements,
         menu=_menu_macro()
         )
 

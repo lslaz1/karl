@@ -1,0 +1,18 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+    <div metal:fill-slot="content">
+
+        <h1>${api.page_title}</h1>
+
+        <ul class="site-announcement-list">
+            <li tal:repeat="item python:api.site_announcements"
+                tal:attributes="class python: 'seen' if item['hash'] in seen else ''">
+                <div tal:content="structure python:item['content']" />
+                <span class='date'>(added on ${item.added.strftime("%x")})</span>
+            </li>
+        </ul>
+    </div>
+</html>

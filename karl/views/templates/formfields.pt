@@ -443,6 +443,16 @@
       <input name="organization"/>
     </fieldset>
 
+    <fieldset metal:define-macro="industry-field"
+	      tal:define="error fielderrors['industry']|None"
+	      class="${error and 'fieldError' or ''}"
+	      id="industry-field">
+      <label>Industry</label>
+      <div class="fieldHelp"></div>
+      <div tal:condition="error" class="errorMessage">${error}</div>
+      <input name="industry"/>
+    </fieldset>
+
     <fieldset metal:define-macro="location-field"
 	      tal:define="error fielderrors['location']|None"
 	      class="${error and 'fieldError' or ''}"
