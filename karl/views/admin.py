@@ -665,7 +665,7 @@ class DeleteEmailGroup(object):
         self.context.settings['email_groups'] = all_groups
         redirect_to = resource_url(
                     context, request, 'email_groups.html',
-                    query=dict(status_message='Email group"' + thisgroup + '" has been deleted'))
+                    query=dict(status_message='Email group "' + thisgroup + '" has been deleted'))
         return HTTPFound(location=redirect_to)
 
 class EmailGroupsView(object):
