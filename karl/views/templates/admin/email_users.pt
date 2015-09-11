@@ -31,7 +31,7 @@
             <option tal:repeat="to_group to_groups"
                     value="${to_group[0]}">${to_group[1]}</option>
           </select><br/>
-          <b>Specific Users</b><br/>
+          <b>Additional Users</b><br/>
           <input name="more_to" size="60"/><br/>
           <br/>
           <b>Subject</b><br/>
