@@ -1891,6 +1891,13 @@
     
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.DeleteEmailGroup"
+    permission="email"
+    name="del_email_group"
+    />
+    
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.ReviewSiteInvitations"
     renderer="templates/admin/review_invitations.pt"
     permission="administer"

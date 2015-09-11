@@ -15,6 +15,7 @@ from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from datetime import datetime
+from webhelpers.util import UnicodeMultiDict
 
 from zope.component import getUtility
 
@@ -504,6 +505,45 @@ class EmailUsersView(object):
         )
 
 
+def getemailusers(profiles, selected_members):
+    peoplelist = []
+    excludefirsts = []
+    for prof in profiles:
+        tmp = profiles.get(prof, None)
+        if tmp is not None:
+            if tmp.firstname in (excludefirsts):
+                continue
+            isselected = False
+            if prof in selected_members:
+                isselected = True
+            peoplelist.append(dict([('name', tmp.firstname + ' ' +
+                                    tmp.lastname),
+                                    ('login', prof),
+                                    ('selected', isselected)]))
+    return peoplelist
+
+
+def process_email_groups(request, profiles):
+    req_params = UnicodeMultiDict(request.params)
+    emails = request.params['email_address'].split()
+    email_list = []
+    for email in emails:
+        email_list.append(dict([('name', ''),
+                                ('email', email),
+                                ('member_login', '')]))
+
+    # process existing members email addresses
+    if 'memberemails' in request.params:
+        memberemails = req_params.getall('memberemails')
+        for tmplogin in memberemails:
+            person = profiles.get(tmplogin, None)
+            if person is not None:
+                email_list.append(dict([('name', person.firstname),
+                                        ('email', person.email),
+                                        ('member_login', tmplogin)]))
+    return email_list
+
+
 class AddEmailGroup(object):
 
     def __init__(self, context, request):
@@ -512,19 +552,20 @@ class AddEmailGroup(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
+        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Group')
+
+        # get list of users
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, [])
 
         if 'save' in request.params or 'submit' in request.params:
             all_groups = self.context.settings.get('email_groups', {})
             group_name = request.params['group_name']
-            emails = request.params['email_address'].split()
-            email_list = []
-            for email in emails:
-                print email
-                email_list.append(dict([('name', ''), ('email', email)]))
+            email_list = process_email_groups(request, profiles)
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
-            status_message = ''
+
+            status_message = 'Email Group "' + group_name + '" has been created'
             if has_permission(ADMINISTER, context, request):
                 redirect_to = resource_url(
                     context, request, 'email_groups.html',
@@ -541,7 +582,9 @@ class AddEmailGroup(object):
             menu=_menu_macro(),
             group_name='',
             email_address='',
+            peoplelist=peoplelist
         )
+
 
 class EditEmailGroup(object):
 
@@ -551,28 +594,40 @@ class EditEmailGroup(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
+        api = AdminTemplateAPI(context, request, 'Admin UI: Edit Email Group')
+
+        actions = []
         thisgroup = request.subpath
         thisgroup = thisgroup[0]
+        actions.append(
+            ('Delete',
+             request.resource_url(context, 'del_email_group' + u'/' + thisgroup)),
+            )
         all_groups = self.context.settings.get('email_groups', {})
         alladdresses = all_groups.get(thisgroup,[])
-        display_email = ''
-        for entry in alladdresses:
-            tmpemail = entry.get('email','')
-            display_email = display_email + tmpemail + "\n"
 
+        display_email = ''
+        selected_members = []
+        for entry in alladdresses:
+            tmpemail = entry.get('email', '')
+            tmplogin = entry.get('member_login', '')
+            tmpname = entry.get('name', '')
+            if tmplogin == '':
+                display_email = display_email + tmpemail + "\n"
+            else:
+                selected_members.append(tmplogin)
+
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, selected_members)
         if 'save' in request.params or 'submit' in request.params:
-            print ('all_groups', all_groups)
             group_name = request.params['group_name']
-            emails = request.params['email_address'].split()
-            email_list = []
-            for email in emails:
-                print email
-                email_list.append(dict([('name', ''), ('email', email)]))
+
+            email_list = process_email_groups(request, profiles)
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
-            self.context.settings._p_changed = True 
-            status_message = ''
+
+            status_message = 'Email Group "'\
+                + group_name + '" successfully modified'
             if has_permission(ADMINISTER, context, request):
                 redirect_to = resource_url(
                     context, request, 'email_groups.html',
@@ -586,10 +641,32 @@ class EditEmailGroup(object):
 
         return dict(
             api=api,
+            actions=actions,
             menu=_menu_macro(),
             group_name=thisgroup,
             email_address=display_email,
+            peoplelist=peoplelist,
+            data=dict([('id', 'admin')])
         )
+
+class DeleteEmailGroup(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+
+        thisgroup = request.subpath
+        thisgroup = thisgroup[0]
+        print ('in del ', thisgroup)
+        all_groups = self.context.settings.get('email_groups', {})
+        del all_groups[thisgroup]
+        self.context.settings['email_groups'] = all_groups
+        redirect_to = resource_url(
+                    context, request, 'email_groups.html',
+                    query=dict(status_message='gone'))
+        return HTTPFound(location=redirect_to)
 
 class EmailGroupsView(object):
     def __init__(self, context, request):

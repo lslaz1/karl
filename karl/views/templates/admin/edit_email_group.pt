@@ -2,6 +2,12 @@
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
+     
+  <head>
+  	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+  </head>
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
     <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
@@ -17,9 +23,11 @@
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Email Group</h1>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
       <div class="koverview_body">
         <form method="POST" name="email_users" enctype="multipart/form-data">
+        
           <b>Email Group Name</b><br/>
           <input name="group_name" size="60" value="${group_name}" required/><br/>
           <br/>
@@ -27,7 +35,20 @@
           Type email addresses (one per line) of people you would like to add to this group<br/>
           <textarea name="email_address" rows="10" cols="78" required>${email_address}</textarea><br/>
           <br/>
+          <b>Existing Members</b><br/>
+          <select name="memberemails" class="memberemails" multiple="multiple" style="width: 300px">
+            <option tal:repeat="profile peoplelist"
+                tal:attributes="selected python: profile.selected is True"
+                value="${profile.login}">${profile.name}</option>    
+          </select>
+          <br/>
           <input type="submit" name="save" value="Save"/>
+          <br/>
+          <script language="javascript" type="text/javascript">
+            $(".memberemails").select2({
+              placeholder: "Select Existing Members"
+            });
+          </script>
         </form>
       </div>
     </div>
