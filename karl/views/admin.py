@@ -579,6 +579,7 @@ class AddEmailGroup(object):
 
         return dict(
             api=api,
+            actions=[],
             menu=_menu_macro(),
             group_name='',
             email_address='',
@@ -659,13 +660,12 @@ class DeleteEmailGroup(object):
 
         thisgroup = request.subpath
         thisgroup = thisgroup[0]
-        print ('in del ', thisgroup)
         all_groups = self.context.settings.get('email_groups', {})
         del all_groups[thisgroup]
         self.context.settings['email_groups'] = all_groups
         redirect_to = resource_url(
                     context, request, 'email_groups.html',
-                    query=dict(status_message='gone'))
+                    query=dict(status_message='Email group"' + thisgroup + '" has been deleted'))
         return HTTPFound(location=redirect_to)
 
 class EmailGroupsView(object):
