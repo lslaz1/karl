@@ -525,7 +525,7 @@ def getemailusers(profiles, selected_members):
 
 def process_email_groups(request, profiles):
     req_params = UnicodeMultiDict(request.params)
-    emails = request.params['email_address'].split()
+    emails = request.params['email_address'].split('\n')
     email_list = []
     for email in emails:
         email_list.append(dict([('name', ''),
