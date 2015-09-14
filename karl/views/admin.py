@@ -9,13 +9,11 @@ import hashlib
 import os
 import re
 import time
-import shutil
 import transaction
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from datetime import datetime
-from webhelpers.util import UnicodeMultiDict
 
 from zope.component import getUtility
 
@@ -363,7 +361,8 @@ def site_announcement_view(context, request):
             annc = PersistentMapping()
             annc["content"] = anncontent
             annc["added"] = datetime.now()
-            annc["hash"] = hashlib.md5("{}{}".format(anncontent, annc["added"]).encode()).hexdigest()
+            annc["hash"] = hashlib.md5("{}{}".format(
+                anncontent, annc["added"]).encode()).hexdigest()
             site.site_announcements.insert(0, annc)
 
     if 'remove-site-announcement' in request.params:
@@ -373,7 +372,7 @@ def site_announcement_view(context, request):
                 if item['hash'] == hsh:
                     site.site_announcements.remove(item)
                     break
-            #site.site_announcements.pop(int(idx))
+            # site.site_announcements.pop(int(idx))
         except ValueError:
             pass
         except IndexError:
@@ -401,7 +400,6 @@ class EmailUsersView(object):
     # The groups are a pretty obvious customization point, so we make this view
     # a class so that customization packages can subclass this and override
     # the groups.
-
 
     def __init__(self, context, request):
         self.context = context
@@ -524,7 +522,6 @@ def getemailusers(profiles, selected_members):
 
 
 def process_email_groups(request, profiles):
-    req_params = UnicodeMultiDict(request.params)
     emails = request.params['email_address'].split('\n')
     email_list = []
     for email in emails:
@@ -534,7 +531,7 @@ def process_email_groups(request, profiles):
 
     # process existing members email addresses
     if 'memberemails' in request.params:
-        memberemails = req_params.getall('memberemails')
+        memberemails = request.params.getall('memberemails')
         for tmplogin in memberemails:
             person = profiles.get(tmplogin, None)
             if person is not None:
@@ -605,14 +602,13 @@ class EditEmailGroup(object):
              request.resource_url(context, 'del_email_group' + u'/' + thisgroup)),
             )
         all_groups = self.context.settings.get('email_groups', {})
-        alladdresses = all_groups.get(thisgroup,[])
+        alladdresses = all_groups.get(thisgroup, [])
 
         display_email = ''
         selected_members = []
         for entry in alladdresses:
             tmpemail = entry.get('email', '')
             tmplogin = entry.get('member_login', '')
-            tmpname = entry.get('name', '')
             if tmplogin == '':
                 display_email = display_email + tmpemail + "\n"
             else:
@@ -664,8 +660,8 @@ class DeleteEmailGroup(object):
         del all_groups[thisgroup]
         self.context.settings['email_groups'] = all_groups
         redirect_to = resource_url(
-                    context, request, 'email_groups.html',
-                    query=dict(status_message='Email group "' + thisgroup + '" has been deleted'))
+            context, request, 'email_groups.html',
+            query=dict(status_message='Email group "' + thisgroup + '" has been deleted'))
         return HTTPFound(location=redirect_to)
 
 class EmailGroupsView(object):
