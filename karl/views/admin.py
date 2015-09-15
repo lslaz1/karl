@@ -426,7 +426,7 @@ class EmailUsersView(object):
             ('admin', '%s Administrator <%s>' % (system_name, admin_email)),
             ('self', '%s <%s>' % (admin.title, admin.email))
         ]
-        all_groups = self.context.settings.get('email_groups', {})
+        all_groups = self.context.settings.get('email_groups', PersistentMapping())
         to_groups = [
             ('none', 'None'),
             ('group.KarlStaff', 'Staff'),
@@ -505,19 +505,19 @@ class EmailUsersView(object):
 
 def getemailusers(profiles, selected_members):
     peoplelist = []
-    excludefirsts = []
+    excludefirsts = ['former', 'system']
     for prof in profiles:
-        tmp = profiles.get(prof, None)
-        if tmp is not None:
-            if tmp.firstname in (excludefirsts):
+        profile = profiles.get(prof, None)
+        if profile is not None:
+            if profile.firstname in (excludefirsts):
                 continue
             isselected = False
             if prof in selected_members:
                 isselected = True
-            peoplelist.append(dict([('name', tmp.firstname + ' ' +
-                                    tmp.lastname),
-                                    ('login', prof),
-                                    ('selected', isselected)]))
+            peoplelist.append({'name': profile.firstname + ' ' + profile.lastname,
+                               'login': prof,
+                               'selected': isselected})
+
     return peoplelist
 
 
@@ -525,9 +525,7 @@ def process_email_groups(request, profiles):
     emails = request.params['email_address'].split('\n')
     email_list = []
     for email in emails:
-        email_list.append(dict([('name', ''),
-                                ('email', email),
-                                ('member_login', '')]))
+        email_list.append({'name': '', 'email': email, 'member_login': ''})
 
     # process existing members email addresses
     if 'memberemails' in request.params:
@@ -535,9 +533,9 @@ def process_email_groups(request, profiles):
         for tmplogin in memberemails:
             person = profiles.get(tmplogin, None)
             if person is not None:
-                email_list.append(dict([('name', person.firstname),
-                                        ('email', person.email),
-                                        ('member_login', tmplogin)]))
+                email_list.append({'name': person.firstname, 'email': person.email,
+                                   'member_login': tmplogin})
+
     return email_list
 
 
@@ -556,7 +554,7 @@ class AddEmailGroup(object):
         peoplelist = getemailusers(profiles, [])
 
         if 'save' in request.params or 'submit' in request.params:
-            all_groups = self.context.settings.get('email_groups', {})
+            all_groups = self.context.settings.get('email_groups', PersistentMapping())
             group_name = request.params['group_name']
             email_list = process_email_groups(request, profiles)
             all_groups[group_name] = email_list
@@ -601,7 +599,7 @@ class EditEmailGroup(object):
             ('Delete',
              request.resource_url(context, 'del_email_group' + u'/' + thisgroup)),
             )
-        all_groups = self.context.settings.get('email_groups', {})
+        all_groups = self.context.settings.get('email_groups', PersistentMapping())
         alladdresses = all_groups.get(thisgroup, [])
 
         display_email = ''
@@ -643,8 +641,9 @@ class EditEmailGroup(object):
             group_name=thisgroup,
             email_address=display_email,
             peoplelist=peoplelist,
-            data=dict([('id', 'admin')])
+            data={'id', 'admin'}
         )
+
 
 class DeleteEmailGroup(object):
     def __init__(self, context, request):
@@ -656,7 +655,7 @@ class DeleteEmailGroup(object):
 
         thisgroup = request.subpath
         thisgroup = thisgroup[0]
-        all_groups = self.context.settings.get('email_groups', {})
+        all_groups = self.context.settings.get('email_groups', PersistentMapping())
         del all_groups[thisgroup]
         self.context.settings['email_groups'] = all_groups
         redirect_to = resource_url(

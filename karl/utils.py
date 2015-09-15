@@ -49,6 +49,7 @@ from lxml.etree import XMLSyntaxError
 
 from email.MIMEText import MIMEText
 from email.mime.image import MIMEImage
+from email.mime.application import MIMEApplication
 
 import time
 from datetime import datetime
@@ -439,12 +440,14 @@ def create_message(request, subject, html, from_email, mailify=True):
         body_html = u'<html><body>%s</body></html>' % html
         message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
 
-    for k in request.params:
-        if str(k).startswith("attachment"):
+    for k in request.params.keys():
+        if k.startswith("attachment"):
             tmpattachment = request.params[k]
             if tmpattachment.filename:
                 if tmpattachment.filename.endswith(('.png','.tiff','gif','bmp','jpeg')):
                     attachment = MIMEImage(tmpattachment.value)
+                elif tmpattachment.filename.endswith(('.pdf','.zip'))
+                    attachment = MIMEApplication(tmpattachment.value)
                 else:
                     attachment = MIMEText(tmpattachment.value)
                 attachment.add_header('Content-Disposition',
