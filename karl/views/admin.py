@@ -663,6 +663,7 @@ class DeleteEmailGroup(object):
             query=dict(status_message='Email group "' + thisgroup + '" has been deleted'))
         return HTTPFound(location=redirect_to)
 
+
 class EmailGroupsView(object):
     def __init__(self, context, request):
         self.context = context
@@ -689,6 +690,137 @@ class EmailGroupsView(object):
             actions=actions,
             menu=_menu_macro(),
             email_groups=email_groups,
+        )
+
+
+class EmailTemplateView(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Email Templates')
+
+        actions = []
+        actions.append(
+            ('Add Email Template',
+             request.resource_url(context, 'add_email_template.html')),
+            )
+
+        template_names = []
+        for e_t in self.context.email_templates:
+            template_names.append(e_t)
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            email_templates=template_names
+        )
+
+
+class AddEmailTemplate(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Group')
+
+        # get list of users
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, [])
+
+        if 'save' in request.params or 'submit' in request.params:
+            selected_list = []
+            memberemails = request.params.getall('memberemails')
+            for tmplogin in memberemails:
+                selected_list.append(tmplogin)
+            all_templates = self.context.settings.get('email_templates', PersistentMapping())
+            template_name = request.params['template_name']
+            template_content = request.params['text']
+            self.context.email_templates[template_name] = {'content': template_content,
+                                                           'template_name': template_name,
+                                                           'selected_list': selected_list}
+
+            status_message = 'Email Template "' + template_name + '" has been created'
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_templates.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            actions=[],
+            menu=_menu_macro(),
+            template_name='',
+            template_content='',
+            peoplelist=peoplelist
+        )
+
+
+class EditEmailTemplate(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Edit Email Group')
+
+        actions = []
+        thistemplate = request.subpath
+        thistemplate = thistemplate[0]
+
+        actions.append(
+            ('Delete',
+             request.resource_url(context, 'del_email_template' + u'/' + thistemplate)),
+            )
+        all_templates = self.context.settings.get('email_templates', PersistentMapping())
+        edit_template = all_templates.get(thistemplate, [])
+
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, edit_template[0].get('selected_list', []))
+        if 'save' in request.params or 'submit' in request.params:
+            selected_list = []
+            memberemails = request.params.getall('memberemails')
+            for tmplogin in memberemails:
+                selected_list.append(tmplogin)
+            template_name = request.params['template_name']
+            template_content = request.params['text']
+            self.context.email_templates[template_name] = {'content': template_content,
+                                                           'template_name': template_name,
+                                                           'selected_list': selected_list}
+
+            status_message = 'Email Template "' + template_name + '" has been successfully modified'
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_templates.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            template_name=thistemplate,
+            template_content=edit_template[0].get('content', 'uknown'),
+            peoplelist=peoplelist
         )
 
 

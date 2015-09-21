@@ -1867,6 +1867,30 @@
   
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EmailTemplateView"
+    renderer="templates/admin/email_template.pt"
+    permission="email"
+    name="email_templates.html"
+    />
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.AddEmailTemplate"
+    renderer="templates/admin/edit_email_template.pt"
+    permission="email"
+    name="add_email_template.html"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EditEmailTemplate"
+    renderer="templates/admin/edit_email_template.pt"
+    permission="email"
+    name="email_template"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.EmailGroupsView"
     renderer="templates/admin/email_groups.pt"
     permission="email"
