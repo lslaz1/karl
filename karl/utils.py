@@ -446,7 +446,7 @@ def create_message(request, subject, html, from_email, mailify=True):
             if tmpattachment.filename:
                 if tmpattachment.filename.endswith(('.png','.tiff','gif','bmp','jpeg')):
                     attachment = MIMEImage(tmpattachment.value)
-                elif tmpattachment.filename.endswith(('.pdf','.zip'))
+                elif tmpattachment.filename.endswith(('.pdf','.zip')):
                     attachment = MIMEApplication(tmpattachment.value)
                 else:
                     attachment = MIMEText(tmpattachment.value)
