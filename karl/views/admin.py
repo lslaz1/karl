@@ -739,7 +739,6 @@ class AddEmailTemplate(object):
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
-            all_templates = self.context.settings.get('email_templates', PersistentMapping())
             template_name = request.params['template_name']
             template_content = request.params['text']
             self.context.email_templates[template_name] = {'content': template_content,
@@ -822,6 +821,24 @@ class EditEmailTemplate(object):
             template_content=edit_template[0].get('content', 'uknown'),
             peoplelist=peoplelist
         )
+
+
+class DeleteEmailTemplate(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+
+        thistempl = request.subpath
+        thistempl = thistempl[0]
+        if thistempl in self.context.email_templates:
+            del self.context.email_templates[thistempl]
+        redirect_to = resource_url(
+            context, request, 'email_templates.html',
+            query=dict(status_message='Email template "' + thistempl + '" has been deleted'))
+        return HTTPFound(location=redirect_to)
 
 
 def syslog_view(context, request):
