@@ -1573,6 +1573,18 @@ class ReviewAccessRequestView(object):
                 messages.append("Clear access request: %s" % email)
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
+
+        review_choices = [
+            ('', 'None'),
+            ('approve', 'Approve'),
+            ('deny', 'Deny'),
+            ('clear', 'Clear'),
+            ('follow_up', 'Follow Up')
+        ]
+        response_templates = [('', 'None')]
+        for e_t in self.context.email_templates:
+            response_templates.append((e_t, e_t))
+
         return {
             'api': api,
             'page_title': 'Review Access Requests',
@@ -1580,7 +1592,9 @@ class ReviewAccessRequestView(object):
             'menu': _menu_macro(),
             'access_requests': reversed(sorted(self.context.access_requests.values(),
                                         key=lambda r: r['date_requested'])),
-            'fields': get_access_request_fields(self.context)
+            'fields': get_access_request_fields(self.context),
+            'review_choices': review_choices,
+            'response_templates': response_templates
         }
 
 
