@@ -1518,7 +1518,14 @@ class ReviewAccessRequestView(object):
         self.invitations = self.context['invitations']
         self.search = ICatalogSearch(self.context)
 
-    def get_templ_data(self, email, template_name, response_type):
+    def replace_keywords(self, in_replace_text, access_request):
+        sys_name = get_setting(self.context, 'title')
+        replace_text = in_replace_text.replace('{{requestor_email}}', access_request['email'])
+        replace_text = replace_text.replace('{{requestor_email}}', access_request['fullname'])
+        replace_text = replace_text.replace('{{system_name}}', sys_name)
+        return replace_text
+
+    def get_templ_msg(self, email, template_name, response_type):
         access_request = self.context.access_requests[email]
         e_template = self.context.email_templates.get(template_name, {})
 
@@ -1528,16 +1535,17 @@ class ReviewAccessRequestView(object):
         if response_type == 'approve':
             invitation = self.get_invitation(email)
             body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
-            email_data['body'] = body_template(template_body=e_template['template_body'],
-                                                  invitation_url=resource_url(invitation.__parent__,
-                                                                              self.request,
-                                                                              invitation.__name__)
-                                                  )
+            body = body_template(template_body=e_template['template_body'],
+                                 invitation_url=resource_url(invitation.__parent__,
+                                                             self.request,
+                                                             invitation.__name__)
+                                 )
+            email_data['body'] = self.replace_keywords(body, access_request)
         else:
-            email_data['body'] = e_template['template_body']
+            email_data['body'] = self.replace_keywords(e_template['template_body'], access_request)
 #         email_data['to'] = e_template['selected_list']
         email_data['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
-#         email_data['subject'] = e_template['subject']
+        email_data['subject'] = self.replace_keywords(e_template['subject'], access_request)
         return email_data
 
     def get_default_msg(self, email, response_type):
@@ -1662,7 +1670,7 @@ class ReviewAccessRequestView(object):
                         self.delete_request(rvw_email)
                         continue
                     if choice_template != '':
-                        email_data = self.get_templ_data(rvw_email, choice_template)
+                        email_data = self.get_templ_msg(rvw_email, choice_template)
                     else:
                         email_data = self.get_default_msg(rvw_email, 'approve')
                     self.send_email(email_data)
@@ -1672,7 +1680,7 @@ class ReviewAccessRequestView(object):
                 elif rvw_action == 'deny':
                     if rvw_email in self.context.access_requests:
                         if choice_template != '':
-                            email_data = self.get_templ_data(rvw_email, choice_template)
+                            email_data = self.get_templ_msg(rvw_email, choice_template)
                         else:
                             email_data = self.get_default_msg(rvw_email, 'deny')
                         self.send_email(email_data)
