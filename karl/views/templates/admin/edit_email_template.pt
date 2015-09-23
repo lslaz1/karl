@@ -25,8 +25,8 @@
           <b>Email Template Name</b><br/>
           <input name="template_name" size="60" value="${template_name}" required/><br/>
           <br/>
-          <input type="checkbox" name="sendtouser" value="yes"> Send to User Requesting Access<br>
-          <input type="checkbox" name="sendtoadmins" value="yes"> Send to Admins<br>
+          <input type="checkbox" name="sendtouser" value="yes" tal:attributes="checked python: sendtouser == 'yes'"> Send to User Requesting Access<br>
+          <input type="checkbox" name="sendtoadmins" value="yes" tal:attributes="checked python: sendtouser == 'yes'"> Send to Admins<br>
           <br/>
           <b>Members To Send List</b><br/>
           <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">

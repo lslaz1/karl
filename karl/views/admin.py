@@ -741,9 +741,13 @@ class AddEmailTemplate(object):
                 selected_list.append(tmplogin)
             template_name = request.params['template_name']
             template_body = request.params['text']
+            sendtoadmins = request.params.get('sendtoadmins', 'no')
+            sendtouser = request.params.get('sendtouser', 'no')
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
-                                                           'selected_list': selected_list}
+                                                           'selected_list': selected_list,
+                                                           'sendtouser': sendtouser,
+                                                           'sendtoadmins': sendtoadmins}
 
             status_message = 'Email Template "' + template_name + '" has been created'
             if has_permission(ADMINISTER, context, request):
@@ -764,6 +768,8 @@ class AddEmailTemplate(object):
             template_name='',
             template_body='',
             template_subject='',
+            sendtouser='no',
+            sendtoadmins='no',
             peoplelist=peoplelist
         )
 
@@ -795,13 +801,17 @@ class EditEmailTemplate(object):
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
+            sendtoadmins = request.params.get('sendtoadmins', 'no')
+            sendtouser = request.params.get('sendtouser', 'no')
             template_name = request.params['template_name']
             subject = request.params['template_subject']
             template_body = request.params['text']
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
-                                                           'subject': subject}
+                                                           'subject': subject,
+                                                           'sendtouser': sendtouser,
+                                                           'sendtoadmins': sendtoadmins}
             # delete old record if key is changing
             if thistemplate != template_name:
                 del self.context.email_templates[thistemplate]
@@ -825,6 +835,8 @@ class EditEmailTemplate(object):
             template_name=thistemplate,
             template_body=edit_template.get('body', ''),
             template_subject=edit_template.get('subject', ''),
+            sendtouser=edit_template.get('sendtouser', 'no'),
+            sendtoadmins=edit_template.get('sendtoadmins', 'no'),
             peoplelist=peoplelist
         )
 
