@@ -42,13 +42,13 @@ jQuery(document).ready(function($) {
               <td>
                 <select name="rvw_ch">
                   <option tal:repeat="rvw_choice review_choices"
-                    value="${rvw_choice[0]}">${rvw_choice[1]}</option>
+                    value="${rvw_choice[0]}^${req['email']}">${rvw_choice[1]}</option>
                 </select>
               </td>
               <td>
                 <select name="templ_ch">
                   <option tal:repeat="e_template response_templates"
-                    value="${e_template[0]}">${e_template[1]}</option>
+                    value="${e_template[0]}^${req['email']}">${e_template[1]}</option>
                 </select>
               </td>
             </tr>

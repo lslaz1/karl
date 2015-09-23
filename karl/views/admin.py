@@ -1480,6 +1480,7 @@ class ReviewSiteInvitations(object):
                     messages.append("Re-sent invite: %s" % invitation.email)
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
+
         return {
             'api': api,
             'page_title': 'Review Invitations',
@@ -1549,28 +1550,50 @@ class ReviewAccessRequestView(object):
         if self.request.method == 'POST' and self.request.POST.get('form.submitted'):
             data = self.request.POST.dict_of_lists()
 
-            for email in data.get('approve', []):
-                total, docids, resolver = self.search(email=email.lower(),
-                                                      interfaces=[IProfile])
-
-                if total:
-                    messages.append("%s already a user on system, deleting" % email)
-                    self.delete_request(email)
+            # load template choices
+            template_choices = {}
+            for e_template in data.get('templ_ch', []):
+                e_template = e_template.split('^')
+                tmpl_email = ''
+                tmpl_name = e_template[0]
+                if len(e_template) > 1:
+                    tmpl_email = e_template[1]
+                if tmpl_email != '':
+                    template_choices[tmpl_email] = tmpl_name
+            # iterate through review choices
+            for rvw_choice in data.get('rvw_ch', []):
+                rvw_choice = rvw_choice.split('^')
+                rvw_email = ''
+                rvw_action = rvw_choice[0]
+                if len(rvw_choice) > 1:
+                    rvw_email = rvw_choice[1]
+                if rvw_email == '':
                     continue
+                choice_template = template_choices.get(rvw_email, "")
 
-                invitation = self.get_invitation(email)
-                _send_invite(self.context, self.request, invitation)
-                self.delete_request(email)
-                messages.append("Approved: %s" % email)
+                if rvw_action == 'approve':
+                    total, docids, resolver = self.search(email=rvw_email.lower(),
+                                                          interfaces=[IProfile])
 
-            for email in data.get('decline', []):
-                if email in self.context.access_requests:
-                    self.deny(email)
-                    self.delete_request(email)
-                    messages.append("Denied: %s" % email)
-            for email in data.get('clear', []):
-                self.delete_request(email)
-                messages.append("Clear access request: %s" % email)
+                    if total:
+                        messages.append("%s already a user on system, deleting" % rvw_email)
+                        self.delete_request(rvw_email)
+                        continue
+
+                    invitation = self.get_invitation(rvw_email)
+                    _send_invite(self.context, self.request, invitation)
+                    self.delete_request(rvw_email)
+                    messages.append("Approved: %s" % rvw_email)
+
+                elif rvw_action == 'deny':
+                    if rvw_email in self.context.access_requests:
+                        self.deny(rvw_email)
+                        self.delete_request(rvw_email)
+                        messages.append("Denied: %s" % rvw_email)
+                elif rvw_action == 'clear':
+                    self.delete_request(rvw_email)
+                    messages.append("Clear access request: %s" % rvw_email)
+
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
 
@@ -1584,6 +1607,7 @@ class ReviewAccessRequestView(object):
         response_templates = [('', 'None')]
         for e_t in self.context.email_templates:
             response_templates.append((e_t, e_t))
+        response_templates.append(('custom', 'Custom'))
 
         return {
             'api': api,
