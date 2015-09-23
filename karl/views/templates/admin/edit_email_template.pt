@@ -28,17 +28,20 @@
           <input type="checkbox" name="sendtouser" value="yes"> Send to User Requesting Access<br>
           <input type="checkbox" name="sendtoadmins" value="yes"> Send to Admins<br>
           <br/>
-          <b>Members Send List</b><br/>
+          <b>Members To Send List</b><br/>
           <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
             <option tal:repeat="profile peoplelist"
                 tal:attributes="selected python: profile.selected is True"
                 value="${profile.login}">${profile.name}</option>    
-          </select>
+          </select><br/>
+          <b>Email Subject</b><br/>
+          <input name="template_subject" size="60" value="${template_subject}" required/><br/>
+          <br/><br/>
           <fieldset
             tal:define="error fielderrors['text']|None"
             class="${error and 'fieldError' or ''}"
             id="txt_field">
-            <label>Email Template Content</label>
+            <label>Email Body</label>
             <div class="fieldHelp" tal:content="help['text']|''"></div>
             <div tal:condition="error" class="errorMessage">${error}</div>
             <input type="hidden" name="text_text_format" value="text/html" />
