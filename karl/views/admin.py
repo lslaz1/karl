@@ -802,6 +802,9 @@ class EditEmailTemplate(object):
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
                                                            'subject': subject}
+            # delete old record if key is changing
+            if thistemplate != template_name:
+                del self.context.email_templates[thistemplate]
 
             status_message = 'Email Template "' + template_name + '" has been successfully modified'
             if has_permission(ADMINISTER, context, request):
