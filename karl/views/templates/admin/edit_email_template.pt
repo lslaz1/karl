@@ -43,7 +43,7 @@
             <div tal:condition="error" class="errorMessage">${error}</div>
             <input type="hidden" name="text_text_format" value="text/html" />
             <textarea id="text" name="text" rows="1" cols="40"
-              class="pat-tinymce">${template_content}</textarea>
+              class="pat-tinymce">${template_body}</textarea>
           </fieldset>
           <br/>
           <input type="submit" name="save" value="Save"/>

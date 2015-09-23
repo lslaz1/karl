@@ -740,8 +740,8 @@ class AddEmailTemplate(object):
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
             template_name = request.params['template_name']
-            template_content = request.params['text']
-            self.context.email_templates[template_name] = {'content': template_content,
+            template_body = request.params['text']
+            self.context.email_templates[template_name] = {'content': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list}
 
@@ -762,7 +762,7 @@ class AddEmailTemplate(object):
             actions=[],
             menu=_menu_macro(),
             template_name='',
-            template_content='',
+            template_body='',
             peoplelist=peoplelist
         )
 
@@ -796,8 +796,8 @@ class EditEmailTemplate(object):
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
             template_name = request.params['template_name']
-            template_content = request.params['text']
-            self.context.email_templates[template_name] = {'content': template_content,
+            template_body = request.params['text']
+            self.context.email_templates[template_name] = {'content': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list}
 
@@ -818,7 +818,7 @@ class EditEmailTemplate(object):
             actions=actions,
             menu=_menu_macro(),
             template_name=thistemplate,
-            template_content=edit_template[0].get('content', 'uknown'),
+            template_body=edit_template[0].get('content', 'uknown'),
             peoplelist=peoplelist
         )
 
@@ -1500,6 +1500,71 @@ class ReviewAccessRequestView(object):
         self.invitations = self.context['invitations']
         self.search = ICatalogSearch(self.context)
 
+    def get_templ_data(self, email, template_name, response_type):
+        access_request = self.context.access_requests[email]
+        e_template = self.context.email_templates.get(template_name, {})
+
+        email_data = {}
+        email_data['email'] = email
+        email_data['from'] = get_setting(self.context, 'admin_email')
+        if response_type == 'approve':
+            invitation = self.get_invitation(email)
+            body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
+            email_data['body'] = body_template(template_body=e_template['template_body'],
+                                                  invitation_url=resource_url(invitation.__parent__,
+                                                                              self.request,
+                                                                              invitation.__name__)
+                                                  )
+        else:
+            email_data['body'] = e_template['template_body']
+#         email_data['to'] = e_template['selected_list']
+        email_data['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+#         email_data['subject'] = e_template['subject']
+        return email_data
+
+    def get_default_msg(self, email, response_type):
+        access_request = self.context.access_requests[email]
+        default_email = {}
+        default_email['email'] = email
+
+        if response_type == 'deny':
+            default_email['subject'] = 'Access Request to %s has been denied' % (
+                get_setting(self.context, 'title'))
+            default_email['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+            default_email['from'] = get_setting(self.context, 'admin_email')
+            default_email['body'] = u'''<html><body>
+        <p>Hello %(name)s,</p>
+        <p>Your access request has been denied. Please read the guidelines on
+           requesting access to %(system_name)s</p>
+        </body></html>''' % {
+                'name': access_request['fullname'],
+                'system_name': get_setting(self.context, 'title')
+            }
+            return default_email
+        elif response_type == 'approve':
+            body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
+            default_email['From'] = '%s <%s>' % (
+                get_setting(self.context, 'title'),
+                get_setting(self.context, 'admin_email'))
+            invitation = self.get_invitation(email)
+            default_email['To'] = invitation.email
+            default_email['Subject'] = 'Please join %s' % get_setting(self.context, 'title')
+            default_email['body'] = body_template(
+                system_name=get_setting(self.context, 'title'),
+                invitation_url=resource_url(invitation.__parent__, self.request,
+                                            invitation.__name__)
+                )
+
+    def send_email(self, email_data):
+        mailer = getUtility(IMailDelivery)
+        message = Message()
+        message['Subject'] = email_data['subject']
+        message['From'] = email_data['from']
+        message['To'] = email_data['to']
+        message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
+        mailer.send([email_data['email']], message)
+
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
@@ -1574,25 +1639,32 @@ class ReviewAccessRequestView(object):
                 if rvw_action == 'approve':
                     total, docids, resolver = self.search(email=rvw_email.lower(),
                                                           interfaces=[IProfile])
-
                     if total:
                         messages.append("%s already a user on system, deleting" % rvw_email)
                         self.delete_request(rvw_email)
                         continue
-
-                    invitation = self.get_invitation(rvw_email)
-                    _send_invite(self.context, self.request, invitation)
+                    if choice_template != '':
+                        email_data = self.get_templ_data(rvw_email, choice_template)
+                    else:
+                        email_data = self.get_default_msg(rvw_email, 'approve')
+                    self.send_email(email_data)
                     self.delete_request(rvw_email)
                     messages.append("Approved: %s" % rvw_email)
 
                 elif rvw_action == 'deny':
                     if rvw_email in self.context.access_requests:
-                        self.deny(rvw_email)
+                        if choice_template != '':
+                            email_data = self.get_templ_data(rvw_email, choice_template)
+                        else:
+                            email_data = self.get_default_msg(rvw_email, 'deny')
+                        self.send_email(email_data)
                         self.delete_request(rvw_email)
                         messages.append("Denied: %s" % rvw_email)
                 elif rvw_action == 'clear':
                     self.delete_request(rvw_email)
                     messages.append("Clear access request: %s" % rvw_email)
+                elif rvw_action == 'follow_up':
+                    messages.append("Follow up sent to %s" % rvw_email)
 
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
