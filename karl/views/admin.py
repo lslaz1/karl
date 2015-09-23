@@ -741,7 +741,7 @@ class AddEmailTemplate(object):
                 selected_list.append(tmplogin)
             template_name = request.params['template_name']
             template_body = request.params['text']
-            self.context.email_templates[template_name] = {'content': template_body,
+            self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list}
 
@@ -763,6 +763,7 @@ class AddEmailTemplate(object):
             menu=_menu_macro(),
             template_name='',
             template_body='',
+            template_subject='',
             peoplelist=peoplelist
         )
 
@@ -785,21 +786,22 @@ class EditEmailTemplate(object):
             ('Delete',
              request.resource_url(context, 'del_email_template' + u'/' + thistemplate)),
             )
-        all_templates = self.context.settings.get('email_templates', PersistentMapping())
-        edit_template = all_templates.get(thistemplate, [])
+        edit_template = self.context.email_templates.get(thistemplate, {})
 
         profiles = find_profiles(context)
-        peoplelist = getemailusers(profiles, edit_template[0].get('selected_list', []))
+        peoplelist = getemailusers(profiles, edit_template.get('selected_list', []))
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
             template_name = request.params['template_name']
+            subject = request.params['template_subject']
             template_body = request.params['text']
-            self.context.email_templates[template_name] = {'content': template_body,
+            self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
-                                                           'selected_list': selected_list}
+                                                           'selected_list': selected_list,
+                                                           'subject': subject}
 
             status_message = 'Email Template "' + template_name + '" has been successfully modified'
             if has_permission(ADMINISTER, context, request):
@@ -818,7 +820,8 @@ class EditEmailTemplate(object):
             actions=actions,
             menu=_menu_macro(),
             template_name=thistemplate,
-            template_body=edit_template[0].get('content', 'uknown'),
+            template_body=edit_template.get('body', ''),
+            template_subject=edit_template.get('subject', ''),
             peoplelist=peoplelist
         )
 
