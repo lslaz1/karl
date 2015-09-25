@@ -1559,7 +1559,9 @@ class ReviewAccessRequestView(object):
                 if not users.member_of_group(userid, 'group.KarlAdmin'):
                     continue
                 email_to.append('%s <%s>' % (profile.title, profile.email))
-        email_data['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+        for member in e_template.get('selected_list', []):
+            email_to.append(member)
+        email_data['to'] = email_to
         email_data['subject'] = self.replace_keywords(e_template['subject'], access_request)
         return email_data
 
