@@ -1544,6 +1544,21 @@ class ReviewAccessRequestView(object):
         else:
             email_data['body'] = self.replace_keywords(e_template['template_body'], access_request)
 #         email_data['to'] = e_template['selected_list']
+        email_to = []
+        if e_template.get('sendtouser', '') == 'yes':
+            email_to.append('%s <%s>' % (access_request['fullname'], access_request['email']))
+        if e_template.get('sendtoadmins', '') == 'yes':
+            users = find_users(self.context)
+            search = ICatalogSearch(self.context)
+            count, docids, resolver = search(interfaces=[IProfile])
+            for docid in docids:
+                profile = resolver(docid)
+                if getattr(profile, 'security_state', None) == 'inactive':
+                    continue
+                userid = profile.__name__
+                if not users.member_of_group(userid, 'group.KarlAdmin'):
+                    continue
+                email_to.append('%s <%s>' % (profile.title, profile.email))
         email_data['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
         email_data['subject'] = self.replace_keywords(e_template['subject'], access_request)
         return email_data
