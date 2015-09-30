@@ -1,5 +1,5 @@
-include karl/views/static/*.js
-include karl/views/static/*.css
-recursive-include karl/views/static/fonts *
-recursive-include karl/views/static/images *
-recursive-include karl/views/static/min *
+recursive-include karl *
+
+recursive-exclude karl/views/static/dist *
+global-exclude karl *.pyc
+global-exclude karl *.git*

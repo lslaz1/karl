@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '5.1.2'
+__version__ = '5.5.0a4'
 import os
 
 from setuptools import setup, find_packages

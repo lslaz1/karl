@@ -20,6 +20,8 @@
 Includes invitations, per-user preferences on alerts, etc.
 """
 
+from sets import Set
+
 import schemaish
 import formish
 from validatish import validator
@@ -32,6 +34,8 @@ from karl.consts import cultures
 
 import transaction
 
+from persistent.list import PersistentList
+
 from email.Message import Message
 
 from pyramid.httpexceptions import HTTPFound
@@ -40,6 +44,7 @@ from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
 from pyramid.renderers import get_renderer
+from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
 from pyramid.security import remember
@@ -205,6 +210,37 @@ def show_members_view(context, request):
             member_batch['entries'], request, api)
 
     return renderer_data
+
+
+def announcements_view(context, request):
+    page_title = 'Site Announcements'
+    api = TemplateAPI(context, request, page_title)
+
+    userid = authenticated_userid(request)
+    if userid is None:
+        raise Exception("User must be logged in")
+
+    site = api.site
+    profiles = find_profiles(site)
+    profile = profiles.get(userid, None)
+    if profile is None:
+        raise Exception("User must have a profile")
+
+    seen = Set()
+    if hasattr(profile, "_seen_announcements"):
+        for item in profile._seen_announcements:
+            seen.add(item)
+
+    if hasattr(site, 'site_announcements'):
+        newseen = seen.copy()
+        for annc in site.site_announcements:
+            newseen.add(annc['hash'])
+        profile._seen_announcements = PersistentList(list(newseen))
+
+    return dict(
+        api=api,
+        seen=list(seen)
+    )
 
 
 def _send_moderators_changed_email(community,
