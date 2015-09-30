@@ -479,7 +479,6 @@ class EmailUsersView(object):
                         'email': to_email
                     })
                     n += 1
-
             self.send_email(
                 request.params['subject'], request.params['text'],
                 addressed_to, from_email)
