@@ -476,6 +476,7 @@ class Site(Folder):
         self.access_requests = OOBTree()
         self.failed_login_attempts = OOBTree()
         self.email_templates = OOBTree()
+        self.denial_tracker = OOBTree()
         self['email_images'] = EmailFolder()
         self['invitations'] = create_content(IInvitationsFolder)
 
