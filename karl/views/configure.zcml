@@ -1942,7 +1942,23 @@
     permission="administer"
     name="review_access_requests.html"
     />
-
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.ReviewAccessRequest"
+    renderer="templates/admin/review_access_request.pt"
+    permission="administer"
+    name="review_access"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.ReviewAccessCustom"
+    renderer="templates/admin/custom_email.pt"
+    permission="administer"
+    name="custom_email"
+    />
+  
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.syslog_view"
