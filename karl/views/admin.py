@@ -1473,6 +1473,18 @@ def _send_invite(context, request, invitation):
     mailer.send([invitation.email], msg)
 
 
+def add_denial(context, requestor_email, requestor_name, reason, full_reason):
+    previous_denails = context.denial_tracker.get(requestor_email, {})
+    # get all denials for this user
+    all_denials = previous_denails.get('all_denials', {})
+    # add current denial
+    all_denials[datetime.now()] = {'reason': reason,
+                                   'reason_full': full_reason}
+    context.denial_tracker[requestor_email] = {'all_denials': all_denials,
+                                               'email:': requestor_email,
+                                               'fullname': requestor_name}
+
+
 class ReviewSiteInvitations(object):
     def __init__(self, context, request):
         self.context = context
@@ -1681,7 +1693,7 @@ class ReviewAccessRequest(object):
                 redirect_to = resource_url(context,
                                            request,
                                            'custom_email',
-                                           query={'address': requestor_email})
+                                           query={'address': requestor_email,
                                                   'action': rvw_action})
                 return HTTPFound(location=redirect_to)
             if rvw_action == 'approve':
@@ -1707,6 +1719,12 @@ class ReviewAccessRequest(object):
                         email_data = self.get_default_msg(requestor_email, 'deny')
                     self.send_email(email_data)
                     self.delete_request(requestor_email)
+
+                    add_denial(self.context,
+                               requestor_email,
+                               requestor_name,
+                               email_data['subject'],
+                               email_data['body'])
                     status_message = "Denied: %s" % requestor_email
             elif rvw_action == 'clear':
                 self.delete_request(requestor_email)
@@ -1760,23 +1778,16 @@ class ReviewAccessCustom(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
+        api = AdminTemplateAPI(context, request, 'Admin UI: Custom Email')
         admin_email = get_setting(context, 'admin_email')
-        profiles = find_profiles(context)
 
         requestor_email = self.request.GET.get('address', '')
         request_action = self.request.GET.get('action', '')
-        all_groups = self.context.settings.get('email_groups', PersistentMapping())
-        to_groups = [
-            ('none', 'None'),
-            ('group.KarlStaff', 'Staff'),
-            ('', 'Everyone'),
-        ]
-        for (k, v) in all_groups.iteritems():
-            to_groups.append(('group-' + k, k))
+        access_request = self.context.access_requests[requestor_email]
+        requestor_name = access_request['fullname']
+        print('GET', requestor_email, request_action)
 
         if 'send_email' in request.params or 'submit' in request.params:
-            search = ICatalogSearch(context)
             n = 0
             addressed_to = []
             # parse additional to email addresses
@@ -1794,10 +1805,15 @@ class ReviewAccessCustom(object):
                     n += 1
             self.send_email(request.params['subject'],
                             request.params['text'],
-                            addressed_to, 
+                            addressed_to,
                             admin_email)
             if requestor_email in self.context.access_requests:
                 del self.context.access_requests[requestor_email]
+            add_denial(self.context,
+                       requestor_email,
+                       requestor_name,
+                       request.params['subject'],
+                       request.params['text'])
             if has_permission(ADMINISTER, context, request):
                 redirect_to = resource_url(context, request, 'review_access_requests.html')
             else:
@@ -1809,7 +1825,6 @@ class ReviewAccessCustom(object):
         return dict(
             api=api,
             menu=_menu_macro(),
-            to_groups=to_groups,
             requestor_email=requestor_email
         )
 
