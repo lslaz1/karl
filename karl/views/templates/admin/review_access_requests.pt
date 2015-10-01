@@ -28,8 +28,6 @@ jQuery(document).ready(function($) {
           </tal:fields>
           <th>Email</th>
           <th>Date Requested</th>
-          <th>Review Decision</th>
-          <th>Email Template</th>
         </thead>
         <tbody>
           <tal:req tal:repeat="req access_requests">
@@ -37,34 +35,15 @@ jQuery(document).ready(function($) {
               <tal:fields tal:repeat="field fields">   
                 <td>${python: req.get(field['id'])}</td>
               </tal:fields>
-              <td>${python: req['email']}</td>
+              <td><a href="review_access/${python: req['email']}">${python: req['email']}</a></td>
               <td><abbr class="timeago" title=${date}>${date}</abbr></td>
-              <td>
-                <select name="rvw_ch">
-                  <option tal:repeat="rvw_choice review_choices"
-                    value="${rvw_choice[0]}^${req['email']}">${rvw_choice[1]}</option>
-                </select>
-              </td>
-              <td>
-                <select name="templ_ch">
-                  <option tal:repeat="e_template response_templates"
-                    value="${e_template[0]}^${req['email']}">${e_template[1]}</option>
-                </select>
-              </td>
             </tr>
           </tal:req>
         </tbody>
       </table>
-      <div class="formControlls loginLeftPadding">
-        <input type="hidden" name="form.submitted" value="1" />
-
-        <div class="buttons clearafter">
-          <button name="image" type="submit" id="signin" class="button primary_button"><span>Submit changes</span></button>
-        </div>
-      </div>
     </form>
 
-
+    <br/>
     <a href="${api.app_url}/review_invitations.html">
       Review Outstanding Site Invitations
     </a>

@@ -1,0 +1,51 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <span metal:fill-slot="extra-headers" tal:omit-tag="">
+    <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
+  </span>
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Review Access Request</h1>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+      <div class="koverview_body">
+        <form method="POST" name="email_users" enctype="multipart/form-data">
+        
+          <b>Requestor</b><br/>
+          ${requestor_name} - ${requestor_email}
+          <br/>
+          <br/>
+          <b>Review Decision</b><br/>
+          <select name="rvw_ch" required>
+            <option tal:repeat="rvw_choice review_choices"
+              value="${rvw_choice[0]}">${rvw_choice[1]}</option>
+          </select>
+          <br/>
+          <br/>
+          <b>Email Template</b><br/>
+          <select name="templ_ch">
+            <option tal:repeat="e_template response_templates"
+              value="${e_template[0]}">${e_template[1]}</option>
+          </select>
+          <br/>
+          <br/>
+          <input type="submit" name="submit" value="Submit"/>
+          <br/>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</html>

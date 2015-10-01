@@ -15,31 +15,21 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
 
-
     <div class="admin_page_body">
-      <h1 class="kscreentitle">Admin Section: Email Groups</h1>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <h1 class="kscreentitle">Access Request Review: Custom Email</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="email_groups" enctype="multipart/form-data">
-          
-          <div class="EmailGroupsWrapper">
-	        <table class="content-listing">
-	          <thead>
-	            <tr>
-	              <th class="clgroup">Email Group</th>
-	            </tr>
-	          </thead>
-	          <tbody>
-	            <tr tal:repeat="eg email_groups">
-	              <td class="clgroup">
-                  <a href="email_group/${eg}">${eg}</a>
-                </td>
-	            </tr>
-	          </tbody>
-	        </table>
-	      </div>
-          
+        <form method="POST" name="email_users" enctype="multipart/form-data">
+          <br/>
+          <b>To</b><br/>
+          <input name="more_to" size="60" value="${requestor_email}"/><br/>
+          <br/>
+          <b>Subject</b><br/>
+          <input name="subject" size="60"/><br/>
+          <br/>
+          <metal:input use-macro="api.formfields.macros['text-field']"/>
+          <br/>
+          <input type="submit" name="send_email" value="Send Email"/>
         </form>
       </div>
     </div>

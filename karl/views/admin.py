@@ -1681,7 +1681,7 @@ class ReviewAccessRequest(object):
                 redirect_to = resource_url(context,
                                            request,
                                            'custom_email',
-                                           query={'address': requestor_email,
+                                           query={'address': requestor_email})
                                                   'action': rvw_action})
                 return HTTPFound(location=redirect_to)
             if rvw_action == 'approve':
