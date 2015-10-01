@@ -1526,6 +1526,9 @@ class ReviewAccessRequest(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.random_id = getUtility(IRandomId)
+        self.invitations = self.context['invitations']
+        self.search = ICatalogSearch(self.context)
 
     def replace_keywords(self, in_replace_text, access_request):
         sys_name = get_setting(self.context, 'title')
@@ -1544,14 +1547,14 @@ class ReviewAccessRequest(object):
         if response_type == 'approve':
             invitation = self.get_invitation(email)
             body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
-            body = body_template(template_body=e_template['template_body'],
+            body = body_template(template_body=e_template['body'],
                                  invitation_url=resource_url(invitation.__parent__,
                                                              self.request,
                                                              invitation.__name__)
                                  )
             email_data['body'] = self.replace_keywords(body, access_request)
         else:
-            email_data['body'] = self.replace_keywords(e_template['template_body'], access_request)
+            email_data['body'] = self.replace_keywords(e_template['body'], access_request)
 #         email_data['to'] = e_template['selected_list']
         email_to = []
         if e_template.get('sendtouser', '') == 'yes':
@@ -1612,7 +1615,7 @@ class ReviewAccessRequest(object):
         message = Message()
         message['Subject'] = email_data['subject']
         message['From'] = email_data['from']
-        message['To'] = email_data['to']
+        message['To'] = ",".join(email_data['to'])
         message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
         message.set_type('text/html')
         mailer.send([email_data['email']], message)
@@ -1704,7 +1707,7 @@ class ReviewAccessRequest(object):
                     status_message = "%s already a user on system, deleting" % requestor_email
                 else:
                     if template_choice != '':
-                        email_data = self.get_templ_msg(requestor_email, template_choice)
+                        email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
                     else:
                         email_data = self.get_default_msg(requestor_email, 'approve')
                     self.send_email(email_data)
@@ -1714,7 +1717,7 @@ class ReviewAccessRequest(object):
             elif rvw_action == 'deny':
                 if requestor_email in self.context.access_requests:
                     if template_choice != '':
-                        email_data = self.get_templ_msg(requestor_email, template_choice)
+                        email_data = self.get_templ_msg(requestor_email, template_choice, 'deny')
                     else:
                         email_data = self.get_default_msg(requestor_email, 'deny')
                     self.send_email(email_data)
@@ -1731,7 +1734,7 @@ class ReviewAccessRequest(object):
                 status_message = "Clear access request: %s" % requestor_email
             elif rvw_action == 'follow_up':
                 if template_choice != '':
-                    email_data = self.get_templ_msg(requestor_email, template_choice)
+                    email_data = self.get_templ_msg(requestor_email, template_choice, 'follow_up')
                     self.send_email(email_data)
                     status_message = "Follow up sent to %s" % requestor_email
                 else:
@@ -1834,14 +1837,8 @@ class ReviewAccessRequestView(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.random_id = getUtility(IRandomId)
-        self.invitations = self.context['invitations']
-        self.search = ICatalogSearch(self.context)
     def __call__(self):
         messages = []
-
-
-
 
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
