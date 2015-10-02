@@ -1546,12 +1546,13 @@ class ReviewAccessRequest(object):
         email_data['from'] = get_setting(self.context, 'admin_email')
         if response_type == 'approve':
             invitation = self.get_invitation(email)
-            body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
-            body = body_template(template_body=e_template['body'],
-                                 invitation_url=resource_url(invitation.__parent__,
-                                                             self.request,
-                                                             invitation.__name__)
-                                 )
+            invitation_url = resource_url(invitation.__parent__, self.request, invitation.__name__)
+            body = e_template['body']
+            body = body + u'''<p>Follow the link below to accept this invitation and to create your account.</p>
+
+                            <p>
+                              <a href=%s>%s</a>
+                            </p>''' % (invitation_url, invitation_url)
             email_data['body'] = self.replace_keywords(body, access_request)
         else:
             email_data['body'] = self.replace_keywords(e_template['body'], access_request)
@@ -1692,6 +1693,13 @@ class ReviewAccessRequest(object):
             template_choice = request.params.get('templ_ch')
             rvw_action = request.params.get('rvw_ch')
 
+            # make sure user doesn't already exist
+            total, docids, resolver = self.search(email=requestor_email.lower(),
+                                                  interfaces=[IProfile])
+            if total:
+                self.delete_request(requestor_email)
+                status_message = "%s already a user on system, deleting" % requestor_email
+
             if template_choice == 'custom':
                 redirect_to = resource_url(context,
                                            request,
@@ -1700,19 +1708,13 @@ class ReviewAccessRequest(object):
                                                   'action': rvw_action})
                 return HTTPFound(location=redirect_to)
             if rvw_action == 'approve':
-                total, docids, resolver = self.search(email=requestor_email.lower(),
-                                                      interfaces=[IProfile])
-                if total:
-                    self.delete_request(requestor_email)
-                    status_message = "%s already a user on system, deleting" % requestor_email
+                if template_choice != '':
+                    email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
                 else:
-                    if template_choice != '':
-                        email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
-                    else:
-                        email_data = self.get_default_msg(requestor_email, 'approve')
-                    self.send_email(email_data)
-                    self.delete_request(requestor_email)
-                    status_message = "Approved: %s" % requestor_email
+                    email_data = self.get_default_msg(requestor_email, 'approve')
+                self.send_email(email_data)
+                self.delete_request(requestor_email)
+                status_message = "Approved: %s" % requestor_email
 
             elif rvw_action == 'deny':
                 if requestor_email in self.context.access_requests:
