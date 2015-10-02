@@ -1867,6 +1867,37 @@
   
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EmailTemplateView"
+    renderer="templates/admin/email_template.pt"
+    permission="email"
+    name="email_templates.html"
+    />
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.AddEmailTemplate"
+    renderer="templates/admin/edit_email_template.pt"
+    permission="email"
+    name="add_email_template.html"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.EditEmailTemplate"
+    renderer="templates/admin/edit_email_template.pt"
+    permission="email"
+    name="email_template"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.DeleteEmailTemplate"
+    permission="email"
+    name="del_email_template"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.admin.EmailGroupsView"
     renderer="templates/admin/email_groups.pt"
     permission="email"
@@ -1911,7 +1942,23 @@
     permission="administer"
     name="review_access_requests.html"
     />
-
+    
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.ReviewAccessRequest"
+    renderer="templates/admin/review_access_request.pt"
+    permission="administer"
+    name="review_access"
+    />
+  
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.ReviewAccessCustom"
+    renderer="templates/admin/custom_email.pt"
+    permission="administer"
+    name="custom_email"
+    />
+  
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.syslog_view"

@@ -663,6 +663,7 @@ class DeleteEmailGroup(object):
             query=dict(status_message='Email group "' + thisgroup + '" has been deleted'))
         return HTTPFound(location=redirect_to)
 
+
 class EmailGroupsView(object):
     def __init__(self, context, request):
         self.context = context
@@ -689,6 +690,172 @@ class EmailGroupsView(object):
             menu=_menu_macro(),
             email_groups=email_groups,
         )
+
+
+class EmailTemplateView(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Email Templates')
+
+        actions = []
+        actions.append(
+            ('Add Email Template',
+             request.resource_url(context, 'add_email_template.html')),
+            )
+
+        template_names = []
+        for e_t in self.context.email_templates:
+            template_names.append(e_t)
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            email_templates=template_names
+        )
+
+
+class AddEmailTemplate(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Group')
+
+        # get list of users
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, [])
+
+        if 'save' in request.params or 'submit' in request.params:
+            selected_list = []
+            memberemails = request.params.getall('memberemails')
+            for tmplogin in memberemails:
+                selected_list.append(tmplogin)
+            template_name = request.params['template_name']
+            template_body = request.params['text']
+            sendtoadmins = request.params.get('sendtoadmins', 'no')
+            sendtouser = request.params.get('sendtouser', 'no')
+            self.context.email_templates[template_name] = {'body': template_body,
+                                                           'template_name': template_name,
+                                                           'selected_list': selected_list,
+                                                           'sendtouser': sendtouser,
+                                                           'sendtoadmins': sendtoadmins}
+
+            status_message = 'Email Template "' + template_name + '" has been created'
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_templates.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            actions=[],
+            menu=_menu_macro(),
+            template_name='',
+            template_body='',
+            template_subject='',
+            sendtouser='no',
+            sendtoadmins='no',
+            peoplelist=peoplelist
+        )
+
+
+class EditEmailTemplate(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Edit Email Group')
+
+        actions = []
+        thistemplate = request.subpath
+        thistemplate = thistemplate[0]
+
+        actions.append(
+            ('Delete',
+             request.resource_url(context, 'del_email_template' + u'/' + thistemplate)),
+            )
+        edit_template = self.context.email_templates.get(thistemplate, {})
+
+        profiles = find_profiles(context)
+        peoplelist = getemailusers(profiles, edit_template.get('selected_list', []))
+        if 'save' in request.params or 'submit' in request.params:
+            selected_list = []
+            memberemails = request.params.getall('memberemails')
+            for tmplogin in memberemails:
+                selected_list.append(tmplogin)
+            sendtoadmins = request.params.get('sendtoadmins', 'no')
+            sendtouser = request.params.get('sendtouser', 'no')
+            template_name = request.params['template_name']
+            subject = request.params['template_subject']
+            template_body = request.params['text']
+            self.context.email_templates[template_name] = {'body': template_body,
+                                                           'template_name': template_name,
+                                                           'selected_list': selected_list,
+                                                           'subject': subject,
+                                                           'sendtouser': sendtouser,
+                                                           'sendtoadmins': sendtoadmins}
+            # delete old record if key is changing
+            if thistemplate != template_name:
+                del self.context.email_templates[thistemplate]
+
+            status_message = 'Email Template "' + template_name + '" has been successfully modified'
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'email_templates.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            template_name=thistemplate,
+            template_body=edit_template.get('body', ''),
+            template_subject=edit_template.get('subject', ''),
+            sendtouser=edit_template.get('sendtouser', 'no'),
+            sendtoadmins=edit_template.get('sendtoadmins', 'no'),
+            peoplelist=peoplelist
+        )
+
+
+class DeleteEmailTemplate(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        context, request = self.context, self.request
+
+        thistempl = request.subpath
+        thistempl = thistempl[0]
+        if thistempl in self.context.email_templates:
+            del self.context.email_templates[thistempl]
+        redirect_to = resource_url(
+            context, request, 'email_templates.html',
+            query=dict(status_message='Email template "' + thistempl + '" has been deleted'))
+        return HTTPFound(location=redirect_to)
 
 
 def syslog_view(context, request):
@@ -1305,6 +1472,18 @@ def _send_invite(context, request, invitation):
     mailer.send([invitation.email], msg)
 
 
+def add_denial(context, requestor_email, requestor_name, reason, full_reason):
+    previous_denails = context.denial_tracker.get(requestor_email, {})
+    # get all denials for this user
+    all_denials = previous_denails.get('all_denials', {})
+    # add current denial
+    all_denials[datetime.now()] = {'reason': reason,
+                                   'reason_full': full_reason}
+    context.denial_tracker[requestor_email] = {'all_denials': all_denials,
+                                               'email:': requestor_email,
+                                               'fullname': requestor_name}
+
+
 class ReviewSiteInvitations(object):
     def __init__(self, context, request):
         self.context = context
@@ -1330,6 +1509,7 @@ class ReviewSiteInvitations(object):
                     messages.append("Re-sent invite: %s" % invitation.email)
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
+
         return {
             'api': api,
             'page_title': 'Review Invitations',
@@ -1340,7 +1520,7 @@ class ReviewSiteInvitations(object):
         }
 
 
-class ReviewAccessRequestView(object):
+class ReviewAccessRequest(object):
 
     def __init__(self, context, request):
         self.context = context
@@ -1348,6 +1528,97 @@ class ReviewAccessRequestView(object):
         self.random_id = getUtility(IRandomId)
         self.invitations = self.context['invitations']
         self.search = ICatalogSearch(self.context)
+
+    def replace_keywords(self, in_replace_text, access_request):
+        sys_name = get_setting(self.context, 'title')
+        replace_text = in_replace_text.replace('{{requestor_email}}', access_request['email'])
+        replace_text = replace_text.replace('{{requestor_name}}', access_request['fullname'])
+        replace_text = replace_text.replace('{{system_name}}', sys_name)
+        return replace_text
+
+    def get_templ_msg(self, email, template_name, response_type):
+        access_request = self.context.access_requests[email]
+        e_template = self.context.email_templates.get(template_name, {})
+
+        email_data = {}
+        email_data['email'] = email
+        email_data['from'] = get_setting(self.context, 'admin_email')
+        if response_type == 'approve':
+            invitation = self.get_invitation(email)
+            invitation_url = resource_url(invitation.__parent__, self.request, invitation.__name__)
+            body = e_template['body']
+            body = body + u'''<p>Follow the link below to accept this invitation and to create your account.</p>
+
+                            <p>
+                              <a href=%s>%s</a>
+                            </p>''' % (invitation_url, invitation_url)
+            email_data['body'] = self.replace_keywords(body, access_request)
+        else:
+            email_data['body'] = self.replace_keywords(e_template['body'], access_request)
+#         email_data['to'] = e_template['selected_list']
+        email_to = []
+        if e_template.get('sendtouser', '') == 'yes':
+            email_to.append('%s <%s>' % (access_request['fullname'], access_request['email']))
+        if e_template.get('sendtoadmins', '') == 'yes':
+            users = find_users(self.context)
+            search = ICatalogSearch(self.context)
+            count, docids, resolver = search(interfaces=[IProfile])
+            for docid in docids:
+                profile = resolver(docid)
+                if getattr(profile, 'security_state', None) == 'inactive':
+                    continue
+                userid = profile.__name__
+                if not users.member_of_group(userid, 'group.KarlAdmin'):
+                    continue
+                email_to.append('%s <%s>' % (profile.title, profile.email))
+        for member in e_template.get('selected_list', []):
+            email_to.append(member)
+        email_data['to'] = email_to
+        email_data['subject'] = self.replace_keywords(e_template['subject'], access_request)
+        return email_data
+
+    def get_default_msg(self, email, response_type):
+        access_request = self.context.access_requests[email]
+        default_email = {}
+        default_email['email'] = email
+
+        if response_type == 'deny':
+            default_email['subject'] = 'Access Request to %s has been denied' % (
+                get_setting(self.context, 'title'))
+            default_email['to'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+            default_email['from'] = get_setting(self.context, 'admin_email')
+            default_email['body'] = u'''<html><body>
+        <p>Hello %(name)s,</p>
+        <p>Your access request has been denied. Please read the guidelines on
+           requesting access to %(system_name)s</p>
+        </body></html>''' % {
+                'name': access_request['fullname'],
+                'system_name': get_setting(self.context, 'title')
+            }
+            return default_email
+        elif response_type == 'approve':
+            body_template = get_renderer('templates/admin/email_invite_new.pt').implementation()
+            default_email['From'] = '%s <%s>' % (
+                get_setting(self.context, 'title'),
+                get_setting(self.context, 'admin_email'))
+            invitation = self.get_invitation(email)
+            default_email['To'] = invitation.email
+            default_email['Subject'] = 'Please join %s' % get_setting(self.context, 'title')
+            default_email['body'] = body_template(
+                system_name=get_setting(self.context, 'title'),
+                invitation_url=resource_url(invitation.__parent__, self.request,
+                                            invitation.__name__)
+                )
+
+    def send_email(self, email_data):
+        mailer = getUtility(IMailDelivery)
+        message = Message()
+        message['Subject'] = email_data['subject']
+        message['From'] = email_data['from']
+        message['To'] = ",".join(email_data['to'])
+        message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
+        message.set_type('text/html')
+        mailer.send([email_data['email']], message)
 
     def deny(self, email):
         access_request = self.context.access_requests[email]
@@ -1395,34 +1666,196 @@ class ReviewAccessRequestView(object):
         return invitation
 
     def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Edit Email Group')
+
+        actions = []
+        requestor_email = request.subpath
+        requestor_email = requestor_email[0]
+        access_request = self.context.access_requests[requestor_email]
+        requestor_name = access_request['fullname']
+
+        response_templates = [('', 'None')]
+        for e_t in self.context.email_templates:
+            response_templates.append((e_t, e_t))
+        response_templates.append(('custom', 'Custom'))
+
+        review_choices = [
+            ('', 'None'),
+            ('approve', 'Approve'),
+            ('deny', 'Deny'),
+            ('clear', 'Clear'),
+            ('follow_up', 'Follow Up')
+        ]
+
+        if 'save' in request.params or 'submit' in request.params:
+            template_choice = request.params.get('templ_ch')
+            rvw_action = request.params.get('rvw_ch')
+
+            # make sure user doesn't already exist
+            total, docids, resolver = self.search(email=requestor_email.lower(),
+                                                  interfaces=[IProfile])
+            if total:
+                self.delete_request(requestor_email)
+                status_message = "%s already a user on system, deleting" % requestor_email
+
+            if template_choice == 'custom':
+                redirect_to = resource_url(context,
+                                           request,
+                                           'custom_email',
+                                           query={'address': requestor_email,
+                                                  'action': rvw_action})
+                return HTTPFound(location=redirect_to)
+            if rvw_action == 'approve':
+                if template_choice != '':
+                    email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
+                else:
+                    email_data = self.get_default_msg(requestor_email, 'approve')
+                self.send_email(email_data)
+                self.delete_request(requestor_email)
+                status_message = "Approved: %s" % requestor_email
+
+            elif rvw_action == 'deny':
+                if requestor_email in self.context.access_requests:
+                    if template_choice != '':
+                        email_data = self.get_templ_msg(requestor_email, template_choice, 'deny')
+                    else:
+                        email_data = self.get_default_msg(requestor_email, 'deny')
+                    self.send_email(email_data)
+                    self.delete_request(requestor_email)
+
+                    add_denial(self.context,
+                               requestor_email,
+                               requestor_name,
+                               email_data['subject'],
+                               email_data['body'])
+                    status_message = "Denied: %s" % requestor_email
+            elif rvw_action == 'clear':
+                self.delete_request(requestor_email)
+                status_message = "Clear access request: %s" % requestor_email
+            elif rvw_action == 'follow_up':
+                if template_choice != '':
+                    email_data = self.get_templ_msg(requestor_email, template_choice, 'follow_up')
+                    self.send_email(email_data)
+                    status_message = "Follow up sent to %s" % requestor_email
+                else:
+                    status_message = "Follow up regarding %s skipped because " + \
+                        "no template was specified" % requestor_email
+
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(
+                    context, request, 'review_access_requests.html',
+                    query=dict(status_message=status_message))
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html',
+                    query=dict(status_message=status_message))
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            actions=actions,
+            menu=_menu_macro(),
+            requestor_email=requestor_email,
+            requestor_name=requestor_name,
+            review_choices=review_choices,
+            response_templates=response_templates,
+        )
+
+
+class ReviewAccessCustom(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def send_email(self, subject, body, addressed_to, from_email):
+        message = create_message(self.request, subject, body, from_email)
+        if get_config_setting('use_threads_to_send_email', False) in (True, 'true', 'True'):  # noqa
+            mailer = ThreadedGeneratorMailDelivery()
+            mailer.sendGenerator(
+                _send_email, mailer, message, addressed_to)
+        else:
+            mailer = getUtility(IMailDelivery)
+            _send_email(mailer, message, addressed_to)
+
+    def __call__(self):
+        context, request = self.context, self.request
+        api = AdminTemplateAPI(context, request, 'Admin UI: Custom Email')
+        admin_email = get_setting(context, 'admin_email')
+
+        requestor_email = self.request.GET.get('address', '')
+        request_action = self.request.GET.get('action', '')
+        access_request = self.context.access_requests[requestor_email]
+        requestor_name = access_request['fullname']
+        print('GET', requestor_email, request_action)
+
+        if 'send_email' in request.params or 'submit' in request.params:
+            n = 0
+            addressed_to = []
+            # parse additional to email addresses
+            if request.params['more_to']:
+                more_to = request.params['more_to'].split(",")
+                for to_email in more_to:
+                    emailparts = to_email.split("@")
+                    if len(emailparts) != 2:
+                        continue
+                    # could validate email more here
+                    addressed_to.append({
+                        'name': emailparts[0],
+                        'email': to_email
+                    })
+                    n += 1
+            self.send_email(request.params['subject'],
+                            request.params['text'],
+                            addressed_to,
+                            admin_email)
+            if requestor_email in self.context.access_requests:
+                del self.context.access_requests[requestor_email]
+            add_denial(self.context,
+                       requestor_email,
+                       requestor_name,
+                       request.params['subject'],
+                       request.params['text'])
+            if has_permission(ADMINISTER, context, request):
+                redirect_to = resource_url(context, request, 'review_access_requests.html')
+            else:
+                redirect_to = resource_url(
+                    find_communities(context), request, 'all_communities.html')
+
+            return HTTPFound(location=redirect_to)
+
+        return dict(
+            api=api,
+            menu=_menu_macro(),
+            requestor_email=requestor_email
+        )
+
+
+class ReviewAccessRequestView(object):
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+    def __call__(self):
         messages = []
-        if self.request.method == 'POST' and self.request.POST.get('form.submitted'):
-            data = self.request.POST.dict_of_lists()
 
-            for email in data.get('approve', []):
-                total, docids, resolver = self.search(email=email.lower(),
-                                                      interfaces=[IProfile])
-
-                if total:
-                    messages.append("%s already a user on system, deleting" % email)
-                    self.delete_request(email)
-                    continue
-
-                invitation = self.get_invitation(email)
-                _send_invite(self.context, self.request, invitation)
-                self.delete_request(email)
-                messages.append("Approved: %s" % email)
-
-            for email in data.get('decline', []):
-                if email in self.context.access_requests:
-                    self.deny(email)
-                    self.delete_request(email)
-                    messages.append("Denied: %s" % email)
-            for email in data.get('clear', []):
-                self.delete_request(email)
-                messages.append("Clear access request: %s" % email)
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
+
+        review_choices = [
+            ('', 'None'),
+            ('approve', 'Approve'),
+            ('deny', 'Deny'),
+            ('clear', 'Clear'),
+            ('follow_up', 'Follow Up')
+        ]
+        response_templates = [('', 'None')]
+        for e_t in self.context.email_templates:
+            response_templates.append((e_t, e_t))
+        response_templates.append(('custom', 'Custom'))
+
         return {
             'api': api,
             'page_title': 'Review Access Requests',
@@ -1430,7 +1863,9 @@ class ReviewAccessRequestView(object):
             'menu': _menu_macro(),
             'access_requests': reversed(sorted(self.context.access_requests.values(),
                                         key=lambda r: r['date_requested'])),
-            'fields': get_access_request_fields(self.context)
+            'fields': get_access_request_fields(self.context),
+            'review_choices': review_choices,
+            'response_templates': response_templates
         }
 
 
@@ -1626,7 +2061,7 @@ class AuthenticationFormController(BaseSiteFormController):
 
 class RegistrationFormController(BaseSiteFormController):
     page_title = 'Registration Settings'
-    fields = ('allow_request_accesss', 'request_access_fields',
+    fields = ('allow_request_accesss', 'hide_repeated_denials', 'request_access_fields',
               'request_access_user_message', 'show_terms_and_conditions',
               'terms_and_conditions', 'show_privacy_statement',
               'privacy_statement', 'member_fields')
@@ -1634,6 +2069,8 @@ class RegistrationFormController(BaseSiteFormController):
     schema = [
         ('allow_request_accesss', schemaish.Boolean(
             description="Allow people to request access to site")),
+        ('hide_repeated_denials', schemaish.Boolean(
+            description="Do not show requests for users that have already been denied")),
         ('request_access_fields', schemaish.Sequence(
             schemaish.String(),
             description="Field access request form should present to user. "
@@ -1658,6 +2095,7 @@ class RegistrationFormController(BaseSiteFormController):
     def form_widgets(self, fields):
         return {
             'allow_request_accesss': formish.widgets.Checkbox(),
+            'hide_repeated_denials': formish.widgets.Checkbox(),
             'request_access_fields': karlwidgets.SequenceTextAreaWidget(),
             'show_terms_and_conditions': formish.widgets.Checkbox(),
             'terms_and_conditions': karlwidgets.RichTextWidget(empty=''),

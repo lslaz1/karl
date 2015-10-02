@@ -28,9 +28,6 @@ jQuery(document).ready(function($) {
           </tal:fields>
           <th>Email</th>
           <th>Date Requested</th>
-          <th>Approve</th>
-          <th>Decline</th>
-          <th>Clear</th>
         </thead>
         <tbody>
           <tal:req tal:repeat="req access_requests">
@@ -38,40 +35,19 @@ jQuery(document).ready(function($) {
               <tal:fields tal:repeat="field fields">   
                 <td>${python: req.get(field['id'])}</td>
               </tal:fields>
-              <td>${python: req['email']}</td>
+              <td><a href="review_access/${python: req['email']}">${python: req['email']}</a></td>
               <td><abbr class="timeago" title=${date}>${date}</abbr></td>
-              <td><input type="checkbox" name="approve" value="${python: req['email']}" /></td>
-              <td><input type="checkbox" name="decline" value="${python: req['email']}" /></td>
-              <td><input type="checkbox" name="clear" value="${python: req['email']}" /></td>
             </tr>
           </tal:req>
         </tbody>
       </table>
-      <div class="formControlls loginLeftPadding">
-        <input type="hidden" name="form.submitted" value="1" />
-
-        <div class="buttons clearafter">
-          <button name="image" type="submit" id="signin" class="button primary_button"><span>Submit changes</span></button>
-        </div>
-      </div>
     </form>
 
-
+    <br/>
     <a href="${api.app_url}/review_invitations.html">
       Review Outstanding Site Invitations
     </a>
-    <script>
-    jQuery(document).ready(function(){
-      $('.access-request-review input').change(function(){
-        var $el = $(this).parent();
-        var $other = $el.next().find('input');
-        if($other.length === 0){
-          $other = $el.prev().find('input');
-        }
-        $other[0].checked = false;
-      });
-    });
-    </script>
+
   </div>
 
 </html>
