@@ -2062,7 +2062,7 @@ class AuthenticationFormController(BaseSiteFormController):
 
 class RegistrationFormController(BaseSiteFormController):
     page_title = 'Registration Settings'
-    fields = ('allow_request_accesss', 'request_access_fields',
+    fields = ('allow_request_accesss', 'hide_repeated_denials', 'request_access_fields',
               'request_access_user_message', 'show_terms_and_conditions',
               'terms_and_conditions', 'show_privacy_statement',
               'privacy_statement', 'member_fields')
@@ -2070,6 +2070,8 @@ class RegistrationFormController(BaseSiteFormController):
     schema = [
         ('allow_request_accesss', schemaish.Boolean(
             description="Allow people to request access to site")),
+        ('hide_repeated_denials', schemaish.Boolean(
+            description="Do not show requests for users that have already been denied")),
         ('request_access_fields', schemaish.Sequence(
             schemaish.String(),
             description="Field access request form should present to user. "
@@ -2094,6 +2096,7 @@ class RegistrationFormController(BaseSiteFormController):
     def form_widgets(self, fields):
         return {
             'allow_request_accesss': formish.widgets.Checkbox(),
+            'hide_repeated_denials': formish.widgets.Checkbox(),
             'request_access_fields': karlwidgets.SequenceTextAreaWidget(),
             'show_terms_and_conditions': formish.widgets.Checkbox(),
             'terms_and_conditions': karlwidgets.RichTextWidget(empty=''),
