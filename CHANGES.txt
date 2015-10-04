@@ -1,7 +1,12 @@
 karl package Changelog
 ======================
 
-5.5.0 (unreleased)
+5.5.1 (unreleased)
+------------------
+
+- add toggle to search all people or just people in similar communities
+
+5.5.0 (2015-09-26)
 ------------------
 
 - make header-links configurable through site settings
