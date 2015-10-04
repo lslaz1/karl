@@ -1285,6 +1285,7 @@ class SiteSettingsFormController(BaseSiteFormController):
         'safe_html',
         'google_analytics_id',
         'navigation_list',
+        'show_all_users',
         )
     labels = {
         'title': 'Site title',
@@ -1299,12 +1300,14 @@ class SiteSettingsFormController(BaseSiteFormController):
             'will be added to each header menu link. All three are '
             'separated by a pipe ("|") character and the "CSS Class List" may '
             'optionally be present.',
+        'show_all_users': 'Enable viewing of all users on Find Other Users page, '
+                          'instead of just users in the same communities.',
     }
     required = ['title', 'admin_email', 'system_list_subdomain', 'system_email_domain',
                 'site_url', 'min_pw_length', 'selectable_groups', 'date_format',
                 'default_home_behavior']
     ints = ['min_pw_length', 'max_upload_size']
-    bools = ['reply_by_email_enabled', 'safe_html']
+    bools = ['reply_by_email_enabled', 'safe_html', 'show_all_users']
 
     schema = []
     for field in fields:

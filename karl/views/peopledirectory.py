@@ -488,8 +488,13 @@ def get_report_query(report, request, letter=None):
                 kw[k] = {'query': values.split(','), 'operator': operator}
             elif k == 'is_staff':
                 kw[k] = v.lower() in ('true', 't', 'yes', 'y', '1')
-    principals = effective_principals(request)
-    kw['allowed'] = {'query': principals, 'operator': 'or'}
+    show_all_users = get_setting(report, "show_all_users")
+    if show_all_users:
+        # a bit hackish, but easy
+        kw['is_staff'] = {'query': [True, False], 'operator': 'or'}
+    else:
+        principals = effective_principals(request)
+        kw['allowed'] = {'query': principals, 'operator': 'or'}
     if letter is None:
         letter = request.params.get('lastnamestartswith')
     if letter:
