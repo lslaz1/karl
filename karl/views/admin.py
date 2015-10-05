@@ -1845,28 +1845,24 @@ class ReviewAccessRequestView(object):
         api = AdminTemplateAPI(self.context, self.request)
         api.status_messages = messages
 
-        review_choices = [
-            ('', 'None'),
-            ('approve', 'Approve'),
-            ('deny', 'Deny'),
-            ('clear', 'Clear'),
-            ('follow_up', 'Follow Up')
-        ]
-        response_templates = [('', 'None')]
-        for e_t in self.context.email_templates:
-            response_templates.append((e_t, e_t))
-        response_templates.append(('custom', 'Custom'))
-
+        filtered_results = {}
+        hide_repeated_denials = self.context.settings.get('hide_repeated_denials', False)
+        if hide_repeated_denials:
+            for k, v in self.context.access_requests.iteritems():
+                tmp_email = v.get('emai', '')
+                # do a lookup to see if this person has been denied previously
+                if tmp_email not in self.context.denial_tracker:
+                    filtered_results[k] = v
+        else:
+            filtered_results = self.context.access_requests
         return {
             'api': api,
             'page_title': 'Review Access Requests',
             'format_date': lambda date: date.strftime(TIMEAGO_FORMAT),
             'menu': _menu_macro(),
-            'access_requests': reversed(sorted(self.context.access_requests.values(),
+            'access_requests': reversed(sorted(filtered_results.values(),
                                         key=lambda r: r['date_requested'])),
             'fields': get_access_request_fields(self.context),
-            'review_choices': review_choices,
-            'response_templates': response_templates
         }
 
 
