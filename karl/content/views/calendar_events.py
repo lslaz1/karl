@@ -1030,7 +1030,7 @@ def show_calendarevent_ics_view(context, request):
         event.add('attach', attachment)
 
     calendar.add_component(event)
-    return Response(body=calendar.as_string(),
+    return Response(body=calendar.to_ical(),
                     content_type='text/calendar',
                     charset='UTF8')
 

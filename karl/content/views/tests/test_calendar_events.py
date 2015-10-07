@@ -653,7 +653,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
     def test_simple(self):
         from datetime import datetime
         from icalendar import Calendar
-        from icalendar import UTC
+        from pytz import UTC
         from pyramid.testing import DummyModel
         from pyramid.testing import DummyRequest
         community = DummyModel()
@@ -679,7 +679,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/calendar')
         self.assertEqual(response.charset, 'UTF8')
 
-        cal = Calendar.from_string(response.body)
+        cal = Calendar.from_ical(response.body)
         self.assertEqual(str(cal['prodid']), '-//KARL3//Event//')
         self.assertEqual(str(cal['version']), '2.0')
         self.assertEqual(str(cal['method']), 'PUBLISH')
@@ -698,7 +698,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
     def test_unicode_attendee(self):
         from datetime import datetime
         from icalendar import Calendar
-        from icalendar import UTC
+        from pytz import UTC
         from pyramid.testing import DummyModel
         from pyramid.testing import DummyRequest
         community = DummyModel()
@@ -724,7 +724,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(response.content_type, 'text/calendar')
         self.assertEqual(response.charset, 'UTF8')
 
-        cal = Calendar.from_string(response.body)
+        cal = Calendar.from_ical(response.body)
         self.assertEqual(str(cal['prodid']), '-//KARL3//Event//')
         self.assertEqual(str(cal['version']), '2.0')
         self.assertEqual(str(cal['method']), 'PUBLISH')
@@ -738,7 +738,7 @@ class Test_show_calendarevent_ics_view(unittest.TestCase):
         self.assertEqual(evt['created'].dt, created)
         self.assertEqual(evt['dtstart'].dt, start)
         self.assertEqual(evt['dtend'].dt, end)
-        self.assertEqual(str(evt['attendee']), 'R\xc3\xa8n & Stimpy')
+        self.assertEqual(evt['attendee'].encode('utf-8'), 'R\xc3\xa8n & Stimpy')
 
 class CalendarCategoriesViewTests(unittest.TestCase):
     def setUp(self):
