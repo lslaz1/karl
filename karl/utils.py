@@ -96,7 +96,10 @@ def find_tags(context):
 
 
 def find_profiles(context):
-    return find_site(context).get('profiles')
+    site = find_site(context)
+    if site is None:
+        return None
+    return site.get('profiles', None)
 
 
 def find_community(context):
