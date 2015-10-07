@@ -419,6 +419,7 @@ class Site(Folder):
         two_factor_plivo_auth_token='',
         two_factor_src_phone_number='',
         allow_request_accesss=False,
+        hide_repeated_denials=False,
         request_access_fields=[
             'fullname|Full Name'
         ],
