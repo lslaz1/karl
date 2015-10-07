@@ -139,7 +139,7 @@ class TemplateAPI(object):
 
         self.site_announcements = getattr(self.site, "site_announcements", [])
         profiles = find_profiles(self.site)
-        profile = profiles.get(self.userid, None)
+        profile = profiles is not None and profiles.get(self.userid, None) or None
         self.unseen_site_announcements = []
         if profile is not None and hasattr(profile, "_seen_announcements") \
                 and hasattr(site, "site_announcements"):
