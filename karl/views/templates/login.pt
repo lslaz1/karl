@@ -15,20 +15,17 @@
     <form name="formLogin" method="post" action="${app_url}/login.html"
           id="formLogin"
           tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)">
-
       <input type="hidden" name="came_from" value="${came_from}" />
       <fieldset class="field">
-
-        <span class="loginLabelWrapper">
-          <label for="username">Username</label>
-        </span>
-        <div class="compound-field">
-          <input name="login" type="text" id="username" value="" size="30"
-             tal:attributes="value username|None"
-             placeholder="or email address"/>
-          <div class="send-auth-code" tal:condition="two_factor">
-            <button type="button">Send Authentication Code</button>
-          </div>
+        <div class="form-inline">
+          <span class="loginLabelWrapper">
+            <label for="username">Username</label>
+          </span>
+            <input name="login" type="text" id="username" value="" size="30"
+               tal:attributes="value username|None"
+               placeholder="or email address"/>
+            <div class="send-auth-code" tal:condition="two_factor">
+              <button type="button">Send Authentication Code</button>
         </div>
         <div class="loginLeftPadding discreet" id="usernameMessage">
         </div>
@@ -36,26 +33,28 @@
       </fieldset>
 
       <fieldset class="field" tal:condition="two_factor">
-
-        <span class="loginLabelWrapper">
-          <label for="code">Code</label>
-        </span>
-        <input type="text" name="code" id="code" value="" size="30" />
-        <div class="loginLeftPadding discreet">
-          <label>Authentication code that was emailed to you.</label>
+        <div class="form-group">
+          <span class="loginLabelWrapper">
+            <label for="code">Code</label>
+          </span>
+          <input type="text" name="code" id="code" value="" size="30" />
+          <div class="loginLeftPadding discreet">
+            <label>Authentication code that was emailed to you.</label>
+          </div>
         </div>
 
       </fieldset>
 
       <fieldset class="field">
-
-        <span class="loginLabelWrapper">
-          <label for="password">Password</label>
-        </span>
-        <input type="password" name="password" id="password" value="" size="30"
-           tal:attributes="value password|None" />
+        <div class="form-group">
+          <span class="loginLabelWrapper">
+            <label for="password">Password</label>
+          </span>
+          <input type="password" name="password" id="password" value="" size="30"
+             tal:attributes="value password|None" />
         <a href="${api.app_url}/reset_request.html">I forgot my password</a>
-
+        </div>
+        
         <div class="field loginLeftPadding discreet">
           <input type="checkbox" name="max_age" id="remember"
                  class="noborder" value="315360000"/> <!-- Ten years -->
@@ -160,7 +159,7 @@
         <input type="hidden" name="form.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" id="signin" class="button primary_button"><span>Sign In</span></button>
+          <button name="image" type="submit" id="signin" class="btn btn-default btn-sm"><span>Sign In</span></button>
         </div>
       </div>
     </form>
@@ -175,7 +174,7 @@
       <hr/>
       <form tal:repeat="provider sso_providers" id="${provider['name']}"
             name="${provider['name']}" action="${provider['url']}" method="POST">
-        <button name="sso_login" type="submit" class="button primary_button">
+        <button name="sso_login" type="submit" class="btn btn-default btn-sm">
           Sign in with ${provider['title']}
         </button>
       </form>

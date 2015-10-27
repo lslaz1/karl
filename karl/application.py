@@ -142,6 +142,8 @@ def configure_karl(config, load_zcml=True):
     if isinstance(config, Configurator):
         # define css only if config is correct instance type
         # this caused some tests to fail...
+        config.define_css('bootstrap', static_path + '/bootstrap/css/bootstrap.min.css', always_include=True)
+        config.define_css('bootstrap-theme', static_path + '/bootstrap/css/bootstrap-theme.min.css', always_include=True)
         config.define_css('karl-wikitoc', static_path + '/karl-wikitoc.css')
         config.define_css('karl-multifileupload',
                           static_path + '/karl-multifileupload.css')
@@ -161,6 +163,7 @@ def configure_karl(config, load_zcml=True):
             'karl-ie9', static_path + '/karl_ie9.css',
             always_include=True, ie_expression='gte IE 9')
 
+        
         config.define_javascript(
             'karl-ui', resource_name='karl-ui', always_include=True)
         config.define_javascript(
@@ -169,7 +172,7 @@ def configure_karl(config, load_zcml=True):
             'karl-multifileupload', resource_name='karl-multifileupload')
         config.define_javascript('karl-wikitoc', resource_name='karl-wikitoc')
         config.define_javascript('tinymce', name='tinymce')
-
+        # config.define_javascript('bootstrap', resource_name='bootstrap', path=static_path + '/bootstrap/js/bootstrap.min.js', always_include=True)
 
 def block_webdav(event):
     """

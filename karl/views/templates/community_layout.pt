@@ -16,48 +16,63 @@
 
       <div tal:replace="structure python: api.render_header()" />
 
-      <div id="main">
-        <div class="rightcol" tal:content="structure api.render_sidebar()">
-        </div>
-        <div id="center" class="clearafter community_view" >
-          <div class="cheader" tal:condition="python: api.community_info">
-            <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
-              <fieldset>
-                <input type="text" class="inp search-community-input" name="body"/>
-                <button type="submit" class="search-community-button">Search&nbsp;Community</button>
-              </fieldset>
-            </form>
-            <h1>${api.community_info.title}
-	      <span tal:condition="api.community_info and not api.has_staff_acl(api.community_info.context)"
-         		 metal:use-macro="api.snippets.macros['privacy_badge']"/><span
-         tal:condition="api.community_info.moderator"
-         metal:use-macro="api.snippets.macros['moderator_badge']"/></h1>
-          </div>
-          <div id="cwrapper">
-            <div id="cleftcol">
-              <div id="cheader">
-                <span tal:condition="python: api.community_info">
-                 <a href="${api.community_info.url}members">Members</a> |
-                 <a href="${api.community_info.url}tagcloud.html"
-                 >Tags</a></span>
-                <ul tal:condition="python: api.community_info">
-                  <li tal:repeat="tab api.community_info.tabs"
-                            class="${tab.css_class}">
-                    <a href="${tab.url}">${tab.name}</a>
-                  </li>
-                </ul>
+      <div class="container-fluid">
+        <div id="main">
+          <div class="row">
+          
+            <div class="col-lg-9">
+              <div id="center" class="clearafter community_view" >
+                <div class="cheader" tal:condition="python: api.community_info">
+                  <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="body"/>
+                      <button type="submit" class="btn btn-default btn-xs">Search&nbsp;Community</button>
+                    </div>
+                  </form>
+                  <h1>${api.community_info.title}
+          	      <span tal:condition="api.community_info and not api.has_staff_acl(api.community_info.context)"
+                   		 metal:use-macro="api.snippets.macros['privacy_badge']"/><span
+                   tal:condition="api.community_info.moderator"
+                   metal:use-macro="api.snippets.macros['moderator_badge']"/></h1>
+                </div> <!-- close .cheader -->
+              </div> <!-- close #center -->
+            </div> <!-- close .col-lg-9 -->
+
+            <div class="col-lg-3 col-lg-offset 12">
+              <div class="rightcol" tal:content="structure api.render_sidebar()">
               </div>
-              <div id="screenid-community-overview" class="ccontent ui-helper-clearfix">
-                <div metal:define-slot="content"/>
-              </div>
-            </div>
-            <div class="visualClear"></div>
-          </div>
-        </div>
-        <div class="visualClear"></div>
-      </div>
+            </div> <!-- close .col-lg-3 --> 
+          </div> <!-- close .row -->
+
+          <div class="row">
+            <div class="col-lg-9">
+              <div id="cwrapper">
+                <div id="cleftcol">
+                  <div id="cheader">
+                    <span tal:condition="python: api.community_info">
+                     <a href="${api.community_info.url}members">Members</a> |
+                     <a href="${api.community_info.url}tagcloud.html"
+                     >Tags</a></span>
+                    <ul tal:condition="python: api.community_info">
+                      <li tal:repeat="tab api.community_info.tabs"
+                                class="${tab.css_class}">
+                        <a href="${tab.url}">${tab.name}</a>
+                      </li>
+                    </ul>
+                  </div> <!-- close #cheader -->    
+                  <div id="screenid-community-overview" class="ccontent ui-helper-clearfix">
+                    <div metal:define-slot="content"/>
+                  </div>
+                </div> <!-- close cleftcol -->
+                <div class="visualClear"></div>
+              </div> <!-- close #cwrapper -->
+            </div> <!-- close col-lg-9 -->
+          </div> <!-- close .row -->
+          <div class="visualClear"></div>
+        </div> <!-- close #main -->
+      </div> <!-- close .container-fluid -->     
       <tal:footer content="structure api.render_footer()" />
-    </div>
+    </div> <!-- close .visual-portal-wrapper -->
     <metal:resources use-macro="api.snippets.macros['analytics']"/>
   </body>
 </html>
