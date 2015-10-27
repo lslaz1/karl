@@ -37,7 +37,7 @@
       <tal:resources tal:repeat="resource python: api.get_javascript()">
         <script tal:replace="structure python: resource.render(request)"></script>
       </tal:resources>
-
+ 
       <tal:resources condition="api.form_field_templates">
         <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
         <metal:resources use-macro="api.snippets.macros['js_extra_resources']"/>
@@ -145,6 +145,11 @@
          tal:replace="api.error_message" /></div>
 
     <metal:actions_box define-macro="actions_box">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default btn-xs" >Left</button>
+        <button type="button" class="btn btn-default btn-xs">Middle</button>
+        <button type="button" class="btn btn-default btn-xs">Right</button>
+      </div>
       <ul class="menubar">
           <tal:block repeat="action api.actions_to_menu(actions)">
               <li tal:attributes="id string:menubar-${repeat.action.number()}"
@@ -195,19 +200,19 @@
         </div>
         <div class="portlet-buttons">
           <a tal:condition="preferred_communities is None"
-             class="primary_button"
+             class="btn btn-default btn-xs"
              title="Personalize the list of communities that appear on this list"
              href="${api.app_url}/jquery_edit_preferred.html">
              <span>Set preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
-             class="primary_button"
+             class="btn btn-default btn-xs"
              title="Edit your personalized list of communities"
              href="${api.app_url}/jquery_edit_preferred.html">
              <span>Edit preferred</span>
           </a>
           <a tal:condition="preferred_communities is not None"
-             class="primary_button"
+             class="btn btn-default btn-xs"
              title="Show all of your communities now"
              href="${api.app_url}/jquery_list_my_communities.html">
              <span>Show all</span>
@@ -318,27 +323,32 @@
       </div>
     </div>
 
+<!-- Tagbox -->
     <div class="tagbox" metal:define-macro="list_tags">
-      <strong class="label-tags" >Tags:</strong>
-      <form id="tag-inputbox" action="javascript://return false;">
-        <input name="taglist" id="tagsearch-input" value=""/>
+      <form class="form-group" action="javascript://return false;">
+        <label><strong>Tags:</strong></label>
+        <input name="taglist" class="form-control" id="tagsearch-input" value=""/>
       </form>
     </div>
 
+<!-- Header -->
     <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header">
-
-      <div class="bc-header-toolbox">
-        <button>All Content</button><ul>
-          <li tal:repeat="o api.livesearch_options" name="${o['name']}"
-              tal:attributes="advanced_search o['component'].live_to_advanced">
-              <a title="Search ${o['description']}" href="#">${o['title']}</a>
-          </li>
-          <li name="all_content">
-            <a title="Search All Content" href="#">All Content</a>
-          </li>
-        </ul><input class="bc-livesearch"/><button>Search</button>
-      </div>
-
+      <form class="form-inline">  
+        <div class="form-group">
+          <div class="dropdown inline pull-left">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              All Content
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li tal:repeat="o api.livesearch_options" name="${o['name']}" tal:attributes="advanced_search o['component'].live_to_advanced"><a title="Search ${o['description']}" href="#">${o['title']}</a></li>
+              <li name="all_content"><a title="Search All Content" href="#">All Content</a></li>
+            </ul>
+          </div> <!-- close .btn-group -->
+          <input type="text" class="form-control" style="height: 30px"/>
+          <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+        </div> <!-- close .form-group -->
+      </form> 
     </div>
 
     <div metal:define-macro="byline" class="kbyline">Posted
@@ -504,14 +514,10 @@
 
     <div id="tagcloud"
          metal:define-macro="tagcloud">
-     <h2 class="tagsHeaderSpace">
-      <form id="tag-form" action="" method="post"
-            onsubmit="this.action='showtag/'+getElementById('tag-field').value;
-                      return true"
-      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
-      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
-       <input id="tag-field" class="tag_field" type="text" name="tag"
-              size="20" /></form>
+      <h2 class="tagsHeaderSpace">
+        <form id="tag-form" class="form-inline" action="" method="post" onsubmit="this.action='showtag/'+getElementById('tag-field').value; return true"><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
+         <input class="form-control" type="text" name="tag"/>
+        </form>
      </h2>
 
      <p>This is the ${api.system_name} tag cloud - a list of tags where size reflect
@@ -526,19 +532,14 @@
                         "
          tal:content="e['name']">NAME</a> </span>
 
-    </div>
+    </div> <!-- close #tagcloud -->
 
     <div id="taglisting"
          metal:define-macro="taglisting">
-
      <h2 class="tagsHeaderSpace">
-      <form id="tag-form" action="" method="post"
-            onsubmit="this.action='showtag/'+getElementById('tag-field').value;
-                      return true"
-      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
-      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
-       <input id="tag-field" class="tag_field" type="text" name="tag"
-              size="20" />
+      <form id="tag-form" class="form-inline" action="" method="post" onsubmit="this.action='showtag/'+getElementById('tag-field').value; return true"
+      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
+      <input class="form-control" type="text" name="tag"/>
       </form>
      </h2>
 
@@ -563,7 +564,7 @@
 
      </table>
 
-    </div>
+    </div> <!-- close taglisting -->
 
     <div id="showtag"
          metal:define-macro="showtag">
@@ -574,12 +575,12 @@
      <tal:block tal:condition="tag is not None">
 
       <h2 class="tagsHeaderSpace">
-       <form id="tag-form" action="${api.view_url}"
+       <form id="tag-form" class="form-inline" action="${api.view_url}"
             onsubmit="this.action='${api.view_url}/'+getElementById('tag-field').value;
                       return true"
        ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
       ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
-         <input id="tag-field" class="tag_field" type="text"
+         <input class="form-control" type="text"
                 name="jumptag" value="${tag}" size="20" />
        </form>
       </h2>
@@ -611,20 +612,20 @@
 
     <div metal:define-macro="peopledir-report-head">
       <div id="peopledir-actions">
-        <ul class="ui-widget ui-helper-clearfix">
-          <li tal:condition="mailto" class="ui-state-default ui-corner-all" title="Email">
-            <a class="button-email" href="${mailto}" title="Email">
-                <span class="ui-icon ui-icon-mail-closed">Email</span>
+        <ul>
+          <li tal:condition="mailto" title="Email">
+            <a class="btn btn-default btn-xs" href="${mailto}" title="Email" aria-label="Email">
+                <span class="glyphicon glyphicon-envelope"></span>
             </a>
           </li>
-            <li class="ui-state-default ui-corner-all" title="Print">
-              <a class="button-print" href="${print_url}" title="Print">
-                  <span class="ui-icon ui-icon-print">Print</span>
+            <li title="Print">
+              <a class="btn btn-default btn-xs" href="${print_url}" title="Print" aria-label="Print">
+                  <span class="glyphicon glyphicon-print"></span>
               </a>
             </li>
-          <li class="ui-state-default ui-corner-all" title="Export as CSV">
-            <a class="button-export-csv" href="${csv_url}" title="Export as CSV">
-                <span class="ui-icon ui-icon-circle-arrow-s">Export as CSV</span>
+          <li title="Export as CSV">
+            <a class="btn btn-default btn-xs" href="${csv_url}" title="Export as CSV">
+                <span class="glyphicon glyphicon-download" aria-label="Export as CSV"></span>
             </a>
           </li>
         </ul>
@@ -636,13 +637,12 @@
       </div>
       <div id="peopledir-search-box-wrapper">
         <div id="peopledir-search-box">
-          <form method="get" action="${api.view_url}">
-            <fieldset>
-              <div class="field">
-                <input type="text" name="body" value="" />
-                <input type="submit" value="Search" />
-              </div>
-            </fieldset>
+          <form class="form-inline" method="get" action="${api.view_url}">
+            <div class="form-group">
+                <input class="form-control"type="text" name="body" value="" />
+                <input class="btn btn-default" type="submit" value="Search" />
+
+            </div>
           </form>
         </div>
       </div>
@@ -655,26 +655,22 @@
       <div class="communityOptions">
         <div id="community-filters">
           <label>Community Filters:</label>
-          <ul>
-            <li tal:repeat="option community_tabs"
-            class="${'%s%s%s' % (option['selected'] and 'current' or '',
-                               repeat['option'].start and ' firstItem' or '',
-                               repeat['option'].end and ' lastItem' or '',)}" >
-                <a href="${option['href']}" title="${option['description']}">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default btn-xs" tal:repeat="option community_tabs"
+            class="${'%s%s%s' % (option['selected'] and 'current' or '', repeat['option'].start and ' firstItem' or '', repeat['option'].end and ' lastItem' or '',)}"><a href="${option['href']}" title="${option['description']}">
                   <span>${option['title']}</span>
-                </a>
-            </li>
-          </ul>
+                </a></button>
+          </div>
         </div>
         <div id="communitiy-search-box-wrapper">
           <div id="communitiy-search-box">
-            <form method="get" action="${api.view_url}">
-              <fieldset>
+            <form class="form-inline" method="get" action="${api.view_url}">
+              <div class="form-group">
                 <div class="field">
-                  <input type="text" name="body" value="" />
-                  <input type="submit" value="Search" />
+                  <input class="form-control" type="text" name="body" value="" style="height: 22px"/>
+                  <input class="btn btn-default btn-xs" type="submit" value="Search" />
                 </div>
-              </fieldset>
+              </div>
             </form>
           </div>
         </div>
@@ -685,11 +681,9 @@
     <div id="peopledir-opensearch-add" metal:define-macro="opensearch"
          tal:condition="opensearch_url|None">
       <div>
-        <a onclick="window.external.AddSearchProvider(
+        <a class="btn btn-default btn-xs" onclick="window.external.AddSearchProvider(
                       '${opensearch_url}'); return false;"
-                      href="#">
-          <img border="0" src="${api.static_url}/opensearch.gif"
-               alt="Add KARL People Search to your browser toolbar" />
+                      href="#" aria-label="Add KARL People Search to your browser toolbar"><span class="glyphicon glyphicon-search"></span>
         </a>
       </div>
     </div>

@@ -14,3 +14,4 @@ node_modules
 *.sublime-workspace
 bower_components
 unit-test-results.xml
+.DS_Store

@@ -1,9 +1,15 @@
-<div id="footer">
-  <!--
-    This template in particular is likely to be overridden a good bit by
-    customization packages.
-  -->
-  ${structure: api.site.settings['footer_html']}
-     <tal:block condition="api.user_is_staff">
-     </tal:block>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">
+			<div id="footer">
+			  <!--
+			    This template in particular is likely to be overridden a good bit by
+			    customization packages.
+			  -->
+			  ${structure: api.site.settings['footer_html']}
+			     <tal:block condition="api.user_is_staff">
+			     </tal:block>
+			</div>
+		</div>
+	</div>
 </div>
