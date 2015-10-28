@@ -19,30 +19,32 @@
       <h1 class="kscreentitle">Admin Section: Email Users</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users" enctype="multipart/form-data">
-          <b>From</b><br/>
-          <select name="from_email">
+        <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
+          <label><strong>From</strong></label><br/>
+          <select class="form-control" name="from_email" style="width:300px; height:30px;">
             <option tal:repeat="from_email from_emails"
                     value="${from_email[0]}">${from_email[1]}</option>
           </select><br/>
           <br/>
-          <b>To</b><br/>
-          <select name="to_group">
+          <label><strong>To</strong></label><br/>
+          <select class="form-control" name="to_group" style="width:300px; height:30px;">
             <option tal:repeat="to_group to_groups"
                     value="${to_group[0]}">${to_group[1]}</option>
           </select><br/>
-          <b>Additional Users</b><br/>
-          <input name="more_to" size="60"/><br/>
           <br/>
-          <b>Subject</b><br/>
-          <input name="subject" size="60"/><br/>
+          <label><strong>Additional Users</strong></label><br/>
+          <input class="form-control" name="more_to" style="width:470px; height:30px;"/><br/>
           <br/>
-          <metal:input use-macro="api.formfields.macros['text-field']"/>
+          <label><strong>Subject</strong></label><br/>
+          <input class="form-control" name="subject" style="width:470px; height:30px;"/><br/>
           <br/>
-          
-          <metal:input use-macro="api.formfields.macros['attachment-field']"/>
-          <br/>
-          <input type="submit" name="send_email" value="Send Email"/>
+          <div class="col-lg-11">
+            <metal:input use-macro="api.formfields.macros['text-field']"/>
+            <br/>
+            <metal:input use-macro="api.formfields.macros['attachment-field']"/>
+            <br/>
+            <input class="btn btn-default btn-sm" type="submit" name="send_email" value="Send Email"/>
+          </div>
         </form>
       </div>
     </div>

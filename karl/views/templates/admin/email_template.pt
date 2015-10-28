@@ -21,22 +21,24 @@
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
       <div class="koverview_body">
-        <form method="POST" name="email_groups" enctype="multipart/form-data">
+        <form class="form-group" method="POST" name="email_groups" enctype="multipart/form-data">
           <div class="EmailTemplateWrapper">
-	          <table class="content-listing">
-	            <thead>
-	              <tr>
-	                <th class="clgroup">Email Template</th>
-	              </tr>
-	            </thead>
-	            <tbody>
-	              <tr tal:repeat="et email_templates">
-	                <td class="clgroup">
-                    <a href="email_template/${et}">${et}</a>
-                  </td>
-	              </tr>
-	            </tbody>
-	          </table>
+            <div class="col-lg-11">
+  	          <table class="table table-striped">
+  	            <thead>
+  	              <tr>
+  	                <th class="clgroup">Email Template</th>
+  	              </tr>
+  	            </thead>
+  	            <tbody>
+  	              <tr tal:repeat="et email_templates">
+  	                <td class="clgroup">
+                      <a href="email_template/${et}">${et}</a>
+                    </td>
+  	              </tr>
+  	            </tbody>
+  	          </table>
+            </div>
 	        </div>      
         </form>
       </div>

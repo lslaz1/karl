@@ -20,27 +20,27 @@
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users" enctype="multipart/form-data">
+        <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
         
-          <b>Requestor</b><br/>
+          <label><strong>Requestor</strong></label><br/>
           ${requestor_name} - ${requestor_email}
           <br/>
           <br/>
-          <b>Review Decision</b><br/>
-          <select name="rvw_ch" required>
+          <label><strong>Review Decision</strong></label><br/>
+          <select class="form-control" name="rvw_ch" required>
             <option tal:repeat="rvw_choice review_choices"
               value="${rvw_choice[0]}">${rvw_choice[1]}</option>
           </select>
           <br/>
           <br/>
-          <b>Email Template</b><br/>
-          <select name="templ_ch">
+          <label><strong>Email Template</strong></label><br/>
+          <select class="form-control" name="templ_ch">
             <option tal:repeat="e_template response_templates"
               value="${e_template[0]}">${e_template[1]}</option>
           </select>
           <br/>
           <br/>
-          <input type="submit" name="submit" value="Submit"/>
+          <input class="btn btn-default btn-sm" type="submit" name="submit" value="Submit"/>
           <br/>
         </form>
       </div>

@@ -22,10 +22,10 @@
 
           <h1>${api.page_title}</h1>
 
-          <form method="POST"
+          <form class="form-group"method="POST"
                 tal:condition="api.context.keys() | None">
            <p tal:repeat="key api.context.keys() | ()">
-            <input type="checkbox" name="selected" value="${key}"/>
+            <input class="form-control"type="checkbox" name="selected" value="${key}"/>
             <a href="${key}/admin.html">${key}</a>&nbsp;&nbsp;
             <a href="${key}/edit.html">(edit)</a>
             <a href="moveup.html?name=${key}" tal:condition="context.is_ordered">(move up)</a>
@@ -36,7 +36,7 @@
             <a href="categories/admin.html">categories</a>&nbsp;&nbsp;
            </p>
            <p>
-            <input type="submit" name="form.delete" value="Delete Selected"/>
+            <input class="btn btn-default btn-xs" type="submit" name="form.delete" value="Delete Selected"/>
            </p>
           </form>
 

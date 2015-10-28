@@ -146,7 +146,7 @@
 
     <metal:actions_box define-macro="actions_box">
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default btn-xs" >Left</button>
+        <button type="button" class="btn btn-default btn-xs">Left</button>
         <button type="button" class="btn btn-default btn-xs">Middle</button>
         <button type="button" class="btn btn-default btn-xs">Right</button>
       </div>
@@ -867,11 +867,14 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
 
     </div>
 
-    <ul id="header-menu" metal:define-macro="header-menu">
-        <li tal:repeat="item python:api.get_header_menu_items()">
-            <a href="${item['url']}" class="${item['extra_css']}">${item['display']}</a>
+<!-- Header Menu -->
+
+    <ul class="nav nav-tabs" role="tablist" data-tabs="tabs" metal:define-macro="header-menu">
+        <li role="presentation" tal:repeat="item python:api.get_header_menu_items()">
+            <a href="${item['url']}" role="tab" data-toggle="tab">${item['display']}</a>
         </li>
     </ul>
+
 
     <metal:lock define-macro="lock">
       <div class="portalWarningMessage pageLockMessage"

@@ -20,16 +20,18 @@
 
       <div class="koverview_body">
         <form method="POST" name="email_users" enctype="multipart/form-data">
-          <br/>
-          <b>To</b><br/>
-          <input name="more_to" size="60" value="${requestor_email}"/><br/>
-          <br/>
-          <b>Subject</b><br/>
-          <input name="subject" size="60"/><br/>
-          <br/>
-          <metal:input use-macro="api.formfields.macros['text-field']"/>
-          <br/>
-          <input type="submit" name="send_email" value="Send Email"/>
+          <div class="col-lg-11">
+            <br/>
+            <label><strong>To</strong></label><br/>
+            <input class="form-control" name="more_to" style="width:470px; height:30px;" value="${requestor_email}"/><br/>
+            <br/>
+            <label><strong>Subject</strong></label><br/>
+            <input class="form-control" name="subject" style="width:470px; height:30px;"/><br/>
+            <br/>
+            <metal:input use-macro="api.formfields.macros['text-field']"/>
+            <br/>
+            <input class="btn btn-default btn-sm" type="submit" name="send_email" value="Send Email"/>
+          </div>
         </form>
       </div>
     </div>

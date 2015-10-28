@@ -12,21 +12,21 @@
     <form name="formTwoFactor" method="post" action="${api.here_url}phone-factor.html"
           tal:condition="python: form == 'number'">
 
-      <fieldset class="field">
+      <div class="form-group">
 
         <label for="phonenumber">Phone Number</label>
         <div class="compound-field">
-          <input name="phonenumber" type="phone" id="phonenumber" value="" size="50"
+          <input class="form-control" name="phonenumber" type="phone" id="phonenumber" value="" size="50"
              required="true"
              tal:attributes="value number|None"
              placeholder="Valid US Phone Number"/>
         </div>
-      </fieldset>
+      </div>
       <div class="formControlls">
         <input type="hidden" name="form.verifyemail.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" id="verify" class="button primary_button"><span>Send text</span></button>
+          <button name="image" type="submit" id="verify" class="btn btn-default btn-sm"><span>Send text</span></button>
         </div>
       </div>
     </form>
@@ -35,20 +35,20 @@
           tal:condition="python: form == 'verify'">
       <input name="phonenumber" type="hidden" tal:attributes="value number|None" />
 
-      <fieldset class="field">
+      <div class="form-group">
 
         <label for="code">Code</label>
         <div class="compound-field">
-          <input name="code" type="text" id="code" value="" size="30"
+          <input class="form-control" name="code" type="text" id="code" value="" size="30"
              required="true"
              placeholder="Code that was texted to you"/>
         </div>
-      </fieldset>
+      </div>
       <div class="formControlls">
         <input type="hidden" name="form.verifycode.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" id="verify" class="button primary_button"><span>Verify</span></button>
+          <button name="image" type="submit" id="verify" class="btn btn-default btn-sm"><span>Verify</span></button>
         </div>
       </div>
     </form>
