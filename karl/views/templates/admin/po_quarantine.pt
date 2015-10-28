@@ -5,40 +5,41 @@
     <title>Post Office Quarantine</title>
   </head>
   <body>
-    <h1>Post Office Quarantine</h1>
-    <table border="1">
-      <thead>
-        <tr>
-          <td>&nbsp;</td>
-          <td>Message-Id</td>
-          <td>Error Message</td>
-        </tr>
-      </thead>
-      <tbody>
-        <form method="POST">
-          <input type="submit" name="requeue_all"
-                 value="Requeue All"/>
-          <input type="submit" name="delete_all"
-                 value="Delete All"/>
-        </form>
-        <tr tal:repeat="m messages">
-          <td>
-            <form method="POST">
-              <input type="submit" name="requeue_${m['po_id']}"
-                     value="Requeue"/>
-              <input
-                     type="submit" name="delete_${m['po_id']}"
-                     value="Delete"/>
-            </form>
-          </td>
-          <td>
-            <a href="${m['url']}">${m['message_id']}</a>
-          </td>
-          <td>
-            ${m['error']}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="col-lg-11">
+      <h1>Post Office Quarantine</h1>
+      <table class="table table-striped" border="1">
+        <thead>
+          <tr>
+            <td>&nbsp;</td>
+            <td>Message-Id</td>
+            <td>Error Message</td>
+          </tr>
+        </thead>
+        <tbody>
+          <form class="form-group" method="POST">
+            <input class="btn btn-default btn-xs" type="submit" name="requeue_all"
+                   value="Requeue All"/>
+            <input class="btn btn-default btn-xs" type="submit" name="delete_all"
+                   value="Delete All"/>
+          </form>
+          <tr tal:repeat="m messages">
+            <td>
+              <form class="form-group" method="POST">
+                <input class="btn btn-default btn-xs" type="submit" name="requeue_${m['po_id']}"
+                       value="Requeue"/>
+                <input class="btn btn-default btn-xs" type="submit" name="delete_${m['po_id']}"
+                       value="Delete"/>
+              </form>
+            </td>
+            <td>
+              <a href="${m['url']}">${m['message_id']}</a>
+            </td>
+            <td>
+              ${m['error']}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>

@@ -20,42 +20,43 @@
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users" enctype="multipart/form-data">
-        
-          <b>Email Template Name</b><br/>
-          <input name="template_name" size="60" value="${template_name}" required/><br/>
-          <br/>
-          <input type="checkbox" name="sendtouser" value="yes" tal:attributes="checked python: sendtouser == 'yes'"> Send to User Requesting Access<br>
-          <input type="checkbox" name="sendtoadmins" value="yes" tal:attributes="checked python: sendtoadmins == 'yes'"> Send to Admins<br>
-          <br/>
-          <b>List of Members to send a copy</b><br/>
-          <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
-            <option tal:repeat="profile peoplelist"
-                tal:attributes="selected python: profile.selected is True"
-                value="${profile.login}">${profile.name}</option>    
-          </select><br/>
-          <b>Email Subject</b><br/>
-          <input name="template_subject" size="60" value="${template_subject}" required/><br/>
-          <br/><br/>
-          <fieldset
-            tal:define="error fielderrors['text']|None"
-            class="${error and 'fieldError' or ''}"
-            id="txt_field">
-            <label>Email Body</label>
-            <div class="fieldHelp" tal:content="help['text']|''"></div>
-            <div tal:condition="error" class="errorMessage">${error}</div>
-            <input type="hidden" name="text_text_format" value="text/html" />
-            <textarea id="text" name="text" rows="1" cols="40"
-              class="pat-tinymce">${template_body}</textarea>
-          </fieldset>
-          <br/>
-          <input type="submit" name="save" value="Save"/>
-          <br/>
-          <script language="javascript" type="text/javascript">
-            $(".memberemails").select2({
-              placeholder: "Select Existing Members"
-            });
-          </script>
+        <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
+          <div class="col-lg-11">
+            <label><strong>Email Template Name</strong></label><br/>
+            <input class="form-control" name="template_name" style="width:470px; height:30px;" value="${template_name}" required/><br/>
+            <br/>
+            <label><input type="checkbox" name="sendtouser" value="yes" tal:attributes="checked python: sendtouser == 'yes'"> Send to User Requesting Access</label><br>
+            <label><input type="checkbox" name="sendtoadmins" value="yes" tal:attributes="checked python: sendtoadmins == 'yes'"> Send to Admins</label><br>
+            <br/>
+            <label><strong>Members To Send List</strong></label><br/>
+            <select class="form-control" name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
+              <option tal:repeat="profile peoplelist"
+                  tal:attributes="selected python: profile.selected is True"
+                  value="${profile.login}">${profile.name}</option>    
+            </select><br/>
+            <label><strong>Email Subject</strong></label><br/>
+            <input class="form-control" name="template_subject" style="width:470px; height:30px;" value="${template_subject}" required/><br/>
+            <br/><br/>
+            <fieldset
+              tal:define="error fielderrors['text']|None"
+              class="${error and 'fieldError' or ''}"
+              id="txt_field">
+              <label>Email Body</label>
+              <div class="fieldHelp" tal:content="help['text']|''"></div>
+              <div tal:condition="error" class="errorMessage">${error}</div>
+              <input type="hidden" name="text_text_format" value="text/html" />
+              <textarea id="text" name="text" rows="1" cols="40"
+                class="pat-tinymce">${template_body}</textarea>
+            </fieldset>
+            <br/>
+            <input class="btn btn-default btn-sm" type="submit" name="save" value="Save"/>
+            <br/>
+            <script language="javascript" type="text/javascript">
+              $(".memberemails").select2({
+                placeholder: "Select Existing Members"
+              });
+            </script>
+          </div>
         </form>
       </div>
     </div>

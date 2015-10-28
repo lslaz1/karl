@@ -16,55 +16,63 @@
 
       <div tal:replace="structure python: api.render_header()" />
 
+<!-- Main Admin Section -->      
       <div id="main">
-        <div class="rightcol"
-             tal:define="my_communities my_communities|();
-                         tags tags|();">
-
-            <metal:portlets define-slot="portlets"></metal:portlets>
-
-            <div class="generic-portlet" id="popular-tags-portlet"
-                 tal:condition="tags">
-                <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
-                <h3 tal:condition="my_communities is not None">My Tags</h3>
-                <div class="portlet-item" tal:condition="not tags">
-                  <strong>No tags</strong>
-                </div>
-                <div class="portlet-item" tal:repeat="tag tags">
-                 ${tag.count}&nbsp;
-                 <a href="${api.here_url}showtag/${tag.name}">${tag.name}</a>
-                </div>
-                <div class="portlet-item">
-                 <a href="${api.here_url}taglisting.html"
-                 >All ${profile.firstname}'s tags</a>
-                </div>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-9">
+              <div id="center" class="clearafter">
+                <div metal:define-slot="content"> Content goes here. </div>
               </div>
+            </div>
+            <div class="col-lg-3 col-lg-offset-9">
+              <div class="rightcol"
+                   tal:define="my_communities my_communities|();
+                               tags tags|();">
 
-              <div tal:condition="my_communities and my_communities is not None"
-                   metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+                  <metal:portlets define-slot="portlets"></metal:portlets>
 
-              <div metal:define-macro="my_communities_portlet" class="generic-portlet"
-                   tal:condition="my_communities is None" id="my-communities-portlet">
-                <h3>${profile.firstname}'s Communities</h3>
-                <div class="portlet-item" tal:condition="communities"
-                     tal:repeat="community communities">
-                  <strong tal:omit-tag="not community.moderator">
-                    <a href="${community.url}">
-                      ${community.title}
-                    </a>
-                  </strong>
-                </div>
-                <div class="portlet-item" tal:condition="not communities">
-                  <strong>No Communities</strong>
-                </div>
-              </div>
-        </div>
+                  <div class="generic-portlet" id="popular-tags-portlet"
+                       tal:condition="tags">
+                      <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
+                      <h3 tal:condition="my_communities is not None">My Tags</h3>
+                      <div class="portlet-item" tal:condition="not tags">
+                        <strong>No tags</strong>
+                      </div>
+                      <div class="portlet-item" tal:repeat="tag tags">
+                       ${tag.count}&nbsp;
+                       <a href="${api.here_url}showtag/${tag.name}">${tag.name}</a>
+                      </div>
+                      <div class="portlet-item">
+                       <a href="${api.here_url}taglisting.html"
+                       >All ${profile.firstname}'s tags</a>
+                      </div>
+                    </div>
 
-        <div id="center" class="clearafter">
-          <div metal:define-slot="content"> Content goes here. </div>
-        </div>
-        <div class="visualClear"><!-- --></div>
-      </div>
+                    <div tal:condition="my_communities and my_communities is not None"
+                         metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
+
+                    <div metal:define-macro="my_communities_portlet" class="generic-portlet"
+                         tal:condition="my_communities is None" id="my-communities-portlet">
+                      <h3>${profile.firstname}'s Communities</h3>
+                      <div class="portlet-item" tal:condition="communities"
+                           tal:repeat="community communities">
+                        <strong tal:omit-tag="not community.moderator">
+                          <a href="${community.url}">
+                            ${community.title}
+                          </a>
+                        </strong>
+                      </div>
+                      <div class="portlet-item" tal:condition="not communities">
+                        <strong>No Communities</strong>
+                      </div>
+                    </div>
+              </div> <!-- close .rightcol -->
+            </div> <!-- close .col-lg-3 -->      
+            <div class="visualClear"><!-- --></div>
+          </div> <!-- close .row -->
+        </div> <!-- close .container-fluid -->
+      </div> <!-- close #main -->
       <tal:footer content="structure api.render_footer()" />
 
     </div>

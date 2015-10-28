@@ -14,22 +14,21 @@
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Move Content</h1>
 
-      <div class="koverview_body">
+      <div>
         <br/>
         <div metal:use-macro="content_select_widget"/>
         <br/>
 
-        <form method="POST" name="select_content">
-          <div metal:use-macro="content_select_grid"/>
-          <br/>
-          <b>Move to</b>
-          <select name="to_community">
-            <option value="">Select community</option>
-            <option tal:repeat="c communities" value="${c['path']}">
-              ${c['title']}
-            </option>
-          </select>
-          <input type="submit" name="move_content" value="Move Content"/>
+        <form class="form-inline" method="POST" name="select_content">
+            <div class="form-group" metal:use-macro="content_select_grid"/>
+            <br/>
+            <label><strong>Move to</strong></label>
+            <select class="form-control" name="to_community" style="width:200px; height:22px;">
+              <option value="">Select community</option>
+              <option tal:repeat="c communities" value="${c['path']}">
+                ${c['title']}</option>
+            </select>
+            <input class="btn btn-default btn-xs" type="submit" name="move_content" value="Move Content"/>
         </form>
       </div>
     </div>

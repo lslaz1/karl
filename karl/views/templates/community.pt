@@ -14,7 +14,7 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
-    <h1 class="kscreentitle">Overview</h1>
+    <h1 class="title">Overview</h1>
     
     <div metal:use-macro="api.snippets.macros['list_tags']"/>    
     <div class="koverview_body" 

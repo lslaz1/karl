@@ -6,7 +6,7 @@
 
  <h2> Local ACL </h2>
 
- <table border="1" cellpadding="2" cellspacing="2">
+ <table class="table table-striped" border="1" cellpadding="2" cellspacing="2">
 
   <tr>
    <th width="15%">Allow / Deny</th>
@@ -37,7 +37,7 @@
    <th colspan="4">New</th>
   </tr>
 
-  <form action="edit_acl.html" method="post">
+  <form class="form-group" action="edit_acl.html" method="post">
   <tr>
    <td>
     <div>
@@ -51,13 +51,13 @@
     </div>
    </td>
    <td>
-    <input type="text" name="principal" />
+    <input class="form-control" type="text" name="principal" />
    </td>
    <td>
-    <input type="text" name="permissions" />
+    <input class="form-control" type="text" name="permissions" />
    </td>
    <td>
-    <input type="submit" name="form.add" value="Add" />
+    <input class="form-control" type="submit" name="form.add" value="Add" />
    </td>
   </tr>
   </form>
@@ -66,7 +66,7 @@
 
  <h2> Inherit Parent ACL?</h2>
  <p>
-  <form action="edit_acl.html" method="post">
+  <form class="form-group" action="edit_acl.html" method="post">
     <input type="radio" id="inherit_enabled" name="inherit" value="enabled"
            tal:attributes="checked inheriting == 'enabled'" />
     <label for="inherit_enabled">Enabled</label>
@@ -76,19 +76,19 @@
            tal:attributes="checked inheriting == 'disabled'" />
     <label for="inherit_disabled">Disabled</label>
 
-    <input type="submit" name="form.inherit" value="Update inherit" />
+    <input class="btn btn-default btn-sm" type="submit" name="form.inherit" value="Update inherit" />
   </form>
  </p>
 
  <tal:block condition="security_states">
   <h2>Workflow State</h2>
-  <form action="edit_acl.html" method="post">
-   <select name="security_state">
+  <form class="form-group" action="edit_acl.html" method="post">
+   <select class="form-control" name="security_state">
     <option tal:repeat="state security_states"
             value="${state}"
             selected="${state == security_state}">${state}</option>
    </select>
-   <input type="submit" name="form.security_state"
+   <input class="btn btn-default btn-sm" type="submit" name="form.security_state"
           value="Update workflow state"/>
   </form>
  </tal:block>

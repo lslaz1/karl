@@ -11,7 +11,7 @@
   ‘preferred’ list select ‘Edit preferred,’ make your changes and press ‘Update.’
   </p>
   <p class="portlet-help">
-  <b>Note:</b> Keep in mind that any communities added after you check this list will NOT
+  <strong>Note:</strong> Keep in mind that any communities added after you check this list will NOT
   show up here until expressly selected.
   </p>
   <div class="portlet-item" tal:repeat="my_community my_communities">
@@ -24,17 +24,17 @@
     </strong>
   </div>
   <div class="portlet-buttons">
-    <a class="primary_button"
+    <a class="btn btn-default btn-sm"
        title="Set the personalized list of communities"
        href="${api.app_url}/jquery_set_preferred.html">
        <span>Update</span>
     </a>
-    <a class="primary_button"
+    <a class="btn btn-default btn-sm"
        title="Reset portlet to show all communities"
        href="${api.app_url}/jquery_clear_preferred.html">
        <span>Clear preferred</span>
     </a>
-    <a class="primary_button"
+    <a class="btn btn-default btn-sm"
        title="Cancel and return to list of communities"
        href="${api.app_url}/jquery_list_preferred.html">
        <span>Cancel</span>

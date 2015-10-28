@@ -14,33 +14,34 @@
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
-    <div class="admin_page_body">
-      <h1 class="kscreentitle">Admin Section: Email Groups</h1>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
-      <div class="koverview_body">
-        <form method="POST" name="email_groups" enctype="multipart/form-data">
-          
-          <div class="EmailGroupsWrapper">
-	        <table class="content-listing">
-	          <thead>
-	            <tr>
-	              <th class="clgroup">Email Group</th>
-	            </tr>
-	          </thead>
-	          <tbody>
-	            <tr tal:repeat="eg email_groups">
-	              <td class="clgroup">
-                  <a href="email_group/${eg}">${eg}</a>
-                </td>
-	            </tr>
-	          </tbody>
-	        </table>
-	      </div>
-          
-        </form>
+    
+      <div class="admin_page_body">
+        <h1 class="kscreentitle">Admin Section: Email Groups</h1>
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+        <div class="koverview_body">
+          <form class="form-group" method="POST" name="email_groups" enctype="multipart/form-data">
+            
+            <div class="EmailGroupsWrapper">
+              <div class="col-lg-11">
+      	        <table class="table table-striped">
+      	          <thead>
+      	            <tr>
+      	              <th class="clgroup">Email Group</th>
+      	            </tr>
+      	          </thead>
+      	          <tbody>
+      	            <tr tal:repeat="eg email_groups">
+      	              <td class="clgroup">
+                        <a href="email_group/${eg}">${eg}</a>
+                      </td>
+      	            </tr>
+      	          </tbody>
+      	        </table>
+      	      </div>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-
   </div>
 
 </html>

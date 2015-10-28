@@ -16,16 +16,20 @@
 
       <div class="koverview_body">
         <form method="POST" name="rename_or_merge">
-          <b>Old Username</b><br/>
-          <input type="text" name="old_username"/><br/>
+          <div class="form-group">
+            <label><strong>Old Username</strong></label><br/>
+            <input class="form-control" type="text" name="old_username" style="width:170px; height:30px;"/><br/>
+            <br/>
+          </div>
+          <div class="form-group">
+            <label><strong>New Username</strong></label><br/>
+            <input class="form-control" type="text" name="new_username" style="width:170px; height:30px;"/><br/>
+            <br/>
+          </div>
+          <label><input type="checkbox" name="merge" value="1"/>
+          Merge user accounts.</label><br/>
           <br/>
-          <b>New Username</b><br/>
-          <input type="text" name="new_username"/><br/>
-          <br/>
-          <input type="checkbox" name="merge" value="1"/>
-          Merge user accounts.<br/>
-          <br/>
-          <input type="submit" value="Rename user"/>
+          <input class="btn btn-default btn-sm" type="submit" value="Rename user"/>
         </form>
 
       </div>
