@@ -8,7 +8,7 @@
           <div class="content" id="top-controls">
             <span id="logo">
               <a href="${api.home_url}">
-                <img src="${api.logo_url}" alt=""/>
+                <img src="${api.logo_url}" alt="KARL"/>
               </a>
             </span>
             <div metal:use-macro="api.snippets.macros['livesearch_box']"/>

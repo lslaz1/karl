@@ -15,33 +15,33 @@
 
     <div metal:use-macro="formfields.macros['formerror']"/>
 
-      <fieldset>
+      <div class="form-group">
 	<label>Markers</label>
 	<div class="fieldHelp">Customize what flavor of folder this is 
 	  by choosing one of the following markers.</div>
 
 	<div>
-	  <input id="reference_manual" name="marker" type="radio" 
-		 value="reference_manual" 
-		 tal:attributes="checked selected=='reference_manual'|None"/>
-	  <label for="reference_manual">Reference Manual</label>
+	  <label><input id="reference_manual" name="marker" type="radio"
+	  	 value="reference_manual" 
+	  	 tal:attributes="checked selected=='reference_manual'|None"/>
+	  	 Reference Manual</label>
 	</div>
 
 	<div>
-	  <input id="network_events" name="marker" type="radio" 
+	  <label><input id="network_events" name="marker" type="radio" 
 		 value="network_events"
 		 tal:attributes="checked selected=='network_events'|None"/>
-	  <label for="network_events">Network Events</label>
+		 Network Events</label>
 	</div>
 
 	<div>
-	  <input id="network_news" name="marker" type="radio" 
+	  <label><input id="network_news" name="marker" type="radio" 
 		 value="network_news"
 		 tal:attributes="checked selected=='network_news'|None"/>
-	  <label for="network_news">Network News</label>
+		 Network News</label>
 	</div>
 
-      </fieldset>
+      </div>
 
       <fieldset metal:use-macro="formfields.macros['form-submit']"/>
 

@@ -164,19 +164,11 @@
       <div class="feedOptions"
            tal:condition="api.user_is_staff and show_filter">
 
-           <div id="feed-filters">
+           <div class="btn-group" role="group" id="feed-filters">
                Feed Filters<br />
-               <ul>
-                   <li tal:attributes="class not filterby and 'firstItem current' or 'firstItem'">
-                       <a class="filterlink" href="#" rel=""><span>All</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycommunities' and 'current' or ''">
-                       <a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycontent' and 'lastItem current' or 'lastItem'">
-                       <a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a>
-                   </li>
-               </ul>
+              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel=""><span>All</span></a></button>
+              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a></button>
+              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a></button>
            </div>
            <div id="feed-polling">
                Auto Update <img id="polling-info" src="${api.static_url}/images/livesearch_info.png" alt="Click for Polling Info" /><br />
@@ -188,7 +180,7 @@
                    <img class="img-error" src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
                </span></a>
                <div class="polling-details info">
-                   <a href="#" class="close">close</a>
+                   <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
                    <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
                    <ul>
                        <li><img src="${api.static_url}/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
@@ -204,7 +196,7 @@
                    </p>
                </div>
                <div class="polling-details errormessage">
-                   <a href="#" class="close">close</a>
+                   <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
                    <p>The following error occurred:</p>
            <div id="kf-errordetail"></div>
                </div>

@@ -41,13 +41,13 @@
   <tr>
    <td>
     <div>
-     <input type="radio" id="allow_add" name="verb" value="Allow" />
-     <label for="allow_add">Allow</label>
+     <label><input type="radio" id="allow_add" name="verb" value="Allow" />
+     Allow</label>
     </div>
 
     <div>
-     <input type="radio" id="deny_add" name="verb" value="Deny" />
-     <label for="deny_add">Deny</label>
+     <label><input type="radio" id="deny_add" name="verb" value="Deny" />
+     Deny</label>
     </div>
    </td>
    <td>
@@ -67,14 +67,12 @@
  <h2> Inherit Parent ACL?</h2>
  <p>
   <form class="form-group" action="edit_acl.html" method="post">
-    <input type="radio" id="inherit_enabled" name="inherit" value="enabled"
-           tal:attributes="checked inheriting == 'enabled'" />
-    <label for="inherit_enabled">Enabled</label>
+    <label><input type="radio" id="inherit_enabled" name="inherit" value="enabled"
+           tal:attributes="checked inheriting == 'enabled'" />Enabled</label>
 
-    <input type="radio" id="inherit_disabled" name="inherit"
+    <label><input type="radio" id="inherit_disabled" name="inherit"
            value="disabled" checked="checked"
-           tal:attributes="checked inheriting == 'disabled'" />
-    <label for="inherit_disabled">Disabled</label>
+           tal:attributes="checked inheriting == 'disabled'" />Disabled</label>
 
     <input class="btn btn-default btn-sm" type="submit" name="form.inherit" value="Update inherit" />
   </form>

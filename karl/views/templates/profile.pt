@@ -106,9 +106,10 @@ jQuery(document).ready(function($) {
           </p>
         </div>
 
-        <div class="profileBio" tal:content="structure python: api.clean_html(profile.biography)" />
+      <div class="col-lg-11">  
+        <div class="table" tal:content="structure python: api.clean_html(profile.biography)" />
         <h3> Content Added Recently </h3>
-        <table class="content-listing" id="staffprofile-content"
+        <table class="table table-striped" id="staffprofile-content"
                style="clear: none">
           <thead>
             <tr>
@@ -130,7 +131,7 @@ jQuery(document).ready(function($) {
           <a href="${api.here_url}recent_content.html"
           >More Content Added Recently</a>
         </p>
-
+        </div>
       </div>
     </div>
   </div>
