@@ -7,94 +7,86 @@
 <div metal:fill-slot="content">
     <div class="chparent_wrapper">
         <a id="backto" class="chparent" href="${back_to_calendar_url}">
-            <img width="15" height="15" alt="Up to"
-                 src="${api.static_url}/images/arrow_up.jpg"/>
+            <span class="glyphicon glyphicon-arrow-left"></span>
             Back to Calendar
         </a>
     </div>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1 class="kscreentitle">Calendar Notes</h1>
+    <div class="container-fluid">
+        <h1 class="kscreentitle">Calendar Notes</h1>
 
-    <p tal:condition="not notes">
-        <em>No calendar notes.</em>
-    </p>
+        <p tal:condition="not notes">
+            <em>No calendar notes.</em>
+        </p>
 
-    <p tal:condition="notes">
+        <p tal:condition="notes">
 
-    <p tal:condition="is_moderator">To re-order the notes,
-        click and hold the up-down arrow to drag a note to a different
-        position in the list.</p>
+        <p tal:condition="is_moderator">To re-order the notes,
+            click and hold the up-down arrow to drag a note to a different
+            position in the list.</p>
 
-    <table>
-        <tbody id="calendarnotes"
-               data-posturl="${notes_url}">
-        <tr tal:repeat="note notes"
-                data-noteid="${note.id}"
-                class="calendarnote">
-            <td>
-        <span class="notehandle ui-icon ui-icon-triangle-2-n-s"
-                tal:condition="is_moderator"></span>
-                <strong>${note.title}</strong>. ${note.description}
-                <form action="${notes_url}"
-                      method="POST"
-                        tal:condition="is_moderator">
-                    <button id="form-remove" name="form.remove"
-                            value="${note.id}" type="submit"
-                            class="button">
-                        <span>Remove</span></button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    </p>
+        <table class="table table-striped">
+            <tbody id="calendarnotes"
+                   data-posturl="${notes_url}">
+            <tr tal:repeat="note notes"
+                    data-noteid="${note.id}"
+                    class="calendarnote">
+                <td>
+            <span class="notehandle ui-icon ui-icon-triangle-2-n-s"
+                    tal:condition="is_moderator"></span>
+                    <strong>${note.title}</strong>. ${note.description}
+                    <form class="form-group" action="${notes_url}"
+                          method="POST"
+                            tal:condition="is_moderator">
+                        <button class="btn btn-default button-xs" name="form.remove"
+                                value="${note.id}" type="submit">
+                            <span>Remove</span></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </p>
+    </div>
 
-    <p>
-
-    <form action="${notes_url}" class="k3_genericForm"
+    <div class="container-fluid">    
+        <p>
+        <form action="${notes_url}" class="k3_genericForm"
           method="POST"
             tal:condition="is_moderator">
-        <h2>Add Note</h2>
-        <fieldset>
-            <label for="note_title">
-                Title
-                <span style="color: red">*</span>
-            </label>
-
-            <div tal:condition="title_missing"
-                    class="errorMessage">Title is required
+            <h2>Add Note</h2>
+            
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="note_title">
+                        Title
+                        <span style="color: red">*</span>
+                    </label>  
+                    <div tal:condition="title_missing"
+                            class="errorMessage">Title is required
+                    </div>
+                    <input name="note_title" class="form-control" 
+                        type="text" value="${title}"/>
+                </div>  
+                <div class="form-group">
+                    <label for="note_description">
+                        Description
+                    </label>
+                    <textarea name="note_description"
+                              class="form-control"
+                              rows="3">${description}</textarea>
+                </div>
+                <div class="form-group">
+                    <button id="form-submit" name="form.submitted"
+                            value="submit" type="submit"
+                            class="btn btn-default">
+                        <span>Add</span></button>
+                </div>
             </div>
-            <div>
-                <input name="note_title" class="note_title"
-                       size="40"
-                       type="text" value="${title}"/>
-            </div>
-        </fieldset>
-        <fieldset>
-            <label for="note_description">
-                Description
-            </label>
-
-            <div>
-                <textarea name="note_description"
-                          class="note_description"
-                          cols="50"
-                          rows="3">${description}</textarea>
-            </div>
-        </fieldset>
-        <fieldset>
-            <div class="buttons clearafter">
-                <button id="form-submit" name="form.submitted"
-                        value="submit" type="submit"
-                        class="button primary_button">
-                    <span>Add</span></button>
-            </div>
-
-        </fieldset>
-
-    </form>
-    </p>
+        </form>
+        </p>
+    </div>
 </div>
 </html>

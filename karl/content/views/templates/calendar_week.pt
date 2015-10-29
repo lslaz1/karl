@@ -16,7 +16,7 @@
     <div metal:use-macro="calendar.navigation.macros['header']"/>
 
     <!-- cal legend -->
-    <table class="cal cal_week ${calendar.today_class}" cellspacing="0">
+    <table class="table cal cal_week ${calendar.today_class}" cellspacing="0">
       <!-- days -->
       <tr class="cal_dates">
         <th>${calendar.week[0].year}</th>
