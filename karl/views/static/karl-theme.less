@@ -1,302 +1,125 @@
-/*
- *	All the #333333 font colors shows as black on the web browser
- *	Change the color: on body and h3 css selectors to modify the main color
- *  NOTES:
- *
- *  1) styles are written with assuming of IE6+ and FF on windows only usage
+/*!
+ * Bootstrap v3.3.5 (http://getbootstrap.com)
+ * Copyright 2011-2015 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
+//
+// Load core variables and mixins
+// --------------------------------------------------
 
-/* Calendar applies to all media, to make it
- * printable. We trim it back
- * in print.css though, a bit. */
+@import "dist/bootstrap/less/variables.less";
+@import "dist/bootstrap/less/mixins.less";
 
 
+//
+// Buttons
+// --------------------------------------------------
 
+// Common styles
+.btn-default,
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger {
+  text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+  @shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+  .box-shadow(@shadow);
 
-/** =BASIC STYLES
------------------------------------------------ */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
-  font-size: 72%;
-  background-color: #fff;
-  color: #333;
-  text-align: center;
-}
-h1, h2, h3 {
-  margin: 0 0 0.5em 0;
-}
-h1 {
-  font-size: 1.8em;
-  font-weight: normal;
-  font-family: Georgia,Palatino,"Times New Roman";
-}
-h2 {
-  font-size: 1.3em;
-}
-h3 {
-  font-size: 1.2em;
-  letter-spacing: 0;
-}
-h3 div {
-  color: #333333;
-}
-h4 {
-  font-size: 1.1em;
-}
-a {
-  color: #3A74A9;
-}
-a:hover  {
-  text-decoration: underline;
-  cursor: pointer;
-}
-table {
-  font-size: 1em;
-}
-pre {
-  background-color: #F0F2F4;
-  border: 1px solid #CECECE;
-  color: black;
-  font-size: 125%;
-  overflow: auto;
-  width: 95%;
-  padding: 10px;
-  padding-bottom: 20px
-}
-blockquote {
-    border-left: 2px solid gray;
-    padding-left: 20px;
+  // Reset the shadow
+  &:active,
+  &.active {
+    .box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    .box-shadow(none);
+  }
+
+  .badge {
+    text-shadow: none;
+  }
 }
 
-/** =FORMS
------------------------------------------------ */
-form {
-  padding: 0;
-  margin: 0;
-  font-size: 0.9em;
-}
-fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-input {
-  background: #fff url('images/input_background.gif') 0% 0% repeat-x;
-  color: black;
-  vertical-align: middle;
-  visibility: visible;
-  border: 1px solid #CECECE;
-  font-size: 14px;
+// Mixin for generating new styles
+.btn-styles(@btn-color: #555) {
+  #gradient > .vertical(@start-color: @btn-color; @end-color: darken(@btn-color, 12%));
+  .reset-filter(); // Disable gradients for IE9 because filter bleeds through rounded corners; see https://github.com/twbs/bootstrap/issues/10620
+  background-repeat: repeat-x;
+  border-color: darken(@btn-color, 14%);
 
-}
-input.inputField {
-  width: 30em;
-}
-textarea {
-  background: #fff url('images/input_background.gif') 0% 0% repeat-x;
-  color: black;
-  border: 1px solid #CECECE;
-}
-label {
-  font-weight: bold;
-  font-size: 110%;
-}
-.k3_genericForm fieldset {
-  margin: 1em 1em 1.5em 0;
-}
-.k3_genericForm .required {
-  background-repeat: no-repeat;
-  background-position: right center;
-  padding-right: 0.8em;
-}
-.k3_genericForm .fieldHelp {
-  color: #76797C;
-  font-size: 90%;
-  margin: 0 0 0.2em;
-  width: 48em;
-}
-.k3_genericForm .fieldError {
-  width: 49em;
-  display: inline;
-  background: url("images/field_error_bg.gif") 0 0 no-repeat;
-  margin: 0 0 1em 0;
-  border-bottom: 1px solid #fff;
-  padding: 8px 10px 8px 32px;
-}
-.k3_genericForm .fieldError label {
-  color: #d31616;
-}
-.k3_genericForm .fieldError .errorMessage {
-  font-size: 95%;
-}
-.k3_genericForm .fieldError input {
-  border: 1px solid #eda379;
-}
-.k3_genericForm .fieldError select {
-  border: 1px solid #eda379;
+  &:hover,
+  &:focus  {
+    background-color: darken(@btn-color, 12%);
+    background-position: 0 -15px;
+  }
+
+  &:active,
+  &.active {
+    background-color: darken(@btn-color, 12%);
+    border-color: darken(@btn-color, 14%);
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      background-color: darken(@btn-color, 12%);
+      background-image: none;
+    }
+  }
 }
 
-.save-attachments a {
-  font-weight: bold;
-  text-decoration: underline;
-  cursor: pointer;
+// Common styles
+.btn {
+  // Remove the gradient for the pressed/active state
+  &:active,
+  &.active {
+    background-image: none;
+  }
 }
 
-/** =FORMISH FORMS
------------------------------------------------ */
+// Apply the mixin to the buttons
+.btn-default { .btn-styles(@btn-default-bg); text-shadow: 0 1px 0 #fff; border-color: #ccc; }
+.btn-primary { .btn-styles(@btn-primary-bg); }
+.btn-success { .btn-styles(@btn-success-bg); }
+.btn-info    { .btn-styles(@btn-info-bg); }
+.btn-warning { .btn-styles(@btn-warning-bg); }
+.btn-danger  { .btn-styles(@btn-danger-bg); }
 
-label.required {
-    background-image: url(images/required.gif);
-}
-input#save-title {
-    width: 490px;
-}
-input#save-caption {
-    width: 490px;
-}
-input#save-address {
-    width: 490px;
-}
-input#save-city {
-    width: 490px;
-}
-input#save-name {
-    width: 245px;
-}
-input#save-state {
-    width: 40px;
+
+//
+// Images
+// --------------------------------------------------
+
+.thumbnail,
+.img-thumbnail {
+  .box-shadow(0 1px 2px rgba(0,0,0,.075));
 }
 
-/** =SHARED
------------------------------------------------ */
-.content {
-  width: 950px;
-  margin: 0 auto;
-  padding: 0;
-}
-.noborder {
-  border: none !important;
-  background: none !important;
-}
-.more {
-	text-align: left;
-	position: relative;
-	display: block;
-	padding-left: 0;
-	margin: 10px 0pt 0pt;
-}
-.more a {
-	color: #639332 !important;
-	text-decoration: underline !important;
-	text-transform:uppercase !important;
-}
-.more a:hover {
-  text-decoration: none !important;
-}
-.documentByLine {
-  color: #8F8F8F;
-  font-style: italic;
-}
-.context {
-  background: #639332;
-  color: white !important;
-  font-size: 1em;
-  padding: 0.2em 0.6em;
-  border: 1px solid #CECECE;
-}
-.standalone {
-  background: #F0F2F4;
-  font-size: 1em;
-  padding: 0.2em 0.6em;
-  color: #333 !important;
-  border: 1px solid #CECECE;
-}
-a.context:hover,
-a.standalone:hover {
-	text-decoration: none;
-}
-button.inline {
-    float: none !important;
-    display: inline !important;
-    margin: 0 4px;
-}
-button.inline span {
-    width: auto !important;
-}
-.kscreentitle {
-  margin-bottom: 0.3em;
-  overflow: hidden;
-}
-.kprivacy_badge {
-  font-size: 11px;
-  color: #ff0000;
-  margin-left: 8px;
-  padding: 0;
-  font-weight: bold;
-  font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
-  position: relative;
-  top: -0.7em;
-  text-transform: lowercase;
-}
-.kmoderator_badge {
-  font-size: 11px;
-  color: #00aa00;
-  margin-left: 8px;
-  padding: 0;
-  font-weight: bold;
-  font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
-  position: relative;
-  top: -0.7em;
-  text-transform: lowercase;
-}
 
-/** =CLEAR HACKS
------------------------------------------------ */
-/* clearafter provides a way to clear after an element */
-.clearafter:after,
-.kscreentitle:after {
-  content: '.';
-  height: 0;
-  visibility: hidden;
-  display: block;
-  clear: both;
-}
-.clearafter,
-.kscreentitle {
-    display: inline-block;
-}
-/* Holly Hack targets IE Win only \*/
-* html .clearafter,
-* html .kscreentitle {
-    height: 1%;
-}
-.clearafter,
-.kscreentitle {
-    display: block;
-}
-/* End Holly Hack */
+//
+// Dropdowns
+// --------------------------------------------------
 
-/* clear after the title without the need to put clearafter
- * in every template */
-
-/* Clearing a given element. It only meant to apply from javascript.
- * It's separate from visualClear to avoid possible layout problems. */
-.clear {
-  height: 0;
-  visibility: hidden;
-  display: block;
-  clear: both;
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  #gradient > .vertical(@start-color: @dropdown-link-hover-bg; @end-color: darken(@dropdown-link-hover-bg, 5%));
+  background-color: darken(@dropdown-link-hover-bg, 5%);
 }
-.clear-ie-container {
-  height: 1%;
-  overflow: hidden;
-}
-.visualClear {
-  clear: both;
-  font-size: 1px;
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  #gradient > .vertical(@start-color: @dropdown-link-active-bg; @end-color: darken(@dropdown-link-active-bg, 5%));
+  background-color: darken(@dropdown-link-active-bg, 5%);
 }
 
 /** =ERROR/STATUS MESSAGES
@@ -357,1070 +180,174 @@ button.inline span {
   margin-top: 2px;
 }
 
-.discreet {
-	color: #999999;
-	font-size: 0.9em;
+//
+// Navbar
+// --------------------------------------------------
+
+// Default navbar
+.navbar-default {
+  #gradient > .vertical(@start-color: lighten(@navbar-default-bg, 10%); @end-color: @navbar-default-bg);
+  .reset-filter(); // Remove gradient in IE<10 to fix bug where dropdowns don't get triggered
+  border-radius: @navbar-border-radius;
+  @shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 5px rgba(0,0,0,.075);
+  .box-shadow(@shadow);
+
+  .navbar-nav > .open > a,
+  .navbar-nav > .active > a {
+    #gradient > .vertical(@start-color: darken(@navbar-default-link-active-bg, 5%); @end-color: darken(@navbar-default-link-active-bg, 2%));
+    .box-shadow(inset 0 3px 9px rgba(0,0,0,.075));
+  }
 }
-.discreet label {
-  font-weight: normal;
-  color:#748B93;
+.navbar-brand,
+.navbar-nav > li > a {
+  text-shadow: 0 1px 0 rgba(255,255,255,.25);
 }
 
-/** =TABLE STYLES
------------------------------------------------ */
-table.content-listing {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing:0;
-  margin: 0 0em 1em 0em;
-  padding: 0;
-  font-size: 1em;
-  border-bottom: 1px dashed #e4e9eb;
-}
-.hiddenCell {
-    padding: 0 !important;
-    width: 0;
-}
-* html table.content-listing {
-  width:98%;
-}
-table.content-listing th,
-table.content-listing td {
-  border-collapse: collapse;
-  border-spacing:0;
-  padding: 0.5em 1em;
-  margin: 0;
-}
-table.content-listing th {
-  text-align: left;
-  border-bottom: 1px dashed #e4e9eb;
-}
-table.content-listing td {
-  border-bottom: 1px dashed #e4e9eb;
-}
-table.content-listing th.cltype {
-	width: 15%;
-}
-table.content-listing th.cldate {
-	width: 20%;
-}
-table.content-listing th.clauthor {
-	width: 20%;
+// Inverted navbar
+.navbar-inverse {
+  #gradient > .vertical(@start-color: lighten(@navbar-inverse-bg, 10%); @end-color: @navbar-inverse-bg);
+  .reset-filter(); // Remove gradient in IE<10 to fix bug where dropdowns don't get triggered; see https://github.com/twbs/bootstrap/issues/10257
+  border-radius: @navbar-border-radius;
+  .navbar-nav > .open > a,
+  .navbar-nav > .active > a {
+    #gradient > .vertical(@start-color: @navbar-inverse-link-active-bg; @end-color: lighten(@navbar-inverse-link-active-bg, 2.5%));
+    .box-shadow(inset 0 3px 9px rgba(0,0,0,.25));
+  }
+
+  .navbar-brand,
+  .navbar-nav > li > a {
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  }
 }
 
-/** =MENU ACTIONS (ADD, EDIT, DELETE)
------------------------------------------------ */
-ul.menubar {
-  display: inline-block;
-  float: right;
-  margin: 0 0 8px;  /* no top margin here */
-  padding: 0;
-  list-style: none;
-  font-weight: bold;
-  text-align: right;
-}
-ul.menubar li {
-  display: inline-block;
-  float: left;
-  height: 18px;
-  position: relative;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  text-align: center;
-  color: #ffffff;
-  border-right: 1px solid #ffffff;
-}
-ul.menubar li a {
-    color: #ffffff;
-    background: #639332;
-    border-top: 1px solid #355217;
-    border-bottom: 1px solid #355217;
-    text-decoration: none;
-    line-height: 16px;
-    height: 16px;
-    margin: 0px;
-    padding: 1px 10px;
-    outline: 0;
-    font-size: 11px;
-}
-ul.menubar li a:hover {
-    background: #6b9e37;
-    text-decoration: none;
-}
-ul.menubar li a:active {
-    background: #557e2c;
-}
-ul.menubar #menubar-1 a {
-    border-left: 1px solid #355217;
-    border-radius: 5px 0 0 5px;
-    -moz-border-radius: 5px 0 0 5px;
-}
-ul.menubar .menubar-lastitem a {
-    border-right: 1px solid #355217;
-    border-radius: 0 5px 5px 0;
-    -moz-border-radius: 0 5px 5px 0;
-}
-/* when there is only one button */
-ul.menubar #menubar-1.menubar-lastitem a {
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-}
-/* dropdowns */
-span.pointer {
-  cursor: pointer;
-}
-ul.menubar a span {
-  padding: 0;
-}
-ul.karldropdown-menu {
-  position: absolute;
-  display: none;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: 9999;
-  text-align: left;
-}
-ul.menubar ul.karldropdown-menu li {
-  display:block;
-  /* reset inheritence from the menubar buttons */
-  background-color: #666666;
-  background-image: none;
-  text-align: left;
-  padding: 2px 11px !important;
-  border: none;
-  /** no fixed width and height here! **/
-}
-ul.menubar ul.karldropdown-menu li a {
-  display: block;
-  padding: 0;
-  border: none !important;
-  background: transparent none !important;
-}
-ul.menubar div.karldropdown-indicator {
-  display: block;
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  /* use lighter icon set */
-  background-image: url("images/ui-icons_ffffff_256x240.png");
-  background-color: transparent;
-  border: 0;
-}
-ul.menubar a.karldropdown-heading {
-  display: inline;
-  padding-right: 22px !important;
+// Undo rounded corners in static and fixed navbars
+.navbar-static-top,
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  border-radius: 0;
 }
 
-/** =LINK TO PARENT (BREADCRUMB)
------------------------------------------------ */
-.chparent_wrapper {
-  margin-bottom: 2em;
-}
-a.chparent {
-  text-decoration: none;
-}
-a.chparent img {
-  border: none;
-}
-a.chparent:hover {
-  text-decoration: none;
-}
-
-/** =SITE ANNOUNCEMENT
------------------------------------------------ */
-#site-announcement {
-  float: left;
-  margin-left: 15px;
-  width: 870px;
-}
-ul.site-announcement-list {
-    padding-left: 0px;
-    margin-left: 0px;
-    width: 870px;
-
-    span.date {
-        font-style: italic;
-        display: block;
-        text-align: right;
+// Fix active state of dropdown items in collapsed mode
+@media (max-width: @grid-float-breakpoint-max) {
+  .navbar .navbar-nav .open .dropdown-menu > .active > a {
+    &,
+    &:hover,
+    &:focus {
+      color: #fff;
+      #gradient > .vertical(@start-color: @dropdown-link-active-bg; @end-color: darken(@dropdown-link-active-bg, 5%));
     }
-
-    li {
-        background-color: #fffad8;
-        border: 1px solid #f1e186;
-        padding: 5px;
-        margin: 5px 0;
-        list-style: none;
-    }
-    li.seen {
-        background-color: #efefef;
-        border: 1px solid #d8d8d8;
-    }
-}
-.site-announcement-list {
-    clear:both;
-    padding-top: 25px;
-
-    ul {
-        padding-left: 0px;
-        margin-left: 0px;
-
-        li {
-            background-color: #fffad8;
-            border: 1px solid #f1e186;
-            padding: 5px;
-            margin: 5px 0px;
-            list-style: none;
-
-            span.date {
-                font-style: italic;
-            }
-            blockquote {
-                margin: 10px;
-            }
-            div {
-              text-align: right;
-            }
-        }
-    }
-}
-.ie-announcement {
-    float: left;
-    margin-left: 15px;
-    border-color: #ff0000;
-    background-color: #F2C3C2;
+  }
 }
 
-/** =LAYOUT STRUCTURE
------------------------------------------------ */
-.visual-portal-wrapper {
-  width: 1003px;
-  text-align: center;
-  margin: 0 auto;
-}
-#header {
-  text-align: center;
-}
-#spo-header {
-  width: 952px;
-  position: relative;
-  z-index: 100; /* to get the livesearch results *above* the content in IE */
-  margin: 0px auto;
-  text-align: right;
-  background: #f0f2f4;
-  border-right: 1px solid #cecece;
-  border-left: 1px solid #cecece;
-}
-#main {
-  width: 952px;
-  margin: 0px auto;
-  text-align: left;
-  border-right: 1px solid #cecece;
-  border-left: 1px solid #cecece;
-  border-bottom: 1px solid #CECECE;
-  background: #f0f2f4;
-  padding-bottom: 3.5em;
-  padding-top: 15px;
-}
-#left {
-  float: left;
-  position: relative;
-  width: 212px;
-  margin: 0 14px;
-  z-index: 2;
-}
-#center {
-  background-color: #FFF;
-  border: 1px solid #CECECE;
-  padding: 10px;
-  margin: 0 15px 15px;
-  float: left;
-}
-/*
-.generic-layout #center.fill-width,
-.community-layout #center.fill-width {
-    width: 900px;
-}
-.generic-layout #center,
-.community-layout #center {
-    width: 704px;
-}
-*/
 
-.generic-layout #center.fill-width {
-    width: 900px;
-}
-.generic-layout #center,
-.community-layout #center {
-    width: 704px;
+//
+// Alerts
+// --------------------------------------------------
+
+// Common styles
+.alert {
+  text-shadow: 0 1px 0 rgba(255,255,255,.2);
+  @shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05);
+  .box-shadow(@shadow);
 }
 
-#right {
- 	float: right;
-	width: 262px;
-	display: block;
-	padding-top: 0px;
-	margin: 0 14px;
-	overflow: visible;
-}
-#footer {
-  width: 932px;
-  margin: 0px auto;
-  padding: 20px 20px 70px;
-  color: #7E7E7E;
-  text-align: center;
+// Mixin for generating new styles
+.alert-styles(@color) {
+  #gradient > .vertical(@start-color: @color; @end-color: darken(@color, 7.5%));
+  border-color: darken(@color, 15%);
 }
 
-/** =HEADER
------------------------------------------------ */
-#header-user-menu {
-  font-size: 0.9em;
-  text-transform: uppercase;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  text-align: right;
-}
-ul.horListing {
-  margin: 0 20px;
-  padding: 0;
-  list-style: none;
-}
-ul.horListing li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: inline;
-}
-.horListing a,
-.horListing a:visited {
-  color: #639332;
-  text-decoration: none;
-  padding: 0 0.5em;
-}
-.horListing li.noborder a {
-  padding-right: 0;
-}
-#header-top {
-  background: #fff url("images/gradient-top.png") top left repeat-x;
-  height: 55px;
-}
-#logo {
-  float: left;
-  margin: 7px 0px 0px 15px;
-  width: 129px;
-  height: 32px;
-}
-#logo a img {
-  border: none;
-  width: 129px;
-  height: 32px;
+// Apply the mixin to the alerts
+.alert-success    { .alert-styles(@alert-success-bg); }
+.alert-info       { .alert-styles(@alert-info-bg); }
+.alert-warning    { .alert-styles(@alert-warning-bg); }
+.alert-danger     { .alert-styles(@alert-danger-bg); }
+
+
+//
+// Progress bars
+// --------------------------------------------------
+
+// Give the progress background some depth
+.progress {
+  #gradient > .vertical(@start-color: darken(@progress-bg, 4%); @end-color: @progress-bg)
 }
 
-/** =HEADER MENU / ROUNDED TABS
------------------------------------------------ */
-#spo-header-top {
- 	width: 100%;
-	display: block;
-	position: relative;
-}
-ul#header-menu {
-    padding: 0 20px 0 0;
-    margin: -1px 0 0;
-    list-style: none none;
-    float: right;
-    width: 915px;
-}
-ul#header-menu li {
-    padding: 0;
-    margin: 0 0 0 5px;
-    float: right;
-    position: relative;
-}
-ul#header-menu li a {
-    text-transform: uppercase;
-    text-decoration: none;
-    font-size: 10px;
-    line-height: 14px;
-    padding: 2px 27px;
-    color: #507988;
-    outline: 0;
-    background-color: #CFD5DA;
-    border-width: 0 1px 1px;
-    border-color: #bcc2c7;
-    border-style: solid;
-    border-radius: 0 0 10px 10px;
-    -moz-border-radius: 0 0 10px 10px;
+// Mixin for generating new styles
+.progress-bar-styles(@color) {
+  #gradient > .vertical(@start-color: @color; @end-color: darken(@color, 10%));
 }
 
-/** =SEARCHBOX
------------------------------------------------ */
-#searchbox {
-  float: right;
-  vertical-align: top;
-  margin: 10px 20px 0 0;
-  padding: 0 !important;
-  text-align: right;
-  width: 520px;
-}
-#searchbox form {
-  margin: 0;
-  padding: 0;
-}
-input#livesearch-input {
-  float: right;
-  display: inline;
-  border: 1px solid #e4e9eb;
-  margin-right: 5px;
-  line-height: 26px !important;
-  height: 26px !important;
-  width: 450px !important;
-  font-size: large;
-  vertical-align: top;
-  float: left;
-  padding: 0 !important;
-}
-#livesearch-button {
-  float: right;
-  width: 47px;
-  height: 24px;
-  line-height: 24px;
-  padding: 0;
-  margin: 0;
-}
-#searchbox .advancedSearch {
-  display: block;
-  font-size: 1.2em;
-  line-height: 1em;
-}
-#searchbox span a,
-#searchbox span a:visited {
-  font-size: 0.8em;
-  color: #63707C;
-  padding: 0;
-  margin: 0;
-  text-decoration: none;
+// Apply the mixin to the progress bars
+.progress-bar            { .progress-bar-styles(@progress-bar-bg); }
+.progress-bar-success    { .progress-bar-styles(@progress-bar-success-bg); }
+.progress-bar-info       { .progress-bar-styles(@progress-bar-info-bg); }
+.progress-bar-warning    { .progress-bar-styles(@progress-bar-warning-bg); }
+.progress-bar-danger     { .progress-bar-styles(@progress-bar-danger-bg); }
+
+// Reset the striped class because our mixins don't do multiple gradients and
+// the above custom styles override the new `.progress-bar-striped` in v3.2.0.
+.progress-bar-striped {
+  #gradient > .striped();
 }
 
-/** =FOOTER
------------------------------------------------ */
-#footer a {
-  text-transform: uppercase;
-  color: #7E7E7E;
-  text-decoration: none;
+
+//
+// List groups
+// --------------------------------------------------
+
+.list-group {
+  border-radius: @border-radius-base;
+  .box-shadow(0 1px 2px rgba(0,0,0,.075));
 }
-#footer .selected {
-  font-weight: bold;
-}
-#footer .osi-logo {
-  float: left;
-  margin: 0px;
-  padding: 0px;
-}
-#footer .osi-logo img {
-  border: none;
-}
-#footer .extra {
-  float: right;
-  font-size: 0.9em;
-}
-#footer .extra a {
-  color: #639332;
+.list-group-item.active,
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+  text-shadow: 0 -1px 0 darken(@list-group-active-bg, 10%);
+  #gradient > .vertical(@start-color: @list-group-active-bg; @end-color: darken(@list-group-active-bg, 7.5%));
+  border-color: darken(@list-group-active-border, 7.5%);
+
+  .badge {
+    text-shadow: none;
+  }
 }
 
-/** =CENTER CONTENT
------------------------------------------------ */
-#center div .sections {
-	padding: 1em 0 0;
-	display: block;
-	overflow: hidden;
-	border-top: 1px solid #cccccc;
-	margin-top: 1.5em;
-}
-#center .sections h3 {
-  font-weight: normal;
-  letter-spacing: 0px;
-  font-family: Georgia,Palatino,"Times New Roman";
-  color: #639332;
-  font-size: 1.6em;
-}
-#center div .teaser {
-	padding: 0;
-	color: #FFF;
-	overflow: hidden;
-}
-#center .teaser img {
-  margin: 0em 0em 1em 0em;
-  border: none;
-}
-#center div .sections p {
-	margin: 7px 0px 0px 0px;
-	padding: 0px;
-}
-#center div .sections a {
-	color: #3A74A9;
-	font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
-	text-decoration: none;
-	padding: 0;
-	margin: 0;
-}
-#center div .sections h2 {
-	margin-left: 0px;
-}
-div.center_boards {
-  margin: 0 0 15px !important;
-  float: left;
-  width: 675px;
+
+//
+// Panels
+// --------------------------------------------------
+
+// Common styles
+.panel {
+  .box-shadow(0 1px 2px rgba(0,0,0,.05));
 }
 
-/** =PEOPLE DIRECTORY
------------------------------------------------ */
-ul#peopledir-tabs {
-  padding: 3px 0 3px 1em;
-  margin: 0;
-  margin-top: 1em;
-  list-style: none;
-}
-ul#peopledir-tabs li {
-  list-style: none;
-  margin: 0;
-  display: inline;
-}
-ul#peopledir-tabs li a {
-  padding: 3px 2em;
-  margin-left: 3px;
-  border: 1px solid #CECECE;
-  border-bottom: none;
-  background: #e6e6f2;
-  text-decoration: none;
-  font-size: 0.9em;
-  text-transform: uppercase;
-}
-ul#peopledir-tabs li a:hover {
-  background-color: white;
-  text-decoration: none;
-}
-ul#peopledir-tabs li.selected a {
-  background: white;
-  border-bottom: 1px solid white;
+// Mixin for generating new styles
+.panel-heading-styles(@color) {
+  #gradient > .vertical(@start-color: @color; @end-color: darken(@color, 5%));
 }
 
-#peopledir-section ul {
-  padding: 0px;
-  margin-left: 0px;
+// Apply the mixin to the panel headings only
+.panel-default > .panel-heading   { .panel-heading-styles(@panel-default-heading-bg); }
+.panel-primary > .panel-heading   { .panel-heading-styles(@panel-primary-heading-bg); }
+.panel-success > .panel-heading   { .panel-heading-styles(@panel-success-heading-bg); }
+.panel-info > .panel-heading      { .panel-heading-styles(@panel-info-heading-bg); }
+.panel-warning > .panel-heading   { .panel-heading-styles(@panel-warning-heading-bg); }
+.panel-danger > .panel-heading    { .panel-heading-styles(@panel-danger-heading-bg); }
+
+
+//
+// Wells
+// --------------------------------------------------
+
+.well {
+  #gradient > .vertical(@start-color: darken(@well-bg, 5%); @end-color: @well-bg);
+  border-color: darken(@well-bg, 10%);
+  @shadow: inset 0 1px 3px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.1);
+  .box-shadow(@shadow);
 }
 
-#peopledir-content-wrapper {
-  border: 1px solid #CECECE;
-  padding: 2em 10px 1em;
-  overflow: hidden;
-}
-#peopledir-section h3 {
-  margin-left: 0px;
-  margin-top: 10px;
-}
-#peopledir-section ul li {
-  list-style: none;
-  padding-left: 0px;
-  margin-left: 0px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-#peopledir-section a.priority {
-  padding-bottom: 5px;
-  font-style: italic;
-  font-weight: bold;
-  display: block;
-}
-
-#peopledir-actions {
-  width: 100px;
-  clear: both;
-  float: right;
-}
-#peopledir-actions ul {
-  margin: 0px;
-  float: right;
-  padding: 0;
-}
-#peopledir-actions li {
-  float: left;
-  margin: 2px;
-  list-style: none;
-}
-#peopledir-actions .ui-icon {
-  height: 16px;
-  width: 16px;
-  margin: 0 4px
-}
-#peopledir-letterbox-wrapper {
-  background: #F0F2F4 none repeat scroll 0 0;
-  border: 1px solid #CECECE;
-  font-size: 0.9em;
-}
-#peopledir-letterbox-wrapper .kalphabetlisting {
-  margin-bottom: 0px;
-  padding: 3px 10px;
-}
-#peopledir-search-box-wrapper {
-  background-color: #ffffff;
-  padding: 8px;
-  border-right: 1px solid #cecece;
-  border-bottom: 1px solid #cecece;
-  border-left: 1px solid #cecece;
-  margin-bottom: 10px;
-}
-#communitiy-search-box-wrapper {
-  background-color: #ffffff;
-  float: right;
-  width: 240px;
-  padding: 9px 8px 8px;
-  border-left: 1px solid #cecece;
-}
-#peopledir-search-box .field,
-#communitiy-search-box .field {
-    margin: 0;
-}
-.deleteMessage {
-	text-align: center;
-	margin-top: 2em;
-	margin-bottom:2em;
-	font-size: 1.3em;
-}
-.deleteMessage .primary_button,
-.deleteMessage .normal_button {
-    float: left;
-    display: block;
-}
-
-.deleteMessage .primary_button {
-    margin-left: 280px;
-}
-
-/** =COMMUNITY HEADER (H1, SEARCH)
------------------------------------------------ */
-.community_view, #center.community_view {
-  background-color: #CEDFEF;
-}
-.community_view .cheader {
-  margin-bottom: 25px;
-  position: relative;
-}
-.community_view .cheader h1 {
-  font-weight: normal;
-  margin-top: 0;
-}
-.community_view .cheader form {
-  float: right;
-  width: 35em;
-  text-align: right;
-}
-.community_view .cheader form input {
-  margin-right: 2px;
-  font-size: 11px;
-  display: inline;
-  height: 19px;
-  vertical-align: baseline;
-}
-.community_view .cheader form .inp {
-	width: 15em;
-}
-
-/** =COMMUNITY TABS (OVERVIEW, BLOG, WIKI)
------------------------------------------------ */
-.community_view #cwrapper {
-  margin-top: 10px;
-  background-color: #CEDFEF;
-}
-.community_view #cleftcol {
-	float: left;
-	width: 690px;
-}
-.community_view #cleftcol .ccontent {
-	border: 1px solid #CECECE;
-    border-top: none;
-	padding: 20px 10px 10px 10px;
-	display: block;
-	background-color: white;
-	margin-top: 0px;
-	overflow: hidden;
-}
-.community_view #cleftcol #cheader ul {
-  padding: 3px 0 3px 1em;
-  margin: 0;
-  border-bottom: 1px solid #CECECE;
-  list-style: none;
-}
-.community_view #cleftcol #cheader ul li {
-  list-style: none;
-  margin: 0;
-  display: inline;
-}
-.community_view #cleftcol #cheader ul li a {
-  padding: 3px 0.5em;
-  margin-left: 3px;
-  border: 1px solid #CECECE;
-  border-bottom: none;
-  background: #e6e6f2;
-  text-decoration: none;
-  font-size: 0.9em;
-  text-transform: uppercase;
-}
-.community_view #cleftcol #cheader ul li a:hover {
-  background-color: white;
-}
-.community_view #cleftcol #cheader ul li.curr a {
-  background: white;
-  border-bottom: 1px solid white;
-}
-.community_view #cleftcol #cheader span {
-	font-size: 11px;
-	color: black;
-	float: right;
-	margin: 5px 10px 0px 10px;
-	font-size: 11px;
-}
-.community_view #cleftcol #cheader span a {
-	color: #748b93;
-	text-decoration: none;
-}
-
-/** =COMMUNITY RIGHT COL (PORTLETS)
------------------------------------------------ */
-.community-layout #crightcol {
-  width: 185px;
-  float: right;
-  margin: 0 10px 0 0;
-  color: #000;
-}
-.community-layout #crightcol .right-portlet {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px dashed #CECECE;
-}
-.community-layout #crightcol a {
-	color: #748b93;
-	text-decoration: none;
-}
-.bt {
-	background-color: #e6e6f2;
-	color: #748b93;
-}
-.recentItemsWrapper {
-	padding-top: 1.0em;
-    clear: both;
-}
-.communityEntry {
-  margin-bottom: 20px;
-}
-.communityEntry p {
-  margin: 0.5em 0;
-}
-tr.moderator td {
-  color: #639332;
-  font-weight: bold;
-}
-
-/** =NAVIGATION TREE MENU
------------------------------------------------ */
-ul.nav li {
-  position: relative;
-  width: 190px;
-}
-ul.nav ul {
-  position: absolute;
-  top: 0;
-  left: 190px;
-  z-index: 10;
-  background: #e6e8ec;
-  visibility: hidden;
-  border: 1px solid #cccccc;
-}
-#left .submenu ul a {
-  background-image: none;
-}
-ul.nav li:hover a,
-ul.nav li.iehover a {
-  background-color: #e6e8ec;
-}
-ul.nav li:hover ul.level2,
-ul.nav li.iehover ul.level2 {
-  visibility: visible;
-}
-ul.nav li:hover ul a,
-ul.nav li.iehover ul a {
-  background-color: transparent;
-}
-ul.nav li:hover ul a:hover,
-ul.nav li.iehover ul a:hover {
-  background-color: #cccccc !important;
-}
-
-/** =PORTLET
------------------------------------------------ */
-.portlet-table {
-  border-collapse: collapse;
-  padding: 0;
-  margin: 0% 5%;
-  width: 90%;
-}
-.portlet-table td {
-  border-collapse: collapse;
-  padding: 0 2px 10px;
-  margin: 0;
-  vertical-align: top;
-}
-.portlet-table td.type {
-    text-align: center;
-}
-.portlet-table td.date {
-    text-align: right;
-}
-.portlet-table .num {
-	width: 10%;
-	padding-right: 10px;
-	text-align: right;
-}
-.portlet-table .name,
-.portlet-table .type{
-	padding-right: 2px;
-}
-a.splitIntoWords span {
-	display: block;
-}
-
-/** =OFFICES
------------------------------------------------ */
-div#offices-wrapper {
-  padding:0 215px;
-  font-size: 0.8em;
-}
-ul#offices-listing {
-  margin: 0;
-  padding:0;
-  list-style: none;
-}
-ul#offices-listing li {
-  margin: 0;
-  padding: 0;
-  list-style:none;
-  text-transform: uppercase;
-  display: inline;
-  white-space: normal;
-}
-span.officeslistSeparator {
-  padding: 0 0.2em 0 0.2em;
-}
-div#offices-wrapper p {
-  padding: 0;
-  margin: 0.5em 0;
-}
-
-/** =WICKED
------------------------------------------------ */
-.wicked_resolved img {
-  border: none;
-}
-.wicked_unresolved {
-  color: red;
-}
-
-/** edit page (form) view **/
-.field {
-  left: 0;
-  top: 0;
-  margin: 1em 1em 1.5em 0;
-}
-.field label.required {
-  background-repeat: no-repeat;
-  background-position: right center;
-  padding-right: 8px;
-}
-input#title {
-  font-family:Tahoma,"Lucida Grande",Lucida,Helvetica,Arial,sans-serif;
-  font-size:160%;
-  font-weight:normal;
-}
-div.error {
-  background-color: #FFCC00;
-  border: 1px solid #FF8A00;
-  margin: 0pt 0pt 1em;
-  padding: 1em;
-  width: 49em;
-}
-div.contains-error {
-  background-color: #FFCC00;
-  border: 1px solid #FF8A00;
-  margin: 0pt 0pt 1em;
-  padding: 1em;
-  width: 49em;
-}
-.error .fieldRequired {
-  color: #FFCC00;
-}
-.contains-error .fieldRequired {
-  color: #FFCC00;
-}
-
-#mce_editor_0_addwickedlink,
-#mce_editor_0_delwickedlink,
-#mce_editor_1_addwickedlink,
-#mce_editor_1_delwickedlink,
-#mce_editor_2_addwickedlink,
-#mce_editor_2_delwickedlink,
-#mce_editor_3_addwickedlink,
-#mce_editor_3_delwickedlink,
-#mce_editor_4_addwickedlink,
-#mce_editor_4_delwickedlink {
-  display: none;
-}
-
-/** =BLOG ENTRY
------------------------------------------------ */
-.addCommentButton {
-  text-align: center;
-  padding: 0.4em 0em;
-  text-transform: capitalize;
-}
-.newsitemImage {
-  float: right;
-  margin: 0 0 1em 1em;
-}
-.imageCaption {
-  margin-top: 0.5em;
-  width: 200px;
-}
-.kbyline {
-  color: #999999;
-}
-.kbody {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-}
-.blogComment {
-  background: #F0F2F4;
-  border: 1px solid #CECECE;
-  margin: 0em 0em 1em;
-  padding: 1em;
-  min-height: 100px;
-  height:auto !important;
-  height: 100px;
-}
-.blogAttachments {
-  margin: 1em 0em 2em 0em;
-  clear: both;
-}
-.blogAttachments span {
-  margin-right: 1em;
-}
-.commentManagement {
-  float: right;
-  margin-top: -0.5em;
-}
-.blogEntry {
-  border-top: 1px solid #CECECE;
-  padding-bottom: 1.5em;
-}
-.blogEntry h2 {
-  margin-bottom: 0;
-  margin-top: 0.5em;
-}
-.blogEntry h2 a {
-  text-decoration: none;
-}
-.commentText {
-  margin-top: 2em;
-  margin-bottom: 2em;
-}
-.batchNavigation {
-  margin-top: 2em;
-}
-
-/** =BATCH MECHANISM
------------------------------------------------ */
-.kpagination_frame {
-  background-color: #F0F2F4;
-  border: 1px solid #cecece;
-  color: black;
-  padding: 0.2em 1em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-
-/** =CALENDAR
------------------------------------------------ */
-.kutility_menu {
-  margin-bottom: 20px;
-}
-.kutility_menu a {
-  color: black;
-}
-h2.eventsListing {
-  text-align: center;
-}
-dl.eventsListing dt {
-  font-weight: bold;
-  margin-top: 15px
-}
-dl.eventsListing dd {
-  margin: 1px 0;
-  padding: 0.5em;
-  background-color: #EFF7FF;
-}
-.batchNavigation {
-	text-align: center;
-	margin-bottom: 0.5em;
-}
-.batchNavigation a {
-  font-weight: bold;
-}
-.batchNavigation a:hover {
-  text-decoration: none;
-}
-table#calendar {
-  border: 1px solid #D9D9D9;
-  border-style: solid solid none none;
-}
-table#calendar td {
-  border: solid #D9D9D9 .5px;
-}
-table#calendar td.this-day {
-  background-color:#fff6e4;
-}
-table#calendar td.other-month,
-table#calendar td.this-month {
-  background: white;
-}
-table#calendar span.middot {
-  font-weight: bold;
-  font-size: 160%;
-  vertical-align: middle;
-  font-family: "Trebuchet MS";
-  line-height: 0.6em;
-}
-.calendar_day_of_week_header {
-  text-align: center;
-  background-color: #e5e8ed;
-}
-.calendar_day_of_week_header td {
-  padding: 4px 0 4px 0;
-  border: solid #D9D9D9;
-  border-width: 1px 0 1px 1px;
-}
-.calendar_day_header {
-  text-align: right;
-  background-color: #E8EEF7;
-  display: block;
-}
-.other-month .calendar_day_header {
-  text-align: right;
-  background-color: #E8EEF7;
-  color: #D9D9D9;
-}
-.calendar_day_entry {
-  padding: 3px;
-  color: #999;
-}
-
+<<<<<<< HEAD
 /** =PEOPLE PROFILE
 ----------------------------------------------- */
 .peopleSearchWrapper {
@@ -2793,3 +1720,5 @@ div#reportgrid_wrapper {
     float: right;
   }
 }
+=======
+>>>>>>> remove all base karl-theme less/css and replace with basic bootstrap-theme less/css for a base to work off of
