@@ -60,8 +60,8 @@
       <div metal:use-macro="api.snippets.macros['show_attachments']"/>
     </div>
 
-
-    <p class="add-to-outlook-link"><a href="@@event.ics">Add to Outlook</a></p>
+    <br/>
+    <a class="btn btn-default btn-sm" href="@@event.ics">Add to Outlook</a><br/><br/>
 
   </div>
 
