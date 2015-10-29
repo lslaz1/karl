@@ -58,7 +58,7 @@ gulp.task('stamp', function() {
   fs.writeFile(res.staticPrefix + 'dist/stampfile', _.template(stampfile)());
 });
 
-var tocopy = ['jquery', 'jquery-ui', 'tinymce-builded', 'lodash', 'patternslib',
+var tocopy = ['jquery', 'jquery-migrate', 'jquery-ui', 'tinymce-builded', 'lodash', 'patternslib',
               'logging', 'jqtree', 'dropzone', 'mockup-core', 'select2', 'requirejs-text',
               'requirejs', 'jquery-form', 'backbone', 'bootstrap',
               'datatables.net', 'datatables.net-dt',

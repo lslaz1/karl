@@ -30,6 +30,7 @@
     baseUrl: baseUrl,
     optimize: 'none',
     paths: {
+      'bootstrap': 'dist/bootstrap/dist/js/bootstrap',
       'backbone': 'dist/backbone/backbone',
       'dropzone': 'dist/dropzone/dist/dropzone-amd-module',
       'jqtree': 'dist/jqtree/tree.jquery',
