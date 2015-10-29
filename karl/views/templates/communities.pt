@@ -40,7 +40,7 @@
 
     <metal:script
         metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
-    <table tal:condition="batch_info['batching_required']" width="100%">
+    <table class="table table-striped" tal:condition="batch_info['batching_required']" width="100%">
       <tr class="ui-grid-footer">
         <th class="ui-widget-header">
           <div metal:use-macro="api.snippets.macros['gridstyle_batching']">
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <table tal:condition="batch_info['batching_required']" width="100%">
+    <table class="table table-striped" tal:condition="batch_info['batching_required']" width="100%">
       <tr class="ui-grid-footer">
         <th class="ui-widget-header">
           <div metal:use-macro="api.snippets.macros['gridstyle_batching']">

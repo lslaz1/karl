@@ -815,13 +815,13 @@
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <div class="sif-widget">
-        <input id="file_nochange" class="sif-nochange noborder" type="radio"
+        <label><input id="file_nochange" class="sif-nochange noborder" type="radio"
               checked="checked" value="nochange" name="file-dummyoption"/>
-        <label for="file_nochange">Keep existing file</label>
+              Keep existing file</label>
         <br />
-        <input id="file_upload" class="sif-upload noborder" type="radio"
+        <label><input id="file_upload" class="sif-upload noborder" type="radio"
               value="" name="file-dummyoption"/>
-        <label for="file_upload">Replace with new file:</label>
+              Replace with new file:</label>
         <br />
         <div class="sif-stub">
           <input type="file" value="true" name="file"/>
