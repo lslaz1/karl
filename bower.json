@@ -3,13 +3,16 @@
   "description": "",
   "private": true,
   "dependencies": {
-    "mockup": "v2.0.4",
+    "jquery": "1.9.1",
+    "jquery-migrate": "1.2.1",
     "jquery-ui": "1.9.2",
+    "bootstrap": "3.3.4",
+    "mockup": "v2.0.4",
     "bgiframe": "3.0.1"
   },
   "resolutions": {
-    "jquery": "1.8.3",
     "select2": "3.5.1",
-    "patternslib": "2.0.9"
+    "patternslib": "2.0.9",
+    "jquery": "1.9.1"
   }
 }

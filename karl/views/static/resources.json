@@ -4,6 +4,7 @@
   "js": {
     "karl-ui": [
       "dist/jquery/jquery.js",
+      "dist/jquery-migrate/jquery-migrate.js",
       "dist/jquery-ui/external/jquery.bgiframe.js",
       "dist/jquery-ui/ui/jquery.ui.core.js",
       "dist/jquery-ui/ui/jquery.ui.widget.js",
@@ -68,6 +69,9 @@
       "jquery-ui-plugins/jquery.ui.selectmenu.js",
       "karl-plugins/karl-calendar/karl.calendar.js",
       "karl.js"
+    ],
+    "bootstrap": [
+      "dist/bootstrap/dist/js/bootstrap.js"
     ]
   },
   "css": [
@@ -75,6 +79,7 @@
     "karl-multifileupload",
     "karl-wikitoc",
     "karl-base",
-    "karl-theme"
+    "karl-theme",
+    "dist/bootstrap/less/bootstrap"
   ]
 }
