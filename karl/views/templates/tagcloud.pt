@@ -5,8 +5,8 @@
 
 <div metal:fill-slot="content">
 
-<a class="rightFloatLink" title="View tag listing"
-    href="${api.app_url}/taglisting.html">Tag listing</a>
+<a class="btn pull-right" title="View tag listing"
+    href="${api.app_url}/taglisting.html">Tag Listing</a>
 
 <h1>${api.page_title}</h1>
 

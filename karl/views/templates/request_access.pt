@@ -13,37 +13,29 @@
     <form id="access-request" tal:condition="not: submitted"
           method="post" action="${app_url}/request_access.html">
 
-      <fieldset class="field">
-        <span class="loginLabelWrapper">
-          <label for="email">Email</label>
-        </span>
-        <input name="email" type="text" id="email" value="${python: request.POST.get('email', '')}" size="30">
-      </fieldset>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input class="form-control" name="email" type="text" id="email" value="${python: request.POST.get('email', '')}">
+      </div>
 
       <tal:field tal:repeat="field fields">
-        <fieldset class="field">
-          <span class="loginLabelWrapper">
-            <label for="${field['id']}">${field['label']}</label>
-          </span>
-          <input name="${field['id']}" type="text" id="${field['id']}" size="30"
-                 value="${python: request.POST.get(field['id'], '')}" />
-        </fieldset>
+        <div class="form-group ">
+          <label for="${field['id']}">${field['label']}</label>
+          <input class="form-control" name="${field['id']}" type="text" id="${field['id']}" 
+            value="${python: request.POST.get(field['id'], '')}" />
+        </div>
       </tal:field>
 
-      <fieldset class="field">
-        <span class="loginLabelWrapper">
-          <label for="recaptcha">ReCaptcha</label>
-        </span>
+      <div class="form-group">
+        <label for="recaptcha">ReCaptcha</label>
         <div class="recaptcha-container">
           <div class="g-recaptcha" data-sitekey="${python: api.site.settings.get('recaptcha_api_site_key')}"></div>
         </div>
-      </fieldset>
+      </div>
 
       <div class="formControlls loginLeftPadding">
         <input type="hidden" name="form.submitted" value="1" />
-        <div class="buttons clearafter">
-          <button name="image" type="submit" id="request" class="button primary_button"><span>Request Access</span></button>
-        </div>
+        <button name="image" type="submit" id="request" class="btn btn-default btn-sm"><span>Request Access</span></button>
       </div>
     </form>
 

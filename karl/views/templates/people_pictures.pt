@@ -33,15 +33,17 @@
             <div tal:define="profile cell['profile']"
                  tal:attributes="class 'photoProfile%s' % (
                      repeat['cell'].end and ' photoProfileEndRow' or '')">
-              <div class="photoProfileImage">
-                <a title="${profile.title}" href="${cell['url']}">
-                  <img alt="${profile.title}" src="${cell['photo_url']}"/>
-                </a>
+              <div class="row">
+                <div class="col-lg-2">
+                  <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
+                    <img alt="${profile.title}" src="${cell['photo_url']}"/>
+                    <div class="caption">
+                      <h3 align="center">${profile.title}</h3>
+                    </div>
+                  </a>
+                </div>
               </div>
               <div class="profileInfoBox">
-                <div>
-                  <a title="${profile.title}" href="${cell['url']}">${profile.title}</a>
-                </div>
                 <div>${profile.position}</div>
                 <div class="profileNoWrap">
                   <div>${profile.organization}</div>

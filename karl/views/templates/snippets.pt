@@ -84,6 +84,7 @@
       </style>
     </metal:resources>
 
+<!-- Alphabet Listing -->
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <span tal:repeat="letter letters">
         <strong tal:condition="letter['is_current']"
@@ -144,39 +145,44 @@
          tal:condition="api.error_message"><span
          tal:replace="api.error_message" /></div>
 
+<!-- Menubar -->
     <metal:actions_box define-macro="actions_box">
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default btn-xs">Left</button>
-        <button type="button" class="btn btn-default btn-xs">Middle</button>
-        <button type="button" class="btn btn-default btn-xs">Right</button>
+      <div class="btn-group pull-right" role="group">
+        <tal:block repeat="action api.actions_to_menu(actions)">
+          <button type="button" class="btn btn-default btn-xs">
+          <a href="${api.here_url}${action[1]}"
+             tal:condition="not action[1].startswith('http')">
+             <span>${action[0]}</span></a>
+          <a href="${action[1]}"
+               tal:condition="action[1].startswith('http')"
+               ><span>${action[0]}</span></a></button>
+            <tal:submenu condition="action[2]">
+              <div class="btn-group">
+                <div class="dropdown">
+                  <button type="button" class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  </button>
+                    <ul class="dropdown-menu" role="menu">
+                      <li tal:repeat="subaction action[2]">
+                        <a href="${api.here_url}${subaction[1]}"
+                           tal:condition="not subaction[1].startswith('http')"
+                        >${subaction[0]}</a>
+                        <a href="${subaction[1]}"
+                           tal:condition="subaction[1].startswith('http')"
+                        >${subaction[0]}</a>
+                      </li>
+                    </ul>
+                </div>
+              </div>
+            </tal:submenu>
+        </tal:block>
       </div>
+
+
       <ul class="menubar">
-          <tal:block repeat="action api.actions_to_menu(actions)">
-              <li tal:attributes="id string:menubar-${repeat.action.number()}"
-                  class="menubar-action-${action[0].replace(' ', '').lower()} ${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
-              <a href="${api.here_url}${action[1]}"
-                   class="${action[2] and 'karldropdown-heading' or ''}"
-                   tal:condition="not action[1].startswith('http')"
-                   ><span>${action[0]}</span></a>
-                <a href="${action[1]}"
-                   class="${action[2] and 'karldropdown-heading' or ''}"
-                   tal:condition="action[1].startswith('http')"
-                   ><span>${action[0]}</span></a>
-                <tal:submenu condition="action[2]">
-                  <ul class="karldropdown-menu">
-                    <li tal:repeat="subaction action[2]">
-                      <a href="${api.here_url}${subaction[1]}"
-                         tal:condition="not subaction[1].startswith('http')"
-                      >${subaction[0]}</a>
-                      <a href="${subaction[1]}"
-                         tal:condition="subaction[1].startswith('http')"
-                      >${subaction[0]}</a>
-                    </li>
-                  </ul>
-                </tal:submenu>
-              </li>
-          </tal:block>
       </ul>
+
+
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         $(document).ready(function() {
@@ -323,7 +329,7 @@
       </div>
     </div>
 
-<!-- Tagbox -->
+<!-- Tag Box -->
     <div class="tagbox" metal:define-macro="list_tags">
       <form class="form-group" action="javascript://return false;">
         <label><strong>Tags:</strong></label>
@@ -331,20 +337,10 @@
       </form>
     </div>
 
-<!-- Header -->
-    <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header">
+<!-- Header Search Box-->
+    <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header pull-right">
       <form class="form-inline">  
         <div class="form-group">
-          <div class="dropdown inline pull-left">
-            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-              All Content
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li tal:repeat="o api.livesearch_options" name="${o['name']}" tal:attributes="advanced_search o['component'].live_to_advanced"><a title="Search ${o['description']}" href="#">${o['title']}</a></li>
-              <li name="all_content"><a title="Search All Content" href="#">All Content</a></li>
-            </ul>
-          </div> <!-- close .btn-group -->
           <input type="text" class="form-control" style="height: 30px"/>
           <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
         </div> <!-- close .form-group -->
@@ -656,8 +652,8 @@
         <div id="community-filters">
           <label>Community Filters:</label>
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default btn-xs" tal:repeat="option community_tabs"
-            class="${'%s%s%s' % (option['selected'] and 'current' or '', repeat['option'].start and ' firstItem' or '', repeat['option'].end and ' lastItem' or '',)}"><a href="${option['href']}" title="${option['description']}">
+            <button type="button" class="btn btn-default btn-xs" tal:repeat="option community_tabs">
+              <a href="${option['href']}" title="${option['description']}">
                   <span>${option['title']}</span>
                 </a></button>
           </div>
@@ -869,9 +865,9 @@ You are currently accessing KARL with Internet Explorer 8 or less. This is an ol
 
 <!-- Header Menu -->
 
-    <ul class="nav nav-tabs" role="tablist" data-tabs="tabs" metal:define-macro="header-menu">
-        <li role="presentation" tal:repeat="item python:api.get_header_menu_items()">
-            <a href="${item['url']}" role="tab" data-toggle="tab">${item['display']}</a>
+    <ul metal:define-macro="header-menu">
+        <li tal:repeat="item python:api.get_header_menu_items()">
+            <a href="${item['url']}">${item['display']}</a>
         </li>
     </ul>
 

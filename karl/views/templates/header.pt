@@ -1,31 +1,52 @@
-<div id="header" class="shadow">
-  <div metal:use-macro="api.snippets.macros['header-user-menu']"/>
-
+<nav class="navbar navbar-default">
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-lg-12">
-        <div id="header-top">
-          <div class="content" id="top-controls">
-            <span id="logo">
-              <a href="${api.home_url}">
-                <img src="${api.logo_url}" alt="KARL"/>
-              </a>
-            </span>
-            <div metal:use-macro="api.snippets.macros['livesearch_box']"/>
-          </div> <!-- .content -->
-          <div class="visualClear"></div>
-        </div> <!-- close #header-top -->
-      </div> <!-- close .col-lg-12 -->
-    </div> <!-- close .row -->
-  </div> <!-- close .container-fluid -->
-</div> <!-- close #header -->
-<div id="spo-header">
-  <div id="spo-header-top">
-    <div class="content">
-      <div metal:use-macro="api.snippets.macros['header-menu']" />
-      <div metal:use-macro="api.snippets.macros['site-announcement']" />
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="${api.home_url}">
+      <img src="${api.logo_url}" alt="KARL"/></a>
     </div>
-  </div>
-  <div class="visualClear"></div>
-</div>
+    
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+      <ul class="nav navbar-nav">
+        <li tal:repeat="item python:api.get_header_menu_items()">
+        <a href="${item['url']}">${item['display']}</a>
+        </li>
+      </ul>
+
+      <form class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <ul class="nav navbar-nav">
+            <select class="form-control" style="width:150px; height:30px;">
+              <option value=""><a href="#">All Content</a></option>
+              <option tal:repeat="o api.livesearch_options" name="${o['name']}" tal:attributes="advanced_search o['component'].live_to_advanced"><a title="Search ${o['description']}" href="#">${o['title']}</a></option>
+            </select>
+          <div metal:use-macro="api.snippets.macros['livesearch_box']"/>
+          </ul>
+      </form>
+
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li tal:repeat="link python: api.get_user_links()">
+            <a href="${link.url}">${link.title}</a></li>
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>  
+
+
+
+      <div metal:use-macro="api.snippets.macros['site-announcement']" />
 

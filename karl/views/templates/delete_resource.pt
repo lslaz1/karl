@@ -6,14 +6,14 @@
   <div metal:fill-slot="content">
 
     <div class="deleteMessage">
-      <p>Do you really want to delete <strong> ${api.context.title} </strong>?</p>
+      <p>Do you really want to delete <strong> ${api.context.title}</strong>?</p>
       <p tal:condition="num_children == 1" style="color: red">Warning: There is ${num_children}
       item in this folder.</p>
       <p tal:condition="num_children > 1" style="color: red">Warning: There are ${num_children}
       items in this folder.</p>
       <p>
-          <a href="?confirm=1" class="primary_button force-post"><span>ok</span></a>
-          <a href="${api.here_url}" class="normal_button"><span>cancel</span></a>
+          <a href="?confirm=1" class="btn btn-default btn-sm force-post"><span>OK</span></a>
+          <a href="${api.here_url}" class="btn btn-default btn-sm"><span>Cancel</span></a>
       </p>
     </div>
 
