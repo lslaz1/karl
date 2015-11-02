@@ -305,8 +305,7 @@
 
     <tal:block metal:define-macro="backto_link_new" tal:condition="backto|False">
       <a class="chparent" href="${backto['href']}" id="backto">
-        <img src="${api.static_url}/images/arrow_up.jpg" height="15"
-             width="15" alt="Up to"/> Back to ${backto['title']} </a>
+        <span class="glyphicon glyphicon-arrow-left"></span> Back to ${backto['title']}</a>
     </tal:block>
 
     <div metal:define-macro="download_file">

@@ -6,14 +6,15 @@
     <br/>
   </tal:block>
   <tal:block repeat="pair enumerate(field.widget.get_options(field))">
-    <input
+    <label><input
        type="radio"
        name="${field.name}"
        id="${field.cssname}-${pair[0]}"
        value="${pair[1][0]}"
        class="noborder"
        tal:attributes="checked field.widget.selected(pair[1], field) or None"/>
-    <label for="${field.cssname}-${pair[0]}">${pair[1][1]}</label>
+       ${field.cssname}-${pair[0]}">${pair[1][1]}
+    </label>
     <br/>
   </tal:block>
 </div>
