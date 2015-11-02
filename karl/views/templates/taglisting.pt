@@ -5,8 +5,8 @@
 
 <div metal:fill-slot="content">
 
-<a class="rightFloatLink" title="View tag cloud"
-href="${api.app_url}/tagcloud.html">tag cloud</a>
+<a class="btn pull-right" title="View tag cloud"
+href="${api.app_url}/tagcloud.html">Tag Cloud</a>
 
 <h1>${api.page_title}</h1>
 
