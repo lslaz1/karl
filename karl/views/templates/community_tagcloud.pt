@@ -4,13 +4,11 @@
      metal:use-macro="api.community_layout">
 
 <div metal:fill-slot="content">
-	<div class="container-fluid">
-		<a class="btn btn-default pull-right" title="View tag listing"
+		<a class="btn pull-right" title="View tag listing"
 		    href="taglisting.html">Tag listing</a>
 
 		<h1>${api.page_title}</h1>
 
 		<div metal:use-macro="api.snippets.macros['tagcloud']"/>
 		</div>
-	</div>
 </div>
