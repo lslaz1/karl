@@ -1,3 +1,9 @@
 <textarea tal:attributes="cols field.widget.cols or 40;
                           rows field.widget.rows or 10;"
-          id="${field.cssname}" class="form-control" name="${field.name}">${field.value[0]}</textarea>
+  id="${field.cssname}" 
+  class="form-control" 
+  name="${field.name}"
+  style="width:300px;">
+  ${field.value[0]}
+</textarea>
+<br/>

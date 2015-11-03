@@ -1,5 +1,5 @@
 <span tal:omit-tag="">
-  <select class="form-control input-sm" id="${field.cssname}" name="${field.name}.select">
+  <select class="form-control input-sm" id="${field.cssname}" name="${field.name}.select" style="width:300px;">
     <option tal:condition="field.widget.none_option"
             value="${field.widget.get_none_option_value(field)}">${field.widget.none_option[1]}</option>
     <option tal:repeat="option field.widget.get_options(field)"
@@ -11,4 +11,5 @@
   </select>
   <input class="form-control input-sm" type="text" id="${field.cssname}-other" name="${field.name}.other" value="${field.value['other'][0]}" />
 </span>
+<br/>
 
