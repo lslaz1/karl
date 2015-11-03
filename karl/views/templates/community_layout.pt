@@ -24,11 +24,11 @@
               <div id="center" class="clearafter community_view" >
                 <div class="cheader" tal:condition="python: api.community_info">
                   <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
-                    <div class="form-group">
-                      <div class="col-lg-3">
-                        <input type="text" class="form-control" name="body"/>
-                        <button type="submit" class="btn btn-default btn-xs">Search Community</button>
-                      </div>
+                    <div class="form-inline">
+
+                        <input type="text" class="form-control input-sm" name="body"/ style="width:150px;">
+                        <button type="submit" class="btn btn-default btn-sm">Search Community</button>
+
                     </div>
                   </form>
                   <h1>${api.community_info.title}
@@ -51,16 +51,14 @@
               <div id="cwrapper">
                 <div id="cleftcol">
                   <div id="cheader">
-                    <span tal:condition="python: api.community_info">
-                     <a href="${api.community_info.url}members">Members</a> |
-                     <a href="${api.community_info.url}tagcloud.html"
-                     >Tags</a></span>
-                    <ul tal:condition="python: api.community_info">
-                      <li tal:repeat="tab api.community_info.tabs"
-                                class="${tab.css_class}">
-                        <a href="${tab.url}">${tab.name}</a>
-                      </li>
+                    
+                    <ul class="nav nav-tabs" tal:condition="python: api.community_info">
+                      <li role="navigation" tal:repeat="tab api.community_info.tabs" class="${tab.css_class}"><a href="${tab.url}">${tab.name}</a></li>
+                      <li role="navigation" class="pull-right"><a href="${api.community_info.url}tagcloud.html"
+                      >Tags</a></li>
+                      <li role="navigation" class="pull-right"><a href="${api.community_info.url}members">Members</a></li>
                     </ul>
+
                   </div> <!-- close #cheader -->    
                   <div id="screenid-community-overview" class="ccontent ui-helper-clearfix">
                     <div metal:define-slot="content"/>
