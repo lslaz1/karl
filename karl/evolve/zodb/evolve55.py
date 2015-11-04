@@ -14,7 +14,7 @@ def evolve(site):
                            'selected_list': [],
                            'sendtouser': 'yes',
                            'sendtoadmins': 'yes'}
-        site.email_templates['accept'] = accept_template
+        site.email_templates['Accept'] = accept_template
 
         deny_template = {'body': u'''<html><body>
         <p>Hello {{requestor_name}},</p>
@@ -34,5 +34,5 @@ def evolve(site):
                              'selected_list': [],
                              'sendtouser': 'no',
                              'sendtoadmins': 'yes'}
-        site.email_templates['Follow_up'] = followup_template
+        site.email_templates['Follow Up'] = followup_template
 
