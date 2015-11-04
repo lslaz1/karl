@@ -36,13 +36,6 @@
                 value="${profile.login}">${profile.name}</option>    
           </select>
           <br/>
-          <b>Existing Members</b><br/>
-          <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
-            <option tal:repeat="profile peoplelist"
-                tal:attributes="selected python: profile.selected is True"
-                value="${profile.login}">${profile.name}</option>    
-          </select>
-          <br/>
           <input type="submit" name="save" value="Save"/>
           <br/>
           <script language="javascript" type="text/javascript">
