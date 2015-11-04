@@ -459,7 +459,9 @@ class EmailUsersView(object):
                     })
                     n += 1
             if group.startswith('group-'):
-                alladdresses = all_groups.get(group, [])
+                group_key = group.replace('group-', '')
+                print('gk', group_key)
+                alladdresses = all_groups.get(group_key, [])
                 for entry in alladdresses:
                     addressed_to.append({
                         'name': '',
@@ -525,6 +527,8 @@ def process_email_groups(request, profiles):
     emails = request.params['email_address'].split('\n')
     email_list = []
     for email in emails:
+        if email == u'\r' or email == u'':
+            continue
         email_list.append({'name': '', 'email': email, 'member_login': ''})
 
     # process existing members email addresses
