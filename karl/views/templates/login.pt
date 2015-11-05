@@ -21,9 +21,9 @@
           <span class="loginLabelWrapper">
             <label for="username">Username</label>
           </span>
-            <input class="form-control" name="login" type="text" id="username" value=""
+            <input class="form-control input-sm" name="login" type="text" id="username" value=""
                tal:attributes="value username|None"
-               placeholder="or email address" style="height:30px;" />
+               placeholder="or email address" />
             <div class="send-auth-code" tal:condition="two_factor">
               <button type="btn btn-default btn-sm">Send Authentication Code</button>
         </div>
@@ -37,8 +37,7 @@
           <span class="loginLabelWrapper">
             <label for="code">Code</label>
           </span>
-          <input class="form-control" type="text" name="code" id="code" value="" 
-            style="height:30px;" />
+          <input class="form-control input-sm" type="text" name="code" id="code" value="" />
           <div class="loginLeftPadding discreet">
             <label>Authentication code that was emailed to you.</label>
           </div>
@@ -49,8 +48,8 @@
           <span class="loginLabelWrapper">
             <label for="password">Password</label>
           </span>
-          <input class="form-control" type="password" name="password" id="password" value=""
-             style="height:30px;" tal:attributes="value password|None" />
+          <input class="form-control input-sm" type="password" name="password" id="password" value=""
+             tal:attributes="value password|None" />
         <a href="${api.app_url}/reset_request.html">I forgot my password</a>
         </div>
         

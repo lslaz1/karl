@@ -15,7 +15,7 @@
       <!-- Initialize javascript to make dynamic ui styles alive -->
     </metal:script>
 
-    <table class="messageBoard content-listing">
+    <table class="messageBoard table table-striped">
       <thead>
         <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
           <th colspan="4" class="ui-widget-header" style="padding: 0;">

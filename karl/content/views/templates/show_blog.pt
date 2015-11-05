@@ -47,11 +47,17 @@
           posts &gt;&gt;</a></span>
     </div>
 
-    <div style="margin-top:20px;text-align:right">
-      <a href="mailto:${api.community_info.name}@${system_email_domain}"><img src="${api.static_url}/images/email.gif" border="0" alt="E-mail Community"
-          id="EmailIcon"/></a>
-      <a href="${feed_url}"><img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
-          id="RSSIcon"/></a>
+    <div class="pull-right" style="margin-top:20px;">
+      <a type="button" class="btn btn-default btn-xs" 
+        href="mailto:${api.community_info.name}@${system_email_domain}" 
+        aria-label="Email">
+        <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+      </a>
+      <a type="button" class="btn btn-default btn-xs" 
+        href="${feed_url}">
+        <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+          id="RSSIcon"/>
+      </a>
     </div>
 
   </div>

@@ -20,10 +20,10 @@
 
 <form method="GET" action=""
       tal:attributes="action request.path_url">
-    <div class="sras-header">
-        <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
+    <div class="form-group">
+        <input class="form-control input-sm" id="ls-current-searchterm" name="body" type="text" value=""
                tal:attributes="value request.params.get('body', '')"/>
-        <input id="sras-searchbutton" type="submit"
+        <input class="btn btn-default btn-sm" id="sras-searchbutton" type="submit"
                value="Search"/>
         <span class="sras-discreet">
             About ${total} results (${elapsed} seconds)
@@ -79,17 +79,17 @@
         </div>
 
         <div class="sras-searchknobgroup last">
-            <form method="GET">
+            <form method="GET" class="form-group">
                 <tal:block repeat="name params" omit-tag="">
                     <input type="hidden" name="${name}"
                            tal:condition="name != 'creator'"
                            value="${params[name]}"/>
                 </tal:block>
                 <label>Author</label>
-                <input style="width: 130px" size="20"
+                <input class="form-control input-sm"
                        name="creator" value="${params.get('creator', '')}"
                        onChange="this.form.submit()"/>
-                <input id="sras-authorknob" type="submit" value="Search" />
+                <input class="btn btn-default btn-sm" id="sras-authorknob" type="submit" value="Search" />
             </form>
             <form method="GET">
                 <tal:block repeat="name params" omit-tag="">
@@ -98,10 +98,10 @@
                            value="${params[name]}"/>
                 </tal:block>
                 <label>Tag</label>
-                <input style="width: 130px" size="20"
+                <input class="form-control input-sm"
                        name="tags" value="${params.get('tags', '')}"
                        onChange="this.form.submit()"/>
-                <input id="sras-tagknob" type="submit" value="Search" />
+                <input class="btn btn-default btn-sm" id="sras-tagknob" type="submit" value="Search" />
             </form>
         </div>
 
@@ -127,7 +127,7 @@ $(document).ready(function(){
 
     <div id="sras-pagination" tal:condition="batch_info['batching_required']">
         <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
-        <table width="100%">
+        <table class="table table-striped" width="100%">
           <tr class="ui-grid-footer">
             <th class="ui-widget-header">
               <div metal:use-macro="api.snippets.macros['gridstyle_batching']">

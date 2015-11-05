@@ -11,7 +11,7 @@
 
   <div metal:fill-slot="content">
 
-    <div class="contentbar-wrapper view-show-file-actions">
+    <div class="contentbar-wrapper view-show-file-actions clearfix">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
       <span class="contentbar-menu">
         <div metal:use-macro="api.snippets.macros['backto_link_new']"/>

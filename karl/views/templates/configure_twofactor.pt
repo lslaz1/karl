@@ -39,7 +39,7 @@
 
         <label for="code">Code</label>
         <div class="compound-field">
-          <input class="form-control" name="code" type="text" id="code" value="" size="30"
+          <input class="form-control" name="code" type="text" id="code" value=""
              required="true"
              placeholder="Code that was texted to you"/>
         </div>

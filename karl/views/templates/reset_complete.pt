@@ -14,7 +14,7 @@
         <input type="hidden" name="form.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" class="button primary_button"><span>Sign In</span></button>
+          <button name="image" type="submit" class="btn btn-default"><span>Sign In</span></button>
         </div>
     </form>
 

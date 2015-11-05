@@ -15,7 +15,7 @@
 
   <form method="post" action="${post_url}" class="k3_genericForm">
 
-  <table class="content-listing">
+  <table class="table table-striped">
     <thead>
       <tr>
         <th>Community</th>

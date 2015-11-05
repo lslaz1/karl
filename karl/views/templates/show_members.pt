@@ -27,21 +27,31 @@
 
 	<tal:block repeat="entry members">
 	  <div class="${entry['css_class']}">
-	    <div class="photoProfileImage">
-	      <a href="${entry['href']}" title="${entry['title']}">
-		<img src="${entry['photo_url']}" alt="${entry['title']}" />
-	      </a>
-	    </div>
-	    <div class="profileInfoBox">
-	      <div>
-		<a href="${entry['href']}">${entry['title']}</a>
-	      </div>
-	      <div>${entry['position']}</div>
-	      <div class="profileNoWrap">
-		<div>${entry['organization']}</div>
-		<div>${entry['department']}</div>
-		<div>${entry['phone']}</div>
-	      </div>
+	    <div class="row">
+	    	<div class="col-lg-2">
+	    		<div class="thumbnail">
+			      	<a href="${entry['href']}" title="${entry['title']}">
+					<img src="${entry['photo_url']}" alt="${entry['title']}" style="width:125px;" />
+			      	</a>
+			      	<div class="caption text-center">
+			      		<a href="${entry['href']}">${entry['title']}</a>
+						    <div>${entry['position']}</div>
+							<div>${entry['organization']}</div>
+							<div>${entry['department']}</div>
+							<div>${entry['phone']}</div>
+			    </div>  	
+		    </div>
+		    <!-- <div class="profileInfoBox"> -->
+
+		      <!-- <div>
+			<a href="${entry['href']}">${entry['title']}</a>
+		      </div>
+		      <div>${entry['position']}</div>
+		      <div class="profileNoWrap">
+			<div>${entry['organization']}</div>
+			<div>${entry['department']}</div>
+			<div>${entry['phone']}</div> -->
+		       
 	    </div>
 	  </div>
 	</tal:block>
@@ -52,7 +62,7 @@
     </tal:block>
 
     <tal:block condition="hide_pictures">
-      <table class="content-listing">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th class="clname">Name</th>

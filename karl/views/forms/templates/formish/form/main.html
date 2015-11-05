@@ -19,16 +19,17 @@
         <tal:block condition="repeat['action'].start">
           <button name="${action.name or ''}"
                   type="submit"
-                  class="button primary_button">
+                  class="btn btn-default btn-sm">
             <span>${action.value}</span>
           </button>
         </tal:block>
         <tal:block condition="not repeat['action'].start">
           <button name="${action.name or ''}"
                   type="submit"
-                  class="button normal_button">
+                  class="btn btn-default btn-sm">
             <span>${action.value}</span>
           </button>
+          <br/><br/>
         </tal:block>
       </tal:block>
     </div>

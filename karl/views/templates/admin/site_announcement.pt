@@ -37,7 +37,7 @@
               </fieldset>
               <br />
               <div>
-                  <button class="btn btn-default btn-xs" name="submit-site-announcement" type="submit" class="button primary_button">
+                  <button class="btn btn-default btn-xs" name="submit-site-announcement" type="submit">
                       <span>Add Site Announcement</span>
                   </button>
               </div>
@@ -49,9 +49,9 @@
                           <blockquote tal:content="structure python:item['content']" />
                           <div>
                               <span class='date'>(added on ${item.added.strftime("%x")})</span>
-                              <button name="remove-site-announcement" type="submit" class="button"
+                              <button name="remove-site-announcement" type="submit" class="btn btn-default btn-xs"
                                       tal:attributes="value python:item['hash']">
-                                  <span>remove</span>
+                                  <span>Remove</span>
                               </button>
                           </div>
                       </li>

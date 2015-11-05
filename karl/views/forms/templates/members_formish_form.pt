@@ -10,11 +10,17 @@
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
     <h1>${api.page_title}</h1>
     <p tal:content="page_description|''"/>
-    <ul class="menubar">
-        <li><a href="${api.here_url}manage.html?type=moderators">Moderators</a></li>
-        <li><a href="${api.here_url}manage.html?type=members">Members</a></li>
-        <li><a href="${api.here_url}manage.html?type=invitations">Invitations</a></li>
-    </ul>
+    <div class="btn-group" role="group" aria-label="...">
+      <button type="button" class="btn btn-default btn-xs">
+        <a href="${api.here_url}manage.html?type=moderators">Moderators</a>
+      </button>
+      <button type="button" class="btn btn-default btn-xs">
+        <a href="${api.here_url}manage.html?type=members">Members</a>
+      </button>
+      <button type="button" class="btn btn-default btn-xs">
+        <a href="${api.here_url}manage.html?type=invitations">Invitations</a>
+      </button>
+    </div>
 
     <div tal:condition="batch_info" style="clear:both">
         <div metal:use-macro="api.snippets.macros['batching']"/>

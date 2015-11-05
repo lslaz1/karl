@@ -73,13 +73,14 @@ from karl.security.workflow import get_security_states
 _wiki_text_help = """You can create a new page by naming it and surrounding
 the name with ((double parentheses)). When you save the page, the contents
 of the parentheses will have a small + link next to it, which you can click
-to create a new page with that name."""
+to create a new page with that name.
+"""
 
 tags_field = schemaish.Sequence(schemaish.String())
 text_field = schemaish.String(
     title='Body text',
     description=_wiki_text_help,
-    )
+)
 sendalert_field = schemaish.Boolean(
     title='Send email alert to community members?')
 security_field = schemaish.String(

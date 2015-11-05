@@ -57,7 +57,7 @@
     <input class="form-control" type="text" name="permissions" />
    </td>
    <td>
-    <input class="form-control" type="submit" name="form.add" value="Add" />
+    <input class="btn btn-default btn-sm" type="submit" name="form.add" value="Add" />
    </td>
   </tr>
   </form>
