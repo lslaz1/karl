@@ -11,7 +11,7 @@
 
     <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <table class="messageBoard content-listing">
+    <table class="messageBoard table table-striped">
       <thead>
 	<tr>
           <th>Forum</th>

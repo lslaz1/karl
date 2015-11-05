@@ -11,7 +11,7 @@
         by <a href="${api.here_url}">${api.context.title}</a></h1>
 
     <div class="recentItemsWrapper">
-      <table class="content-listing">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th class="cldate">Created</th>

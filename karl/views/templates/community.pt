@@ -25,10 +25,10 @@
     <div class="recentItemsWrapper" tal:define="default_batch_size string:10">
       <h3>Recent Activity</h3>
       <metal:script metal:use-macro="api.snippets.macros['batch_size_selector']"/>
-      <table class="content-listing">
+      <table class="table table-striped">
         <thead>
           <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
+            <th colspan="4" class="ui-widget-header" style="padding: 100px;">
               <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
             </th>
           </tr>

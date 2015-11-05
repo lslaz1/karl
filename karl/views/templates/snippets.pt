@@ -102,7 +102,7 @@
 
     <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
 
-    <h1 metal:define-macro="page_title" class="kscreentitle">${api.page_title}
+    <h1 metal:define-macro="page_title" class="kscreentitle clearfix">${api.page_title}
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
     </h1>
@@ -239,7 +239,7 @@
     </div>
 
     <metal:pagesize metal:define-macro="batch_size_selector">
-      <div class="batch-size"
+      <div class="batch-size pull-right"
            tal:define="default_batch_size default_batch_size|string:25;
                        current python: request.params.get('limit', request.params.get('batch_size', default_batch_size));">
         <span class="label">Batch size:</span>
@@ -291,9 +291,9 @@
     </metal:table>
 
 
-    <div metal:define-macro="rss_icon" class="rss-icon"
+    <div metal:define-macro="rss_icon" class="rss-icon pull-right"
          tal:condition="feed_url|None">
-      <a href="${feed_url}">
+      <a type="button" class="btn btn-default btn-xs" href="${feed_url}">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
           id="RSSIcon"/>
       </a>
@@ -340,7 +340,7 @@
     <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header pull-right">
       <form class="form-inline">  
         <div class="form-group">
-          <input type="text" class="form-control" style="height: 30px"/>
+          <input type="text" class="form-control input-sm" />
           <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
         </div> <!-- close .form-group -->
       </form> 
@@ -366,15 +366,18 @@
     </div>
 
     <div metal:define-macro="submenu" class="kutility_menu">
-      <span tal:repeat="entry submenu">
-        <tal:block tal:condition="entry['make_link'] is True">
-          <a href="${entry['href']}">${entry['label']}</a>
-        </tal:block>
-        <tal:block tal:condition="entry['make_link'] is False">
-          ${entry['label']}
-        </tal:block>
-        <span tal:condition="not repeat['entry'].end">|</span>
-      </span>
+      <div class="btn-group" role="group">
+        <span tal:repeat="entry submenu">
+          <button type="button" class="btn btn-default btn-xs">
+            <tal:block tal:condition="entry['make_link'] is True">
+              <a href="${entry['href']}">${entry['label']}</a>
+            </tal:block>
+            <tal:block tal:condition="entry['make_link'] is False">
+              ${entry['label']}
+            </tal:block>
+          </button>
+        </span>
+      </div>
     </div>
 
     <div metal:define-macro="batching">
@@ -434,28 +437,34 @@
       <div class="addCommentButton" style="float: right;">
         <a href="#addcomment">add comment</a>
       </div>
-      <h2>
-            <a name="comments" id="comments">Comments</a>
-      </h2>
+      <h2 id="comments">Comments</h2>
 
       <div tal:repeat="comment comments">
        <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
        <div class="blogComment">
 
         <div class="commentManagement">
-          <a href="#" class="quo-paste">quote</a>
-          <tal:ifeditable
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default btn-xs">
+              <a href="#" class="quo-paste">quote</a>
+            </button>
+            <tal:ifeditable
              tal:condition="comment['edit_url'] is not None">
-            | <a class="k3_edit_comment"
-                 href="${comment['edit_url']}">edit</a> |
-            <a class="k3_delete_comment"
-               href="${comment['delete_url']}">delete</a>
-          </tal:ifeditable>
-          <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
-            | <a class="k3_edit_comment"
-                 href="${comment['advanced_url']}">advanced</a>
-          </tal:ifadmin>
+              <button type="button" class="btn btn-default btn-xs">
+                <a href="${comment['edit_url']}">edit</a>
+              </button>
+              <button type="button" class="btn btn-default btn-xs">
+                <a href="${comment['delete_url']}">delete</a>
+              </button>
+            </tal:ifeditable>
+            <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
+              <button type="button" class="btn btn-default btn-xs">
+                <a href="${comment['advanced_url']}">advanced</a>
+              </button>
+            </tal:ifadmin>
+          </div>
         </div>
+        <br/>
 
         <span class="portrait">
               <img width="75" height="100" src="${comment['portrait_url']}" />
@@ -511,7 +520,7 @@
          metal:define-macro="tagcloud">
       <h2 class="tagsHeaderSpace">
         <form id="tag-form" class="form-inline" action="" method="post" onsubmit="this.action='showtag/'+getElementById('tag-field').value; return true"><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
-         <input class="form-control" type="text" name="tag"/>
+         <input class="form-control input-sm" type="text" name="tag"/>
         </form>
      </h2>
 
@@ -534,7 +543,7 @@
      <h2 class="tagsHeaderSpace">
       <form id="tag-form" class="form-inline" action="" method="post" onsubmit="this.action='showtag/'+getElementById('tag-field').value; return true"
       ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
-      <input class="form-control" type="text" name="tag"/>
+      <input class="form-control input-sm" type="text" name="tag"/>
       </form>
      </h2>
 
@@ -575,8 +584,8 @@
                       return true"
        ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
       ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
-         <input class="form-control" type="text"
-                name="jumptag" value="${tag}" size="20" />
+         <input class="form-control input-sm" type="text"
+                name="jumptag" value="${tag}" />
        </form>
       </h2>
 
@@ -662,7 +671,7 @@
             <form class="form-inline" method="get" action="${api.view_url}">
               <div class="form-group">
                 <div class="field">
-                  <input class="form-control" type="text" name="body" value="" style="height: 22px"/>
+                  <input class="form-control input-xs" type="text" name="body" value="" />
                   <input class="btn btn-default btn-xs" type="submit" value="Search" />
                 </div>
               </div>

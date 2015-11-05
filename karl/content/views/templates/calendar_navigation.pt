@@ -13,53 +13,61 @@
       </div>
 
 
-      <div class="cal_header" metal:define-macro="header">
-        <div class="cal_calendars clearafter" >
-          <div class="form-inline">
-            <div class="col-lg-4">
-              <label>
-                Layer:
-              </label>
-                <select class="form-control" style="height:30px;">
-                  <option
-                          tal:attributes="value api.request.path_url + '?filter=';
-                                          class 'group'"
-                          >All layers</option>
-                  <option
-                          tal:repeat="layer layers"
-                          tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
-                                          class 'color cal_' + layer.color.strip();
-                                          selected layer.__name__ == selected_layer"
-                          >${layer.title}</option>
-                </select>
-                <tal:block condition="setup_url">
-                  (<a href="${setup_url}">Setup</a>)
-                </tal:block>
+      <div class="container-fluid">    
+        <div class="cal_header" metal:define-macro="header">
+          <div class="cal_calendars clearafter" >
+            <div class="row">
+              <!-- Select Layer -->
+              <div class="col-lg-5">
+                <div class="form-inline"> 
+                  <label>
+                    Layer:
+                  </label>
+                    <select class="form-control input-sm">
+                      <option
+                              tal:attributes="value api.request.path_url + '?filter=';
+                                              class 'group'"
+                              >All layers</option>
+                      <option
+                              tal:repeat="layer layers"
+                              tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
+                                              class 'color cal_' + layer.color.strip();
+                                              selected layer.__name__ == selected_layer"
+                              >${layer.title}</option>
+                    </select>
+                    <tal:block condition="setup_url">
+                      (<a href="${setup_url}">Setup</a>)
+                    </tal:block>
+                  </div>
               </div>
-          </div>
+            
+              <!-- new event -->
+              <div class="col-lg-2 pull-right">   
+                <div class="cal_new_event" tal:condition="may_create"> 
+                  <a class="btn btn-default btn-xs" href="${calendar.add_event_url}"><span>Add Event</span></a>
+                </div>
+              </div>
+                <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
+                  <a class="btn btn-default btn-xs" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
+                </div>
+              </div>
 
-          <!-- buttons -->
-          <div class="col-lg-7">
-            <div class="btn btn-default btn-xs cal-buttonbar clearafter"></div>
-          </div>
+              <div class="row">
+                <!-- buttons -->
+                <div class="col-lg-12">
+                  <div class="cal-buttonbar clearafter"></div>
+                </div>
+              </div>
 
+        </div>
       </div>
 
       <div class="cal_footer clearafter" metal:define-macro="footer">
 
-        <!-- new event -->
-        <div class="col-lg-1">   
-          <div class="cal_new_event" tal:condition="may_create"> 
-            <a class="btn btn-default btn-xs" href="${calendar.add_event_url}"><span>Add Event</span></a>
-          </div>
-        </div>
-          <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
-            <a class="btn btn-default btn-xs" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
-          </div>
-        </div>
+        
 
         <!-- actions --> 
-        <div class="button-group">
+        <div class="button-group pull-right">
            <!-- <a class="cal_download" href="#">Download</a> -->
            <a class="btn btn-default btn-xs" aria-label="Subscribe" href="${calendar.feed_url}">Subscribe</a>
            <a class="btn btn-default btn-xs" aria-label="Print" href="#"><span class="glyphicon glyphicon-print"></span></a>

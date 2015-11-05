@@ -7,7 +7,7 @@
 
 <form method="post" id="tag-manage">
 
-<h1 class="kscreentitle">${api.page_title}</h1>
+<h1 class="kscreentitle">${api.page_title}</h1><br/>
 
 <h4 class="abouthead">Rename tags</h4>
 
@@ -18,18 +18,19 @@
 
 <div tal:condition="error" class="portalMessage">${error}</div>
 
-<fieldset>
+<div class="form-inline">
  <label for="old_tag">Old tag</label>
- <select name="old_tag">
+ <select class="form-control input-sm" name="old_tag" style="width:147px;">
    <option tal:repeat="tag my_tags"
                 value="${tag}" selected="${tag == old}">${tag}</option>
  </select>
 
  <label for="new_tag">New tag</label>
- <input type="text" size="35" name="new_tag" value="${new}"/>
+ <input class="form-control input-sm" type="text" name="new_tag" value="${new}"/>
 
- <input type="submit" name="form.rename" value="Rename tags" />
-</fieldset>
+ <input class="btn btn-default btn-sm" type="submit" name="form.rename" value="Rename Tag" />
+</div>
+<br/>
 
 <h4 class="abouthead">Delete tags</h4>
 
@@ -38,15 +39,16 @@
   will not delete the item.
 </p>
 
-<fieldset>
+<div class="form-inline">
  <label for="todelete">Tag to be deleted</label>
- <select name="todelete">
+ <select class="form-control input-sm" name="todelete" style="width:147px;">
   <option tal:repeat="to_delete my_tags"
           value="${to_delete}">${to_delete}</option>
  </select>
 
- <input type="submit" name="form.delete" value="delete tag" />
-</fieldset>
+ <input class="btn btn-default btn-sm" type="submit" name="form.delete" value="Delete Tag" />
+</div>
+<br/>
 </form>
 
 </div>

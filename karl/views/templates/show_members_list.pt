@@ -52,7 +52,7 @@
     </tal:block>
 
     <tal:block condition="hide_pictures">
-      <table class="content-listing">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th class="clname">Name</th>

@@ -9,10 +9,19 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+    <div class="btn-group pull-left" role="group">
+      <button type="button" class="btn btn-default btn-xs"><a  
+        href="/communities/default/wiki">Front Page</a></button>
+      <button type="button" class="btn btn-default btn-xs"><a  
+        href="/communities/default/wiki/wikitoc.html">Index</a></button>
+      <button type="button" class="btn btn-default btn-xs"><a 
+      href="/communities/default/wiki/trash">Trash</a></button>
+    </div>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']" />
 
     <div class="kbody">
-        <table class="content-listing">
+        <table class="table table-striped">
             <tr>
                 <th>Title</th>
                 <th>Date Deleted</th>

@@ -15,13 +15,13 @@
 
       <div class="form-group">
         <label for="email">Email</label>
-        <input class="form-control" name="email" type="text" id="email" value="${python: request.POST.get('email', '')}">
+        <input class="form-control input-sm" name="email" type="text" id="email" value="${python: request.POST.get('email', '')}">
       </div>
 
       <tal:field tal:repeat="field fields">
         <div class="form-group ">
           <label for="${field['id']}">${field['label']}</label>
-          <input class="form-control" name="${field['id']}" type="text" id="${field['id']}" 
+          <input class="form-control input-sm" name="${field['id']}" type="text" id="${field['id']}" 
             value="${python: request.POST.get(field['id'], '')}" />
         </div>
       </tal:field>

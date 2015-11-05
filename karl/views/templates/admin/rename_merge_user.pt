@@ -18,12 +18,12 @@
         <form method="POST" name="rename_or_merge">
           <div class="form-group">
             <label><strong>Old Username</strong></label><br/>
-            <input class="form-control" type="text" name="old_username" style="width:170px; height:30px;"/><br/>
+            <input class="form-control input-sm" type="text" name="old_username" style="width:170px;" /><br/>
             <br/>
           </div>
           <div class="form-group">
             <label><strong>New Username</strong></label><br/>
-            <input class="form-control" type="text" name="new_username" style="width:170px; height:30px;"/><br/>
+            <input class="form-control input-sm" type="text" name="new_username" style="width:170px;" /><br/>
             <br/>
           </div>
           <label><input type="checkbox" name="merge" value="1"/>
