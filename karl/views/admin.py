@@ -460,7 +460,6 @@ class EmailUsersView(object):
                     n += 1
             if group.startswith('group-'):
                 group_key = group.replace('group-', '')
-                print('gk', group_key)
                 alladdresses = all_groups.get(group_key, [])
                 for entry in alladdresses:
                     addressed_to.append({
