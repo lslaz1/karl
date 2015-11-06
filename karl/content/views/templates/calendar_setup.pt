@@ -7,7 +7,7 @@
   <div metal:fill-slot="content">
     <div class="chparent_wrapper">
       <a id="backto" class="chparent" href="${back_to_calendar_url}">
-        <span class="glyphicon glyphicon-arrow-left"></span>
+        <span class="glyphicon glyphicon-arrow-left" style="padding-right:5px;"></span>
         Back to Calendar
       </a>
     </div>

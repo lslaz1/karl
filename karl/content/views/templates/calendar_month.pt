@@ -17,7 +17,7 @@
 
     <h3 class="cal_title">${calendar.title}</h3>
 
-    <div class="col-lg-10 col-lg-offset-2">
+    <div class="col-lg-12" align="center">
       <table id="cal_month" class="cal cal_month" cellspacing="0">
         <tr class="days">
           <th tal:repeat="day calendar.day_headings">${day}</th>

@@ -21,23 +21,21 @@
 
       <div class="koverview_body">
         <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
-          <div class="col-lg-11">
+          <div class="col-lg-6">
             <label><strong>Email Group Name</strong></label><br/>
-            <input class="form-control" name="group_name" style="width:470px; height:30px;" value="${group_name}" required/><br/>
-            <br/>
+            <input class="form-control" name="group_name" value="${group_name}" required/><br/>
             <label><strong>Email Addresses</strong></label><br/>
             Type email addresses (one per line) of people you would like to add to this group<br/>
             <textarea class="form-control" name="email_address" rows="10" cols="78">${email_address}</textarea><br/>
-            <br/>
             <label><strong>Existing Members</strong></label><br/>
-            <select class="form-control" name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
+            <select class="form-control" name="memberemails" class="memberemails" multiple="multiple">
               <option tal:repeat="profile peoplelist"
                   tal:attributes="selected python: profile.selected is True"
                   value="${profile.login}">${profile.name}</option>    
             </select>
             <br/>
             <label><strong>Existing Members</strong></label><br/>
-            <select class="form-control" name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
+            <select class="form-control" name="memberemails" class="memberemails" multiple="multiple">
               <option tal:repeat="profile peoplelist"
                   tal:attributes="selected python: profile.selected is True"
                   value="${profile.login}">${profile.name}</option>    

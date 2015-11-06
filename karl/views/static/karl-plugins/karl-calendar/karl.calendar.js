@@ -28,7 +28,7 @@ $.widget('karl.karlcalendarbuttons', {
 
         this.element.append(
             '<span class="karl-calendar-buttonset-term">' +
-                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-day" class="karl-calendar-button-day"></input><label for="karl-calendar-button-day">Day</label>' +
+                '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-day" class="karl-calendar-button-day"></input><label for="karl-calendar-button-day">D</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-week" class="karl-calendar-button-week"></input><label for="karl-calendar-button-week">Week</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-term" id="karl-calendar-button-month" class="karl-calendar-button-month"></input><label for="karl-calendar-button-month">Month</label>' +
             '</span>' +
@@ -37,7 +37,7 @@ $.widget('karl.karlcalendarbuttons', {
                 '<input type="radio" name="karl-calendar-buttonset-viewtype" id="karl-calendar-button-list" class="karl-calendar-button-list"></input><label for="karl-calendar-button-list">List</label>' +
             '</span>' +
 
-            '<button class="karl-calendar-button-today">T</button>' +
+            '<button class="karl-calendar-button-today">Today</button>' +
             '<span class="karl-calendar-buttonset-navigate">' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-prev" class="karl-calendar-button-prev"></input><label for="karl-calendar-button-prev" class="karl-calendar-label-prev">&nbsp;</label>' +
                 '<input type="radio" name="karl-calendar-buttonset-navigate" id="karl-calendar-button-next" class="karl-calendar-button-next"></input><label for="karl-calendar-button-next" class="karl-calendar-label-next">&nbsp;</label>' +

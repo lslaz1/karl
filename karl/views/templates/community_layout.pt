@@ -21,15 +21,14 @@
           <div class="row">
           
             <div class="col-lg-9">
-              <div id="center" class="clearafter community_view" >
+              <div id="center" class="clearafter community_view">
                 <div class="cheader" tal:condition="python: api.community_info">
-                  <form id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
-                    <div class="form-inline">
-
-                        <input type="text" class="form-control input-sm" name="body"/ style="width:150px;">
+                  <form class="clearfix" id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
+                    <div class="form-inline pull-right">
+                        <input type="text" class="form-control input-sm" name="body"/ style="width:200px;">
                         <button type="submit" class="btn btn-default btn-sm">Search Community</button>
-
                     </div>
+
                   </form>
                   <h1>${api.community_info.title}
           	      <span tal:condition="api.community_info and not api.has_staff_acl(api.community_info.context)"
@@ -41,7 +40,7 @@
             </div> <!-- close .col-lg-9 -->
 
             <div class="col-lg-3">
-              <div class="rightcol" tal:content="structure api.render_sidebar()">
+              <div class="rightcol" style="border: 2px solid #DDDDDD; border-radius:5px; padding-bottom: 20px;" align="center" tal:content="structure api.render_sidebar()">
               </div>
             </div> <!-- close .col-lg-3 --> 
           </div> <!-- close .row -->
@@ -60,7 +59,7 @@
                     </ul>
 
                   </div> <!-- close #cheader -->    
-                  <div id="screenid-community-overview" class="ccontent ui-helper-clearfix">
+                  <div id="screenid-community-overview">
                     <div metal:define-slot="content"/>
                   </div>
                 </div> <!-- close cleftcol -->

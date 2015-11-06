@@ -15,23 +15,22 @@
       <h1 class="kscreentitle">Admin Section: Rename or Merge Users</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="rename_or_merge">
-          <div class="form-group">
-            <label><strong>Old Username</strong></label><br/>
-            <input class="form-control input-sm" type="text" name="old_username" style="width:170px;" /><br/>
+        <div class=col-lg-3>
+          <form method="POST" name="rename_or_merge">
+            <div class="form-group">
+              <label><strong>Old Username</strong></label><br/>
+              <input class="form-control input-sm" type="text" name="old_username" />
+            </div>
+            <div class="form-group">
+              <label><strong>New Username</strong></label><br/>
+              <input class="form-control input-sm" type="text" name="new_username" />
+            </div>
+            <label><input type="checkbox" name="merge" value="1"/>
+            Merge user accounts.</label><br/>
             <br/>
-          </div>
-          <div class="form-group">
-            <label><strong>New Username</strong></label><br/>
-            <input class="form-control input-sm" type="text" name="new_username" style="width:170px;" /><br/>
-            <br/>
-          </div>
-          <label><input type="checkbox" name="merge" value="1"/>
-          Merge user accounts.</label><br/>
-          <br/>
-          <input class="btn btn-default btn-sm" type="submit" value="Rename user"/>
-        </form>
-
+            <input class="btn btn-default btn-sm" type="submit" value="Rename user"/>
+          </form>
+        </div>
       </div>
     </div>
 

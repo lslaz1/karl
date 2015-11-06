@@ -9,15 +9,14 @@
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
     <h1 class="peopledir-title">${peopledir.title}</h1>
-    <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
-      <li tal:repeat="tab peopledir_tabs"
-        class="${tab['selected'] and 'selected' or ''}">
+    <div class="btn-group" role="group">
+      <button class="btn btn-link btn-xs" tal:repeat="tab peopledir_tabs">
         <a href="${tab['href']}">${tab['title']}</a>
-      </li>
-    </ul>
-    <div id="peopledir-content-wrapper">
-
+      </button>
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
+    </div>
+
+    <div id="peopledir-content-wrapper">
 
       <div class="peopledir-report-description"
         tal:repeat="description descriptions"
@@ -56,11 +55,10 @@
         //]]>
       </script>
 
-      <div style="margin-top:20px;text-align:right"
-           tal:condition="1 or mailto" >
-        <a href="${mailto}"
-        ><img src="${api.static_url}/images/email.gif"
-              border="0" alt="E-mail Community" id="EmailIcon"/></a>
+      <div class="pull-right" tal:condition="1 or mailto">
+        <a href="${mailto}" aria-label="Email">
+          <span class="glyphicon glyphicon-envelope" aria-hidden="true" style="padding: 10px 5px;"></span>
+        </a>
       </div>
 
       <div metal:use-macro="api.snippets.macros['opensearch']"></div>

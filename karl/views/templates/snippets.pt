@@ -84,7 +84,7 @@
       </style>
     </metal:resources>
 
-<!-- Alphabet Listing -->
+<!-- Alphabet Toolbar -->
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <span tal:repeat="letter letters">
         <strong tal:condition="letter['is_current']"
@@ -95,13 +95,14 @@
         <span tal:condition="not letter['href'] and not letter['is_current']"
            class="${letter['css_class']}">${letter['name']}</span>
         <span tal:condition="not repeat['letter'].end">|</span>
-      </span>
+      </span><br/><br/>
     </div>
 
     <span metal:define-macro="privacy_badge" class="kprivacy_badge">Private</span>
 
     <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
 
+<!-- Page Title -->
     <h1 metal:define-macro="page_title" class="kscreentitle clearfix">${api.page_title}
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
@@ -117,7 +118,7 @@
       <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
     </div>
 
-    <!-- status box that works together with ui.karlstatusbox -->
+<!-- status box that works together with ui.karlstatusbox -->
     <div metal:define-macro="karl_status_message"
          class="statusbox">
       <div class="portalMessage" tal:condition="api.status_messages">
@@ -193,6 +194,7 @@
       </script>
     </metal:actions_box>
 
+<!-- My Communities column buttons -->
     <div metal:define-macro="my_communities_portlet" class="generic-portlet"
       id="my-communities-portlet">
       <div id="my-communities-list">
@@ -238,18 +240,30 @@
       </script>
     </div>
 
+<!-- Batch size buttons -->
     <metal:pagesize metal:define-macro="batch_size_selector">
-      <div class="batch-size pull-right"
+      <div class="btn-group pull-right"
            tal:define="default_batch_size default_batch_size|string:25;
-                       current python: request.params.get('limit', request.params.get('batch_size', default_batch_size));">
+              current python: request.params.get('limit', 
+              request.params.get('batch_size', default_batch_size));"
+              role="group">
         <span class="label">Batch size:</span>
-        <a href="${request.path_url}?limit=10" tal:omit-tag="python: current == '10'">10</a> |
-        <a href="${request.path_url}?limit=25" tal:omit-tag="python: current == '25'">25</a> |
-        <a href="${request.path_url}?limit=50" tal:omit-tag="python: current == '50'">50</a> |
-        <a href="${request.path_url}?limit=100" tal:omit-tag="python: current == '100'">100</a>
+        <button type="button" class="btn btn-default btn-xs">
+          <a href="${request.path_url}?limit=10" tal:omit-tag="python: current == '10'">10</a>
+        </button>
+        <button type="button" class="btn btn-default btn-xs">
+          <a href="${request.path_url}?limit=25" tal:omit-tag="python: current == '25'">25</a>
+        </button>
+        <button type="button" class="btn btn-default btn-xs">
+          <a href="${request.path_url}?limit=50" tal:omit-tag="python: current == '50'">50</a>
+        </button>
+        <button type="button" class="btn btn-default btn-xs">
+          <a href="${request.path_url}?limit=100" tal:omit-tag="python: current == '100'">100</a>
+        </button>
       </div>
     </metal:pagesize>
 
+<!-- Files table -->
     <metal:table metal:define-macro="folder_grid">
        <div id="filegrid"></div>
       <script language="javascript" type="text/javascript">
@@ -290,7 +304,7 @@
       </script>
     </metal:table>
 
-
+<!-- Subscribe button -->
     <div metal:define-macro="rss_icon" class="rss-icon pull-right"
          tal:condition="feed_url|None">
       <a type="button" class="btn btn-default btn-xs" href="${feed_url}">
@@ -299,13 +313,14 @@
       </a>
     </div>
 
+<!-- "Back To..." + arrow icon --> 
     <div class="chparent_wrapper" metal:define-macro="backto_link" tal:condition="backto|False">
       <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
     </div>
 
     <tal:block metal:define-macro="backto_link_new" tal:condition="backto|False">
       <a class="chparent" href="${backto['href']}" id="backto">
-        <span class="glyphicon glyphicon-arrow-left"></span> Back to ${backto['title']}</a>
+        <span class="glyphicon glyphicon-arrow-left" style="padding-right:5px;"></span> Back to ${backto['title']}</a>
     </tal:block>
 
     <div metal:define-macro="download_file">
@@ -341,8 +356,9 @@
       <form class="form-inline">  
         <div class="form-group">
           <input type="text" class="form-control input-sm" />
-          <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-        </div> <!-- close .form-group -->
+          <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+          </button>
+        </div>
       </form> 
     </div>
 
@@ -380,6 +396,7 @@
       </div>
     </div>
 
+<!-- Batching -->
     <div metal:define-macro="batching">
       <div tal:condition="batch_info.batching_required"
            class="kpagination_frame">
@@ -433,6 +450,7 @@
         </span>
     </div>
 
+<!-- Blog Comments -->
     <div metal:define-macro="show_comments" tal:condition="comments">
       <div class="addCommentButton" style="float: right;">
         <a href="#addcomment">add comment</a>
@@ -477,6 +495,7 @@
 
         <div class="commentText" tal:content="structure python: api.clean_html(comment['text'])" />
 
+<!-- Blog Attachments -->
         <div class="blogAttachments">
           <span tal:repeat="attachment comment['attachments']">
             <img alt="[icon]"
@@ -516,6 +535,7 @@
           </div>
     </div>
 
+<!-- TagCloud -->
     <div id="tagcloud"
          metal:define-macro="tagcloud">
       <h2 class="tagsHeaderSpace">
@@ -538,6 +558,7 @@
 
     </div> <!-- close #tagcloud -->
 
+<!-- Tag Listing -->
     <div id="taglisting"
          metal:define-macro="taglisting">
      <h2 class="tagsHeaderSpace">
@@ -570,6 +591,7 @@
 
     </div> <!-- close taglisting -->
 
+<!-- Show Tags -->
     <div id="showtag"
          metal:define-macro="showtag">
 
@@ -615,39 +637,33 @@
     </div>
 
     <div metal:define-macro="peopledir-report-head">
-      <div id="peopledir-actions">
-        <ul>
-          <li tal:condition="mailto" title="Email">
-            <a class="btn btn-default btn-xs" href="${mailto}" title="Email" aria-label="Email">
-                <span class="glyphicon glyphicon-envelope"></span>
-            </a>
-          </li>
-            <li title="Print">
-              <a class="btn btn-default btn-xs" href="${print_url}" title="Print" aria-label="Print">
-                  <span class="glyphicon glyphicon-print"></span>
-              </a>
-            </li>
-          <li title="Export as CSV">
-            <a class="btn btn-default btn-xs" href="${csv_url}" title="Export as CSV">
-                <span class="glyphicon glyphicon-download" aria-label="Export as CSV"></span>
-            </a>
-          </li>
-        </ul>
+<!-- Email - Print - CSV icons -->      
+      <div class="btn-group" role="group" id="peopledir-actions">
+        <a tal:condition="mailto" href="${mailto}" title="Email" aria-label="Email">
+          <span class="glyphicon glyphicon-envelope" style="padding-left:5px"></span>
+        </a>
+        <a href="${print_url}" title="Print" aria-label="Print">
+          <span class="glyphicon glyphicon-print" style="padding-left:5px"></span>
+        </a>
+        <a href="${csv_url}" title="Export as CSV" aria-label="Export as CSV">
+          <span class="glyphicon glyphicon-download" style="padding-left:5px"></span>
+        </a>
       </div>
+      
       <h1 class="peopledir-screentitle">${api.page_title}
       </h1>
       <div id="peopledir-letterbox-wrapper">
         <div metal:use-macro="api.snippets.macros['letter_box']"/>
       </div>
+<!-- People Search bar -->      
       <div id="peopledir-search-box-wrapper">
         <div id="peopledir-search-box">
           <form class="form-inline" method="get" action="${api.view_url}">
             <div class="form-group">
-                <input class="form-control"type="text" name="body" value="" />
-                <input class="btn btn-default" type="submit" value="Search" />
-
+                <input class="form-control input-sm"type="text" name="body" value="" />
+                <input class="btn btn-default btn-sm" type="submit" value="Search" />
             </div>
-          </form>
+          </form><br/>
         </div>
       </div>
     </div>
@@ -656,6 +672,7 @@
       <div id="peopledir-letterbox-wrapper">
         <div metal:use-macro="api.snippets.macros['letter_box']"/>
       </div>
+      <br/>
       <div class="communityOptions">
         <div id="community-filters">
           <label>Community Filters:</label>
@@ -665,30 +682,32 @@
                   <span>${option['title']}</span>
                 </a></button>
           </div>
+          <br/><br/>
         </div>
         <div id="communitiy-search-box-wrapper">
           <div id="communitiy-search-box">
             <form class="form-inline" method="get" action="${api.view_url}">
               <div class="form-group">
                 <div class="field">
-                  <input class="form-control input-xs" type="text" name="body" value="" />
-                  <input class="btn btn-default btn-xs" type="submit" value="Search" />
+                  <input class="form-control input-sm" type="text" name="body" value="" />
+                  <input class="btn btn-default btn-sm" type="submit" value="Search" />
                 </div>
               </div>
             </form>
           </div>
-        </div>
+        </div><br/>
       <div class="visualClear"><!-- --></div>
       </div>
     </div>
 
-    <div id="peopledir-opensearch-add" metal:define-macro="opensearch"
-         tal:condition="opensearch_url|None">
+<!-- Peopledir Search icon -->
+    <div class="pull-right" id="peopledir-opensearch-add" metal:define-macro="opensearch"
+         tal:condition="opensearch_url|None" style="padding:10px;">
       <div>
-        <a class="btn btn-default btn-xs" onclick="window.external.AddSearchProvider(
-                      '${opensearch_url}'); return false;"
-                      href="#" aria-label="Add KARL People Search to your browser toolbar"><span class="glyphicon glyphicon-search"></span>
-        </a>
+          <a onclick="window.external.AddSearchProvider
+            ('${opensearch_url}'); return false;"
+            href="#" aria-label="Add KARL People Search to your browser toolbar">
+            <span class="glyphicon glyphicon-search"></span></a>
       </div>
     </div>
 
