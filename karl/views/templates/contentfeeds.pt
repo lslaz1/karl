@@ -62,10 +62,11 @@
 
     <script type="text/tmpl" id="item_row">
         <div class="feeditem">
-            <div class="thumbnail">
-                <img src="{%= item.thumbnail %}" />
+            <div class="col-lg-2">
+              <div class="thumbnail">
+                <img src="{%= item.thumbnail %}" style="width:150px;" />
+              </div>
             </div>
-
             <div class="feedoperation">
                 <div class="{%= item.operation %}"><span>{%= item.operation %}</span></div>
                 <div class="contenttype">{%= item.content_type %}</div>
@@ -160,58 +161,67 @@
   <div metal:fill-slot="content">
     <div tal:define="filterby request.params.get('filter') or sticky_filter">
       <div style="display:none" id="filter" tal:content="filterby" />
+        <div class="container-fluid">
+          <div class="row">
+            
+            <div class="col-lg-9">
+              <h1>${api.page_title}</h1>
 
-      <div class="feedOptions"
-           tal:condition="api.user_is_staff and show_filter">
+              <p>A real-time list of updates on ${api.system_name} that
+              refreshes automatically every 30 seconds.</p>
 
-           <div class="btn-group" role="group" id="feed-filters">
-               Feed Filters<br />
-              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel=""><span>All</span></a></button>
-              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a></button>
-              <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a></button>
-           </div>
-           <div id="feed-polling">
-               Auto Update <img id="polling-info" src="${api.static_url}/images/livesearch_info.png" alt="Click for Polling Info" /><br />
-               <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
-               <a href="#" id="poll-indicator" class="on"><span>
-                   <img class="img-on" src="${api.static_url}/images/feed-on.gif" alt="Polling is On" />
-                   <img class="img-off" src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" />
-                   <img class="img-polling" src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" />
-                   <img class="img-error" src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
-               </span></a>
-               <div class="polling-details info">
-                   <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
-                   <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
-                   <ul>
-                       <li><img src="${api.static_url}/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
-                       <li><img src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
-                       <li><img src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
-                       <li><img src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
-                   </ul>
-                   <p id="feedinfo">
-                      <i>Last updated:</i><br/><span id="polled">AGO</span><br/><br/>
-                      <i>Last generation:</i><span id="last_gen"></span><br/>
-                      <i>Last index:</i><span id="last_index"></span><br/>
-                      <i>JSON Feed URL:</i><br/><a id="json_feed_url" href="#">Unknown</a>
-                   </p>
-               </div>
-               <div class="polling-details errormessage">
-                   <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
-                   <p>The following error occurred:</p>
-           <div id="kf-errordetail"></div>
-               </div>
-           </div>
-      </div>
+              <div id="feedlist"></div>
+            </div> 
 
-      <h1>${api.page_title}</h1>
+            <div class="col-lg-3">
+              <div class="feedOptions"
+                tal:condition="api.user_is_staff and show_filter">
 
-      <p>A real-time list of updates on ${api.system_name} that
-      refreshes automatically every 30 seconds.</p>
+                 <div class="btn-group" role="group" id="feed-filters">
+                     Feed Filters<br />
+                    <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel=""><span>All</span></a></button>
+                    <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a></button>
+                    <button type="button" class="btn btn-default btn-xs"><a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a></button>
+                 </div> <!-- close #feed-filters -->
+                 <br/><br/>
 
-      <div id="feedlist"></div>
-
-    </div>
-  </div>
-
+                 <div id="feed-polling">
+                     Auto Update <img id="polling-info" src="${api.static_url}/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+                     <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
+                     <a href="#" id="poll-indicator" class="on"><span>
+                         <img class="img-on" src="${api.static_url}/images/feed-on.gif" alt="Polling is On" />
+                         <img class="img-off" src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" />
+                         <img class="img-polling" src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" />
+                         <img class="img-error" src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+                     </span></a>
+                     <div class="polling-details info">
+                         <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
+                         <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
+                         <ul>
+                             <li><img src="${api.static_url}/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
+                             <li><img src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
+                             <li><img src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
+                             <li><img src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+                         </ul>
+                         <p id="feedinfo">
+                            <em>Last updated:</em><br/><span id="polled">AGO</span><br/><br/>
+                            <em>Last generation:</em><span id="last_gen"></span><br/>
+                            <em>Last index:</em><span id="last_index"></span><br/>
+                            <em>JSON Feed URL:</em><br/><a id="json_feed_url" href="#">Unknown</a>
+                         </p>
+                     </div> <!-- close polling-details info -->
+                     <div class="polling-details errormessage">
+                         <a href="#" class="close"><span class="glyphicon glyphicon-remove" aria-label="close"></span></a>
+                         <p>The following error occurred:</p>
+                        <div id="kf-errordetail"></div>
+                     </div> <!-- close .polling-details errormessage-->
+                 </div> <!-- close #feed-polling -->
+              </div> <!-- close .feedOptions -->
+            </div> <!-- close .col-lg-3 -->
+  
+          </div> <!-- close row -->
+        </div> <!-- close .container-fluid --> 
+      </div> 
+    </div> <!-- close tal:define -->
 </body>
 </html>

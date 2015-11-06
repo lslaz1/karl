@@ -8,7 +8,7 @@
       <form class="form-inline "method="GET" name="filter_content">
         <div class="form-group">
           <label><strong>Community:</strong></label>
-          <select class="form-control" name="community" style="height:22px;">
+          <select class="form-control input-sm" name="community">
             <option value="_any">Any Community</option>
             <option tal:repeat="c communities" value="${c['path']}"
                     selected="${c['path'] == selected_community}">
@@ -17,8 +17,8 @@
           </select>
 
           <label><strong>Title contains:</strong></label>
-          <input class="form-control" name="title_contains" value="${title_contains}" style="height:22px;"/>
-          <input class="btn btn-default btn-xs" type="submit" name="filter_content" value="Find Content"/>
+          <input class="form-control input-sm" name="title_contains" value="${title_contains}" />
+          <input class="btn btn-default btn-sm" type="submit" name="filter_content" value="Find Content"/>
         </div>
 
     </div>

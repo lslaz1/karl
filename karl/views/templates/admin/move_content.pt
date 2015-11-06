@@ -19,16 +19,18 @@
         <div metal:use-macro="content_select_widget"/>
         <br/>
 
-        <form class="form-inline" method="POST" name="select_content">
-            <div class="form-group" metal:use-macro="content_select_grid"/>
-            <br/>
-            <label><strong>Move to</strong></label>
-            <select class="form-control" name="to_community" style="width:200px; height:22px;">
-              <option value="">Select community</option>
-              <option tal:repeat="c communities" value="${c['path']}">
-                ${c['title']}</option>
-            </select>
-            <input class="btn btn-default btn-xs" type="submit" name="move_content" value="Move Content"/>
+        <form method="POST" name="select_content">
+          <div metal:use-macro="content_select_grid"/>
+          <br/>
+            <div class="form-inline">
+              <label><strong>Move to</strong></label>
+              <select class="form-control input-sm" name="to_community" style="width:200px;">
+                <option value="">Select community</option>
+                <option tal:repeat="c communities" value="${c['path']}">
+                  ${c['title']}</option>
+              </select>
+              <input class="btn btn-default btn-sm" type="submit" name="move_content" value="Move Content"/>
+            </div>
         </form>
       </div>
     </div>

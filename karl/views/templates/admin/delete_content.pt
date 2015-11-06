@@ -21,7 +21,7 @@
         <form class="form-group" method="POST" name="select_content">
             <div metal:use-macro="content_select_grid"/>
             <br/>
-            <input class="btn btn-default btn-xs" type="submit" name="delete_content" value="Delete Content"/>
+            <input class="btn btn-default btn-sm" type="submit" name="delete_content" value="Delete Content"/>
         </form>
       </div>
     </div>

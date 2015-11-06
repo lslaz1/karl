@@ -1,20 +1,23 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default" role="navigation">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-haspopup="true">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
+
       <a class="navbar-brand" href="${api.home_url}">
-      <img src="${api.logo_url}" alt="KARL"/></a>
+      <img src="${api.logo_url}" alt="KARL" style="padding:5px 30px;"/></a>
+
     </div>
     
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
 
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav" style="padding:13px;">
         <li tal:repeat="item python:api.get_header_menu_items()">
         <a href="${item['url']}">${item['display']}</a>
         </li>
@@ -22,8 +25,8 @@
 
       <form class="navbar-form navbar-right" role="search">
         <div class="form-group">
-          <ul class="nav navbar-nav">
-            <select class="form-control" style="width:150px; height:30px;">
+          <ul class="nav navbar-nav" style="padding-top:13px;">
+            <select class="form-control input-sm" style="width:150px;">
               <option value=""><a href="#">All Content</a></option>
               <option tal:repeat="o api.livesearch_options" name="${o['name']}" tal:attributes="advanced_search o['component'].live_to_advanced"><a title="Search ${o['description']}" href="#">${o['title']}</a></option>
             </select>
@@ -31,12 +34,13 @@
           </ul>
       </form>
 
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <strong class="caret"></strong></a>
+          <ul class="dropdown-menu" role="menu">
             <li tal:repeat="link python: api.get_user_links()">
-            <a href="${link.url}">${link.title}</a></li>
+              <a href="${link.url}">${link.title}</a>
+            </li>
           </ul>
         </li>
       </ul>

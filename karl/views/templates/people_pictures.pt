@@ -6,12 +6,11 @@
   <div metal:fill-slot="content">
 
     <h1 class="peopledir-title">${peopledir.title}</h1>
-    <ul tal:condition="peopledir_tabs" id="peopledir-tabs">
-      <li tal:repeat="tab peopledir_tabs"
-        class="${tab['selected'] and 'selected' or ''}">
+    <div class="btn-group" role="group">
+      <button class="btn btn-default btn-xs" tal:repeat="tab peopledir_tabs">
         <a href="${tab['href']}">${tab['title']}</a>
-      </li>
-    </ul>
+      </button>
+    </div>
     <div id="peopledir-content-wrapper">
 
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
@@ -21,7 +20,7 @@
         tal:content="structure python: api.clean_html(description)"></div>
 
       <div>
-        <a class="rightFloatLink" title="Show table"
+        <a title="Show table"
             href="${tabular_url}">Tabular View</a>
         <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
         <div style="clear: both"></div>
@@ -36,7 +35,7 @@
               <div class="row">
                 <div class="col-lg-2">
                   <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
-                    <img alt="${profile.title}" src="${cell['photo_url']}"/>
+                    <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
                     <div class="caption">
                       <h3 align="center">${profile.title}</h3>
                     </div>

@@ -19,8 +19,8 @@
         <form class="form-group" method="POST" name="upload_users_csv"
               enctype="multipart/form-data">
           <label><strong>Upload a CSV file.</strong></label><br/>
-          <input name="csv" type="file"/>
-          <input class="btn btn-default btn-xs" type="submit" value="Upload"/><br/>
+          <input name="csv" type="file"/><br/>
+          <input class="btn btn-default btn-sm" type="submit" value="Upload"/><br/>
           <div class="checkbox">
             <label><input type="checkbox" name="reactivate" value="true"/>Reactivate inactive users.<label>
           </div>

@@ -50,7 +50,7 @@
                 <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
                   <a class="btn btn-default btn-xs" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
                 </div>
-              </div>
+              </div><br/>
 
               <div class="row">
                 <!-- buttons -->
@@ -69,8 +69,8 @@
         <!-- actions --> 
         <div class="button-group pull-right">
            <!-- <a class="cal_download" href="#">Download</a> -->
-           <a class="btn btn-default btn-xs" aria-label="Subscribe" href="${calendar.feed_url}">Subscribe</a>
-           <a class="btn btn-default btn-xs" aria-label="Print" href="#"><span class="glyphicon glyphicon-print"></span></a>
+           <a aria-label="Subscribe" href="${calendar.feed_url}" style="padding:10px 5px;">Subscribe</a>
+           <a aria-label="Print" href="#"><span class="glyphicon glyphicon-print" style="padding:10px 5px;"></span></a>
         </div>
       </div>
 

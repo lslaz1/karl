@@ -18,9 +18,11 @@
         </div>
 
 
-        <div style="margin-top:20px;text-align:right">
-                <a href="mailto:${api.community_info.name}@${system_email_domain}"><img src="${api.static_url}/images/email.gif" border="0" alt="E-mail Community"
-                        id="EmailIcon"/></a>
+        <div class="pull-right">
+            <a href="mailto:${api.community_info.name}@${system_email_domain}"
+                aria-label="Email">
+                <span class="glyphicon glyphicon-envelope" 
+                   aria-hidden="true" style="padding:10px;"></span></a>
         </div>
 
         </div>

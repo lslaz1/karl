@@ -7,7 +7,7 @@
 <div metal:fill-slot="content">
     <div class="chparent_wrapper">
         <a id="backto" class="chparent" href="${back_to_calendar_url}">
-            <span class="glyphicon glyphicon-arrow-left"></span>
+            <span class="glyphicon glyphicon-arrow-left" style="padding-right:5px"></span>
             Back to Calendar
         </a>
     </div>
@@ -36,7 +36,7 @@
                 <td>
             <span class="notehandle ui-icon ui-icon-triangle-2-n-s"
                     tal:condition="is_moderator"></span>
-                    <strong>${note.title}</strong>. ${note.description}
+                    <strong>${note.title}</strong>. ${note.description}<br/><br/>
                     <form class="form-group" action="${notes_url}"
                           method="POST"
                             tal:condition="is_moderator">
