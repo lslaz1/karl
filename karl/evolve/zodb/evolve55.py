@@ -9,7 +9,7 @@ def evolve(site):
         site.email_templates = OOBTree()
 
         accept_template = {'body': '''<p>Your access request has been approved<p>''',
-                           'Subject': 'Please join {{system_name}}',
+                           'subject': 'Please join {{system_name}}',
                            'template_name': 'Accept',
                            'selected_list': [],
                            'sendtouser': 'yes',
@@ -21,7 +21,7 @@ def evolve(site):
         <p>Your access request has been denied. Please read the guidelines on
            requesting access to {{system_name}}</p>
         </body></html>''',
-                         'Subject': 'Access Request to {{system_name}} has been denied',
+                         'subject': 'Access Request to {{system_name}} has been denied',
                          'template_name': 'Deny',
                          'selected_list': [],
                          'sendtouser': 'yes',
@@ -29,7 +29,7 @@ def evolve(site):
         site.email_templates['Deny'] = deny_template
 
         followup_template = {'body': 'Follow up for {{requestor_name}} - {{requestor_email}}',
-                             'Subject': 'Follow up regarding request from {{requestor_email}',
+                             'subject': 'Follow up regarding request from {{requestor_email}',
                              'template_name': 'Follow_up',
                              'selected_list': [],
                              'sendtouser': 'no',
