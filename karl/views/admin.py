@@ -480,6 +480,22 @@ class EmailUsersView(object):
                         'email': to_email
                     })
                     n += 1
+            if n == 0 or request.params['text'] == '':
+                if n == 0:
+                    api.status_message = "At least 1 recipient is required"
+                else:
+                    api.status_message = "Message Body is required"
+                return dict(
+                    api=api,
+                    menu=_menu_macro(),
+                    to_groups=to_groups,
+                    to_grp_value=group,
+                    from_emails=from_emails,
+                    from_email_value=from_email,
+                    msg_subject=request.params['subject'],
+                    msg_body=request.params['text'],
+                    more_to=request.params['more_to'],
+                )
             self.send_email(
                 request.params['subject'], request.params['text'],
                 addressed_to, from_email)
@@ -500,7 +516,12 @@ class EmailUsersView(object):
             api=api,
             menu=_menu_macro(),
             to_groups=to_groups,
+            to_grp_value='none',
             from_emails=from_emails,
+            from_email_value='admin',
+            msg_subject='',
+            msg_body='',
+            more_to='',
         )
 
 

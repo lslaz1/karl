@@ -22,22 +22,44 @@
         <form method="POST" name="email_users" enctype="multipart/form-data">
           <b>From</b><br/>
           <select name="from_email">
-            <option tal:repeat="from_email from_emails"
-                    value="${from_email[0]}">${from_email[1]}</option>
+              <tal:block tal:repeat="from_email from_emails">
+                  <tal:block tal:condition="from_email[0] == from_email_value">
+                      <option value="${from_email[0]}" selected>${from_email[1]}</option> 
+                  </tal:block>
+                  <tal:block tal:condition="from_email[0] != from_email_value">
+                      <option value="${from_email[0]}">${from_email[1]}</option> 
+                  </tal:block>
+              </tal:block>
           </select><br/>
           <br/>
           <b>To</b><br/>
           <select name="to_group">
-            <option tal:repeat="to_group to_groups"
-                    value="${to_group[0]}">${to_group[1]}</option>
+            <tal:block tal:repeat="to_group to_groups">
+                <tal:block tal:condition="to_group[0] == to_grp_value">
+                    <option value="${to_group[0]}" selected>${to_group[1]}</option> 
+                </tal:block>
+                <tal:block tal:condition="to_group[0] != to_grp_value">
+                    <option value="${to_group[0]}">${to_group[1]}</option> 
+                </tal:block>
+            </tal:block> 
           </select><br/>
           <b>Additional Users</b><br/>
-          <input name="more_to" size="60"/><br/>
+          <input name="more_to" size="60" value="${more_to}"/><br/>
           <br/>
           <b>Subject</b><br/>
-          <input name="subject" size="60"/><br/>
+          <input name="subject" size="60" value="${msg_subject}" required/><br/>
           <br/>
-          <metal:input use-macro="api.formfields.macros['text-field']"/>
+          <fieldset
+              tal:define="error fielderrors['text']|None"
+              class="${error and 'fieldError' or ''}"
+              id="text-field">
+            <label>Text</label>
+            <div class="fieldHelp" tal:content="help['text']|''"></div>
+            <div tal:condition="error" class="errorMessage">${error}</div>
+            <input type="hidden" name="text_text_format" value="text/html" />
+            <textarea id="text" name="text" rows="1" cols="40"
+              class="pat-tinymce">${msg_body}</textarea>
+          </fieldset>
           <br/>
           
           <metal:input use-macro="api.formfields.macros['attachment-field']"/>
