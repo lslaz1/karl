@@ -787,9 +787,26 @@ class AddEmailTemplate(object):
             template_body = request.params['text']
             sendtoadmins = request.params.get('sendtoadmins', 'no')
             sendtouser = request.params.get('sendtouser', 'no')
+            subject = request.params['template_subject']
+            subject = subject.strip()
+            if subject == "" or template_body == "":
+                api.status_message = 'Subject and Email Body fields are required'
+
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    template_name=template_name,
+                    template_body=template_body,
+                    template_subject=subject,
+                    sendtouser=sendtouser,
+                    sendtoadmins=sendtoadmins,
+                    peoplelist=peoplelist
+                )
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
+                                                           'subject': subject,
                                                            'sendtouser': sendtouser,
                                                            'sendtoadmins': sendtoadmins}
 
@@ -839,7 +856,8 @@ class EditEmailTemplate(object):
         edit_template = self.context.email_templates.get(thistemplate, {})
 
         profiles = find_profiles(context)
-        peoplelist = getemailusers(profiles, edit_template.get('selected_list', []))
+        existing_list = edit_template.get('selected_list', [])
+        peoplelist = getemailusers(profiles, existing_list)
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
             memberemails = request.params.getall('memberemails')
@@ -848,8 +866,21 @@ class EditEmailTemplate(object):
             sendtoadmins = request.params.get('sendtoadmins', 'no')
             sendtouser = request.params.get('sendtouser', 'no')
             template_name = request.params['template_name']
-            subject = request.params['template_subject']
+            subject = request.params['template_subject'].strip()
             template_body = request.params['text']
+            if subject == "" or template_body == "":
+                api.status_message = 'Subject and Email Body fields are required!'
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    template_name=template_name,
+                    template_body=template_body,
+                    template_subject=subject,
+                    sendtouser=sendtouser,
+                    sendtoadmins=sendtoadmins,
+                    peoplelist=peoplelist
+                )
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
