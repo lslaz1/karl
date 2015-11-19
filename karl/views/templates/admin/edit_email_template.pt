@@ -28,7 +28,7 @@
           <input type="checkbox" name="sendtouser" value="yes" tal:attributes="checked python: sendtouser == 'yes'"> Send to User Requesting Access<br>
           <input type="checkbox" name="sendtoadmins" value="yes" tal:attributes="checked python: sendtoadmins == 'yes'"> Send to Admins<br>
           <br/>
-          <b>Members To Send List</b><br/>
+          <b>List of Members to send a copy</b><br/>
           <select name="memberemails" class="memberemails" multiple="multiple" style="width: 490px">
             <option tal:repeat="profile peoplelist"
                 tal:attributes="selected python: profile.selected is True"
