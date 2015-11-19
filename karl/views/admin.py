@@ -581,6 +581,16 @@ class AddEmailGroup(object):
             all_groups = self.context.settings.get('email_groups', PersistentMapping())
             group_name = request.params['group_name']
             email_list = process_email_groups(request, profiles)
+            if email_list == []:
+                api.status_message = "At least one addressee is required"
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    group_name=group_name,
+                    email_address='',
+                    peoplelist=peoplelist
+                )
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
 
@@ -642,6 +652,16 @@ class EditEmailGroup(object):
             group_name = request.params['group_name']
 
             email_list = process_email_groups(request, profiles)
+            if email_list == []:
+                api.status_message = "At least one addressee is required"
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    group_name=thisgroup,
+                    email_address='',
+                    peoplelist=peoplelist
+                )
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
 
