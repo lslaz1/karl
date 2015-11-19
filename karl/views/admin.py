@@ -780,6 +780,7 @@ class AddEmailTemplate(object):
 
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
+            no_addressee = False
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
@@ -789,8 +790,13 @@ class AddEmailTemplate(object):
             sendtouser = request.params.get('sendtouser', 'no')
             subject = request.params['template_subject']
             subject = subject.strip()
-            if subject == "" or template_body == "":
-                api.status_message = 'Subject and Email Body fields are required'
+            if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
+                no_addressee = True
+            if subject == "" or template_body == "" or no_addressee:
+                if no_addressee:
+                    api.status_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                else:
+                    api.status_message = 'Subject and Email Body fields are required!'
 
                 return dict(
                     api=api,
@@ -860,6 +866,7 @@ class EditEmailTemplate(object):
         peoplelist = getemailusers(profiles, existing_list)
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
+            no_addressee = False
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
@@ -868,8 +875,13 @@ class EditEmailTemplate(object):
             template_name = request.params['template_name']
             subject = request.params['template_subject'].strip()
             template_body = request.params['text']
-            if subject == "" or template_body == "":
-                api.status_message = 'Subject and Email Body fields are required!'
+            if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
+                no_addressee = True
+            if subject == "" or template_body == "" or no_addressee:
+                if no_addressee:
+                    api.status_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                else:
+                    api.status_message = 'Subject and Email Body fields are required!'
                 return dict(
                     api=api,
                     actions=[],
