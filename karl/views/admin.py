@@ -1708,6 +1708,21 @@ class ReviewAccessRequest(object):
         message.set_type('text/html')
         mailer.send([email_data['email']], message)
 
+    def send_emails(self, email_data):
+        mailer = getUtility(IMailDelivery)
+        who_it_is_to = email_data['to']
+        sent_list = []
+        for who in who_it_is_to:
+            if who not in sent_list:
+                sent_list.append(who)
+                message = Message()
+                message['Subject'] = email_data['subject']
+                message['From'] = email_data['from']
+                message['To'] = who
+                message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
+                message.set_type('text/html')
+                mailer.send([email_data['email']], message)
+
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
@@ -1799,7 +1814,7 @@ class ReviewAccessRequest(object):
                     email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
                 else:
                     email_data = self.get_default_msg(requestor_email, 'approve')
-                self.send_email(email_data)
+                self.send_emails(email_data)
                 self.delete_request(requestor_email)
                 status_message = "Approved: %s" % requestor_email
 
@@ -1809,7 +1824,7 @@ class ReviewAccessRequest(object):
                         email_data = self.get_templ_msg(requestor_email, template_choice, 'deny')
                     else:
                         email_data = self.get_default_msg(requestor_email, 'deny')
-                    self.send_email(email_data)
+                    self.send_emails(email_data)
                     self.delete_request(requestor_email)
 
                     add_denial(self.context,
@@ -1824,7 +1839,7 @@ class ReviewAccessRequest(object):
             elif rvw_action == 'follow_up':
                 if template_choice != '':
                     email_data = self.get_templ_msg(requestor_email, template_choice, 'follow_up')
-                    self.send_email(email_data)
+                    self.send_emails(email_data)
                     status_message = "Follow up sent to %s" % requestor_email
                 else:
                     status_message = "Follow up regarding %s skipped because " + \
@@ -1857,6 +1872,10 @@ class ReviewAccessCustom(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+
+    def send_emails(self, subject, body, addressed_to, from_email):
+        for email_to in addressed_to:
+            self.send_email(subject, body, email_to, from_email)
 
     def send_email(self, subject, body, addressed_to, from_email):
         message = create_message(self.request, subject, body, from_email)
@@ -1895,7 +1914,7 @@ class ReviewAccessCustom(object):
                         'email': to_email
                     })
                     n += 1
-            self.send_email(request.params['subject'],
+            self.send_emails(request.params['subject'],
                             request.params['text'],
                             addressed_to,
                             admin_email)
