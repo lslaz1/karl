@@ -8,11 +8,12 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
+<!-- All, print, CSV buttons -->
     <h1 class="peopledir-title">${peopledir.title}</h1>
-    <div class="btn-group" role="group">
-      <button class="btn btn-link btn-xs" tal:repeat="tab peopledir_tabs">
-        <a href="${tab['href']}">${tab['title']}</a>
-      </button>
+    <div class="btn-group" role="group" tal:repeat="tab peopledir_tabs">
+      <a href="${tab['href']}" class="btn btn-link" 
+        >${tab['title']}
+      </a>
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
     </div>
 
@@ -63,13 +64,14 @@
         //]]>
       </script>
 
-      <div class="pull-right" tal:condition="1 or mailto">
+      
+      <div class="btn-group pull-left" tal:condition="1 or mailto">
         <a href="${mailto}" aria-label="Email">
           <span class="glyphicon glyphicon-envelope" aria-hidden="true" style="padding: 10px 5px;"></span>
         </a>
+        <div metal:use-macro="api.snippets.macros['opensearch']"></div>
       </div>
-
-      <div metal:use-macro="api.snippets.macros['opensearch']"></div>
+      
 
     </div>
   </div>

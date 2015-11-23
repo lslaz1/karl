@@ -16,38 +16,43 @@
   </metal:slot>
 </head>
 
-<div metal:fill-slot="content">
+<div metal:fill-slot="content"><br/>
 
-<form method="GET" action=""
-      tal:attributes="action request.path_url">
-    <div class="form-group">
-        <input class="form-control input-sm" id="ls-current-searchterm" name="body" type="text" value=""
-               tal:attributes="value request.params.get('body', '')"/>
-        <input class="btn btn-default btn-sm" id="sras-searchbutton" type="submit"
-               value="Search"/>
-        <span class="sras-discreet">
-            About ${total} results (${elapsed} seconds)
-        </span>
-    </div>
-</form>
+<div class="row">
+  <form method="GET" action=""
+        tal:attributes="action request.path_url">
+      <div class="form-inline col col-lg-12" align="right">
+          <input class="form-control input-sm" id="ls-current-searchterm" name="body" type="text"
+            value="" tal:attributes="value request.params.get('body', '')" />
+          <input class="btn btn-default btn-sm" id="sras-searchbutton" type="submit"
+                 value="Search"/><br/><br/>
+          <span class="sras-discreet clearfix">
+              About ${total} results (${elapsed} seconds)
+          </span>
+      </div>
+  </form>
+</div><br/>
 
-<div id="sras-content">
-    <div class="sras-searchknobs" tal:condition="show_search_knobs">
-
-        <!-- Left hand column of search knobs -->
-
+<div id="sras-content clearfix">
+    <div class="sras-searchknobs container" tal:condition="show_search_knobs">
+      <div class="row">
+        
+<!-- Search options -->
         <div class="sras-searchknobgroup" tal:condition="scope_knob">
-            <ul>
+          <div class="col col-lg-3">  
+            <ul class="list-unstyled">
                 <li tal:repeat="o scope_knob">
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
                             ${o['name']}</strong></a>
                 </li>
             </ul>
+          </div>
         </div>
 
         <div class="sras-searchknobgroup sras-searchcontent">
-            <ul>
+          <div class="col col-lg-3">
+            <ul class="list-unstyled">
                 <li tal:repeat="o kind_knob">
                     <img src="${api.static_url}/images/${o['icon']}"
                          alt="${o['title']}" tal:condition="o['icon']"/>
@@ -56,42 +61,52 @@
                           ${o['title']}</strong></a>
                 </li>
             </ul>
+          </div>
         </div>
 
         <div class="sras-searchknobgroup">
-            <ul>
+          <div class="col col-lg-3">  
+            <ul class="list-unstyled">
                 <li tal:repeat="o since_knob">
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
                             ${o['name']}</strong></a>
                 </li>
             </ul>
+          </div>  
         </div>
 
         <div class="sras-searchknobgroup">
-            <ul>
+          <div class="col col-lg-3">  
+            <ul class="list-unstyled">
                 <li tal:repeat="o sort_knob">
                     <a href="${o['url']}" tal:omit-tag="o['selected']">
                         <strong tal:omit-tag="not o['selected']">
                             ${o['name']}</strong></a>
                 </li>
             </ul>
+          </div>
         </div>
+      </div><br/> <!-- /.row -->
 
-        <div class="sras-searchknobgroup last">
-            <form method="GET" class="form-group">
+<!-- Search inputs at bottom of page -->
+        <div class="sras-searchknobgroup last container">
+            <form method="GET" class="form-inline">
+              <div class="form-group">
                 <tal:block repeat="name params" omit-tag="">
                     <input type="hidden" name="${name}"
                            tal:condition="name != 'creator'"
                            value="${params[name]}"/>
                 </tal:block>
                 <label>Author</label>
-                <input class="form-control input-sm"
+                <input class="form-control input-sm" type="text"
                        name="creator" value="${params.get('creator', '')}"
                        onChange="this.form.submit()"/>
                 <input class="btn btn-default btn-sm" id="sras-authorknob" type="submit" value="Search" />
-            </form>
-            <form method="GET">
+              </div>
+            </form><br/>
+            <form method="GET" class="form-inline">
+              <div class="form-group">
                 <tal:block repeat="name params" omit-tag="">
                     <input type="hidden" name="${name}"
                            tal:condition="name != 'tags'"
@@ -102,7 +117,8 @@
                        name="tags" value="${params.get('tags', '')}"
                        onChange="this.form.submit()"/>
                 <input class="btn btn-default btn-sm" id="sras-tagknob" type="submit" value="Search" />
-            </form>
+              </div>
+            </form><br/>
         </div>
 
     </div>
@@ -112,17 +128,20 @@ $(document).ready(function(){
  });
     </script>
 
-
+<!-- Search Results -->
     <div id="sras-results">
       <div class="search-error" tal:condition="error">${error}</div>
-      <tal:loop repeat="r results">
+      <ul class="list-group">
+        <tal:loop repeat="r results">
+        <li class="list-group-item">
         <tal:var define="result_display r['result_display'];
                          doc result_display.context">
           <metal:searchresult
               use-macro="api.snippets.macros[result_display.macro]">
           </metal:searchresult>
-        </tal:var>
+        </tal:var></li>
       </tal:loop>
+      </ul>
     </div>
 
     <div id="sras-pagination" tal:condition="batch_info['batching_required']">

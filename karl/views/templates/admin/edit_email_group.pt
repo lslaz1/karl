@@ -21,7 +21,7 @@
 
       <div class="koverview_body">
         <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
-          <div class="col-lg-6">
+          <div class="col col-lg-6">
             <label><strong>Email Group Name</strong></label><br/>
             <input class="form-control" name="group_name" value="${group_name}" required/><br/>
             <label><strong>Email Addresses</strong></label><br/>

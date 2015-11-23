@@ -3,7 +3,7 @@
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
 
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-haspopup="true">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-navbar-collapse" aria-expanded="false" aria-haspopup="true">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -15,7 +15,7 @@
 
     </div>
     
-    <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
+    <div class="navbar-collapse collapse" id="header-navbar-collapse">
 
       <ul class="nav navbar-nav" style="padding:13px;">
         <li tal:repeat="item python:api.get_header_menu_items()">

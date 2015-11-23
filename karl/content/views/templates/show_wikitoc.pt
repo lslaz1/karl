@@ -14,13 +14,13 @@
     <div class="contentbar-wrapper clearfix">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
         <div class="btn-group pull-left" role="group">
-          <button type="button" class="btn btn-default btn-xs"><a  
-            href="${api.here_url}">Front Page</a></button>
-          <button type="button" class="btn btn-default btn-xs"><a  
-            href="#">Index</a></button>
+          <a type="button" class="btn btn-default btn-sm"  
+            href="${api.here_url}">Front Page</a>
+          <a type="button" class="btn btn-default btn-sm"  
+            href="#">Index</a>
           <tal:block condition="show_trash">
-            <button type="button" class="btn btn-default btn-xs"><a  
-            href="${api.here_url}trash">Trash</a></button>
+            <a type="button" class="btn btn-default btn-sm"  
+            href="${api.here_url}trash">Trash</a>
           </tal:block>
         </div>
     </div>

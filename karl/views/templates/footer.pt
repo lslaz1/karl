@@ -1,4 +1,4 @@
-<div class="navbar navbar-default navbar-fixed-bottom">
+<div class="navbar navbar-default navbar-static-bottom" style="margin-bottom:0px;">
 	<div class="container-fluid" align="center" style="padding:13px;">
 		  <!--
 		    This template in particular is likely to be overridden a good bit by
@@ -8,5 +8,7 @@
 		     <tal:block condition="api.user_is_staff">
 		     </tal:block>
 
+	    <div metal:use-macro="api.snippets.macros['rss_icon']"/>
+		
 	</div>
 </div>

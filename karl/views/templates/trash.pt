@@ -8,16 +8,18 @@
     <h1 metal:use-macro="api.snippets.macros['backto_link']"/>
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-
-    <div class="btn-group pull-left" role="group">
-      <button type="button" class="btn btn-default btn-xs"><a  
-        href="/communities/default/wiki">Front Page</a></button>
-      <button type="button" class="btn btn-default btn-xs"><a  
-        href="/communities/default/wiki/wikitoc.html">Index</a></button>
-      <button type="button" class="btn btn-default btn-xs"><a 
-      href="/communities/default/wiki/trash">Trash</a></button>
+<div class="container" style="margin-top:10px;">
+    <div class="row">
+        <div class="btn-group pull-left" role="group">
+          <a type="button" class="btn btn-default btn-sm"  
+            href="/communities/default/wiki">Front Page</a>
+          <a type="button" class="btn btn-default btn-sm"  
+            href="/communities/default/wiki/wikitoc.html">Index</a>
+          <a type="button" class="btn btn-default btn-sm" 
+          href="/communities/default/wiki/trash">Trash</a>
+        </div>  
     </div>
-
+</div>
     <h1 metal:use-macro="api.snippets.macros['page_title']" />
 
     <div class="kbody">

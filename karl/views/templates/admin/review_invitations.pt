@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
   <div metal:fill-slot="content">
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['error_message']"/>
-    <div class="col-lg-11">
+    <div class="col col-lg-11">
       <h1 class="kscreentitle">Review Invitations</h1>
 
       <p>These are invitations that were sent out to join the portal but have not been acted on.</p>

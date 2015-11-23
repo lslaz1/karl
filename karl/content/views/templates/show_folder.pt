@@ -48,17 +48,17 @@
 
   <div metal:fill-slot="content">
 
-    <div class="contentbar-wrapper view-show-folder-actions clearfix">
+    <div class="contentbar-wrapper clearfix">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
         <div class="btn-group pull-left" role="group">
-          <button type="button" class="btn btn-default btn-xs"><a  
-            href="${api.here_url}">Front Page</a></button>
-          <button type="button" class="btn btn-default btn-xs"><a  
-            href="#">Index</a></button>
+          <a type="button" class="btn btn-default btn-sm" 
+            href="${api.here_url}">Front Page</a>
+          <a type="button" class="btn btn-default btn-sm"  
+            href="#">Index</a>
           <tal:block condition="trash_url">
             <span tal:omit-tag="True" tal:condition="backto">|</span>
-              <button type="button" class="btn btn-default btn-xs"><a 
-                href="${api.here_url}trash">Trash</a></button>
+              <a type="button" class="btn btn-default btn-sm" 
+                href="${api.here_url}trash">Trash</a>
           </tal:block>
         </div>
     </div>
@@ -66,15 +66,15 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+      <h1 metal:use-macro="api.snippets.macros['page_title']"/>
 
-    <div metal:use-macro="api.snippets.macros['list_tags']"/>
+      <div metal:use-macro="api.snippets.macros['list_tags']"/>
 
-    <div metal:use-macro="api.snippets.macros['batch_size_selector']"> </div>
-    
-    <div metal:use-macro="api.snippets.macros['folder_grid']"> </div>
+      <div metal:use-macro="api.snippets.macros['batch_size_selector']"> </div>
+      
+      <div metal:use-macro="api.snippets.macros['folder_grid']"> </div>
 
-    <div metal:use-macro="api.snippets.macros['rss_icon']"/>
+      <div metal:use-macro="api.snippets.macros['rss_icon']"/>
 
   </div>
 

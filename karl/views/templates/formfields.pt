@@ -837,20 +837,15 @@
       </script>
     </div>
 
-
+<!-- Submit/Cancel Buttons -->
     <div class="form-group" metal:define-macro="form-submit"
 	      id="submitcancel-field">
 
-    <div class="form-group">
-      <button id="form-submit" name="form.submitted" value="submit" type="submit" class="btn btn-default btn-sm"><span>Submit</span></button>
-      <button id="form-cancel" name="form.cancel" value="cancel" type="submit" class="btn btn-default btn-sm"><span>Cancel</span></button>
+      <div class="form-group">
+        <button id="form-submit" name="form.submitted" value="submit" type="submit" class="btn btn-default btn-sm"><span>Submit</span></button>
+        <button id="form-cancel" name="form.cancel" value="cancel" type="submit" class="btn btn-default btn-sm"><span>Cancel</span></button>
+      </div>
     </div>
-      <style type="text/css">
-	.required {
-	  background-image: url(${api.static_url}/images/required.gif);
-	}
-      </style>
-
 
  </body>
 </html>

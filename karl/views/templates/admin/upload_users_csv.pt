@@ -29,7 +29,7 @@
       </div>
 
       
-      <div class="col-lg-11">
+      <div class="col col-lg-11">
         <p><b>Notes on file format</b></p>
 
         <p> CSV (comma separated value) files should be in the same format as

@@ -15,7 +15,7 @@
      <legend>Followed Users</legend>
      <textarea class="form-control" name="followed" rows="10" cols="30">${followed}</textarea>
     </fieldset>
-    <input class="btn btn-default btn-xs" type="submit" value="Post"/>
+    <input class="btn btn-default btn-sm" type="submit" value="Post"/>
    </form>
   </div>
 

@@ -17,19 +17,23 @@
 
   <div metal:fill-slot="content">
 
-    <div class="contentbar-wrapper clearfix">
+<div class="container">
+  <div class="row">
+    <div class="contentbar-wrapper col col-lg-10">
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
         <div class="btn-group pull-left" role="group">
-          <button type="button" class="btn btn-default btn-xs"><a  
+          <button type="button" class="btn btn-default btn-sm"><a  
             href="${api.here_url}" tal:omit-tag="is_front_page">Front Page</a></button>
-          <button type="button" class="btn btn-default btn-xs"><a  
-            href="/communities/default/wiki/wikitoc.html">Index</a></button>
+          <a type="button" class="btn btn-default btn-sm"  
+            href="/communities/default/wiki/wikitoc.html">Index</a>
           <tal:block condition="show_trash">
-            <button type="button" class="btn btn-default btn-xs"><a  
-            href="${api.here_url}trash">Trash</a></button>
+            <a type="button" class="btn btn-default btn-sm" 
+            href="${api.here_url}trash">Trash</a>
           </tal:block>
         </div>
     </div>
+  </div>
+</div>
     
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>

@@ -13,7 +13,7 @@
   you will no longer be able to participate in (or possibly even view)
   resources related to that community.</p>
 
-  <form method="post" action="${post_url}" class="k3_genericForm">
+  <form class="form-group" method="post" action="${post_url}" class="k3_genericForm">
 
   <table class="table table-striped">
     <thead>
@@ -27,7 +27,7 @@
   <tr tal:repeat="c communities">
     <td tal:content="c.title">Community Title</td>
     <td>
-      <select name="alerts_pref_${c.name}">
+      <select class="form-control input-sm" name="alerts_pref_${c.name}" style="width:200px;">
     <option tal:repeat="o c.alerts_pref"
     value="${o.value}" selected="${o.selected}">
     
@@ -56,7 +56,7 @@
     <input type="radio" name="attachments" value="attach"
            checked="${attachments == 'attach'}"/>
     Yes
-  </div>
+  </div><br/>
 
   <fieldset metal:use-macro="formfields.macros['form-submit']"/>
 </form>

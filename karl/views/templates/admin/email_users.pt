@@ -61,7 +61,7 @@
               class="pat-tinymce">${msg_body}</textarea>
           </fieldset>
         <form class="form-group" method="POST" name="email_users" enctype="multipart/form-data">
-          <div class="col-lg-4">
+          <div class="col col-lg-4">
             <label><strong>From</strong></label><br/>
             <select class="form-control input-sm" name="from_email">
               <option tal:repeat="from_email from_emails"

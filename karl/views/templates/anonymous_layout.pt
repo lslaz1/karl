@@ -11,13 +11,11 @@
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
   <body id="login-wrapper" tal:attributes="api.body_attriubtes">
-    <img src="${api.static_url}/images/login_gradient.gif"
-	 id="login-gradient" alt="" />
     <div id="header-user-menu"></div>
     <div id="outer">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-lg-12">
+          <div class="col col-lg-12">
             <div id="inner">
               <h1 class="kscreentitle" style="margin-top: 50px">
                 <span></span>

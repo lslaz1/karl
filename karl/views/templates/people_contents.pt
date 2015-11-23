@@ -12,7 +12,7 @@
  <h1 class="peopledir-title">${peopledir.title}</h1>
    <div class="container-fluid">
     <div class="row">
-      <div class="col-lg-12">
+      <div class="col col-lg-12">
         <div id="peopledir-content-wrapper">
 
           <p style="float: right"
@@ -40,10 +40,10 @@
            </p>
           </form>
 
-        </div> <!-- close #peopledir-content-wrapper -->
-      </div> <!-- close .col-lg-12 -->
-    </div> <!-- close .row -->
-  </div> <!-- close .container-fluid -->
+        </div> <!-- /#peopledir-content-wrapper -->
+      </div> <!-- /.col col-lg-12 -->
+    </div> <!-- /.row -->
+  </div> <!-- /.container-fluid -->
 </div>
 
 </body>
