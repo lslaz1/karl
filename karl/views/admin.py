@@ -879,9 +879,9 @@ class EditEmailTemplate(object):
                 no_addressee = True
             if subject == "" or template_body == "" or no_addressee:
                 if no_addressee:
-                    api.error_email = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                    api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
                 else:
-                    api.error_email = 'Subject and Email Body fields are required!'
+                    api.error_message = 'Subject and Email Body fields are required!'
                 return dict(
                     api=api,
                     actions=[],
