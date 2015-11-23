@@ -459,7 +459,8 @@ class EmailUsersView(object):
                     })
                     n += 1
             if group.startswith('group-'):
-                alladdresses = all_groups.get(group, [])
+                group_key = group.replace('group-', '')
+                alladdresses = all_groups.get(group_key, [])
                 for entry in alladdresses:
                     addressed_to.append({
                         'name': '',
@@ -479,6 +480,22 @@ class EmailUsersView(object):
                         'email': to_email
                     })
                     n += 1
+            if n == 0 or request.params['text'] == '':
+                if n == 0:
+                    api.error_message = "At least 1 recipient is required"
+                else:
+                    api.error_message = "Message Body is required"
+                return dict(
+                    api=api,
+                    menu=_menu_macro(),
+                    to_groups=to_groups,
+                    to_grp_value=group,
+                    from_emails=from_emails,
+                    from_email_value=from_email,
+                    msg_subject=request.params['subject'],
+                    msg_body=request.params['text'],
+                    more_to=request.params['more_to'],
+                )
             self.send_email(
                 request.params['subject'], request.params['text'],
                 addressed_to, from_email)
@@ -499,7 +516,12 @@ class EmailUsersView(object):
             api=api,
             menu=_menu_macro(),
             to_groups=to_groups,
+            to_grp_value='none',
             from_emails=from_emails,
+            from_email_value='admin',
+            msg_subject='',
+            msg_body='',
+            more_to='',
         )
 
 
@@ -525,6 +547,8 @@ def process_email_groups(request, profiles):
     emails = request.params['email_address'].split('\n')
     email_list = []
     for email in emails:
+        if email == u'\r' or email == u'':
+            continue
         email_list.append({'name': '', 'email': email, 'member_login': ''})
 
     # process existing members email addresses
@@ -557,6 +581,16 @@ class AddEmailGroup(object):
             all_groups = self.context.settings.get('email_groups', PersistentMapping())
             group_name = request.params['group_name']
             email_list = process_email_groups(request, profiles)
+            if email_list == []:
+                api.error_message = "At least one addressee is required"
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    group_name=group_name,
+                    email_address='',
+                    peoplelist=peoplelist
+                )
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
 
@@ -618,6 +652,16 @@ class EditEmailGroup(object):
             group_name = request.params['group_name']
 
             email_list = process_email_groups(request, profiles)
+            if email_list == []:
+                api.error_message = "At least one addressee is required"
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    group_name=thisgroup,
+                    email_address='',
+                    peoplelist=peoplelist
+                )
             all_groups[group_name] = email_list
             self.context.settings['email_groups'] = all_groups
 
@@ -736,6 +780,7 @@ class AddEmailTemplate(object):
 
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
+            no_addressee = False
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
@@ -743,9 +788,31 @@ class AddEmailTemplate(object):
             template_body = request.params['text']
             sendtoadmins = request.params.get('sendtoadmins', 'no')
             sendtouser = request.params.get('sendtouser', 'no')
+            subject = request.params['template_subject']
+            subject = subject.strip()
+            if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
+                no_addressee = True
+            if subject == "" or template_body == "" or no_addressee:
+                if no_addressee:
+                    api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                else:
+                    api.error_message = 'Subject and Email Body fields are required!'
+
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    template_name=template_name,
+                    template_body=template_body,
+                    template_subject=subject,
+                    sendtouser=sendtouser,
+                    sendtoadmins=sendtoadmins,
+                    peoplelist=peoplelist
+                )
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
+                                                           'subject': subject,
                                                            'sendtouser': sendtouser,
                                                            'sendtoadmins': sendtoadmins}
 
@@ -795,17 +862,37 @@ class EditEmailTemplate(object):
         edit_template = self.context.email_templates.get(thistemplate, {})
 
         profiles = find_profiles(context)
-        peoplelist = getemailusers(profiles, edit_template.get('selected_list', []))
+        existing_list = edit_template.get('selected_list', [])
+        peoplelist = getemailusers(profiles, existing_list)
         if 'save' in request.params or 'submit' in request.params:
             selected_list = []
+            no_addressee = False
             memberemails = request.params.getall('memberemails')
             for tmplogin in memberemails:
                 selected_list.append(tmplogin)
             sendtoadmins = request.params.get('sendtoadmins', 'no')
             sendtouser = request.params.get('sendtouser', 'no')
             template_name = request.params['template_name']
-            subject = request.params['template_subject']
+            subject = request.params['template_subject'].strip()
             template_body = request.params['text']
+            if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
+                no_addressee = True
+            if subject == "" or template_body == "" or no_addressee:
+                if no_addressee:
+                    api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                else:
+                    api.error_message = 'Subject and Email Body fields are required!'
+                return dict(
+                    api=api,
+                    actions=[],
+                    menu=_menu_macro(),
+                    template_name=template_name,
+                    template_body=template_body,
+                    template_subject=subject,
+                    sendtouser=sendtouser,
+                    sendtoadmins=sendtoadmins,
+                    peoplelist=peoplelist
+                )
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
@@ -1621,6 +1708,21 @@ class ReviewAccessRequest(object):
         message.set_type('text/html')
         mailer.send([email_data['email']], message)
 
+    def send_emails(self, email_data):
+        mailer = getUtility(IMailDelivery)
+        who_it_is_to = email_data['to']
+        sent_list = []
+        for who in who_it_is_to:
+            if who not in sent_list:
+                sent_list.append(who)
+                message = Message()
+                message['Subject'] = email_data['subject']
+                message['From'] = email_data['from']
+                message['To'] = who
+                message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
+                message.set_type('text/html')
+                mailer.send([email_data['email']], message)
+
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
@@ -1712,7 +1814,7 @@ class ReviewAccessRequest(object):
                     email_data = self.get_templ_msg(requestor_email, template_choice, 'approve')
                 else:
                     email_data = self.get_default_msg(requestor_email, 'approve')
-                self.send_email(email_data)
+                self.send_emails(email_data)
                 self.delete_request(requestor_email)
                 status_message = "Approved: %s" % requestor_email
 
@@ -1722,7 +1824,7 @@ class ReviewAccessRequest(object):
                         email_data = self.get_templ_msg(requestor_email, template_choice, 'deny')
                     else:
                         email_data = self.get_default_msg(requestor_email, 'deny')
-                    self.send_email(email_data)
+                    self.send_emails(email_data)
                     self.delete_request(requestor_email)
 
                     add_denial(self.context,
@@ -1737,7 +1839,7 @@ class ReviewAccessRequest(object):
             elif rvw_action == 'follow_up':
                 if template_choice != '':
                     email_data = self.get_templ_msg(requestor_email, template_choice, 'follow_up')
-                    self.send_email(email_data)
+                    self.send_emails(email_data)
                     status_message = "Follow up sent to %s" % requestor_email
                 else:
                     status_message = "Follow up regarding %s skipped because " + \
@@ -1770,6 +1872,10 @@ class ReviewAccessCustom(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+
+    def send_emails(self, subject, body, addressed_to, from_email):
+        for email_to in addressed_to:
+            self.send_email(subject, body, email_to, from_email)
 
     def send_email(self, subject, body, addressed_to, from_email):
         message = create_message(self.request, subject, body, from_email)
@@ -1808,7 +1914,7 @@ class ReviewAccessCustom(object):
                         'email': to_email
                     })
                     n += 1
-            self.send_email(request.params['subject'],
+            self.send_emails(request.params['subject'],
                             request.params['text'],
                             addressed_to,
                             admin_email)
