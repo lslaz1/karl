@@ -482,9 +482,9 @@ class EmailUsersView(object):
                     n += 1
             if n == 0 or request.params['text'] == '':
                 if n == 0:
-                    api.status_message = "At least 1 recipient is required"
+                    api.error_message = "At least 1 recipient is required"
                 else:
-                    api.status_message = "Message Body is required"
+                    api.error_message = "Message Body is required"
                 return dict(
                     api=api,
                     menu=_menu_macro(),
@@ -582,7 +582,7 @@ class AddEmailGroup(object):
             group_name = request.params['group_name']
             email_list = process_email_groups(request, profiles)
             if email_list == []:
-                api.status_message = "At least one addressee is required"
+                api.error_message = "At least one addressee is required"
                 return dict(
                     api=api,
                     actions=[],
@@ -653,7 +653,7 @@ class EditEmailGroup(object):
 
             email_list = process_email_groups(request, profiles)
             if email_list == []:
-                api.status_message = "At least one addressee is required"
+                api.error_message = "At least one addressee is required"
                 return dict(
                     api=api,
                     actions=[],
@@ -794,9 +794,9 @@ class AddEmailTemplate(object):
                 no_addressee = True
             if subject == "" or template_body == "" or no_addressee:
                 if no_addressee:
-                    api.status_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                    api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
                 else:
-                    api.status_message = 'Subject and Email Body fields are required!'
+                    api.error_message = 'Subject and Email Body fields are required!'
 
                 return dict(
                     api=api,
@@ -879,9 +879,9 @@ class EditEmailTemplate(object):
                 no_addressee = True
             if subject == "" or template_body == "" or no_addressee:
                 if no_addressee:
-                    api.status_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                    api.error_email = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
                 else:
-                    api.status_message = 'Subject and Email Body fields are required!'
+                    api.error_email = 'Subject and Email Body fields are required!'
                 return dict(
                     api=api,
                     actions=[],
