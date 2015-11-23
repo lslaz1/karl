@@ -28,7 +28,7 @@
 	<tal:block repeat="entry members">
 	  <div class="${entry['css_class']}">
 	    <div class="row">
-	    	<div class="col-lg-2">
+	    	<div class="col col-lg-3">
 	    		<div class="thumbnail">
 			      	<a href="${entry['href']}" title="${entry['title']}">
 					<img src="${entry['photo_url']}" alt="${entry['title']}" style="width:125px;" />

@@ -36,10 +36,10 @@ jQuery(document).ready(function($) {
     <div class="profile_page_body">
       <div class="wrapper">
         <div class="row">
-          <div class="col-lg-3">
-            <div class="thumbnail">
-              <img src="${profile.photo.url}" style="width: 200px"/>
-              <div class="caption">
+          <div class="col col-lg-3">
+            <div class="thumbnail" style="width:300px;">
+              <img src="${profile.photo.url}" style="width: 150px"/>
+              <div class="caption" align="center">
                 <p tal:condition="profile.last_login_time | False">
                   <span class="profileLabel">Last login:</span>
                   <abbr class="timeago"
@@ -98,7 +98,7 @@ jQuery(document).ready(function($) {
         </div>
         
 
-      <div class="col-lg-11">  
+      <div class="col col-lg-11">  
         <div class="table" tal:content="structure python: api.clean_html(profile.biography)" />
         <h3> Content Added Recently </h3>
         <table class="table table-striped" id="staffprofile-content"

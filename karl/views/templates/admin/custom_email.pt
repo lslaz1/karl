@@ -20,7 +20,7 @@
 
       <div class="koverview_body">
         <form method="POST" name="email_users" enctype="multipart/form-data">
-          <div class="col-lg-11">
+          <div class="col col-lg-11">
             <br/>
             <label><strong>To</strong></label><br/>
             <input class="form-control" name="more_to" style="width:470px; height:30px;" value="${requestor_email}"/><br/>

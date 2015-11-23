@@ -18,14 +18,14 @@
 
 <!-- Main Admin Section -->      
       <div id="main">
-        <div class="container-fluid">
+        <div class="container-fluid" style="margin-bottom:100px;">
           <div class="row">
-            <div class="col-lg-9">
+            <div class="col col-lg-9">
               <div id="center" class="clearafter">
                 <div metal:define-slot="content"> Content goes here. </div>
               </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col col-lg-3">
               <div class="rightcol"
                    tal:define="my_communities my_communities|();
                                tags tags|();">
@@ -67,12 +67,12 @@
                         <strong>No Communities</strong>
                       </div>
                     </div>
-              </div> <!-- close .rightcol -->
-            </div> <!-- close .col-lg-3 -->      
+              </div> <!-- /.rightcol -->
+            </div> <!-- /.col col-lg-3 -->      
             <div class="visualClear"><!-- --></div>
-          </div> <!-- close .row -->
-        </div> <!-- close .container-fluid -->
-      </div> <!-- close #main -->
+          </div> <!-- /.row -->
+        </div> <!-- /.container-fluid -->
+      </div> <!-- /#main -->
       <tal:footer content="structure api.render_footer()" />
 
     </div>

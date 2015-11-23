@@ -49,23 +49,23 @@
       </tr>
     </table>
 
-    <div class="communityEntry"
-         tal:repeat="community communities">
+    <div class="communityEntry">
 
-      <div class="klisting_header">
-        <a href="${community.url}">${community.title}</a>
-        <span tal:condition="not api.has_staff_acl(community.context)"
+      <div class="list-group col col-lg-12">
+        <a tal:repeat="community communities" href="${community.url}" class="list-group-item">
+          <h4 class="list-group-item-heading">${community.title}</h4>
+          <span tal:condition="not api.has_staff_acl(community.context)"
           metal:use-macro="api.snippets.macros['privacy_badge']"/>
-        <span tal:condition="community.moderator"
-          metal:use-macro="api.snippets.macros['moderator_badge']"/>
+          <span tal:condition="community.moderator"
+            metal:use-macro="api.snippets.macros['moderator_badge']"/>
+          <p class="list-group-item-text">${community.description}</p><br/>
+          <span>${community.number_of_members} Member(s)</span>
+          <span> | </span>
+          <span>Last Activity: <span class="globalize-short-date">${community.last_activity_date}</span></span>
+          <span class="glyphicon glyphicon-chevron-right pull-right">
+        </a>
       </div>
 
-      <p>${community.description}</p>
-      <div class="documentByLine">
-        <span>${community.number_of_members} Member(s)</span>
-        <span> | </span>
-        <span>Last Activity: <span class="globalize-short-date">${community.last_activity_date}</span></span>
-      </div>
     </div>
 
     <table class="table table-striped" tal:condition="batch_info['batching_required']" width="100%">

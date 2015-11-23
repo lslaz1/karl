@@ -5,7 +5,7 @@
     <title>Post Office Quarantine</title>
   </head>
   <body>
-    <div class="col-lg-11">
+    <div class="col col-lg-11">
       <h1>Post Office Quarantine</h1>
       <table class="table table-striped" border="1">
         <thead>

@@ -21,7 +21,7 @@
 
       <div class="koverview_body">
         <form class="forn-group" method="POST" name="email_users" enctype="multipart/form-data">
-          <div class="col-lg-11">
+          <div class="col col-lg-11">
             <label><strong>Email Template Name</strong></label><br/>
             <input class="form-control" name="template_name" style="width:470px; height:30px;" value="${template_name}" required/><br/>
             <br/>

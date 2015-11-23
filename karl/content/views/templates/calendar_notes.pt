@@ -58,7 +58,7 @@
             tal:condition="is_moderator">
             <h2>Add Note</h2>
             
-            <div class="col-lg-6">
+            <div class="col col-lg-6">
                 <div class="form-group">
                     <label for="note_title">
                         Title

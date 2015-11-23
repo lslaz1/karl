@@ -23,7 +23,7 @@
       <div class="koverview_body">
         <form class="form-group" method="POST" name="email_groups" enctype="multipart/form-data">
           <div class="EmailTemplateWrapper">
-            <div class="col-lg-11">
+            <div class="col col-lg-11">
   	          <table class="table table-striped">
   	            <thead>
   	              <tr>

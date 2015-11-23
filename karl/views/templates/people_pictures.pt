@@ -7,13 +7,13 @@
 
     <h1 class="peopledir-title">${peopledir.title}</h1>
     <div class="btn-group" role="group">
-      <button class="btn btn-default btn-xs" tal:repeat="tab peopledir_tabs">
-        <a href="${tab['href']}">${tab['title']}</a>
-      </button>
+        <a type="button" class="btn btn-link" 
+          tal:repeat="tab peopledir_tabs" 
+          href="${tab['href']}">${tab['title']}
+        </a>
+      <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
     </div>
     <div id="peopledir-content-wrapper">
-
-      <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
 
       <div class="peopledir-report-description"
         tal:repeat="description descriptions"
@@ -33,7 +33,7 @@
                  tal:attributes="class 'photoProfile%s' % (
                      repeat['cell'].end and ' photoProfileEndRow' or '')">
               <div class="row">
-                <div class="col-lg-2">
+                <div class="col col-lg-3">
                   <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
                     <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
                     <div class="caption">
@@ -51,7 +51,7 @@
                     <span tal:condition="profile.extension and profile.extension.strip()">
                       x ${profile.extension}
                     </span>
-                  </div>
+                  </div><br/>
                 </div>
               </div>
               <div style="clear:both"></div>

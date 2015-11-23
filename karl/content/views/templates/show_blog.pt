@@ -47,7 +47,7 @@
           posts &gt;&gt;</a></span>
     </div>
 
-    <div class="pull-right">
+    <div class="btn-group pull-left" role="group" style="margin-top:50px;">
       <a href="mailto:${api.community_info.name}@${system_email_domain}" 
         aria-label="Email">
         <span class="glyphicon glyphicon-envelope" aria-hidden="true"

@@ -15,7 +15,7 @@
       <h1 class="kscreentitle">Admin Section: Rename or Merge Users</h1>
 
       <div class="koverview_body">
-        <div class=col-lg-3>
+        <div class=col col-lg-3>
           <form method="POST" name="rename_or_merge">
             <div class="form-group">
               <label><strong>Old Username</strong></label><br/>

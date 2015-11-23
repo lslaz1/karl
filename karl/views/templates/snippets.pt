@@ -103,31 +103,33 @@
     <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
 
 <!-- Page Title -->
-    <h1 metal:define-macro="page_title" class="kscreentitle clearfix">${api.page_title}
+    <h1 metal:define-macro="page_title" class="clearfix">${api.page_title}
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
     </h1>
 
     <div metal:define-macro="status_message" class="portalMessage"
          tal:condition="api.status_messages">
-      <ul tal:condition="python: len(api.status_messages) > 1">
-        <tal:sm tal:repeat="m api.status_messages">
-          <li>${m}</li>
-        </tal:sm>
-      </ul>
-      <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
-    </div>
-
-<!-- status box that works together with ui.karlstatusbox -->
-    <div metal:define-macro="karl_status_message"
-         class="statusbox">
-      <div class="portalMessage" tal:condition="api.status_messages">
         <ul tal:condition="python: len(api.status_messages) > 1">
           <tal:sm tal:repeat="m api.status_messages">
             <li>${m}</li>
           </tal:sm>
         </ul>
         <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
+    </div>
+
+<!-- status box that works together with ui.karlstatusbox -->
+    <div metal:define-macro="karl_status_message"
+         class="statusbox col col-lg-4 col-lg-offset-4">
+      <div class="portalMessage" tal:condition="api.status_messages">
+        <div class="alert alert-warning" role="alert">
+          <ul tal:condition="python: len(api.status_messages) > 1">
+            <tal:sm tal:repeat="m api.status_messages">
+              <li>${m}</li>
+            </tal:sm>
+          </ul>
+          <span tal:replace="api.status_message" tal:condition="python: len(api.status_messages) == 1"/>
+        </div>
       </div>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
@@ -150,13 +152,12 @@
     <metal:actions_box define-macro="actions_box">
       <div class="btn-group pull-right" role="group">
         <tal:block repeat="action api.actions_to_menu(actions)">
-          <button type="button" class="btn btn-default btn-xs">
-          <a href="${api.here_url}${action[1]}"
+          <a type="button" class="btn btn-default btn-sm" href="${api.here_url}${action[1]}"
              tal:condition="not action[1].startswith('http')">
              <span>${action[0]}</span></a>
-          <a href="${action[1]}"
+          <a type="button" class="btn btn-default btn-sm" href="${action[1]}"
                tal:condition="action[1].startswith('http')"
-               ><span>${action[0]}</span></a></button>
+               ><span>${action[0]}</span></a>
             <tal:submenu condition="action[2]">
               <div class="btn-group">
                 <div class="dropdown">
@@ -242,24 +243,15 @@
 
 <!-- Batch size buttons -->
     <metal:pagesize metal:define-macro="batch_size_selector">
-      <div class="btn-group pull-right"
+      <div class="pull-right"
            tal:define="default_batch_size default_batch_size|string:25;
               current python: request.params.get('limit', 
               request.params.get('batch_size', default_batch_size));"
               role="group">
-        <span class="label">Batch size:</span>
-        <button type="button" class="btn btn-default btn-xs">
-          <a href="${request.path_url}?limit=10" tal:omit-tag="python: current == '10'">10</a>
-        </button>
-        <button type="button" class="btn btn-default btn-xs">
-          <a href="${request.path_url}?limit=25" tal:omit-tag="python: current == '25'">25</a>
-        </button>
-        <button type="button" class="btn btn-default btn-xs">
-          <a href="${request.path_url}?limit=50" tal:omit-tag="python: current == '50'">50</a>
-        </button>
-        <button type="button" class="btn btn-default btn-xs">
-          <a href="${request.path_url}?limit=100" tal:omit-tag="python: current == '100'">100</a>
-        </button>
+        <a href="${request.path_url}?limit=10" tal:omit-tag="python: current == '10'">10</a> |
+        <a href="${request.path_url}?limit=25" tal:omit-tag="python: current == '25'">25</a> |
+        <a href="${request.path_url}?limit=50" tal:omit-tag="python: current == '50'">50</a> |
+        <a href="${request.path_url}?limit=100" tal:omit-tag="python: current == '100'">100</a>
       </div>
     </metal:pagesize>
 
@@ -305,9 +297,9 @@
     </metal:table>
 
 <!-- Subscribe button -->
-    <div metal:define-macro="rss_icon" class="rss-icon pull-right"
-         tal:condition="feed_url|None">
-      <a type="button" class="btn btn-default btn-xs" href="${feed_url}">
+    <div metal:define-macro="rss_icon" class="rss-icon pull-left"
+         tal:condition="feed_url|None" style="margin-top:50px;">
+      <a href="${feed_url}">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
           id="RSSIcon"/>
       </a>
@@ -354,10 +346,12 @@
 <!-- Header Search Box-->
     <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header pull-right">
       <form class="form-inline">  
-        <div class="form-group">
+        <div class="input-group">
           <input type="text" class="form-control input-sm" />
-          <button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-          </button>
+          <span class="input-group-btn">
+            <button class="btn btn-default btn-sm" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </button>
+          </span>
         </div>
       </form> 
     </div>
@@ -366,7 +360,7 @@
       by <a href="${byline_info.author_url}">${byline_info.author_name}</a>
       on <span class="globalize-full-date">${byline_info.posted_date}</span></div>
 
-    <div metal:define-macro="searchresults">
+    <div metal:define-macro="search_s">
       <div class="searchresult_entry" tal:repeat="entry entries">
         <div class="klisting_header">
           <a href="${entry['href']}">${entry['title']}</a>
@@ -384,17 +378,17 @@
     <div metal:define-macro="submenu" class="kutility_menu">
       <div class="btn-group" role="group">
         <span tal:repeat="entry submenu">
-          <button type="button" class="btn btn-default btn-xs">
             <tal:block tal:condition="entry['make_link'] is True">
-              <a href="${entry['href']}">${entry['label']}</a>
+              <a type="button" class="btn btn-default btn-sm" 
+                href="${entry['href']}">${entry['label']}
+              </a>
             </tal:block>
             <tal:block tal:condition="entry['make_link'] is False">
               ${entry['label']}
             </tal:block>
-          </button>
         </span>
       </div>
-    </div>
+    </div><br/><br/>
 
 <!-- Batching -->
     <div metal:define-macro="batching">
@@ -452,8 +446,8 @@
 
 <!-- Blog Comments -->
     <div metal:define-macro="show_comments" tal:condition="comments">
-      <div class="addCommentButton" style="float: right;">
-        <a href="#addcomment">add comment</a>
+      <div class="addCommentButton pull-right">
+        <a type="button" class="btn btn-default btn-sm" href="#addcomment">Add Comment</a>
       </div>
       <h2 id="comments">Comments</h2>
 
@@ -461,24 +455,18 @@
        <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
        <div class="blogComment">
 
+<!-- Comment button group -->
         <div class="commentManagement">
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default btn-xs">
-              <a href="#" class="quo-paste">quote</a>
-            </button>
+            <a href="#" class="quo-paste btn btn-default btn-sm" type="button">Quote</a>
             <tal:ifeditable
              tal:condition="comment['edit_url'] is not None">
-              <button type="button" class="btn btn-default btn-xs">
-                <a href="${comment['edit_url']}">edit</a>
-              </button>
-              <button type="button" class="btn btn-default btn-xs">
-                <a href="${comment['delete_url']}">delete</a>
-              </button>
+              <a type="button" class="btn btn-default btn-sm" href="${comment['edit_url']}">Edit</a>
+              <a type="button" class="btn btn-default btn-sm"
+              href="${comment['delete_url']}">Delete</a>
             </tal:ifeditable>
             <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
-              <button type="button" class="btn btn-default btn-xs">
-                <a href="${comment['advanced_url']}">advanced</a>
-              </button>
+              <a type="button" class="btn btn-default btn-sm" href="${comment['advanced_url']}">Advanced</a>
             </tal:ifadmin>
           </div>
         </div>
@@ -542,7 +530,7 @@
         <form id="tag-form" class="form-inline" action="" method="post" onsubmit="this.action='showtag/'+getElementById('tag-field').value; return true"><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
          <input class="form-control input-sm" type="text" name="tag"/>
         </form>
-     </h2>
+     </h2><br/>
 
      <p>This is the ${api.system_name} tag cloud - a list of tags where size reflect
      popularity.</p>
@@ -556,7 +544,7 @@
                         "
          tal:content="e['name']">NAME</a> </span>
 
-    </div> <!-- close #tagcloud -->
+    </div> <!-- /#tagcloud -->
 
 <!-- Tag Listing -->
     <div id="taglisting"
@@ -566,12 +554,12 @@
       ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
       <input class="form-control input-sm" type="text" name="tag"/>
       </form>
-     </h2>
+     </h2><br/>
 
      <p>This page shows all the tags applied across ${api.system_name}, with a
        count of each tag.</p>
 
-     <table border="0" cellpadding="6" cellspacing="0">
+     <table class="table table-striped" border="0" cellpadding="6" cellspacing="0">
       <tr>
        <th> Tag </th>
        <th> Count </th>
@@ -589,7 +577,7 @@
 
      </table>
 
-    </div> <!-- close taglisting -->
+    </div> <!-- /#taglisting -->
 
 <!-- Show Tags -->
     <div id="showtag"
@@ -617,6 +605,22 @@
 
     </div>
 
+    <div metal:define-macro="searchresults">
+      <div class="searchresult_entry" tal:repeat="entry entries">
+        <div class="klisting_header list-group">
+          <a href="${entry['href']}" class="list-group-item">
+            <h4 class="list-group-item-heading">${entry['title']}</h4>
+            <p class="list-group-item-text">${entry['description']}</p>
+            <p class="list-group-item-text">${entry['type']}<span tal:condition="entry.get('tagusers_href', False)"> | Tagged by ${entry['tagusers_count']}</span> | ${entry['href']}
+            <span class="glyphicon glyphicon-chevron-right pull-right"></span></p>
+          </a>
+          
+    
+        </div>
+        
+      </div>
+    </div>
+
     <div id="tagusers"
          metal:define-macro="tagusers">
       <h1 class="kscreentitle">
@@ -637,13 +641,14 @@
     </div>
 
     <div metal:define-macro="peopledir-report-head">
+
 <!-- Email - Print - CSV icons -->      
       <div class="btn-group" role="group" id="peopledir-actions">
         <a tal:condition="mailto" href="${mailto}" title="Email" aria-label="Email">
           <span class="glyphicon glyphicon-envelope" style="padding-left:5px"></span>
         </a>
         <a href="${print_url}" title="Print" aria-label="Print">
-          <span class="glyphicon glyphicon-print" style="padding-left:5px"></span>
+          <span class="glyphicon glyphicon-print" style="padding-top:9px;"></span>
         </a>
         <a href="${csv_url}" title="Export as CSV" aria-label="Export as CSV">
           <span class="glyphicon glyphicon-download" style="padding-left:5px"></span>
@@ -655,6 +660,7 @@
       <div id="peopledir-letterbox-wrapper">
         <div metal:use-macro="api.snippets.macros['letter_box']"/>
       </div>
+
 <!-- People Search bar -->      
       <div id="peopledir-search-box-wrapper">
         <div id="peopledir-search-box">
@@ -668,6 +674,7 @@
       </div>
     </div>
 
+<!-- Community Filters Buttons -->
     <div metal:define-macro="communities-listing-head" id="communities-listing-head">
       <div id="peopledir-letterbox-wrapper">
         <div metal:use-macro="api.snippets.macros['letter_box']"/>
@@ -677,21 +684,21 @@
         <div id="community-filters">
           <label>Community Filters:</label>
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default btn-xs" tal:repeat="option community_tabs">
-              <a href="${option['href']}" title="${option['description']}">
-                  <span>${option['title']}</span>
-                </a></button>
+            <a type="button" class="btn btn-default btn-xs" 
+              tal:repeat="option community_tabs" href="${option['href']}" title="${option['description']}"><span>${option['title']}</span></a>
           </div>
           <br/><br/>
         </div>
-        <div id="communitiy-search-box-wrapper">
-          <div id="communitiy-search-box">
+
+<!-- Search Box - Community Landing Page -->        
+        <div id="community-search-box-wrapper">
+          <div id="community-search-box">
             <form class="form-inline" method="get" action="${api.view_url}">
-              <div class="form-group">
-                <div class="field">
-                  <input class="form-control input-sm" type="text" name="body" value="" />
+              <div class="input-group">
+                <input class="form-control input-sm" type="text" name="body" value="" />
+                <span class="input-group-btn">
                   <input class="btn btn-default btn-sm" type="submit" value="Search" />
-                </div>
+                </span>
               </div>
             </form>
           </div>
@@ -701,7 +708,7 @@
     </div>
 
 <!-- Peopledir Search icon -->
-    <div class="pull-right" id="peopledir-opensearch-add" metal:define-macro="opensearch"
+    <div class="pull-left" id="peopledir-opensearch-add" metal:define-macro="opensearch"
          tal:condition="opensearch_url|None" style="padding:10px;">
       <div>
           <a onclick="window.external.AddSearchProvider

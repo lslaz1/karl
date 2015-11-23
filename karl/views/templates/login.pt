@@ -5,7 +5,7 @@
 
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
+    <div metal:use-macro="api.snippets.macros['karl_status_message']" /><br/><br/>
 
     <div id="kerberos-login" style="display: none;" 
         tal:condition="try_kerberos">
@@ -14,9 +14,9 @@
 
     <form name="formLogin" method="post" action="${app_url}/login.html"
           id="formLogin"
-          tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)">
+          tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)"
+          class="col col-lg-4 col-lg-offset-4">
       <input type="hidden" name="came_from" value="${came_from}" />
-      <div class="form-inline">
         <div class="form-group">
           <span class="loginLabelWrapper">
             <label for="username">Username</label>
@@ -33,7 +33,7 @@
       </div>
 
 
-        <div class="form-group" tal:condition="two_factor">
+        <div tal:condition="two_factor">
           <span class="loginLabelWrapper">
             <label for="code">Code</label>
           </span>
@@ -44,20 +44,20 @@
         </div>
 
 
-        <div class="form-group">
+        <div>
           <span class="loginLabelWrapper">
             <label for="password">Password</label>
           </span>
           <input class="form-control input-sm" type="password" name="password" id="password" value=""
              tal:attributes="value password|None" />
-        <a href="${api.app_url}/reset_request.html">I forgot my password</a>
-        </div>
+        <a href="${api.app_url}/reset_request.html" class="pull-right">I forgot my password</a>
+        </div><br/>
         
         <div class="field loginLeftPadding discreet">
           <label><input type="checkbox" name="max_age" id="remember"
                  class="noborder" value="315360000"/> <!-- Ten years -->
                  Remember me on this computer</label>
-        </div>
+        </div><br/>
 
 
 
@@ -157,7 +157,7 @@
         <input type="hidden" name="form.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" id="signin" class="btn btn-default btn-sm"><span>Sign In</span></button>
+          <button name="image" type="submit" id="signin" class="btn btn-default"><span>Sign In</span></button>
         </div>
       </div>
     </form>
