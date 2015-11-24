@@ -542,6 +542,17 @@ def getemailusers(profiles, selected_members):
 
     return peoplelist
 
+def getuseremail(profiles):
+    useremails = {}
+    excludefirsts = ['former', 'system']
+    for prof in profiles:
+        profile = profiles.get(prof, None)
+        if profile is not None:
+            if profile.firstname in (excludefirsts):
+                continue
+            useremails[prof] = '%s <%s>' % (profile.title, profile.email)
+
+    return useremails
 
 def process_email_groups(request, profiles):
     emails = request.params['email_address'].split('\n')
@@ -792,9 +803,16 @@ class AddEmailTemplate(object):
             subject = subject.strip()
             if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
                 no_addressee = True
-            if subject == "" or template_body == "" or no_addressee:
+            # don't allow existing template to be overwritten
+            template_name_in_use = False
+            new_template = self.context.email_templates.get(template_name, None)
+            if new_template is not None:
+                template_name_in_use = True
+            if subject == "" or template_body == "" or no_addressee or template_name_in_use:
                 if no_addressee:
                     api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                elif template_name_in_use:
+                    api.error_message = "Template Name already in use!"
                 else:
                     api.error_message = 'Subject and Email Body fields are required!'
 
@@ -877,9 +895,19 @@ class EditEmailTemplate(object):
             template_body = request.params['text']
             if selected_list == [] and sendtoadmins == 'no' and sendtouser == 'no':
                 no_addressee = True
-            if subject == "" or template_body == "" or no_addressee:
+
+            # don't allow existing template to be overwritten
+            template_name_in_use = False
+            if template_name != thistemplate:
+                new_template = self.context.email_templates.get(template_name, None)
+                if new_template is not None:
+                    template_name_in_use = True
+
+            if subject == "" or template_body == "" or no_addressee or template_name_in_use:
                 if no_addressee:
                     api.error_message = "At lease one addressee is required.  Add exising members or check one of the 'Send to' checkboxes."
+                elif template_name_in_use:
+                    api.error_message = "Template Name already in use!"
                 else:
                     api.error_message = 'Subject and Email Body fields are required!'
                 return dict(
@@ -893,6 +921,7 @@ class EditEmailTemplate(object):
                     sendtoadmins=sendtoadmins,
                     peoplelist=peoplelist
                 )
+
             self.context.email_templates[template_name] = {'body': template_body,
                                                            'template_name': template_name,
                                                            'selected_list': selected_list,
@@ -1628,6 +1657,8 @@ class ReviewAccessRequest(object):
         access_request = self.context.access_requests[email]
         e_template = self.context.email_templates.get(template_name, {})
 
+        profiles = find_profiles(self.context)
+        useremails = getuseremail(profiles)
         email_data = {}
         email_data['email'] = email
         email_data['from'] = get_setting(self.context, 'admin_email')
@@ -1660,7 +1691,9 @@ class ReviewAccessRequest(object):
                     continue
                 email_to.append('%s <%s>' % (profile.title, profile.email))
         for member in e_template.get('selected_list', []):
-            email_to.append(member)
+            tmpemail = useremails.get(member, '')
+            if tmpemail != '':
+                email_to.append(tmpemail)
         email_data['to'] = email_to
         email_data['subject'] = self.replace_keywords(e_template['subject'], access_request)
         return email_data
@@ -1721,7 +1754,7 @@ class ReviewAccessRequest(object):
                 message['To'] = who
                 message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
                 message.set_type('text/html')
-                mailer.send([email_data['email']], message)
+                mailer.send([who], message)
 
     def deny(self, email):
         access_request = self.context.access_requests[email]
