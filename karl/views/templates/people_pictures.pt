@@ -27,38 +27,42 @@
       </div>
 
       <div class="profilesWrapper">
-        <tal:row_loop tal:repeat="row rows">
-          <tal:profile_loop tal:repeat="cell row">
-            <div tal:define="profile cell['profile']"
-                 tal:attributes="class 'photoProfile%s' % (
-                     repeat['cell'].end and ' photoProfileEndRow' or '')">
-              <div class="row">
-                <div class="col col-lg-3">
-                  <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
-                    <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
-                    <div class="caption">
-                      <h3 align="center">${profile.title}</h3>
-                    </div>
-                  </a>
+       <div class="row">
+          <tal:row_loop tal:repeat="row rows">
+            <tal:profile_loop tal:repeat="cell row">
+              <div class="col col-lg-3">
+                <div tal:define="profile cell['profile']"
+                   tal:attributes="class 'photoProfile%s' % (
+                       repeat['cell'].end and ' photoProfileEndRow' or '')">
+               
+                  
+                    <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
+                      <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
+                      <div class="caption">
+                        <h3 align="center">${profile.title}</h3>
+                      </div>
+                    </a>
+                  
+                
+                <div class="profileInfoBox">
+                  <div>${profile.position}</div>
+                  <div class="profileNoWrap">
+                    <div>${profile.organization}</div>
+                    <div>${profile.location}</div>
+                    <div>${profile.phone}
+                      <span tal:condition="profile.extension and profile.extension.strip()">
+                        x ${profile.extension}
+                      </span>
+                    </div><br/>
+                  </div>
                 </div>
-              </div>
-              <div class="profileInfoBox">
-                <div>${profile.position}</div>
-                <div class="profileNoWrap">
-                  <div>${profile.organization}</div>
-                  <div>${profile.location}</div>
-                  <div>${profile.phone}
-                    <span tal:condition="profile.extension and profile.extension.strip()">
-                      x ${profile.extension}
-                    </span>
-                  </div><br/>
                 </div>
+                <div style="clear:both"></div>
               </div>
-              <div style="clear:both"></div>
-            </div>
-          </tal:profile_loop>
-          <div class="visual-clear"></div>
-        </tal:row_loop>
+            </tal:profile_loop>
+            <div class="visual-clear"></div>
+          </tal:row_loop>
+        </div>
       </div>
 
       <div style="clear:both"></div>
