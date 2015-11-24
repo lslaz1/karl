@@ -61,7 +61,7 @@
     </script>
 
     <script type="text/tmpl" id="item_row">
-        <div class="feeditem">
+        <div class="feeditem clearfix">
             <div class="col col-lg-2">
               <div class="thumbnail">
                 <img src="{%= item.thumbnail %}" style="width:150px;" />
@@ -186,22 +186,22 @@
                  <br/><br/>
 
                  <div id="feed-polling">
-                     Auto Update <img id="polling-info" src="${api.static_url}/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+                     Auto Update <span class="glyphicon glyphicon-info-sign" id="polling-info" aria-hidden="true"></span><span class="sr-only">Click for Polling Info</span><br/>
                      <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
                      <a href="#" id="poll-indicator" class="on"><span>
-                         <img class="img-on" src="${api.static_url}/images/feed-on.gif" alt="Polling is On" />
-                         <img class="img-off" src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" />
-                         <img class="img-polling" src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" />
-                         <img class="img-error" src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+                         <span class="glyphicon glyphicon-off" aria-hidden="true" style="color:green;"></span><span class="sr-only">Auto Update is On</span>
+                         <span class="glyphicon glyphicon-off" aria-hidden="true" style="color:red;"></span><span class="sr-only">Auto Update is Off</span>
+                         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span><span class="sr-only">Auto Update for New Content</span>
+                         <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"><span class="sr-only">Auto Update Error.</span>
                      </span></a>
                      <div class="polling-details info">
                          <button type="button" class="close" aria-label="close"><span aria-hidden="true">&times;</span></button>
                          <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
                          <ul>
-                             <li><img src="${api.static_url}/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
-                             <li><img src="${api.static_url}/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
-                             <li><img src="${api.static_url}/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
-                             <li><img src="${api.static_url}/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+                             <li><span class="glyphicon glyphicon-off" aria-hidden="true" style="color:green;"></span> Auto Update is On</li>
+                             <li><span class="glyphicon glyphicon-off" aria-hidden="true" style="color:red;"></span>  Auto Update is Off</li>
+                             <li><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Auto Update for New Content</li>
+                             <li><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Auto Update Error. Click the button for info</li>
                          </ul>
                          <p id="feedinfo">
                             <em>Last updated:</em><br/><span id="polled">AGO</span><br/><br/>
