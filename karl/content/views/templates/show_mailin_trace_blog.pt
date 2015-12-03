@@ -21,8 +21,8 @@
         <div class="pull-right">
             <a href="mailto:${api.community_info.name}@${system_email_domain}"
                 aria-label="Email">
-                <span class="glyphicon glyphicon-envelope" 
-                   aria-hidden="true" style="padding:10px;"></span></a>
+                <span class="glyphicon glyphicon-envelope icons" 
+                   aria-hidden="true"></span></a>
         </div>
 
         </div>

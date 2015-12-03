@@ -23,7 +23,7 @@
 </head>
 
 <body>
-  <div metal:fill-slot="content">
+  <div class="container-fluid" metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
