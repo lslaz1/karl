@@ -17,7 +17,7 @@
       <div tal:replace="structure python: api.render_header()" />
 
       <div class="container-fluid">
-        <div id="main" style="margin-bottom:100px;">
+        <div id="main">
           <div class="row">
           
             <div class="col col-lg-9">
@@ -25,7 +25,7 @@
                 <div class="cheader" tal:condition="python: api.community_info">
                   <form class="clearfix md-hide" id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
                     <div class="input-group pull-right">
-                      <input type="text" class="form-control input-sm" name="body"/ style="width:200px;">
+                      <input type="text" class="form-control input-sm sm-input" name="body" />
                         <button type="submit" class="btn btn-default btn-sm">Search Community</button>
                     </div>
 
@@ -39,10 +39,20 @@
               </div> <!-- /#center -->
             </div> <!-- /.col col-lg-9 -->
 
-            <div class="col col-lg-3">
+            <div class="col col-lg-3 visible-lg">
               <div class="rightcol panel panel-default" align="center" style="padding-bottom:25px;" tal:content="structure api.render_sidebar()">
               </div>
             </div> <!-- /.col col-lg-3 --> 
+            <div class="container-fluid">
+              <ul class="nav navbar-nav hidden-lg">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sidebar (name????)<span class="caret pull-right"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li role="navigation" align="center" tal:content="structure api.render_sidebar()" />
+                  </ul>
+                </li>
+              </ul>
+            </div>  
           </div> <!-- /.row -->
 
           <div class="row">
@@ -50,13 +60,24 @@
               <div id="cwrapper">
                 <div id="cleftcol">
                   <div id="cheader">
-                      <ul class="nav nav-tabs" tal:condition="python: api.community_info">
-                        <li role="navigation" tal:repeat="tab api.community_info.tabs" class="${tab.css_class}"><a href="${tab.url}">${tab.name}</a></li>
-                        <li role="navigation" class="pull-right"><a href="${api.community_info.url}tagcloud.html"
-                        >Tags</a></li>
-                        <li role="navigation" class="pull-right"><a href="${api.community_info.url}members">Members</a></li>
-                      </ul>
-
+                    <ul class="nav navbar-nav visible-xs">
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu<span class="glyphicon glyphicon-menu-hamburger pull-right"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li role="navigation" tal:repeat="tab api.community_info.tabs" class="${tab.css_class}"><a href="${tab.url}">${tab.name}</a></li>
+                          <li class="divider"></li>
+                          <li role="navigation"><a href="${api.community_info.url}members">Members</a></li>
+                          <li role="navigation"><a href="${api.community_info.url}tagcloud.html"
+                          >Tags</a></li>
+                        </ul>
+                      </li>
+                    </ul>
+                    <ul class="nav nav-tabs hidden-xs" tal:condition="python: api.community_info">
+                      <li role="navigation" tal:repeat="tab api.community_info.tabs" class="${tab.css_class}"><a href="${tab.url}">${tab.name}</a></li>
+                      <li role="navigation" class="pull-right"><a href="${api.community_info.url}tagcloud.html"
+                      >Tags</a></li>
+                      <li role="navigation" class="pull-right"><a href="${api.community_info.url}members">Members</a></li>
+                    </ul>
                   </div> <!-- /#cheader -->    
                   <div id="screenid-community-overview">
                     <div metal:define-slot="content"/>

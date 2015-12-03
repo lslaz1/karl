@@ -17,7 +17,7 @@
         <div class="row">
           <div class="col col-lg-12">
             <div id="inner">
-              <h1 class="kscreentitle" style="margin-top: 50px">
+              <h1 class="kscreentitle">
                 <span></span>
               </h1>
       	<h2 style="margin-top: 20px; text-align: center">${api.page_title}</h2>
