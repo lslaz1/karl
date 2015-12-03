@@ -13,7 +13,7 @@
       </div>
 
 
-      <div class="container-fluid">    
+      <div class="container">    
         <div class="cal_header" metal:define-macro="header">
           <div class="cal_calendars clearafter" >
             <div class="row">
@@ -69,9 +69,9 @@
         <!-- actions --> 
         <div class="button-group pull-left">
            <!-- <a class="cal_download" href="#">Download</a> -->
-           <a aria-label="Subscribe" href="${calendar.feed_url}" style="padding:10px 5px;"><img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+           <a aria-label="Subscribe" href="${calendar.feed_url}" class="icons"><img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
           id="RSSIcon"/></a>
-           <a aria-label="Print" href="#"><span class="glyphicon glyphicon-print" style="padding:10px 5px;"></span></a>
+           <a aria-label="Print" href="#" class="icons"><span class="glyphicon glyphicon-print"></span></a>
         </div>
       </div>
 

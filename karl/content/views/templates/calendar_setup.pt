@@ -7,7 +7,7 @@
   <div metal:fill-slot="content">
     <div class="chparent_wrapper">
       <a id="backto" class="chparent" href="${back_to_calendar_url}">
-        <span class="glyphicon glyphicon-arrow-left" style="padding-right:5px;"></span>
+        <span class="glyphicon glyphicon-arrow-left icon"></span>
         Back to Calendar
       </a>
     </div>
@@ -19,7 +19,7 @@
 
     <h1 class="kscreentitle">Calendar Categories</h1>   
     <div class="setup_group">
-      <p class="cal_hint">
+      <p class="fieldHelp">
           Categories help to organize the calendar events within a community. 
       </p>
       <table id="calendars" class="table table-striped" cellspacing="0" tal:condition="editable_categories">
@@ -52,8 +52,8 @@
         <fieldset tal:define="error (fielderrors_target == '__add_category__' and fielderrors['category_title'])|None"
                   class="calendar-categories-field ${error and 'fieldError' or ''}">
           <label for="category_title" class="required">Name the category</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
-          <input name="category_title" class="input-sm form-control" type="text" style="width:300px;"/>
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
+          <input name="category_title" class="input-sm form-control med_input" type="text" />
         </fieldset><br/>
 
         <fieldset id="submitcancel-field">
@@ -83,8 +83,8 @@
         <fieldset tal:define="error (fielderrors_target == ('%s_category' % category.__name__) and fielderrors['category_title'])|None"
                   class="calendar-categories-field ${error and 'fieldError' or ''}">
           <label for="category_title" class="required">Name the category</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
-          <input name="category_title" class="form-control input-sm" type="text" value="${category.title}" style="width:300px;"/>
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
+          <input name="category_title" class="form-control input-sm med_input" type="text" value="${category.title}" />
         </fieldset>
 
         <fieldset class="submitcancel-field">
@@ -103,7 +103,7 @@
 
     <h1 class="kscreentitle">Calendar Layers</h1>   
     <div class="setup_group">
-      <p class="cal_hint">
+      <p class="fieldHelp">
         Layers are groupings of categories. Categories are not shown on the calendar directly. 
         Instead, they are grouped into layers and the layers are shown on the calendar. 
       </p>
@@ -146,18 +146,18 @@
         <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['layer_title'])|None"
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
-          <input name="layer_title" class="form-control input-sm" type="text" style="width:300px;"/>
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
+          <input name="layer_title" class="form-control input-sm med_input" type="text" />
         </fieldset>
       
         <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['category_paths'])|None"
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="category_paths" class="required">Categories</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
           <table border="0" class="layers">
             <tr>
               <td>
-                <select name="category_paths" class="form-control input-sm">
+                <select name="category_paths" class="form-control input-sm med_input">
                   <option tal:repeat="category all_categories"
                           value="${category['path']}">${category['title']}</option>
                 </select>
@@ -171,7 +171,7 @@
         <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['layer_color'])|None"
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_color" class="required">Choose color</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
 
           <ul class="cal_choose_color">
             <li tal:repeat="color colors">
@@ -209,8 +209,8 @@
         <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['layer_title'])|None"
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
-          <input name="layer_title" class="form-control input-sm" type="text" value="${layer.title}" style="width:300px;" />
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
+          <input name="layer_title" class="form-control input-sm med_input" type="text" value="${layer.title}" />
         </fieldset>
       
         <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['category_paths'])|None"
@@ -244,7 +244,7 @@
         <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['layer_color'])|None"
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_color" class="required">Choose color</label><br />
-          <div tal:condition="error" class="errorMessage">${error}</div> 
+          <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
 
           <ul class="cal_choose_color">
             <li tal:repeat="color colors">

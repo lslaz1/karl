@@ -47,15 +47,14 @@
           posts &gt;&gt;</a></span>
     </div>
 
-    <div class="btn-group pull-left" role="group" style="margin-top:50px;">
+    <div class="btn-group pull-left btn-group-left" role="group">
       <a href="mailto:${api.community_info.name}@${system_email_domain}" 
         aria-label="Email">
-        <span class="glyphicon glyphicon-envelope" aria-hidden="true"
-           style="padding:10px 5px;"></span>
+        <span class="glyphicon glyphicon-envelope icons" aria-hidden="true"></span>
       </a>
-      <a href="${feed_url}">
+      <a href="${feed_url}" class="icons">
         <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
-          id="RSSIcon" style="padding:10px 5px;"/>
+          id="RSSIcon" />
       </a>
     </div>
 

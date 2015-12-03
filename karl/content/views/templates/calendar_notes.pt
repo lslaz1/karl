@@ -7,7 +7,7 @@
 <div metal:fill-slot="content">
     <div class="chparent_wrapper">
         <a id="backto" class="chparent" href="${back_to_calendar_url}">
-            <span class="glyphicon glyphicon-arrow-left" style="padding-right:5px"></span>
+            <span class="glyphicon glyphicon-arrow-left icons"></span>
             Back to Calendar
         </a>
     </div>
@@ -62,13 +62,13 @@
                 <div class="form-group">
                     <label for="note_title">
                         Title
-                        <span style="color: red">*</span>
+                        <span class="req_asterisk">*</span>
                     </label>  
                     <div tal:condition="title_missing"
                             class="errorMessage">Title is required
                     </div>
                     <input name="note_title" class="form-control" 
-                        type="text" value="${title}"/>
+                        type="text" value="${title}" />
                 </div>  
                 <div class="form-group">
                     <label for="note_description">
