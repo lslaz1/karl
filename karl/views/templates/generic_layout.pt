@@ -12,19 +12,31 @@
   </head>
 
   <body class="generic-layout" tal:attributes="api.body_attriubtes">
-    <div class="visual-portal-wrapper">
+    <div class="visual-portal-wrapper container-fluid">
 
       <div tal:replace="structure python: api.render_header()" />
 
 <!-- Main Admin Section -->      
       <div id="main">
-        <div class="container-fluid" style="margin-bottom:100px;">
+        <div class="container-fluid">
           <div class="row">
+
             <div class="col col-lg-9">
               <div id="center" class="clearafter">
                 <div metal:define-slot="content"> Content goes here. </div>
               </div>
             </div>
+            <div class="container-fluid">
+              <ul class="nav navbar-nav hidden-lg">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sidebar (name????)<span class="caret pull-right"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li role="navigation" align="center" tal:content="structure api.render_sidebar()" />
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
             <div class="col col-lg-3">
               <div class="rightcol"
                    tal:define="my_communities my_communities|();
@@ -68,7 +80,9 @@
                       </div>
                     </div>
               </div> <!-- /.rightcol -->
-            </div> <!-- /.col col-lg-3 -->      
+            </div> <!-- /.col col-lg-3 -->
+
+
             <div class="visualClear"><!-- --></div>
           </div> <!-- /.row -->
         </div> <!-- /.container-fluid -->

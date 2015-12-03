@@ -57,7 +57,7 @@
               <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
             </th>
           </tr>
-	</tfoot>
+	      </tfoot>
       </table>
     </div>
 
