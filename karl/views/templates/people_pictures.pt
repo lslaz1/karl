@@ -30,32 +30,33 @@
        <div class="row">
           <tal:row_loop tal:repeat="row rows">
             <tal:profile_loop tal:repeat="cell row">
-              <div class="col col-lg-3">
+              <div class="col col-lg-3" style="height:350px">
                 <div tal:define="profile cell['profile']"
                    tal:attributes="class 'photoProfile%s' % (
                        repeat['cell'].end and ' photoProfileEndRow' or '')">
                
                   
-                    <a title="${profile.title}" href="${cell['url']}" class="thumbnail">
+                    <a title="${profile.title}" href="${cell['url']}" class="thumbnail" style="height:340px;"><br/>
                       <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
                       <div class="caption">
-                        <h3 align="center">${profile.title}</h3>
+                        <h4 align="center">${profile.title}</h4>
+                      </div>
+                      <div class="container">
+                        <ul class="list-unstyled profileInfoBox">
+                          <li>${profile.position}</li>
+                          <li>${profile.organization}</li>
+                          <li>${profile.location}</li>
+                          <li>${profile.phone}
+                            <span tal:condition="profile.extension and profile.extension.strip()">
+                              x ${profile.extension}
+                            </span>
+                          </li><br/>
+                        </ul>
                       </div>
                     </a>
                   
                 
-                <div class="profileInfoBox">
-                  <div>${profile.position}</div>
-                  <div class="profileNoWrap">
-                    <div>${profile.organization}</div>
-                    <div>${profile.location}</div>
-                    <div>${profile.phone}
-                      <span tal:condition="profile.extension and profile.extension.strip()">
-                        x ${profile.extension}
-                      </span>
-                    </div><br/>
-                  </div>
-                </div>
+                
                 </div>
                 <div style="clear:both"></div>
               </div>
