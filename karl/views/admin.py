@@ -445,6 +445,7 @@ class EmailUsersView(object):
             count, docids, resolver = search(interfaces=[IProfile])
             n = 0
             addressed_to = []
+            sent_list = []
             if group == 'group.KarlStaff' or group == '':
                 for docid in docids:
                     profile = resolver(docid)
@@ -453,6 +454,9 @@ class EmailUsersView(object):
                     userid = profile.__name__
                     if group and not users.member_of_group(userid, group):
                         continue
+                    if profile.email in sent_list:
+                        continue
+                    sent_list.append(profile.email)
                     addressed_to.append({
                         'name': profile.title,
                         'email': profile.email
@@ -462,9 +466,13 @@ class EmailUsersView(object):
                 group_key = group.replace('group-', '')
                 alladdresses = all_groups.get(group_key, [])
                 for entry in alladdresses:
+                    tmpgroupemail = entry.get('email', '')
+                    if tmpgroupemail in sent_list:
+                        continue
+                    sent_list.append(tmpgroupemail)
                     addressed_to.append({
                         'name': '',
-                        'email': entry.get('email', '')
+                        'email': tmpgroupemail
                     })
                     n += 1
             # parse additional to email addresses
@@ -475,6 +483,9 @@ class EmailUsersView(object):
                     if len(emailparts) != 2:
                         continue
                     # could validate email more here
+                    if to_email in sent_list:
+                        continue
+                    sent_list.append(to_email)
                     addressed_to.append({
                         'name': emailparts[0],
                         'email': to_email
@@ -1929,7 +1940,6 @@ class ReviewAccessCustom(object):
         request_action = self.request.GET.get('action', '')
         access_request = self.context.access_requests[requestor_email]
         requestor_name = access_request['fullname']
-        print('GET', requestor_email, request_action)
 
         if 'send_email' in request.params or 'submit' in request.params:
             n = 0
@@ -1988,7 +1998,7 @@ class ReviewAccessRequestView(object):
         hide_repeated_denials = self.context.settings.get('hide_repeated_denials', False)
         if hide_repeated_denials:
             for k, v in self.context.access_requests.iteritems():
-                tmp_email = v.get('emai', '')
+                tmp_email = v.get('email', '')
                 # do a lookup to see if this person has been denied previously
                 if tmp_email not in self.context.denial_tracker:
                     filtered_results[k] = v
