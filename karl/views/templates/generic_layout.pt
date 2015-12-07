@@ -26,7 +26,7 @@
                 <div metal:define-slot="content"> Content goes here. </div>
               </div>
             </div>
-            <div class="container-fluid">
+            <!-- <div class="container-fluid">
               <ul class="nav navbar-nav hidden-lg">
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sidebar (name????)<span class="caret pull-right"></span></a>
@@ -35,9 +35,9 @@
                   </ul>
                 </li>
               </ul>
-            </div>
+            </div> -->
 
-            <div class="col col-lg-3">
+            <div class="col col-lg-3 col-md-12">
               <div class="rightcol"
                    tal:define="my_communities my_communities|();
                                tags tags|();">
