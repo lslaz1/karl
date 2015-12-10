@@ -30,27 +30,31 @@
         <div style="clear: both"></div>
       </div>
 
-      <div id="reportgrid"></div>
+      <table id="reportgrid" class="display"></table>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
-        $(document).ready(function() {
-            // get karl_client_data.grid_data
+        $(document).ready(function(){
             var grid_data = window.karl_client_data && karl_client_data.grid_data || {};
             if (!grid_data.records) {
-                throw 'karl_client_data.grid_data not specified or has no records.';
+                throw 'error loading people.';
             }
-            // bind the widget
-            $("#reportgrid").karlgrid({
-                url: grid_data.fetch_url,
-                limit: grid_data.batchSize,
-                height: 300,
-                width: grid_data.width,
-                pagination: true,
-                sortColumn: grid_data.sortColumn,
-                sortDirection: grid_data.sortDirection,
-                scrollbarWidth: grid_data.scrollbarWidth,
-                allocateWidthForScrollbar: grid_data.allocateWidthForScrollbar,
-                initialState: grid_data
+            var grid_columns = [];
+            for(var i = 0; i < grid_data.columns.length; i++) {
+                grid_columns.push({
+                    title:grid_data.columns[i].label,
+                    width:grid_data.columns[i].width
+                });
+            }
+            $("#reportgrid").DataTable({
+                columns: grid_columns,
+                data: grid_data.records,
+                paging: true,
+                lengthChange: false,
+                responsive: false,
+                scrollY: 300,
+                deferRender: true,
+                scroller: true,
+                searching: false,
             });
         });
         //]]>

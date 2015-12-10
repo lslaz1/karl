@@ -39,7 +39,10 @@
       "bottlecap-livesearch/livesearch.js",
       "l10n/globalize.js",
       "l10n/globalize.cultures.js",
-      "l10n/globalize.actions.js"
+      "l10n/globalize.actions.js",
+      "dist/datatables.net/js/jquery.dataTables.js",
+      "dist/datatables.net-responsive/js/dataTables.responsive.js",
+      "dist/datatables.net-scroller/js/dataTables.scroller.js"
     ],
     "karl-multifileupload": [
       "plupload/src/javascript/gears_init.js",

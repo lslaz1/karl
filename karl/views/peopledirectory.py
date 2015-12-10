@@ -320,7 +320,13 @@ def report_view(context, request, pictures=False):
     if section:
         section_name = section.__name__
     peopledir_tabs = get_tabs(peopledir, request, section_name)
-    report_data = get_grid_data(context, request)
+
+    # make the max limit here ridiculously huge so the frontend can just deal
+    # with rendering all of the data. this should scale fairly well up to
+    # quite large datasets (several thousand if not tens of thousands) -- if
+    # it starts becoming an issue, then the limit will need to be reduced, and
+    # the client lib updated to handle the paging interaction with the backend
+    report_data = get_grid_data(context, request, limit=2147483647)
 
     batch = report_data['batch']
     if pictures:

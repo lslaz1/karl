@@ -43,5 +43,9 @@
   },
   "napa": {
     "tinymce": "tinymce/tinymce#3.5.2"
+  },
+  "dependencies": {
+    "readable-stream": "~2.0.4",
+    "xtend": "~4.0.1"
   }
 }
