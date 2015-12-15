@@ -12,6 +12,7 @@ from karl.security.policy import GUEST_PERMS
 from karl.security.policy import MODERATOR_PERMS
 from karl.security.policy import MEMBER_PERMS
 from karl.security.policy import CREATE
+from karl.security.policy import VIEW
 from karl.security.policy import NO_INHERIT
 from karl.security.workflow import postorder
 from karl.security.workflow import acl_diff
@@ -273,22 +274,19 @@ def forum_topic_to_inherits(ob, info):
 
 def to_profile_active(ob, info):
     acl = [
-        (Allow, ob.creator, MEMBER_PERMS + ('view_only',)),
+        (Allow, ob.creator, MEMBER_PERMS),
     ]
-    acl.append((Allow, 'group.KarlUserAdmin',
-                ADMINISTRATOR_PERMS + ('view_only',)))
-    acl.append((Allow, 'group.KarlAdmin',
-                ADMINISTRATOR_PERMS + ('view_only',)))
-    acl.append((Allow, 'group.KarlStaff',
-                GUEST_PERMS + ('view_only',)))
+    acl.append((Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS))
+    acl.append((Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS))
+    acl.append((Allow, 'group.KarlStaff', GUEST_PERMS))
     users = find_users(ob)
     user = users.get_by_id(ob.creator)
     if user is not None:
         groups = user['groups']
         for group, role in get_community_groups(groups):
             c_group = 'group.community:%s:%s' % (group, role)
-            acl.append((Allow, c_group, GUEST_PERMS + ('view_only',)))
-    acl.append((Allow, 'system.Authenticated', ('view_only',)))
+            acl.append((Allow, c_group, GUEST_PERMS))
+    acl.append((Allow, 'system.Authenticated', ('view',)))
     acl.append(NO_INHERIT)
     msg = None
     added, removed = acl_diff(ob, acl)
@@ -302,9 +300,9 @@ def to_profile_active(ob, info):
 
 def to_profile_inactive(ob, info):
     acl = [
-        (Allow, 'system.Authenticated', ('view_only',)),
-        (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
-        (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS + ('view_only',)),
+        (Allow, 'system.Authenticated', (VIEW,)),
+        (Allow, 'group.KarlUserAdmin', ADMINISTRATOR_PERMS),
+        (Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
         NO_INHERIT,
     ]
     msg = None

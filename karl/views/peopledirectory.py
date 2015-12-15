@@ -495,6 +495,10 @@ def get_report_query(report, request, letter=None):
             elif k == 'is_staff':
                 kw[k] = v.lower() in ('true', 't', 'yes', 'y', '1')
     principals = effective_principals(request)
+    show_all_users = get_setting(report, "show_all_users")
+    if not show_all_users:
+        principals.remove("system.Authenticated")
+        principals.remove("system.Everyone")
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     if letter is None:
         letter = request.params.get('lastnamestartswith')
@@ -696,8 +700,8 @@ class NameColumn(ReportColumn):
     def render_html(self, profile, request):
         value = unicode(profile.title)
         url = resource_url(profile, request)
-        return '%s<a href=%s style="display: none;"/>' % (
-            escape(value), quoteattr(url))
+        return '<a href=%s>%s</a>' % (
+            quoteattr(url), escape(value))
 
 
 class PhoneColumn(ReportColumn):
