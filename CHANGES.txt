@@ -9,7 +9,8 @@ karl package Changelog
   [jmartens]
 - Enable the configuration and use of email groups
   [jmartens]
-
+- Change people report to use datatables jquery plugin
+- Add Industry to default columns on people report
 
 5.5.0 (unreleased)
 ------------------
