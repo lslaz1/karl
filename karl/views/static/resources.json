@@ -39,7 +39,15 @@
       "bottlecap-livesearch/livesearch.js",
       "l10n/globalize.js",
       "l10n/globalize.cultures.js",
-      "l10n/globalize.actions.js"
+      "l10n/globalize.actions.js",
+      "dist/datatables.net/js/jquery.dataTables.js",
+      "dist/datatables.net-buttons/js/dataTables.buttons.js",
+      "dist/datatables.net-buttons/js/buttons.colVis.js",
+      "dist/datatables.net-buttons/js/buttons.flash.js",
+      "dist/datatables.net-buttons/js/buttons.html5.js",
+      "dist/datatables.net-buttons/js/buttons.print.js",
+      "dist/datatables.net-responsive/js/dataTables.responsive.js",
+      "dist/datatables.net-scroller/js/dataTables.scroller.js"
     ],
     "karl-multifileupload": [
       "plupload/src/javascript/gears_init.js",

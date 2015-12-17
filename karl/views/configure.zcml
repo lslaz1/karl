@@ -1144,7 +1144,7 @@
   <view
     for="karl.models.interfaces.IProfile"
     view=".people.show_profile_view"
-    permission="view_only"
+    permission="view"
     renderer="templates/profile.pt"
     />
 

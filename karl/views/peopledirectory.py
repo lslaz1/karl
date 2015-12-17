@@ -320,7 +320,13 @@ def report_view(context, request, pictures=False):
     if section:
         section_name = section.__name__
     peopledir_tabs = get_tabs(peopledir, request, section_name)
-    report_data = get_grid_data(context, request)
+
+    # make the max limit here ridiculously huge so the frontend can just deal
+    # with rendering all of the data. this should scale fairly well up to
+    # quite large datasets (several thousand if not tens of thousands) -- if
+    # it starts becoming an issue, then the limit will need to be reduced, and
+    # the client lib updated to handle the paging interaction with the backend
+    report_data = get_grid_data(context, request, limit=2147483647)
 
     batch = report_data['batch']
     if pictures:
@@ -489,6 +495,10 @@ def get_report_query(report, request, letter=None):
             elif k == 'is_staff':
                 kw[k] = v.lower() in ('true', 't', 'yes', 'y', '1')
     principals = effective_principals(request)
+    show_all_users = get_setting(report, "show_all_users")
+    if not show_all_users:
+        principals.remove("system.Authenticated")
+        principals.remove("system.Everyone")
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     if letter is None:
         letter = request.params.get('lastnamestartswith')
@@ -690,8 +700,8 @@ class NameColumn(ReportColumn):
     def render_html(self, profile, request):
         value = unicode(profile.title)
         url = resource_url(profile, request)
-        return '%s<a href=%s style="display: none;"/>' % (
-            escape(value), quoteattr(url))
+        return '<a href=%s>%s</a>' % (
+            quoteattr(url), escape(value))
 
 
 class PhoneColumn(ReportColumn):
@@ -710,6 +720,7 @@ COLUMNS = {
     'email': ReportColumn('email', 'Email'),
     'location': ReportColumn('location', 'Location'),
     'organization': ReportColumn('organization', 'Organization'),
+    'industry': ReportColumn('industry', 'Industry'),
     'phone': PhoneColumn('phone', 'Phone'),
     'position': ReportColumn('position', 'Position'),
     }

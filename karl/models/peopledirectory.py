@@ -158,7 +158,7 @@ class PeopleDirectory(Folder):
         # Set up a default configuration
         self['all'] = section = PeopleSection('All')
         section['all'] = report = PeopleReport('All')
-        report.columns = ('name', 'organization', 'location', 'email')
+        report.columns = ('name', 'organization', 'location', 'industry', 'email')
         self.order = ['all']
 
     def update_indexes(self):
