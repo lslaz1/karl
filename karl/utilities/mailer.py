@@ -233,6 +233,7 @@ class ThreadedGeneratorMailDelivery(KarlMailDelivery):
     def __init__(self, settings=None):
         if settings is None:
             settings = get_config_settings()
+            self.msgid_domain = settings.get('msgid_domain', None)
         super(ThreadedGeneratorMailDelivery, self).__init__(settings)
 
     def send(self, mto, message):
@@ -248,8 +249,7 @@ class ThreadedGeneratorMailDelivery(KarlMailDelivery):
             pass
         messageid = message['Message-Id']
         if messageid is None:
-            settings = get_config_settings()
-            msgid_domain = settings.get('msgid_domain', None)
+            msgid_domain = self.msgid_domain
             messageid = message['Message-Id'] = make_msgid('repoze.sendmail', msgid_domain)
         if message['Date'] is None:
             message['Date'] = formatdate()
