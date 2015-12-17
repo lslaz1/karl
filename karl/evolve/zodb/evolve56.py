@@ -52,6 +52,6 @@ def evolve(site):
                 # them with the new default columns
                 if colvals[0] == 'name' and colvals[1] == 'organization' \
                         and colvals[2] == 'location' and colvals[3] == 'email':
-                    colvals.columns = ('name', 'organization', 'location', 'industry', 'email')
+                    obj2.columns = ('name', 'organization', 'location', 'industry', 'email')
 
     transaction.commit()
