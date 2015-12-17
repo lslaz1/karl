@@ -12,13 +12,12 @@
   </head>
 
   <body class="generic-layout" tal:attributes="api.body_attriubtes">
-    <div class="visual-portal-wrapper container-fluid">
+    <div class="container-fluid">
 
       <div tal:replace="structure python: api.render_header()" />
 
 <!-- Main Admin Section -->      
-      <div id="main">
-        <div class="container-fluid">
+        <div class="container-fluid" id="main">
           <div class="row">
 
             <div class="col col-lg-9">
@@ -44,7 +43,7 @@
 
                   <metal:portlets define-slot="portlets"></metal:portlets>
 
-                  <div class="generic-portlet" id="popular-tags-portlet"
+                  <div class="panel panel-default rightcol" align="center"
                        tal:condition="tags">
                       <h3 tal:condition="my_communities is None">${profile.firstname}'s Tags</h3>
                       <h3 tal:condition="my_communities is not None">My Tags</h3>
@@ -64,20 +63,22 @@
                     <div tal:condition="my_communities and my_communities is not None"
                          metal:use-macro="api.snippets.macros['my_communities_portlet']"/>
 
-                    <div metal:define-macro="my_communities_portlet" class="generic-portlet"
+                    <div metal:define-macro="my_communities_portlet"
                          tal:condition="my_communities is None" id="my-communities-portlet">
-                      <h3>${profile.firstname}'s Communities</h3>
-                      <div class="portlet-item" tal:condition="communities"
-                           tal:repeat="community communities">
-                        <strong tal:omit-tag="not community.moderator">
-                          <a href="${community.url}">
-                            ${community.title}
-                          </a>
-                        </strong>
-                      </div>
-                      <div class="portlet-item" tal:condition="not communities">
-                        <strong>No Communities</strong>
-                      </div>
+                      <div class="panel panel-default rightcol" align="center">
+                        <h3>${profile.firstname}'s Communities</h3>
+                        <div class="portlet-item" tal:condition="communities"
+                             tal:repeat="community communities">
+                          <strong tal:omit-tag="not community.moderator">
+                            <a href="${community.url}">
+                              ${community.title}
+                            </a>
+                          </strong>
+                        </div>
+                        <div class="portlet-item" tal:condition="not communities">
+                          <strong>No Communities</strong>
+                        </div>
+                      </div>  
                     </div>
               </div> <!-- /.rightcol -->
             </div> <!-- /.col col-lg-3 -->
@@ -85,8 +86,7 @@
 
             <div class="visualClear"><!-- --></div>
           </div> <!-- /.row -->
-        </div> <!-- /.container-fluid -->
-      </div> <!-- /#main -->
+        </div> <!-- #main -->
       <tal:footer content="structure api.render_footer()" />
 
     </div>
