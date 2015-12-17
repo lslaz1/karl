@@ -23,13 +23,6 @@
         tal:repeat="description descriptions"
         tal:content="structure python: api.clean_html(description)"></div>
 
-      <div>
-        <a class="rightFloatLink" title="Show pictures"
-            href="${pictures_url}">Picture View</a>
-        <h3 tal:repeat="qualifier qualifiers">${qualifier}</h3>
-        <div style="clear: both"></div>
-      </div>
-
       <table id="reportgrid" class="display"></table>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
@@ -46,15 +39,26 @@
                 });
             }
             $("#reportgrid").DataTable({
+                dom: 'fBrtip',
                 columns: grid_columns,
                 data: grid_data.records,
                 paging: true,
                 lengthChange: false,
                 responsive: false,
-                scrollY: 300,
+                scrollY: 500,
                 deferRender: true,
                 scroller: true,
-                searching: false,
+                searching: true,
+                buttons: [
+                    {
+                        text: 'Picture View',
+                        action: function(e,dt,node,config) {
+                            window.location.href = "${pictures_url}";
+                        }
+                    },
+                    'print',
+                    'csv'
+                ]
             });
         });
         //]]>

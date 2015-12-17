@@ -720,6 +720,7 @@ COLUMNS = {
     'email': ReportColumn('email', 'Email'),
     'location': ReportColumn('location', 'Location'),
     'organization': ReportColumn('organization', 'Organization'),
+    'industry': ReportColumn('industry', 'Industry'),
     'phone': PhoneColumn('phone', 'Phone'),
     'position': ReportColumn('position', 'Position'),
     }
