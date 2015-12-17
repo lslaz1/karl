@@ -88,31 +88,58 @@
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <div class="container-fluid">
         <div class="row">
+
           <ul class="list-inline hidden-xs">
-            <span tal:repeat="letter letters">
-            <strong tal:condition="letter['is_current']"
-             class="${letter['css_class']}">${letter['name']}</strong>
-            <li class="letter"><a tal:condition="letter['href'] and not letter['is_current']"
+            <span tal:omit-tag="" tal:repeat="letter letters">
+            <li tal:condition="letter['is_current']"><strong
+             class="${letter['css_class']}">${letter['name']}</strong></li>
+            <li tal:condition="letter['href'] and not letter['is_current']"><a
                class="${letter['css_class']}" href="${letter['href']}"
               >${letter['name']}</a></li>
-            <li class="letter"><span tal:condition="not letter['href'] and not letter['is_current']"
+            <li tal:condition="not letter['href'] and not letter['is_current']"><span
                class="${letter['css_class']}">${letter['name']}</span></li>
             </span>
           </ul>
-          <ul class="nav navbar-nav visible-xs">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter<span class="caret pull-right"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li role="navigation" class="letter" tal:repeat="letter letters"><strong tal:condition="letter['is_current']"
-                 class="${letter['css_class']}">${letter['name']}</strong></li>
-                <li role="navigation" class="letter" tal:repeat="letter letters"><a tal:condition="letter['href'] and not letter['is_current']"
-                   class="${letter['css_class']}" href="${letter['href']}"
-                  >${letter['name']}</a></li>
-                <li role="navigation" class="letter" tal:repeat="letter letters"><span tal:condition="not letter['href'] and not letter['is_current']"
-                   class="${letter['css_class']}">${letter['name']}</span></li>
-              </ul>
-            </li>
-          </ul>
+          
+            <div class="input-group visible-xs">
+              <select class="form-control" id="alpha-filter">
+                <span tal:omit-tag="" tal:repeat="letter letters">
+                  <option tal:condition="letter['is_current']">
+                    ${letter['name']}
+                  </option>
+                  <option class="B" tal:condition="letter['href'] and not letter['is_current']">
+                    ${letter['name']}
+                  </option>
+                  <option class="C" disabled tal:condition="not letter['href'] and not letter['is_current']">
+                    ${letter['name']}
+                  </option>
+                </span>
+               </select> 
+              <span class="input-group-btn"> 
+                <button class="btn btn-default" id="filter-btn">Filter</button>
+              </span>
+            </div> <!-- /.input-group -->
+          
+          <script>
+          
+            $(document).ready(function() { 
+              $("#filter-btn").click(function() {
+                var x = {};
+
+                <span tal:omit-tag="" tal:repeat="letter letters">
+                  x["<span tal:replace="letter['name']"/>"] = "<span tal:replace="letter['href']"/>" 
+                </span>
+
+                if (x[$("#alpha-filter").val()]) {
+                  window.location = x[$("#alpha-filter").val()];
+                } else {
+                    console.log("No results for " + letter['name']);
+                }
+              });  
+            });
+
+          </script>
+
         </div>
       </div>
     </div>
@@ -121,7 +148,7 @@
 
     <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
 
-<!-- Page Title -->
+<!-- Page  -->
     <h1 metal:define-macro="page_title" class="clearfix">${api.page_title}
         <span tal:condition="api.is_private_in_public_community(api.context)"
             class="kprivacy_badge">Private</span>
@@ -169,40 +196,47 @@
 
 <!-- Menubar -->
     <metal:actions_box define-macro="actions_box">
-      <div class="btn-group pull-right" role="group">
-        <tal:block repeat="action api.actions_to_menu(actions)">
-          <a type="button" class="btn btn-default btn-sm" href="${api.here_url}${action[1]}"
-             tal:condition="not action[1].startswith('http')">
-             <span>${action[0]}</span></a>
-          <a type="button" class="btn btn-default btn-sm" href="${action[1]}"
-               tal:condition="action[1].startswith('http')"
-               ><span>${action[0]}</span></a>
-            <tal:submenu condition="action[2]">
-              <div class="btn-group">
-                <div class="dropdown">
-                  <button type="button" class="btn btn-default dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  </button>
-                    <ul class="dropdown-menu" role="menu">
-                      <li tal:repeat="subaction action[2]">
-                        <a href="${api.here_url}${subaction[1]}"
-                           tal:condition="not subaction[1].startswith('http')"
-                        >${subaction[0]}</a>
-                        <a href="${subaction[1]}"
-                           tal:condition="subaction[1].startswith('http')"
-                        >${subaction[0]}</a>
-                      </li>
-                    </ul>
+        <div class="btn-group pull-right hidden-xs" role="group">
+          <tal:block repeat="action api.actions_to_menu(actions)">
+            <a type="button" class="btn btn-default btn-sm" href="${api.here_url}${action[1]}"
+               tal:condition="not action[1].startswith('http')">
+               <span>${action[0]}</span></a>
+            <a type="button" class="btn btn-default btn-sm" href="${action[1]}"
+                 tal:condition="action[1].startswith('http')"
+                 ><span>${action[0]}</span></a>
+              <tal:submenu condition="action[2]">
+                <div class="btn-group">
+                  <div class="dropdown">
+                    <button type="button" class="btn btn-default dropdown-toggle"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li tal:repeat="subaction action[2]">
+                          <a href="${api.here_url}${subaction[1]}"
+                             tal:condition="not subaction[1].startswith('http')"
+                          >${subaction[0]}</a>
+                          <a href="${subaction[1]}"
+                             tal:condition="subaction[1].startswith('http')"
+                          >${subaction[0]}</a>
+                        </li>
+                      </ul>
+                  </div>
                 </div>
-              </div>
-            </tal:submenu>
-        </tal:block>
+              </tal:submenu>
+          </tal:block>
       </div>
-
-
-      <ul class="menubar">
+      
+      <ul class="nav navbar-nav nav-menu visible-xs">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Actions<span class="glyphicon glyphicon-cog pull-right"></span></a>
+          <ul class="dropdown-menu nav-menu" role="menu" tal:repeat="action api.actions_to_menu(actions)">
+            <li role="navigation" tal:condition="not action[1].startswith('http')">
+              <a href="${api.here_url}${action[1]}">${action[0]}</a></li>
+            <li role="navigation" tal:condition="action[1].startswith('http')">
+              <a href="${action[1]}">${action[0]}</a></li>
+          </ul>
+        </li>
       </ul>
-
 
       <script language="javascript" type="text/javascript">
         //<![CDATA[
@@ -215,7 +249,7 @@
     </metal:actions_box>
 
 <!-- My Communities column buttons -->
-    <div metal:define-macro="my_communities_portlet" class="generic-portlet"
+    <div metal:define-macro="my_communities_portlet" class="panel panel-default rightcol" align="center"
       id="my-communities-portlet">
       <div id="my-communities-list">
         <h3>My Communities</h3>
@@ -363,7 +397,7 @@
     </div>
 
 <!-- Header Search Box-->
-    <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header pull-right">
+    <div metal:define-macro="livesearch_box" id="searchbox" class="pull-right">
       <form class="form-inline">  
         <div class="input-group">
           <input type="text" class="form-control input-sm" />
@@ -664,13 +698,13 @@
 <!-- Email - Print - CSV icons -->      
       <div class="btn-group" role="group" id="peopledir-actions">
         <a tal:condition="mailto" href="${mailto}" title="Email" aria-label="Email">
-          <span class="glyphicon glyphicon-envelope" style="padding-left:5px"></span>
+          <span class="glyphicon glyphicon-envelope icons"></span>
         </a>
         <a href="${print_url}" title="Print" aria-label="Print">
-          <span class="glyphicon glyphicon-print" style="padding-top:9px;"></span>
+          <span class="glyphicon glyphicon-print people-icons"></span>
         </a>
         <a href="${csv_url}" title="Export as CSV" aria-label="Export as CSV">
-          <span class="glyphicon glyphicon-download" style="padding-left:5px"></span>
+          <span class="glyphicon glyphicon-download icons"></span>
         </a>
       </div>
       
@@ -727,8 +761,8 @@
     </div>
 
 <!-- Peopledir Search icon -->
-    <div class="pull-left" id="peopledir-opensearch-add" metal:define-macro="opensearch"
-         tal:condition="opensearch_url|None" style="padding:10px;">
+    <div class="pull-left icons" id="peopledir-opensearch-add" metal:define-macro="opensearch"
+         tal:condition="opensearch_url|None">
       <div>
           <a onclick="window.external.AddSearchProvider
             ('${opensearch_url}'); return false;"

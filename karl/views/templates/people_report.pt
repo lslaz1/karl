@@ -3,10 +3,9 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
-  <div class="container" metal:fill-slot="content">
+  <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
 <!-- All, print, CSV buttons -->
     <h1 class="peopledir-title">${peopledir.title}</h1>
@@ -15,6 +14,7 @@
         >${tab['title']}
       </a>
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
+      <div metal:use-macro="api.snippets.macros['actions_box']"/>
     </div>
 
     <div id="peopledir-content-wrapper">
@@ -59,7 +59,7 @@
       
       <div class="btn-group pull-left" tal:condition="1 or mailto">
         <a href="${mailto}" aria-label="Email">
-          <span class="glyphicon glyphicon-envelope" aria-hidden="true" style="padding: 10px 5px;"></span>
+          <span class="glyphicon glyphicon-envelope icons" aria-hidden="true"></span>
         </a>
         <div metal:use-macro="api.snippets.macros['opensearch']"></div>
       </div>

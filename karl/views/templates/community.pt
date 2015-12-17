@@ -10,12 +10,22 @@
   </span>
   
   <div metal:fill-slot="content">
-    
+
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
     <h1 class="title">Overview</h1>
     
+    <form class="clearfix md-hide form-inline" id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
+      <div class="input-group">
+        <input type="text" class="form-control input-sm med_input" name="body" />
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-default btn-sm">Search This Community</button>
+          </span>
+      </div>
+
+    </form>
+
     <div metal:use-macro="api.snippets.macros['list_tags']"/>    
     <div class="koverview_body" 
 	 tal:condition="api.context.text != u''">

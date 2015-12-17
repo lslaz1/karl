@@ -23,12 +23,13 @@
 </head>
 
 <body>
-  <div class="container-fluid" metal:fill-slot="content">
+  <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
     <h1>${api.page_title}</h1>
+
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
     <div id="communities-content-wrapper">
 
@@ -51,7 +52,7 @@
 
     <div class="communityEntry">
 
-      <div class="list-group col col-lg-12">
+      <div class="list-group col col-lg-12" id="communities-list">
         <a tal:repeat="community communities" href="${community.url}" class="list-group-item">
           <h4 class="list-group-item-heading">${community.title}</h4>
           <span tal:condition="not api.has_staff_acl(community.context)"

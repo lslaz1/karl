@@ -53,7 +53,7 @@
                   class="calendar-categories-field ${error and 'fieldError' or ''}">
           <label for="category_title" class="required">Name the category</label><br />
           <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
-          <input name="category_title" class="input-sm form-control med_input" type="text" />
+          <input name="category_title" class="input-sm form-control med-input" type="text" />
         </fieldset><br/>
 
         <fieldset id="submitcancel-field">
@@ -84,7 +84,7 @@
                   class="calendar-categories-field ${error and 'fieldError' or ''}">
           <label for="category_title" class="required">Name the category</label><br />
           <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
-          <input name="category_title" class="form-control input-sm med_input" type="text" value="${category.title}" />
+          <input name="category_title" class="form-control input-sm med-input" type="text" value="${category.title}" />
         </fieldset>
 
         <fieldset class="submitcancel-field">
@@ -147,7 +147,7 @@
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
           <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
-          <input name="layer_title" class="form-control input-sm med_input" type="text" />
+          <input name="layer_title" class="form-control input-sm med-input" type="text" />
         </fieldset>
       
         <fieldset tal:define="error (fielderrors_target == '__add_layer__' and fielderrors['category_paths'])|None"
@@ -157,7 +157,7 @@
           <table border="0" class="layers">
             <tr>
               <td>
-                <select name="category_paths" class="form-control input-sm med_input">
+                <select name="category_paths" class="form-control input-sm med-input">
                   <option tal:repeat="category all_categories"
                           value="${category['path']}">${category['title']}</option>
                 </select>
@@ -210,7 +210,7 @@
                   class="form-group categories-field ${error and 'fieldError' or ''}">
           <label for="layer_title" class="required">Name the layer</label><br />
           <div tal:condition="error" class="errorMessage fieldHelp">${error}</div> 
-          <input name="layer_title" class="form-control input-sm med_input" type="text" value="${layer.title}" />
+          <input name="layer_title" class="form-control input-sm med-input" type="text" value="${layer.title}" />
         </fieldset>
       
         <fieldset tal:define="error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors['category_paths'])|None"
