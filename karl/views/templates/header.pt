@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default" role="navigation" id="header-navbar">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -11,7 +11,7 @@
       </button>
 
       <a class="navbar-brand" href="${api.home_url}">
-      <img src="${api.logo_url}" alt="KARL" style="padding:5px 30px;"/></a>
+      <img src="${api.logo_url}" alt="KARL logo" id="logo" /></a>
 
     </div>
     
@@ -23,10 +23,10 @@
         </li>
       </ul>
 
-      <form class="navbar-form navbar-right header-nav" role="search">
+      <form class="navbar-form navbar-right" id="nav-search" role="search">
         <div class="form-group">
           <ul class="nav navbar-nav">
-            <select class="form-control input-sm sm-input">
+            <select class="form-control input-sm">
               <option value=""><a href="#">All Content</a></option>
               <option tal:repeat="o api.livesearch_options" name="${o['name']}" tal:attributes="advanced_search o['component'].live_to_advanced"><a title="Search ${o['description']}" href="#">${o['title']}</a></option>
             </select>
@@ -34,9 +34,9 @@
           </ul>
       </form>
 
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-right" id="cog">
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="glyphicon glyphicon-cog"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog"></span><span class="caret"></a>
           <ul class="dropdown-menu" role="menu">
             <li tal:repeat="link python: api.get_user_links()">
               <a href="${link.url}">${link.title}</a>
