@@ -13,8 +13,12 @@
 
     <h1 class="kscreentitle">Admin Section</h1>
 
-    <div class="koverview_body">
+    <div class="koverview_body visible-lg">
       Select an item from the list on the right.
+    </div>
+
+    <div class="koverview_body hidden-lg">
+      Select an item from the list below.
     </div>
 
   </div>

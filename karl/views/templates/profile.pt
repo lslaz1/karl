@@ -36,15 +36,15 @@ jQuery(document).ready(function($) {
     <div class="profile_page_body">
       <div class="wrapper">
         <div class="row">
-          <div class="col col-lg-3">
-            <div class="thumbnail" style="width:300px;">
-              <img src="${profile.photo.url}" style="width: 150px"/>
+          <div class="col col-lg-3 col-md-3 col-sm-4 col-xs-12">
+            <div class="thumbnail">
+              <img src="${profile.photo.url}"/>
               <div class="caption" align="center">
                 <p tal:condition="profile.last_login_time | False">
                   <span class="profileLabel">Last login:</span>
                   <abbr class="timeago"
-                        title="${profile.last_login_time}"
-                  >${profile.last_login_time}</abbr>
+                        title="${profile.last_login_time}">
+                        ${profile.last_login_time}</abbr>
                 </p>
                 <p tal:condition="profile.department">
                   <span class="profileLabel">Department:</span>

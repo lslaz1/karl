@@ -12,7 +12,7 @@
  <h1 class="peopledir-title">${peopledir.title}</h1>
    <div class="container-fluid">
     <div class="row">
-      <div class="col col-lg-12">
+      <div class="col col-lg-9">
         <div id="peopledir-content-wrapper">
 
           <p style="float: right"

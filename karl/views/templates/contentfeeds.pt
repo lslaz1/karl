@@ -61,13 +61,13 @@
     </script>
 
     <script type="text/tmpl" id="item_row">
-        <div class="feeditem clearfix">
-            <div class="col col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        <div class="clearfix">
+            <div class="col col-lg-2 col-md-2 col-sm-2 col-xs-4">
               <div class="thumbnail feed-img">
                 <img src="{%= item.thumbnail %}" alt="Profile Photo" />
               </div>
             </div>
-            <div class="col col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            
             <div class="feedoperation">
                 <div class="{%= item.operation %}"><span>{%= item.operation %}</span></div>
                 <div class="contenttype">{%= item.content_type %}</div>
@@ -77,7 +77,7 @@
                       >XXX</abbr>
                 </div>
             </div>
-
+            <div class="col col-lg-10 col-md-10 col-sm-10 col-xs-8">
             <div class="feedtext">
                 <div class="firstline">{%= item.flavor %}</div>
 
@@ -164,11 +164,27 @@
       <div style="display:none" id="filter" tal:content="filterby" />
         <div class="container-fluid">
           <div class="row">
-            <div class="col col-lg-3 hidden-lg">
+
+            <div class="col col-lg-9">
+              <h1>${api.page_title}</h1>
+
+              <p>A real-time list of updates on ${api.system_name} that
+              refreshes automatically every 30 seconds.</p>
+
+              <div class="btn-group" role="group" >Feed Filters<br/>
+                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel=""><span>All</span></a>
+                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
+                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel="mycontent"><span>My Content</span></a>
+               </div> <!-- /#feed-filters -->
+               <br/><br/>
+               <div style="clear:both;"></div>
+              <div id="feedlist"></div>
+            </div> <!-- /.col-lg-9 -->
+            
+            <div class="col col-lg-3 col-md-9">
               <div class="feedOptions"
                 tal:condition="api.user_is_staff and show_filter">
-
-                 <div id="feed-polling">
+                  <div id="feed-polling">
                      Auto Update <span class="glyphicon glyphicon-info-sign" id="polling-info" aria-hidden="true"></span><span class="sr-only">Click for Polling Info</span><br/>
                      <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
                      <a href="#" id="poll-indicator" class="on"><span>
@@ -202,62 +218,6 @@
               </div> <!-- /.feedOptions -->
             </div> <!-- /.col col-lg-3 -->
 
-            <div class="col col-lg-9">
-              <h1>${api.page_title}</h1>
-
-              <p>A real-time list of updates on ${api.system_name} that
-              refreshes automatically every 30 seconds.</p>
-
-              <div class="btn-group" role="group" id="feed-filters">Feed Filters<br/>
-                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel=""><span>All</span></a>
-                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
-                  <a type="button" class="btn btn-default btn-xs filterlink" href="#" rel="mycontent"><span>My Content</span></a>
-               </div> <!-- /#feed-filters -->
-               <br/><br/>
-
-              <div id="feedlist"></div>
-            </div>
-
-            <div class="col col-lg-3 visible-lg">
-              <div class="feedOptions"
-                tal:condition="api.user_is_staff and show_filter">
-
-                 <div id="feed-polling">
-                     Auto Update <span class="glyphicon glyphicon-info-sign" id="polling-info" aria-hidden="true"></span><span class="sr-only">Click for Polling Info</span><br/>
-                     <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
-                     <a href="#" id="poll-indicator" class="on"><span>
-                         <span class="glyphicon glyphicon-off" aria-hidden="true" style="color:green;"></span><span class="sr-only">Auto Update is On</span>
-                         <span class="glyphicon glyphicon-off" aria-hidden="true" style="color:red;"></span><span class="sr-only">Auto Update is Off</span>
-                         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span><span class="sr-only">Auto Update for New Content</span>
-                         <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"><span class="sr-only">Auto Update Error.</span>
-                     </span></a>
-                     <div class="polling-details info">
-                         <button type="button" class="close" aria-label="close"><span aria-hidden="true">&times;</span></button>
-                         <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
-                         <ul>
-                             <li><span class="glyphicon glyphicon-off" aria-hidden="true" style="color:green;"></span> Auto Update is On</li>
-                             <li><span class="glyphicon glyphicon-off" aria-hidden="true" style="color:red;"></span>  Auto Update is Off</li>
-                             <li><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Auto Update for New Content</li>
-                             <li><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Auto Update Error. Click the button for info</li>
-                         </ul>
-                         <p id="feedinfo">
-                            <em>Last updated:</em><br/><span id="polled">AGO</span><br/><br/>
-                            <em>Last generation:</em><span id="last_gen"></span><br/>
-                            <em>Last index:</em><span id="last_index"></span><br/>
-                            <em>JSON Feed URL:</em><br/><a id="json_feed_url" href="#">Unknown</a>
-                         </p>
-                     </div> <!-- /.polling-details info -->
-                     <div class="polling-details errormessage">
-                         <button type="button" class="close" aria-label="close"><span aria-hidden="true">&times;</span></button>
-                         <p>The following error occurred:</p>
-                        <div id="kf-errordetail"></div>
-                     </div> <!-- /.polling-details errormessage-->
-                 </div> <!-- /#feed-polling -->
-              </div> <!-- /.feedOptions -->
-            </div> <!-- /.col col-lg-3 --> 
-
-            
-  
           </div> <!-- /row -->
         </div> <!-- /.container-fluid --> 
       </div> 

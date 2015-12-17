@@ -30,19 +30,19 @@
        <div class="row">
           <tal:row_loop tal:repeat="row rows">
             <tal:profile_loop tal:repeat="cell row">
-              <div class="col col-lg-3" style="height:350px">
+              <div class="col col-lg-3 col-md-3 col-sm-4 col-xs-6">
                 <div tal:define="profile cell['profile']"
                    tal:attributes="class 'photoProfile%s' % (
                        repeat['cell'].end and ' photoProfileEndRow' or '')">
                
                   
-                    <a title="${profile.title}" href="${cell['url']}" class="thumbnail" style="height:340px;"><br/>
-                      <img alt="${profile.title}" src="${cell['photo_url']}" style="width:150px;" />
+                    <a title="${profile.title}" href="${cell['url']}" class="thumbnail" id="profile-thumbnail"><br/>
+                      <img alt="${profile.title}" src="${cell['photo_url']}" id="profile-img" />
                       <div class="caption">
                         <h4 align="center">${profile.title}</h4>
                       </div>
                       <div class="container">
-                        <ul class="list-unstyled profileInfoBox">
+                        <ul class="list-unstyled">
                           <li>${profile.position}</li>
                           <li>${profile.organization}</li>
                           <li>${profile.location}</li>
