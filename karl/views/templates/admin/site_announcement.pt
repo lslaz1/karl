@@ -7,7 +7,7 @@
     <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
   </span>
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
@@ -17,10 +17,12 @@
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Site Announcements</h1>
-
+      <div class="hidden-lg">
+        <div metal:use-macro="menu"/>
+      </div>
       <div class="container-fluid">
         <div class="row">
-          <div class="col col-lg-11">
+          <div>
             <form class="form-group" method="POST" name="select_content">
               <fieldset tal:define="error fielderrors['site-announcement-input']|None"
                         class="${error and 'fieldError' or ''}"

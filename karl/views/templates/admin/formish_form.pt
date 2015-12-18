@@ -3,7 +3,7 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
@@ -12,7 +12,11 @@
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
     <h1 class="kscreentitle">${page_title|api.page_title|nothing}</h1>
-
+    
+    <div class="hidden-lg">
+      <div metal:use-macro="menu"/>
+    </div>
+      
       <span tal:content="structure request.form()" tal:omit-tag=""/>
     
   </div>

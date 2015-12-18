@@ -7,16 +7,17 @@
     <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
   </span>
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
   <div metal:fill-slot="content">
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['error_message']"/>
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Review Access Request</h1>
+      <div class="hidden-lg">
+        <div metal:use-macro="menu"/>
+      </div>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
       <div class="koverview_body">
@@ -39,6 +40,9 @@
               value="${e_template[0]}">${e_template[1]}</option>
           </select>
           <br/>
+          <br/>
+          <div metal:use-macro="api.snippets.macros['status_message']"/>
+          <div metal:use-macro="api.snippets.macros['error_message']"/>
           <br/>
           <input class="btn btn-default btn-sm" type="submit" name="submit" value="Submit"/>
           <br/>

@@ -3,7 +3,14 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal">
   <body>
     <metal:menu define-macro="menu">
-      <div id="admin-ui-menu">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed pull-left btn-block text-left text-info" data-toggle="collapse" data-target="#admin-actions" aria-expanded="false" aria-haspopup="true" id="admin-actions-btn">
+          Admin Actions<span class="glyphicon glyphicon-cog pull-right"></span>
+        </button>
+      </div>
+
+      <div class="navbar-collapse collapse" id="admin-actions">
         <div class="generic-portlet"
              tal:condition="api.can_administer">
           <h3>Content Actions</h3>
@@ -14,7 +21,7 @@
           </div>
           <div class="portlet-item">
               <a href="${api.app_url}/delete_content.html">
-                Delete content
+                Delete Content
               </a>
           </div>
         </div>
