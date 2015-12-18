@@ -2,6 +2,11 @@ from __future__ import with_statement
 
 import os
 import sys
+import time
+import random
+import socket
+
+from email.message import Message
 
 from zope.interface import implements
 from repoze.sendmail.delivery import QueuedMailDelivery
@@ -13,10 +18,35 @@ from transaction.interfaces import IDataManager
 import transaction
 
 from email.utils import formatdate
-from email.utils import make_msgid
 from email.header import Header
 from repoze.sendmail.maildir import Maildir
 import threading
+
+
+# ripped from: https://github.com/python/cpython/blob/master/Lib/email/utils.py#L186
+# the custom domain was added in python 3.2+ but not back-ported
+# This is here because email relayed through a system, making the default FQDN
+# that gets added to the msgid incorrect, causing messages to be identified more
+# readily as possible spam.
+def make_msgid(idstring=None, domain=None):
+    """Returns a string suitable for RFC 2822 compliant Message-ID, e.g:
+    <142480216486.20800.16526388040877946887@nightshade.la.mastaler.com>
+    Optional idstring if given is a string used to strengthen the
+    uniqueness of the message id.  Optional domain if given provides the
+    portion of the message id after the '@'.  It defaults to the locally
+    defined hostname.
+    """
+    timeval = int(time.time()*100)
+    pid = os.getpid()
+    randint = random.getrandbits(64)
+    if idstring is None:
+        idstring = ''
+    else:
+        idstring = '.' + idstring
+    if domain is None:
+        domain = socket.getfqdn()
+    msgid = '<%d.%d.%d%s@%s>' % (timeval, pid, randint, idstring, domain)
+    return msgid
 
 
 def boolean(s):
@@ -68,13 +98,29 @@ class KarlMailDelivery(QueuedMailDelivery):
             queue_path = os.path.abspath(os.path.normpath(
                 os.path.expanduser(queue_path)))
 
-        QueuedMailDelivery.__init__(self, queue_path)
+        super(KarlMailDelivery, self).__init__(queue_path)
 
     def send(self, mto, msg):
-        QueuedMailDelivery.send(self, self.mfrom, mto, msg)
+        assert isinstance(msg, Message), \
+               'Message must be instance of email.message.Message'
+        try:
+            from repoze.sendmail import encoding
+            encoding.cleanup_message(msg)
+        except ImportError:
+            pass
+        messageid = msg['Message-Id']
+        if messageid is None:
+            settings = get_config_settings()
+            msgid_domain = settings.get('msgid_domain', None)
+            messageid = msg['Message-Id'] = make_msgid(domain=msgid_domain)
+        if msg['Date'] is None:
+            msg['Date'] = formatdate()
+        transaction.get().join(
+            self.createDataManager(self.mfrom, mto, msg))
+        return messageid
 
     def bounce(self, mto, msg):
-        QueuedMailDelivery.send(self, self.bounce_from, mto, msg)
+        self.send(self.bounce_from, mto, msg)
 
 
 class FakeMailDelivery:
@@ -187,6 +233,7 @@ class ThreadedGeneratorMailDelivery(KarlMailDelivery):
     def __init__(self, settings=None):
         if settings is None:
             settings = get_config_settings()
+            self.msgid_domain = settings.get('msgid_domain', None)
         super(ThreadedGeneratorMailDelivery, self).__init__(settings)
 
     def send(self, mto, message):
@@ -202,7 +249,8 @@ class ThreadedGeneratorMailDelivery(KarlMailDelivery):
             pass
         messageid = message['Message-Id']
         if messageid is None:
-            messageid = message['Message-Id'] = make_msgid('repoze.sendmail')
+            msgid_domain = self.msgid_domain
+            messageid = message['Message-Id'] = make_msgid(domain=msgid_domain)
         if message['Date'] is None:
             message['Date'] = formatdate()
 

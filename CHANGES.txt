@@ -1,6 +1,7 @@
 karl package Changelog
 ======================
-5.6.0 (unreleased)
+
+5.6.0 (2015-12-18)
 ------------------
 
 - Enable email attachments 
@@ -11,8 +12,9 @@ karl package Changelog
   [jmartens]
 - Change people report to use datatables jquery plugin
 - Add Industry to default columns on people report
+- add toggle to search all people or just people in similar communities
 
-5.5.0 (unreleased)
+5.5.0 (2015-09-26)
 ------------------
 
 - make header-links configurable through site settings

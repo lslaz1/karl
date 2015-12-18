@@ -17,7 +17,9 @@
 
 import logging
 
+import copy
 from datetime import datetime
+from HTMLParser import HTMLParser
 from urlparse import urljoin
 import re
 import requests
@@ -49,11 +51,27 @@ from karl.views.api import TemplateAPI
 from zope.component import getUtility
 from zope.event import notify
 from repoze.sendmail.interfaces import IMailDelivery
-from repoze.postoffice.message import Message
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 
 log = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(r'[^@]+@[^@]+\.[^@]+')
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 
 def _fixup_came_from(request, came_from):
@@ -318,11 +336,11 @@ class RequestAccessView(object):
         system_name = get_setting(self.context, 'title')
         self.context.access_requests[email] = self.data
         mailer = getUtility(IMailDelivery)
-        message = Message()
+        message = MIMEMultipart()
         message['Subject'] = '%s Access Request(%s)' % (
             system_name, self.data.get('fullname'))
         message['From'] = get_setting(self.context, 'admin_email')
-        body = u'''<html><body>
+        bodyhtml = u'''<html><body>
 <p>New access request has been submitted for the site %s</p>
 <p><b>Email</b>: %s <br />
 %s
@@ -333,8 +351,20 @@ class RequestAccessView(object):
             '<br />'.join([_email_field_tmp % (f['label'], self.data.get(f['id'], ''))
                            for f in self.fields])
         )
-        message.set_payload(body.encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
+        bodyplain = u'''New access request has been submitted for the site %s
+Email: %s
+%s
+''' % (
+            self.request.application_url,
+            email,
+            '\n'.join([_email_field_tmp % (f['label'], self.data.get(f['id'], ''))
+                           for f in self.fields])
+        )
+        bodyplain = strip_tags(bodyplain)  # just to be sure
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        message.attach(plainpart)
+        message.attach(htmlpart)
 
         # First, send mail to all admins
         users = find_users(self.context)
@@ -347,22 +377,30 @@ class RequestAccessView(object):
             userid = profile.__name__
             if not users.member_of_group(userid, 'group.KarlAdmin'):
                 continue
-            message['To'] = '%s <%s>' % (profile.title, profile.email)
-            mailer.send([profile.email], message)
+            copyofmsg = copy.deepcopy(message)
+            fullemail = '%s <%s>' % (profile.title, profile.email)
+            copyofmsg['To'] = fullemail
+            mailer.send([profile.email], copyofmsg)
 
         # next, send to person that submitted
-        message = Message()
+        message = MIMEMultipart()
         message['Subject'] = 'Access Request to %s' % system_name
         message['From'] = get_setting(self.context, 'admin_email')
         user_message = get_setting(self.context, 'request_access_user_message', '') % (
             SafeDict(self.data, {
                 'system_name': system_name
                 }))
-        body = u'<html><body>%s</body></html>' % user_message
-        message.set_payload(body.encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
-        message['To'] = '%s <%s>' % (self.data.get('fullname', ''), email)
-        mailer.send([email], message)
+        bodyhtml = u'<html><body>%s</body></html>' % user_message
+        bodyplain = u'%s' % user_message
+        bodyplain = strip_tags(bodyplain)  # just to be sure
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        message.attach(plainpart)
+        message.attach(htmlpart)
+        copyofmsg = copy.deepcopy(message)
+        fullemail = '%s <%s>' % (self.data.get('fullname', ''), email)
+        copyofmsg['To'] = fullemail
+        mailer.send([email], copyofmsg)
 
         self.submitted = True
         self.errors.append('Successfully requested access')

@@ -454,6 +454,7 @@ class Site(Folder):
             "Communities|/communities",
             "Feeds|/contentfeeds.html",
         ]),
+        show_all_users=False,
     )
     _repo = Uninitialized
 

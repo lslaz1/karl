@@ -2082,6 +2082,7 @@ class SiteSettingsFormController(BaseSiteFormController):
         'safe_html',
         'google_analytics_id',
         'navigation_list',
+        'show_all_users',
         )
     labels = {
         'title': 'Site title',

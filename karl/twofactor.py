@@ -5,7 +5,8 @@ from datetime import timedelta
 from datetime import datetime
 from karl.utils import make_random_code
 from karl.utils import get_setting
-from repoze.postoffice.message import Message
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 from repoze.sendmail.interfaces import IMailDelivery
 from zope.component import getUtility
 import requests
@@ -39,19 +40,27 @@ class TwoFactor(object):
 
     def send_mail_code(self, profile):
         mailer = getUtility(IMailDelivery)
-        message = Message()
+        message = MIMEMultipart()
         message['From'] = get_setting(self.context, 'admin_email')
         message['To'] = '%s <%s>' % (profile.title, profile.email)
         message['Subject'] = '%s Authorization Request' % self.context.title
-        body = u'''<html><body>
+        bodyhtml = u'''<html><body>
     <p>An authorization code has been requested for the site %s.</p>
     <p>Authorization Code: <b>%s</b></p>
     </body></html>''' % (
             self.request.application_url,
             profile.current_auth_code
         )
-        message.set_payload(body.encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
+        bodyplain = u'''An authorization code has been requested for the site %s.
+    Authorization Code: %s
+    ''' % (
+            self.request.application_url,
+            profile.current_auth_code
+        )
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        message.attach(plainpart)
+        message.attach(htmlpart)
         mailer.send([profile.email], message)
 
     def send_text_code(self, profile):
