@@ -14,7 +14,7 @@
         >${tab['title']}
       </a>
       <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
-      <div metal:use-macro="api.snippets.macros['actions_box']"/>
+      <div metal:use-macro="api.snippets.macros['actions_box']"/
     </div>
 
     <div id="peopledir-content-wrapper">
