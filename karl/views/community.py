@@ -20,7 +20,8 @@ import formish
 from validatish import validator
 
 from repoze.lemonade.content import create_content
-from repoze.postoffice.message import Message
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
@@ -557,7 +558,7 @@ def join_community_view(context, request):
     if "form.submitted" in request.POST:
         message = request.POST.get("message", "")
         moderators = [profiles[id] for id in context.moderator_names]
-        mail = Message()
+        mail = MIMEMultipart()
         mail["From"] = "%s <%s>" % (profile.title, profile.email)
         mail["To"] = ",".join(
             ["%s <%s>" % (p.title, p.email) for p in moderators]
@@ -570,19 +571,18 @@ def join_community_view(context, request):
         accept_url = resource_url(
             context, request, "members", "add_existing.html",
             query={"user_id": user})
-        body = body_template(
+        bodyhtml = body_template(
             message=message,
             community_title=context.title,
             person_name=profile.title,
             profile_url=profile_url,
             accept_url=accept_url
         )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        mail.set_payload(body, "UTF-8")
-        mail.set_type("text/html")
+        bodyplain = "Please see HTML version of this email."
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        mail.attach(plainpart)
+        mail.attach(htmlpart)
 
         recipients = [p.email for p in moderators]
         mailer = getUtility(IMailDelivery)

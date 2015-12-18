@@ -36,7 +36,8 @@ import transaction
 
 from persistent.list import PersistentList
 
-from email.Message import Message
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 
 from pyramid.httpexceptions import HTTPFound
 from zope.component import getUtility
@@ -261,11 +262,11 @@ def _send_moderators_changed_email(community,
     to_addrs = ["%s <%s>" % (p.title, p.email) for p in to_profiles]
 
     mailer = getUtility(IMailDelivery)
-    msg = Message()
+    msg = MIMEMultipart()
     msg['From'] = info['mfrom']
     msg['To'] = ",".join(to_addrs)
     msg['Subject'] = subject
-    body = body_template(
+    bodyhtml = body_template(
         system_name=info['system_name'],
         community_href=info['c_href'],
         community_name=info['c_title'],
@@ -274,12 +275,11 @@ def _send_moderators_changed_email(community,
         cur_moderators=[profiles[name].title for name in cur_moderators],
         prev_moderators=[profiles[name].title for name in prev_moderators]
         )
-
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
-
-    msg.set_payload(body, "UTF-8")
-    msg.set_type('text/html')
+    bodyplain = "Please see HTML portion of this email."
+    htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+    plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+    msg.attach(plainpart)
+    msg.attach(htmlpart)
     mailer.send(to_addrs, msg)
 
 
@@ -486,23 +486,22 @@ def _send_aeu_emails(community, community_href, profiles, text):
     for profile in profiles:
         to_email = profile.email
 
-        msg = Message()
+        msg = MIMEMultipart()
         msg['From'] = info['mfrom']
         msg['To'] = to_email
         msg['Subject'] = subject
-        body = body_template(
+        bodyhtml = body_template(
             system_name=info['system_name'],
             community_href=info['c_href'],
             community_name=info['c_title'],
             community_description=info['c_description'],
             personal_message=html_body,
             )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        msg.set_payload(body, "UTF-8")
-        msg.set_type('text/html')
+        bodyplain = "Please see HTML portion of this email."
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        msg.attach(plainpart)
+        msg.attach(htmlpart)
         mailer.send([to_email], msg)
 
 
@@ -826,21 +825,20 @@ class AcceptSiteInvitationFormController(BaseInvitationFormController):
         from_name = '%s invitation' % title
         from_email = 'invitation@%s' % system_email_domain
         mailer = getUtility(IMailDelivery)
-        msg = Message()
+        msg = MIMEMultipart()
         msg['From'] = '%s <%s>' % (from_name, from_email)
         msg['To'] = profile.email
         msg['Subject'] = subject
-        body = body_template(
+        bodyhtml = body_template(
             username=username,
             site_href=resource_url(site, self.request),
             system_name=title
             )
-
-        if isinstance(body, unicode):
-            body = body.encode("UTF-8")
-
-        msg.set_payload(body, "UTF-8")
-        msg.set_type('text/html')
+        bodyplain = "Please see HTML portion of this email."
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        msg.attach(plainpart)
+        msg.attach(htmlpart)
         mailer.send([profile.email], msg)
 
 
@@ -854,22 +852,21 @@ def _send_ai_email(community, community_href, username, profile):
         'templates/email_accept_invitation.pt').implementation()
 
     mailer = getUtility(IMailDelivery)
-    msg = Message()
+    msg = MIMEMultipart()
     msg['From'] = info['mfrom']
     msg['To'] = profile.email
     msg['Subject'] = subject
-    body = body_template(
+    bodyhtml = body_template(
         community_href=info['c_href'],
         community_name=info['c_title'],
         community_description=info['c_description'],
         username=username,
         )
-
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
-
-    msg.set_payload(body, "UTF-8")
-    msg.set_type('text/html')
+    bodyplain = "Please see HTML portion of this email."
+    htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+    plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+    msg.attach(plainpart)
+    msg.attach(htmlpart)
     mailer.send([profile.email], msg)
 
 
@@ -1011,11 +1008,11 @@ def send_invitation_email(request, community, community_href, invitation):
     body_template = get_renderer(
         'templates/email_invite_new.pt').implementation()
 
-    msg = Message()
+    msg = MIMEMultipart()
     msg['From'] = info['mfrom']
     msg['To'] = invitation.email
     msg['Subject'] = info['subject']
-    body = body_template(
+    bodyhtml = body_template(
         system_name=info['system_name'],
         community_href=info['c_href'],
         community_name=info['c_title'],
@@ -1024,12 +1021,11 @@ def send_invitation_email(request, community, community_href, invitation):
         invitation_url=resource_url(invitation.__parent__, request,
                                     invitation.__name__)
         )
-
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
-
-    msg.set_payload(body, "UTF-8")
-    msg.set_type('text/html')
+    bodyplain = "Please see HTML version of this email."
+    htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+    plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+    msg.attach(plainpart)
+    msg.attach(htmlpart)
     mailer.send([invitation.email], msg)
 
 

@@ -4,7 +4,6 @@ import codecs
 from cStringIO import StringIO
 import csv
 from _csv import Error
-from repoze.postoffice.message import Message
 import hashlib
 import os
 import re
@@ -30,6 +29,8 @@ from pyramid.url import resource_url
 from repoze.lemonade.content import create_content
 from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 from repoze.workflow import get_workflow
 
 from karl.content.interfaces import IBlogEntry
@@ -1580,23 +1581,22 @@ def _send_invite(context, request, invitation):
     body_template = get_renderer(
         'templates/admin/email_invite_new.pt').implementation()
 
-    msg = Message()
+    msg = MIMEMultipart()
     msg['From'] = '%s <%s>' % (
         get_setting(context, 'title'),
         get_setting(context, 'admin_email'))
     msg['To'] = invitation.email
     msg['Subject'] = 'Please join %s' % get_setting(context, 'title')
-    body = body_template(
+    bodyhtml = body_template(
         system_name=get_setting(context, 'title'),
         invitation_url=resource_url(invitation.__parent__, request,
                                     invitation.__name__)
         )
-
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
-
-    msg.set_payload(body, "UTF-8")
-    msg.set_type('text/html')
+    bodyplain = "Please see the HTML portion of this email."
+    htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+    plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+    msg.attach(plainpart)
+    msg.attach(htmlpart)
     mailer.send([invitation.email], msg)
 
 
@@ -1742,39 +1742,43 @@ class ReviewAccessRequest(object):
                                             invitation.__name__)
                 )
 
-    def send_email(self, email_data):
+    def send_email(self, email_data, mto=None):
         mailer = getUtility(IMailDelivery)
-        message = Message()
+        message = MIMEMultipart()
         message['Subject'] = email_data['subject']
         message['From'] = email_data['from']
-        message['To'] = ",".join(email_data['to'])
-        message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
-        mailer.send([email_data['email']], message)
+        if not mto:
+            message['To'] = ",".join(email_data['to'])
+        else:
+            message['To'] = mto
+        bodyhtml = email_data['body']
+        bodyplain = 'Please see the HTML part of this email.'
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        message.attach(plainpart)
+        message.attach(htmlpart)
+        if not mto:
+            mailer.send([email_data['email']], message)
+        else:
+            mailer.send([mto], message)
 
     def send_emails(self, email_data):
-        mailer = getUtility(IMailDelivery)
         who_it_is_to = email_data['to']
         sent_list = []
         for who in who_it_is_to:
             if who not in sent_list:
                 sent_list.append(who)
-                message = Message()
-                message['Subject'] = email_data['subject']
-                message['From'] = email_data['from']
-                message['To'] = who
-                message.set_payload(email_data['body'].encode('UTF-8'), 'UTF-8')
-                message.set_type('text/html')
-                mailer.send([who], message)
+                self.send_email(email_data, mto=who)
 
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
-        message = Message()
+        message = MIMEMultipart()
         message['Subject'] = 'Access Request to %s has been denied' % (
             get_setting(self.context, 'title'))
         message['From'] = get_setting(self.context, 'admin_email')
-        body = u'''<html><body>
+        message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+        bodyhtml = u'''<html><body>
     <p>Hello %(name)s,</p>
     <p>Your access request has been denied. Please read the guidelines on
        requesting access to %(system_name)s</p>
@@ -1782,9 +1786,18 @@ class ReviewAccessRequest(object):
             'name': access_request['fullname'],
             'system_name': get_setting(self.context, 'title')
         }
-        message.set_payload(body.encode('UTF-8'), 'UTF-8')
-        message.set_type('text/html')
-        message['To'] = '%s <%s>' % (access_request['fullname'], access_request['email'])
+        bodyplain = u'''Hello $(name)s
+
+Your access request has been denied. Please read the guidelines on requesting
+access to %(system_name)s
+''' % {
+            'name': access_request['fullname'],
+            'system_name': get_setting(self.context, 'title')
+        }
+        htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+        plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+        message.attach(plainpart)
+        message.attach(htmlpart)
         mailer.send([access_request['email']], message)
 
     def delete_request(self, email):

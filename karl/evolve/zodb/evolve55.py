@@ -29,7 +29,7 @@ def evolve(site):
         site.email_templates['Deny'] = deny_template
 
         followup_template = {'body': 'Follow up for {{requestor_name}} - {{requestor_email}}',
-                             'subject': 'Follow up regarding request from {{requestor_email}',
+                             'subject': 'Follow up regarding request from {{requestor_email}}',
                              'template_name': 'Follow_up',
                              'selected_list': [],
                              'sendtouser': 'no',

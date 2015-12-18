@@ -31,8 +31,9 @@ from pyramid.renderers import render
 from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
 from pyramid.url import resource_url
-from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
+from repoze.postoffice.message import MIMEMultipart
+from email.mime.text import MIMEText
 from validatish import validator
 from pyramid.httpexceptions import HTTPFound
 from zope.component import getAdapter
@@ -146,26 +147,24 @@ def request_password_reset(user, profile, request):
         query=dict(key=profile.password_reset_key))
 
     # send email
-    mail = Message()
+    mail = MIMEMultipart()
     system_name = get_setting(context, 'title', 'KARL')
     admin_email = get_setting(context, 'admin_email')
     mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
     mail["To"] = "%s <%s>" % (profile.title, profile.email)
     mail["Subject"] = "%s Password Reset Request" % system_name
-    body = render(
+    bodyhtml = render(
         "templates/email_reset_password.pt",
         dict(login=user['login'],
              reset_url=reset_url,
              system_name=system_name),
         request=request,
     )
-
-    if isinstance(body, unicode):
-        body = body.encode("UTF-8")
-
-    mail.set_payload(body, "UTF-8")
-    mail.set_type("text/html")
-
+    bodyplain = "Please see HTML portion of this email."
+    htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
+    plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
+    mail.attach(plainpart)
+    mail.attach(htmlpart)
     recipients = [profile.email]
     mailer = getUtility(IMailDelivery)
     mailer.send(recipients, mail)
