@@ -3,19 +3,20 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
   <div metal:fill-slot="content">
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Delete Content</h1>
-
+      <div class="hidden-lg">
+        <div metal:use-macro="menu" class="hidden-lg"/>
+      </div>
       <div class="koverview_body">
         <br/>
         <div metal:use-macro="content_select_widget"/>
+        <div metal:use-macro="api.snippets.macros['status_message']"/>
         <br/>
 
         <form class="form-group" method="POST" name="select_content">

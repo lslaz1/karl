@@ -3,30 +3,32 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
   <div metal:fill-slot="content">
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['error_message']"/>
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Rename or Merge Users</h1>
-
+      <div class="hidden-lg">
+        <div metal:use-macro="menu"/>
+      </div>
       <div class="koverview_body">
         <div class=col col-lg-3>
           <form method="POST" name="rename_or_merge">
             <div class="form-group">
               <label><strong>Old Username</strong></label><br/>
-              <input class="form-control input-sm" type="text" name="old_username" />
+              <input class="form-control input-sm med-input" type="text" name="old_username" />
             </div>
             <div class="form-group">
               <label><strong>New Username</strong></label><br/>
-              <input class="form-control input-sm" type="text" name="new_username" />
+              <input class="form-control input-sm med-input" type="text" name="new_username" />
             </div>
             <label><input type="checkbox" name="merge" value="1"/>
             Merge user accounts.</label><br/>
+            <div metal:use-macro="api.snippets.macros['status_message']"/>
+            <div metal:use-macro="api.snippets.macros['error_message']"/>
             <br/>
             <input class="btn btn-default btn-sm" type="submit" value="Rename user"/>
           </form>

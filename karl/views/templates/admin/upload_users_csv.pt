@@ -3,7 +3,7 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal"
      metal:use-macro="api.generic_layout">
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
@@ -13,23 +13,24 @@
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Upload Users (CSV)</h1>
+      <div class="hidden-lg">
+        <div metal:use-macro="menu"/>
+      </div>
 
-    <div class="container-fluid">
       <div class="koverview_body">
         <form class="form-group" method="POST" name="upload_users_csv"
               enctype="multipart/form-data">
           <label><strong>Upload a CSV file.</strong></label><br/>
           <input name="csv" type="file"/><br/>
           <input class="btn btn-default btn-sm" type="submit" value="Upload"/><br/>
-          <div class="checkbox">
-            <label><input type="checkbox" name="reactivate" value="true"/>Reactivate inactive users.<label>
-          </div>
+            <input type="checkbox" name="reactivate" value="true"/>
+            <label for="reactivate">Reactivate inactive users.<label>
           <br/><br/>
         </form>
       </div>
 
       
-      <div class="col col-lg-11">
+      <div>
         <p><b>Notes on file format</b></p>
 
         <p> CSV (comma separated value) files should be in the same format as
@@ -62,7 +63,6 @@
           </tal:item>
         </ul>
       </div>
-    </div>
     </div>
 
   </div>

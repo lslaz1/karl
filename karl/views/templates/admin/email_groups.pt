@@ -7,7 +7,7 @@
     <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
   </span>
 
-  <div metal:fill-slot="portlets">
+  <div metal:fill-slot="portlets" class="visible-lg">
     <div metal:use-macro="menu"/>
   </div>
 
@@ -17,12 +17,15 @@
     
       <div class="admin_page_body">
         <h1 class="kscreentitle">Admin Section: Email Groups</h1>
+        <div class="hidden-lg">
+          <div metal:use-macro="menu"/>
+        </div>
       <div metal:use-macro="api.snippets.macros['actions_box']"/>
         <div class="koverview_body">
           <form class="form-group" method="POST" name="email_groups" enctype="multipart/form-data">
             
             <div class="EmailGroupsWrapper">
-              <div class="col col-lg-11">
+              <div>
       	        <table class="table table-striped">
       	          <thead>
       	            <tr>
