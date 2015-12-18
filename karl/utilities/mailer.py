@@ -112,7 +112,7 @@ class KarlMailDelivery(QueuedMailDelivery):
         if messageid is None:
             settings = get_config_settings()
             msgid_domain = settings.get('msgid_domain', None)
-            messageid = msg['Message-Id:'] = make_msgid(domain=msgid_domain)
+            messageid = msg['Message-Id'] = make_msgid(domain=msgid_domain)
         if msg['Date'] is None:
             msg['Date'] = formatdate()
         transaction.get().join(
