@@ -294,7 +294,7 @@
 // Bootstrap Retheme Changes
 // --------------------------------------------------
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   #nav-search {
     margin: 0;
   }
@@ -308,7 +308,11 @@
   .navbar-brand img#logo {
     padding: 5px;
   }
+  h1 {
+    font-size: 28px;
+  }
 }
+
 
 @media only screen and (min-width: 768px) and (max-width: 954px) {
   .container-fluid {
@@ -349,11 +353,11 @@ span .notcurrent {
   color: red;
 }
 
-.sm-input {
+input.sm-input {
   width: 150px;
 }
 
-.med-input {
+input.med-input {
   width: 300px;
 }
 
@@ -439,4 +443,25 @@ ul.nav-menu {
 
 #communities-list {
   padding: 0;
+}
+
+#actions-btn {
+  padding: 0;
+}
+
+#actions-btn.caret {
+  font-size: 30px;
+}
+
+#admin-actions-btn {
+  padding: 0;
+}
+
+#community-menu-btn {
+  padding: 0;
+}
+
+#admin-actions {
+  padding-left: 0;
+  margin-bottom: 20px;
 }
