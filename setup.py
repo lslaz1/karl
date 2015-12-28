@@ -60,7 +60,8 @@ requires = [
     'ZODB3',
     'requests',
     'unidecode',
-    'setuptools'
+    'setuptools',
+    'html2text'
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
