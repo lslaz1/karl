@@ -9,6 +9,7 @@ import os
 import re
 import time
 import transaction
+import html2text
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -1592,7 +1593,7 @@ def _send_invite(context, request, invitation):
         invitation_url=resource_url(invitation.__parent__, request,
                                     invitation.__name__)
         )
-    bodyplain = "Please see the HTML portion of this email."
+    bodyplain = html2text.html2text(bodyhtml)
     htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
     plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
     msg.attach(plainpart)
@@ -1752,7 +1753,7 @@ class ReviewAccessRequest(object):
         else:
             message['To'] = mto
         bodyhtml = email_data['body']
-        bodyplain = 'Please see the HTML part of this email.'
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
@@ -1786,14 +1787,7 @@ class ReviewAccessRequest(object):
             'name': access_request['fullname'],
             'system_name': get_setting(self.context, 'title')
         }
-        bodyplain = u'''Hello $(name)s
-
-Your access request has been denied. Please read the guidelines on requesting
-access to %(system_name)s
-''' % {
-            'name': access_request['fullname'],
-            'system_name': get_setting(self.context, 'title')
-        }
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
