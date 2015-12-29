@@ -1582,7 +1582,7 @@ def _send_invite(context, request, invitation):
     body_template = get_renderer(
         'templates/admin/email_invite_new.pt').implementation()
 
-    msg = MIMEMultipart()
+    msg = MIMEMultipart('alternative')
     msg['From'] = '%s <%s>' % (
         get_setting(context, 'title'),
         get_setting(context, 'admin_email'))
@@ -1745,7 +1745,7 @@ class ReviewAccessRequest(object):
 
     def send_email(self, email_data, mto=None):
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = email_data['subject']
         message['From'] = email_data['from']
         if not mto:
@@ -1774,7 +1774,7 @@ class ReviewAccessRequest(object):
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = 'Access Request to %s has been denied' % (
             get_setting(self.context, 'title'))
         message['From'] = get_setting(self.context, 'admin_email')
