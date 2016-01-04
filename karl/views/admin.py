@@ -417,6 +417,19 @@ class EmailUsersView(object):
             mailer = getUtility(IMailDelivery)
             _send_email(mailer, message, addressed_to)
 
+    def scrub_keywords(self, scrub_in):
+        # templates were originally intended for 'Access Request' responses
+        # accept templates or deny templates for example
+        # in this context a requestor_name or requestor_email is a valid object
+        # when used for generic email sending, the program has no knowledge of
+        # an 'Access Request' so these replacements are not valid
+        scrub_out = scrub_in.replace('{{requestor_name}}', '')
+        scrub_out = scrub_out.replace('{{requestor_email}}', '')
+        # system name we can get though
+        sys_name = get_setting(self.context, 'title')
+        scrub_out = scrub_out.replace('{{system_name}}', sys_name)
+        return scrub_out
+
     def __call__(self):
         context, request = self.context, self.request
         api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
@@ -424,6 +437,7 @@ class EmailUsersView(object):
         system_name = get_setting(context, 'title')
         profiles = find_profiles(context)
         admin = profiles[authenticated_userid(request)]
+        useremails = getuseremail(profiles)
         from_emails = [
             ('admin', '%s Administrator <%s>' % (system_name, admin_email)),
             ('self', '%s <%s>' % (admin.title, admin.email))
@@ -437,7 +451,28 @@ class EmailUsersView(object):
         for (k, v) in all_groups.iteritems():
             to_groups.append(('group-' + k, k))
 
-        if 'send_email' in request.params or 'submit' in request.params:
+        response_templates = [('', 'None')]
+        for e_t in self.context.email_templates:
+            response_templates.append((e_t, e_t))
+
+        if 'template' in request.params:
+            template_name = request.params.get('templ_ch', '')
+            e_template = self.context.email_templates.get(template_name, {})
+            template_body = self.scrub_keywords(e_template.get('body', ''))
+            template_subject = self.scrub_keywords(e_template.get('subject', ''))
+            return dict(
+                        api=api,
+                        menu=_menu_macro(),
+                        to_groups=to_groups,
+                        to_grp_value='none',
+                        from_emails=from_emails,
+                        from_email_value='admin',
+                        msg_subject=template_subject,
+                        msg_body=template_body,
+                        more_to='',
+                        response_templates=response_templates
+                    )
+        if 'send_email' in request.params:
             from_email = from_emails[0][1]
             if request.params['from_email'] == 'self':
                 from_email = from_emails[1][1]
@@ -508,6 +543,7 @@ class EmailUsersView(object):
                     msg_subject=request.params['subject'],
                     msg_body=request.params['text'],
                     more_to=request.params['more_to'],
+                    response_templates=response_templates
                 )
             self.send_email(
                 request.params['subject'], request.params['text'],
@@ -535,6 +571,7 @@ class EmailUsersView(object):
             msg_subject='',
             msg_body='',
             more_to='',
+            response_templates=response_templates
         )
 
 
@@ -796,7 +833,7 @@ class AddEmailTemplate(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Group')
+        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Template')
 
         # get list of users
         profiles = find_profiles(context)
