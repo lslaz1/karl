@@ -43,6 +43,7 @@ import formish
 import random
 import schemaish
 import urllib
+import html2text
 
 
 try:
@@ -147,7 +148,7 @@ def request_password_reset(user, profile, request):
         query=dict(key=profile.password_reset_key))
 
     # send email
-    mail = MIMEMultipart()
+    mail = MIMEMultipart('alternative')
     system_name = get_setting(context, 'title', 'KARL')
     admin_email = get_setting(context, 'admin_email')
     mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
@@ -160,7 +161,7 @@ def request_password_reset(user, profile, request):
              system_name=system_name),
         request=request,
     )
-    bodyplain = "Please see HTML portion of this email."
+    bodyplain = html2text.html2text(bodyhtml)
     htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
     plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
     mail.attach(plainpart)

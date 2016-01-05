@@ -1,10 +1,12 @@
 karl package Changelog
 ======================
 
-plaintext-email (2015-12-29)
-- include plain text body in addition to html body
-  this will reduce the likelyhood email will be marked as spam
-  [jmartens]
+5.6.1 (2015-01-05)
+------------------
+
+- fix multipart messages to have mime type 'alternative'
+- add html2text to convert html body to plaintext
+
 
 5.6.0 (2015-12-18)
 ------------------
