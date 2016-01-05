@@ -6,6 +6,7 @@
     "jquery": "1.9.1",
     "jquery-migrate": "1.2.1",
     "jquery-ui": "1.9.2",
+<<<<<<< HEAD
     "bgiframe": "3.0.1",
     "datatables.net": "~1.10.10",
     "datatables.net-dt": "~1.10.9",
@@ -17,6 +18,11 @@
     "datatables.net-buttons-dt": "~1.1.0"
     "bootstrap": "3.3.4",
     "mockup": "v2.0.4",
+=======
+    "bootstrap": "3.3.4",
+    "mockup": "v2.0.4",
+    "bgiframe": "3.0.1"
+>>>>>>> ec015b152f734a55909aff3e68cf7e83b17f9f6c
   },
   "resolutions": {
     "select2": "3.5.1",

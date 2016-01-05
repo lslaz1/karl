@@ -122,64 +122,6 @@
   background-color: darken(@dropdown-link-active-bg, 5%);
 }
 
-/** =ERROR/STATUS MESSAGES
------------------------------------------------ */
-.portalMessage,
-.portalWarningMessage,
-.portalStopMessage,
-.statusbox-item {
-  background: #fffad8 url('images/message_info_icon.gif') 7px 50% no-repeat;
-}
-.portalErrorMessage {
-  background: #FFE3D8 url('images/message_notice_icon.gif') 7px 50% no-repeat;
-}
-.portalMessage,
-.portalErrorMessage,
-.portalWarningMessage,
-.portalStopMessage,
-.statusbox-item {
-  border: 1px solid #f1e186;
-  color: #333;
-  font-weight: normal;
-  font-size: 1.1em;
-  margin: 1em 0em;
-  padding: 6px 10px 6px 30px;
-  vertical-align: middle;
-  width: 600px;
-  font-size: 1em;
-  text-align: left;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-}
-.pageLockMessage {
-  background-image: url('images/lock-icon.jpg');
-  padding-left: 50px;
-}
-#inner .portalMessage {
-  padding: 0.5em 10px 0.5em 30px;
-  width: 438px;
-  margin: 0;
-}
-.generic-portlet .portalMessage {
-  margin: 1em 0;
-  width: 118px;
-}
-/* also make tag statusbox look nice */
-#tag-inputbox .statusbox-item {
-  padding: 3px 10px 4px 30px;
-  width: auto;
-}
-#tag-inputbox .message-span {
-  margin-top: 4px;
-}
-#tag-inputbox a.statusbox-closebutton {
-  margin-top: 8px;
-  text-indent: -9999px;
-}
-.bit-box {
-  margin-top: 2px;
-}
-
 //
 // Navbar
 // --------------------------------------------------
@@ -267,6 +209,7 @@
 //
 // Progress bars
 // --------------------------------------------------
+<<<<<<< HEAD
 
 // Give the progress background some depth
 .progress {
@@ -524,6 +467,264 @@ ul.nav-menu {
   margin-bottom: 20px;
 }
 
+=======
+
+// Give the progress background some depth
+.progress {
+  #gradient > .vertical(@start-color: darken(@progress-bg, 4%); @end-color: @progress-bg)
+}
+
+// Mixin for generating new styles
+.progress-bar-styles(@color) {
+  #gradient > .vertical(@start-color: @color; @end-color: darken(@color, 10%));
+}
+
+// Apply the mixin to the progress bars
+.progress-bar            { .progress-bar-styles(@progress-bar-bg); }
+.progress-bar-success    { .progress-bar-styles(@progress-bar-success-bg); }
+.progress-bar-info       { .progress-bar-styles(@progress-bar-info-bg); }
+.progress-bar-warning    { .progress-bar-styles(@progress-bar-warning-bg); }
+.progress-bar-danger     { .progress-bar-styles(@progress-bar-danger-bg); }
+
+// Reset the striped class because our mixins don't do multiple gradients and
+// the above custom styles override the new `.progress-bar-striped` in v3.2.0.
+.progress-bar-striped {
+  #gradient > .striped();
+}
+
+
+//
+// List groups
+// --------------------------------------------------
+
+.list-group {
+  border-radius: @border-radius-base;
+  .box-shadow(0 1px 2px rgba(0,0,0,.075));
+}
+.list-group-item.active,
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+  text-shadow: 0 -1px 0 darken(@list-group-active-bg, 10%);
+  #gradient > .vertical(@start-color: @list-group-active-bg; @end-color: darken(@list-group-active-bg, 7.5%));
+  border-color: darken(@list-group-active-border, 7.5%);
+
+  .badge {
+    text-shadow: none;
+  }
+}
+
+
+//
+// Panels
+// --------------------------------------------------
+
+// Common styles
+.panel {
+  .box-shadow(0 1px 2px rgba(0,0,0,.05));
+}
+
+// Mixin for generating new styles
+.panel-heading-styles(@color) {
+  #gradient > .vertical(@start-color: @color; @end-color: darken(@color, 5%));
+}
+
+// Apply the mixin to the panel headings only
+.panel-default > .panel-heading   { .panel-heading-styles(@panel-default-heading-bg); }
+.panel-primary > .panel-heading   { .panel-heading-styles(@panel-primary-heading-bg); }
+.panel-success > .panel-heading   { .panel-heading-styles(@panel-success-heading-bg); }
+.panel-info > .panel-heading      { .panel-heading-styles(@panel-info-heading-bg); }
+.panel-warning > .panel-heading   { .panel-heading-styles(@panel-warning-heading-bg); }
+.panel-danger > .panel-heading    { .panel-heading-styles(@panel-danger-heading-bg); }
+
+
+//
+// Wells
+// --------------------------------------------------
+
+.well {
+  #gradient > .vertical(@start-color: darken(@well-bg, 5%); @end-color: @well-bg);
+  border-color: darken(@well-bg, 10%);
+  @shadow: inset 0 1px 3px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.1);
+  .box-shadow(@shadow);
+}
+
+//
+// Bootstrap Retheme Changes
+// --------------------------------------------------
+
+@media only screen and (max-width: 767px) {
+  #nav-search {
+    margin: 0;
+  }
+  #searchbox {
+    margin-bottom: 15px;
+  }
+  #cog {
+    margin-left: -25px;
+    margin-right: -25px;
+  }
+  .navbar-brand img#logo {
+    padding: 5px;
+  }
+  h1 {
+    font-size: 28px;
+  }
+}
+
+
+@media only screen and (min-width: 768px) and (max-width: 954px) {
+  .container-fluid {
+    min-width: 955px;
+  }
+  #cog {
+    margin-right: 15px;
+  }
+}
+
+.list-inline {
+  margin: auto;
+}
+
+.list-inline li {
+  display: inline;
+  float: left;
+}
+
+span .notcurrent {
+  padding-right: 5px;
+}
+
+.fieldHelp {
+  font-size: 12px;
+  font-style: italic;
+}
+
+.icons {
+  padding: 5px;
+}
+
+.people-icons {
+  padding-top: 9px;
+}
+
+.req_asterisk {
+  color: red;
+}
+
+input.sm-input {
+  width: 150px;
+}
+
+input.med-input {
+  width: 300px;
+}
+
+.btn-group-left {
+  margin-top: 5px;
+}
+
+kscreentitle {
+  margin-top: 50px;
+}
+
+.caret {
+  margin-top: 8px;
+}
+
+.glyphicon-menu-hamburger {
+  margin-top: 1px;
+}
+
+.glyphicon-cog {
+  margin-top: 1px;
+}
+
+.feed-img {
+  min-width: 100%;
+}
+
+.header-nav {
+  padding-top: 13px;
+}
+
+#nav-search {
+  padding-top: 15px;
+}
+
+#profile-thumbnail {
+  height: 340px; 
+}
+
+#profile-img {
+  width: 150px;
+}
+
+div.rightcol {
+  padding-bottom: 25px;
+}
+
+ul.nav-menu {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+#alpha-filter {
+  width: 82%;
+  margin: 15px 0 15px 0;
+}
+
+#filter-btn {
+  margin: 15px 0 15px 0;
+}
+
+#header-navbar {
+  min-height: 81px;
+}
+
+#cog {
+  margin-top: -10px;
+  font-size: 20px;
+}
+
+#cog span.caret {
+  margin-top: -6px;
+}
+
+.navbar-header button {
+  margin-top: 20px;
+}
+
+.navbar-brand img {
+  padding: 5px 30px 5px 5px;
+}
+
+#communities-list {
+  padding: 0;
+}
+
+#actions-btn {
+  padding: 0;
+}
+
+#actions-btn.caret {
+  font-size: 30px;
+}
+
+#admin-actions-btn {
+  padding: 0;
+}
+
+#community-menu-btn {
+  padding: 0;
+}
+
+#admin-actions {
+  padding-left: 0;
+  margin-bottom: 20px;
+}
+
+>>>>>>> ec015b152f734a55909aff3e68cf7e83b17f9f6c
 #login-status {
   margin-top: 25px;
 }
