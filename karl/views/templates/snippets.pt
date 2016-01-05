@@ -165,9 +165,8 @@
     </div>
 
 <!-- status box that works together with ui.karlstatusbox -->
-    <div metal:define-macro="karl_status_message"
-         class="statusbox col col-lg-4 col-lg-offset-4">
-      <div class="portalMessage" tal:condition="api.status_messages">
+    <div metal:define-macro="karl_status_message">
+      <div id="login-status" tal:condition="api.status_messages">
         <div class="alert alert-warning" role="alert">
           <ul tal:condition="python: len(api.status_messages) > 1">
             <tal:sm tal:repeat="m api.status_messages">

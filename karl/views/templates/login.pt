@@ -5,17 +5,16 @@
 
   <div metal:fill-slot="content">
 
-    <div metal:use-macro="api.snippets.macros['karl_status_message']" /><br/><br/>
-
     <div id="kerberos-login" style="display: none;" 
         tal:condition="try_kerberos">
        Attempting automatic login...
     </div>
 
+    <div class="col col-lg-4 col-lg-offset-4 col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+    <div metal:use-macro="api.snippets.macros['karl_status_message']" />
     <form name="formLogin" method="post" action="${app_url}/login.html"
           id="formLogin"
-          tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)"
-          class="col col-lg-4 col-lg-offset-4">
+          tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)">
       <input type="hidden" name="came_from" value="${came_from}" />
         <div class="form-group">
           <span class="loginLabelWrapper">
@@ -54,9 +53,9 @@
         </div><br/>
         
         <div class="field loginLeftPadding discreet">
-          <label><input type="checkbox" name="max_age" id="remember"
+          <input type="checkbox" name="max_age" id="remember"
                  class="noborder" value="315360000"/> <!-- Ten years -->
-                 Remember me on this computer</label>
+          <label for="max_age">Remember me on this computer</label>
         </div><br/>
 
 
@@ -176,6 +175,7 @@
           Sign in with ${provider['title']}
         </button>
       </form>
+    </div>
     </div>
 
   </div>
