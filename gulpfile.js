@@ -61,10 +61,10 @@ gulp.task('stamp', function() {
 var tocopy = ['jquery', 'jquery-migrate', 'jquery-ui', 'tinymce-builded', 'lodash', 'patternslib',
               'logging', 'jqtree', 'dropzone', 'mockup-core', 'select2', 'requirejs-text',
               'requirejs', 'jquery-form', 'backbone', 'bootstrap',
-              'datatables.net', 'datatables.net-dt',
-              'datatables.net-responsive', 'datatables.net-responsive-dt',
-              'datatables.net-buttons', 'datatables.net-buttons-dt',
-              'datatables.net-scroller', 'datatables.net-scroller-dt'];
+              'datatables.net', 'datatables.net-bs',
+              'datatables.net-responsive', 'datatables.net-responsive-bs',
+              'datatables.net-buttons', 'datatables.net-buttons-bs',
+              'datatables.net-scroller', 'datatables.net-scroller-bs'];
 
 gulp.task('copy', function() {
   for(var i=0; i<tocopy.length; i++){
