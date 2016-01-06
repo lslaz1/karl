@@ -21,6 +21,7 @@ import json
 import os
 import threading
 import transaction
+import html2text
 
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
@@ -433,7 +434,7 @@ def mailify_html(request, html, message):
 
 
 def create_message(request, subject, html, from_email, mailify=True):
-    message = MIMEMultipart()
+    message = MIMEMultipart('alternative')
     message['From'] = from_email
     message['Subject'] = subject
 
@@ -441,6 +442,8 @@ def create_message(request, subject, html, from_email, mailify=True):
         mailify_html(request, html, message)
     else:
         body_html = u'<html><body>%s</body></html>' % html
+        bodyplain = html2text.html2text(body_html)
+        message.attach(MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8'))
         message.attach(MIMEText(body_html.encode('UTF-8'), 'html', 'UTF-8'))
 
     for k in request.params.keys():

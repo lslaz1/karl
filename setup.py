@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '5.6.0'
+__version__ = '5.6.1'
 import os
 
 from setuptools import setup, find_packages
@@ -60,7 +60,8 @@ requires = [
     'ZODB3',
     'requests',
     'unidecode',
-    'setuptools'
+    'setuptools',
+    'html2text'
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']

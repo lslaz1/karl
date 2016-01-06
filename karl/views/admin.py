@@ -9,6 +9,7 @@ import os
 import re
 import time
 import transaction
+import html2text
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -416,6 +417,19 @@ class EmailUsersView(object):
             mailer = getUtility(IMailDelivery)
             _send_email(mailer, message, addressed_to)
 
+    def scrub_keywords(self, scrub_in):
+        # templates were originally intended for 'Access Request' responses
+        # accept templates or deny templates for example
+        # in this context a requestor_name or requestor_email is a valid object
+        # when used for generic email sending, the program has no knowledge of
+        # an 'Access Request' so these replacements are not valid
+        scrub_out = scrub_in.replace('{{requestor_name}}', '')
+        scrub_out = scrub_out.replace('{{requestor_email}}', '')
+        # system name we can get though
+        sys_name = get_setting(self.context, 'title')
+        scrub_out = scrub_out.replace('{{system_name}}', sys_name)
+        return scrub_out
+
     def __call__(self):
         context, request = self.context, self.request
         api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
@@ -423,6 +437,7 @@ class EmailUsersView(object):
         system_name = get_setting(context, 'title')
         profiles = find_profiles(context)
         admin = profiles[authenticated_userid(request)]
+        useremails = getuseremail(profiles)
         from_emails = [
             ('admin', '%s Administrator <%s>' % (system_name, admin_email)),
             ('self', '%s <%s>' % (admin.title, admin.email))
@@ -436,7 +451,28 @@ class EmailUsersView(object):
         for (k, v) in all_groups.iteritems():
             to_groups.append(('group-' + k, k))
 
-        if 'send_email' in request.params or 'submit' in request.params:
+        response_templates = [('', 'None')]
+        for e_t in self.context.email_templates:
+            response_templates.append((e_t, e_t))
+
+        if 'template' in request.params:
+            template_name = request.params.get('templ_ch', '')
+            e_template = self.context.email_templates.get(template_name, {})
+            template_body = self.scrub_keywords(e_template.get('body', ''))
+            template_subject = self.scrub_keywords(e_template.get('subject', ''))
+            return dict(
+                        api=api,
+                        menu=_menu_macro(),
+                        to_groups=to_groups,
+                        to_grp_value='none',
+                        from_emails=from_emails,
+                        from_email_value='admin',
+                        msg_subject=template_subject,
+                        msg_body=template_body,
+                        more_to='',
+                        response_templates=response_templates
+                    )
+        if 'send_email' in request.params:
             from_email = from_emails[0][1]
             if request.params['from_email'] == 'self':
                 from_email = from_emails[1][1]
@@ -507,6 +543,7 @@ class EmailUsersView(object):
                     msg_subject=request.params['subject'],
                     msg_body=request.params['text'],
                     more_to=request.params['more_to'],
+                    response_templates=response_templates
                 )
             self.send_email(
                 request.params['subject'], request.params['text'],
@@ -534,6 +571,7 @@ class EmailUsersView(object):
             msg_subject='',
             msg_body='',
             more_to='',
+            response_templates=response_templates
         )
 
 
@@ -795,7 +833,7 @@ class AddEmailTemplate(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Group')
+        api = AdminTemplateAPI(context, request, 'Admin UI: Add Email Template')
 
         # get list of users
         profiles = find_profiles(context)
@@ -1581,7 +1619,7 @@ def _send_invite(context, request, invitation):
     body_template = get_renderer(
         'templates/admin/email_invite_new.pt').implementation()
 
-    msg = MIMEMultipart()
+    msg = MIMEMultipart('alternative')
     msg['From'] = '%s <%s>' % (
         get_setting(context, 'title'),
         get_setting(context, 'admin_email'))
@@ -1592,7 +1630,7 @@ def _send_invite(context, request, invitation):
         invitation_url=resource_url(invitation.__parent__, request,
                                     invitation.__name__)
         )
-    bodyplain = "Please see the HTML portion of this email."
+    bodyplain = html2text.html2text(bodyhtml)
     htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
     plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
     msg.attach(plainpart)
@@ -1744,7 +1782,7 @@ class ReviewAccessRequest(object):
 
     def send_email(self, email_data, mto=None):
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = email_data['subject']
         message['From'] = email_data['from']
         if not mto:
@@ -1752,7 +1790,7 @@ class ReviewAccessRequest(object):
         else:
             message['To'] = mto
         bodyhtml = email_data['body']
-        bodyplain = 'Please see the HTML part of this email.'
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
@@ -1773,7 +1811,7 @@ class ReviewAccessRequest(object):
     def deny(self, email):
         access_request = self.context.access_requests[email]
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = 'Access Request to %s has been denied' % (
             get_setting(self.context, 'title'))
         message['From'] = get_setting(self.context, 'admin_email')
@@ -1786,14 +1824,7 @@ class ReviewAccessRequest(object):
             'name': access_request['fullname'],
             'system_name': get_setting(self.context, 'title')
         }
-        bodyplain = u'''Hello $(name)s
-
-Your access request has been denied. Please read the guidelines on requesting
-access to %(system_name)s
-''' % {
-            'name': access_request['fullname'],
-            'system_name': get_setting(self.context, 'title')
-        }
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)

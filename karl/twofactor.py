@@ -1,3 +1,4 @@
+import html2text
 import json
 from karl.utils import strings_differ
 from karl.utils import find_profiles
@@ -40,7 +41,7 @@ class TwoFactor(object):
 
     def send_mail_code(self, profile):
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['From'] = get_setting(self.context, 'admin_email')
         message['To'] = '%s <%s>' % (profile.title, profile.email)
         message['Subject'] = '%s Authorization Request' % self.context.title
@@ -51,12 +52,7 @@ class TwoFactor(object):
             self.request.application_url,
             profile.current_auth_code
         )
-        bodyplain = u'''An authorization code has been requested for the site %s.
-    Authorization Code: %s
-    ''' % (
-            self.request.application_url,
-            profile.current_auth_code
-        )
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
