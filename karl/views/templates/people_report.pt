@@ -9,13 +9,7 @@
 
 <!-- All, print, CSV buttons -->
     <h1 class="peopledir-title">${peopledir.title}</h1>
-    <div class="btn-group" role="group" tal:repeat="tab peopledir_tabs">
-      <a href="${tab['href']}" class="btn btn-link" 
-        >${tab['title']}
-      </a>
-      <div metal:use-macro="api.snippets.macros['peopledir-report-head']"/>
-      <div metal:use-macro="api.snippets.macros['actions_box']"/
-    </div>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
     <div id="peopledir-content-wrapper">
 
@@ -44,7 +38,7 @@
                 data: grid_data.records,
                 paging: true,
                 lengthChange: false,
-                responsive: false,
+                responsive: true,
                 scrollY: 500,
                 deferRender: true,
                 scroller: true,
