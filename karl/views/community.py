@@ -19,6 +19,8 @@ import schemaish
 import formish
 from validatish import validator
 
+import html2text
+
 from repoze.lemonade.content import create_content
 from repoze.postoffice.message import MIMEMultipart
 from email.mime.text import MIMEText
@@ -558,7 +560,7 @@ def join_community_view(context, request):
     if "form.submitted" in request.POST:
         message = request.POST.get("message", "")
         moderators = [profiles[id] for id in context.moderator_names]
-        mail = MIMEMultipart()
+        mail = MIMEMultipart('alternative')
         mail["From"] = "%s <%s>" % (profile.title, profile.email)
         mail["To"] = ",".join(
             ["%s <%s>" % (p.title, p.email) for p in moderators]
@@ -578,7 +580,7 @@ def join_community_view(context, request):
             profile_url=profile_url,
             accept_url=accept_url
         )
-        bodyplain = "Please see HTML version of this email."
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         mail.attach(plainpart)

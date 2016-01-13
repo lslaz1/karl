@@ -17,6 +17,8 @@
 
 import logging
 
+import html2text
+
 import copy
 from datetime import datetime
 from HTMLParser import HTMLParser
@@ -57,21 +59,6 @@ from email.mime.text import MIMEText
 log = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(r'[^@]+@[^@]+\.[^@]+')
-
-
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
 
 
 def _fixup_came_from(request, came_from):
@@ -274,7 +261,6 @@ def send_auth_code_view(context, request):
 
 
 def verify_recaptcha(site, request, code):
-    return True
     key = site.settings.get('recaptcha_api_secret_key')
     resp = requests.post(
         'https://www.google.com/recaptcha/api/siteverify',
@@ -337,7 +323,7 @@ class RequestAccessView(object):
         system_name = get_setting(self.context, 'title')
         self.context.access_requests[email] = self.data
         mailer = getUtility(IMailDelivery)
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = '%s Access Request(%s)' % (
             system_name, self.data.get('fullname'))
         message['From'] = get_setting(self.context, 'admin_email')
@@ -352,16 +338,7 @@ class RequestAccessView(object):
             '<br />'.join([_email_field_tmp % (f['label'], self.data.get(f['id'], ''))
                            for f in self.fields])
         )
-        bodyplain = u'''New access request has been submitted for the site %s
-Email: %s
-%s
-''' % (
-            self.request.application_url,
-            email,
-            '\n'.join([_email_field_tmp % (f['label'], self.data.get(f['id'], ''))
-                           for f in self.fields])
-        )
-        bodyplain = strip_tags(bodyplain)  # just to be sure
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
@@ -384,7 +361,7 @@ Email: %s
             mailer.send([profile.email], copyofmsg)
 
         # next, send to person that submitted
-        message = MIMEMultipart()
+        message = MIMEMultipart('alternative')
         message['Subject'] = 'Access Request to %s' % system_name
         message['From'] = get_setting(self.context, 'admin_email')
         user_message = get_setting(self.context, 'request_access_user_message', '') % (
@@ -392,8 +369,7 @@ Email: %s
                 'system_name': system_name
                 }))
         bodyhtml = u'<html><body>%s</body></html>' % user_message
-        bodyplain = u'%s' % user_message
-        bodyplain = strip_tags(bodyplain)  # just to be sure
+        bodyplain = html2text.html2text(bodyhtml)
         htmlpart = MIMEText(bodyhtml.encode('UTF-8'), 'html', 'UTF-8')
         plainpart = MIMEText(bodyplain.encode('UTF-8'), 'plain', 'UTF-8')
         message.attach(plainpart)
