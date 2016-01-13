@@ -1664,7 +1664,7 @@ class ReviewSiteInvitations(object):
             for invite_id in data.get('delete', []):
                 if invite_id in self.invitations:
                     invitation = self.invitations[invite_id]
-                    messages.append("Approved: %s" % invitation.email)
+                    messages.append("Deleted Request for: %s" % invitation.email)
                     del self.invitations[invite_id]
 
             for invite_id in data.get('resend', []):

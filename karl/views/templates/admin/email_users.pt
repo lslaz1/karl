@@ -46,6 +46,12 @@
           <b>Additional Users</b><br/>
           <input name="more_to" size="60" value="${more_to}"/><br/>
           <br/>
+          <b>Email Template</b><br/>
+          <select name="templ_ch">
+            <option tal:repeat="e_template response_templates"
+              value="${e_template[0]}">${e_template[1]}</option>
+          </select>
+          <button type="submit" name="template" formnovalidate>Load Template</button><br/><br/>
           <b>Subject</b><br/>
           <input name="subject" size="60" value="${msg_subject}" required/><br/>
           <br/>
