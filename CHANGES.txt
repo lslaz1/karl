@@ -1,7 +1,15 @@
 karl package Changelog
 ======================
 
-5.6.1 (2015-01-05)
+5.6.2 (2016-01-13)
+------------------
+
+- fix invite new message
+- change wording on delete of request
+- fix template loading on email users page
+
+
+5.6.1 (2016-01-05)
 ------------------
 
 - fix multipart messages to have mime type 'alternative'
