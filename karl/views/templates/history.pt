@@ -15,7 +15,26 @@
 
 
     <div class="kbody">
-        <table class="table table-striped">
+        <script language="javascript" type="text/javascript">
+            //<![CDATA[
+            $(document).ready(function(){
+                
+                $("#historygrid").DataTable({
+                    dom: 'fBrtip',
+                    paging: true,
+                    lengthChange: false,
+                    responsive: true,
+                    scrollY: 500,
+                    deferRender: true,
+                    scroller: true,
+                    searching: true
+                });
+
+            });
+            //]]>
+        </script>
+
+        <table id="historygrid" class="display">
             <tr>
                 <th>Date</th>
                 <th>Editor</th>

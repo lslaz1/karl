@@ -17,12 +17,35 @@
 
     <h3 class="cal_title">${calendar.title}</h3>        
 
-    <table class="table table-striped">
+    <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#calgridlist").DataTable({
+              dom: 'fBrtip',
+              paging: true,
+              lengthChange: false,
+              responsive: true,
+              scrollY: 100,
+              deferRender: true,
+              scroller: true,
+              searching: true,
+              buttons: [
+                    'print'
+              ]
+            });
+        });
+        //]]>
+      </script>
 
-      <tr tal:condition="calendar.page != 1" class="cal_agenda_range">
-        <td colspan="3"><a href="${calendar.navigation.prev_url}">View previous events</a></td>
-      </tr>      
-
+    <table id="calgridlist" class="table table-striped">
+      <thead>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Event</th>
+        <th>Location</th>
+      </thead>      
+      <tbody>
       <tr tal:repeat="event calendar.events" 
           tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[bool(repeat['event'].odd())]">
         
@@ -53,19 +76,16 @@
                 <a href="${event.show_url}" class="cal_${event.color}">${event.layer}</a>
               </div>                             
             </tal:block>
-
+          </div>
+        </td>
+        <td>
             <tal:block condition="event.location">
               <div class="cal_agenda_loc">
               &nbsp; ${event.location} </div>
             </tal:block>              
-          </div>
         </td>
-      </tr>
-
-      <tr tal:condition="calendar.has_more" class="cal_agenda_range">
-        <td colspan="3"><a href="${calendar.navigation.next_url}">View more events</a></td>
       </tr>      
-
+    </tbody>
     </table>
 
     <div metal:use-macro="calendar.navigation.macros['footer']"/>

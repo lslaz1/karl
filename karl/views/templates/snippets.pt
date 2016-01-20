@@ -205,7 +205,7 @@
       <div class="navbar-collapse collapse" id="actions">
         <div class="btn-group pull-right" role="group">
           <tal:block repeat="action api.actions_to_menu(actions)">
-            <a type="button" class="btn btn-default btn-sm" href="${api.here_url}${action[1]}"
+            <a type="button" class="btn btn-link btn-sm" href="${api.here_url}${action[1]}"
                tal:condition="not action[1].startswith('http')">
                <span>${action[0]}</span></a>
             <a type="button" class="btn btn-default btn-sm" href="${action[1]}"
@@ -608,22 +608,41 @@
      <p>This page shows all the tags applied across ${api.system_name}, with a
        count of each tag.</p>
 
-     <table class="table table-striped" border="0" cellpadding="6" cellspacing="0">
-      <tr>
-       <th> Tag </th>
-       <th> Count </th>
-      </tr>
+     <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#taggrid").DataTable({
+              paging: true,
+              lengthChange: false,
+              responsive: true,
+              deferRender: true,
+              scroller: true,
+              searching: true
+            });
+            
+        });
+        //]]>
+     </script>
 
-      <tr tal:repeat="entry entries">
-       <td>
-        <a href="${api.here_url}showtag/${entry['name']}"
-        >${entry['name']}</a>
-       </td>
-       <td>
-        ${entry['count']}
-       </td>
-      </tr>
-
+     <table id="taggrid" class="table table-striped">
+      <thead>
+        <tr>
+         <th> Tag </th>
+         <th> Count </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr tal:repeat="entry entries">
+         <td>
+          <a href="${api.here_url}showtag/${entry['name']}"
+          >${entry['name']}</a>
+         </td>
+         <td>
+          ${entry['count']}
+         </td>
+        </tr>
+      </tbody>
      </table>
 
     </div> <!-- /#taglisting -->

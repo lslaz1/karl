@@ -61,7 +61,7 @@
                 <div class="visualClear"></div>
               </div> <!-- /#cwrapper -->
             </div> <!-- / .col col-lg-9 -->
-            <div class="col col-lg-3 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+            <div class="col col-lg-3 col-md-4 col-sm-6" id="community-rightcol">
               <div class="panel panel-default rightcol" align="center" tal:content="structure api.render_sidebar()">
               </div>
             </div> <!-- /.col col-lg-3 --> 

@@ -18,8 +18,6 @@ jQuery(document).ready(function($) {
     <div metal:use-macro="api.snippets.macros['status_message']"/>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
-    <h1 class="kscreentitle">${profile.title}</h1>
-
     <tal:tf-activate tal:condition="python: same_user and tf.enabled and tf.phone_factor_enabled">
       <div class="portalMessage" tal:condition="python: not context.two_factor_verified">
         <a href="${api.here_url}phone-factor.html">Configure your phone number</a> for Two Factor Authentication.</div>
@@ -36,73 +34,91 @@ jQuery(document).ready(function($) {
     <div class="profile_page_body">
       <div class="wrapper">
         <div class="row">
-          <div class="col col-lg-3 col-md-3 col-sm-4 col-xs-12">
-            <div class="thumbnail">
-              <img src="${profile.photo.url}"/>
-              <div class="caption" align="center">
+          <div class="col col-lg-4 col-md-3 col-sm-4 col-xs-6">
+            <div class="panel panel-default" id="profile-panel">
+              <div class="panel-heading">
+                <h3 class="panel-title">${profile.title}</h3>
+              </div>
+              <div class="panel-body">
+                <img src="${profile.photo.url}" style="width:100%;"/>
                 <p tal:condition="profile.last_login_time | False">
-                  <span class="profileLabel">Last login:</span>
-                  <abbr class="timeago"
-                        title="${profile.last_login_time}">
-                        ${profile.last_login_time}</abbr>
-                </p>
-                <p tal:condition="profile.department">
-                  <span class="profileLabel">Department:</span>
-                  <span class="value">${profile.department}</span>
-                </p>
-                <p tal:condition="profile.position">
-                  <span class="profileLabel">Position:</span>
-                  <span>${profile.position}</span>
-                </p>
-                <p>
-                  <span class="profileLabel">Email:</span>
-                  <a href="mailto:${profile.email}">${profile.email}</a>
-                </p>
+                    <span class="profileLabel">Last login:</span>
+                    <abbr class="timeago"
+                          title="${profile.last_login_time}">
+                          ${profile.last_login_time}</abbr>
+                  </p>
+                  <p tal:condition="profile.department">
+                    <span class="profileLabel">Department:</span>
+                    <span class="value">${profile.department}</span>
+                  </p>
+                  <p tal:condition="profile.position">
+                    <span class="profileLabel">Position:</span>
+                    <span>${profile.position}</span>
+                  </p>
+                  <p>
+                    <span class="profileLabel">Email:</span>
+                    <a href="mailto:${profile.email}">${profile.email}</a>
+                  </p>
 
-                <p tal:condition="profile.extension">
-                  <span class="profileLabel">Extension:</span>
-                  <span>${profile.extension}</span>
-                </p>
-                <p tal:condition="profile.phone">
-                  <span class="profileLabel">Phone:</span>
-                  <span>${profile.phone}</span>
-                </p>
-                <p tal:condition="profile.fax">
-                  <span class="profileLabel">Fax:</span>
-                  <span>${profile.fax}</span>
-                </p>
-                <p tal:condition="profile.room_no">
-                  <span class="profileLabel">Room:</span>
-                  <span>${profile.room_no}</span>
-                </p>
-                <p tal:condition="profile.location">
-                  <span class="profileLabel">Location:</span>
-                  <span>${profile.location}</span>
-                </p>
-                <p tal:condition="profile.country">
-                  <span class="profileLabel">Country:</span>
-                  <span>${profile.country}</span>
-                </p>
-                <p tal:condition="profile.organization">
-                  <span class="profileLabel">Organization:</span>
-                  <span>${profile.organization}</span>
-                </p>
-                <p tal:condition="profile.languages">
-                  <span class="profileLabel">Languages:</span>
+                  <p tal:condition="profile.extension">
+                    <span class="profileLabel">Extension:</span>
+                    <span>${profile.extension}</span>
+                  </p>
+                  <p tal:condition="profile.phone">
+                    <span class="profileLabel">Phone:</span>
+                    <span>${profile.phone}</span>
+                  </p>
+                  <p tal:condition="profile.fax">
+                    <span class="profileLabel">Fax:</span>
+                    <span>${profile.fax}</span>
+                  </p>
+                  <p tal:condition="profile.room_no">
+                    <span class="profileLabel">Room:</span>
+                    <span>${profile.room_no}</span>
+                  </p>
+                  <p tal:condition="profile.location">
+                    <span class="profileLabel">Location:</span>
+                    <span>${profile.location}</span>
+                  </p>
+                  <p tal:condition="profile.country">
+                    <span class="profileLabel">Country:</span>
+                    <span>${profile.country}</span>
+                  </p>
+                  <p tal:condition="profile.organization">
+                    <span class="profileLabel">Organization:</span>
+                    <span>${profile.organization}</span>
+                  </p>
+                  <p tal:condition="profile.languages">
+                    <span class="profileLabel">Languages:</span>
 
-                  <span>${profile.languages}</span>
-                </p>
+                    <span>${profile.languages}</span>
+                  </p>
               </div>
             </div>
           </div>
         </div>
         
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
 
+            $("#staffprofile-content").DataTable({
+              paging: true,
+              lengthChange: false,
+              responsive: true,
+              deferRender: true,
+              scroller: true,
+              searching: true,
+            });
+
+        });
+        //]]>
+      </script>
+        
       <div class="col col-lg-11">  
-        <div class="table" tal:content="structure python: api.clean_html(profile.biography)" />
+        <div tal:content="structure python: api.clean_html(profile.biography)" />
         <h3> Content Added Recently </h3>
-        <table class="table table-striped" id="staffprofile-content"
-               style="clear: none">
+        <table class="table table-striped" id="staffprofile-content">
           <thead>
             <tr>
               <th class="cldate">Created</th>

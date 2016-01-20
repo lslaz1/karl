@@ -19,7 +19,7 @@
 		<div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
 				tal:repeat="entry entries">
 			<h2>
-          	<a href="${entry['href']}">${entry['title']}</a>
+          	<a href="${entry['href']}" id="blog-title">${entry['title']}</a>
         	</h2>
 
 			<div class="kbyline globalize-full-date">${entry['byline_info'].posted_date}</div>

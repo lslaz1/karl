@@ -1,6 +1,24 @@
+<script language="javascript" type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function(){
+        
+        $("#${field.cssname}").DataTable({
+            paging: true,
+            lengthChange: false,
+            responsive: true,
+            deferRender: true,
+            scroller: true,
+            searching: true,
+        });
+
+    });
+    //]]>
+  </script>
+
 <table id="${field.cssname}" class="table table-striped"
        tal:define="rows list(field.fields)">
   <!-- widgets/KarlManageMembers/widgets.html -->
+
   <thead>
     <tr>
       <th class="hiddenCell"></th>

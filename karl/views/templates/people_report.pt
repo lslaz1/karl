@@ -7,7 +7,6 @@
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
 
-<!-- All, print, CSV buttons -->
     <h1 class="peopledir-title">${peopledir.title}</h1>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
@@ -17,7 +16,7 @@
         tal:repeat="description descriptions"
         tal:content="structure python: api.clean_html(description)"></div>
 
-      <table id="reportgrid" class="display"></table>
+      <table id="reportgrid" class="table table-striped"></table>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         $(document).ready(function(){
@@ -57,16 +56,13 @@
         });
         //]]>
       </script>
-
-      
+     
       <div class="btn-group pull-left" tal:condition="1 or mailto">
         <a href="${mailto}" aria-label="Email">
           <span class="glyphicon glyphicon-envelope icons" aria-hidden="true"></span>
         </a>
         <div metal:use-macro="api.snippets.macros['opensearch']"></div>
       </div>
-      
-
     </div>
   </div>
 </html>

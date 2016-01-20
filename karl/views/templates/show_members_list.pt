@@ -52,7 +52,24 @@
     </tal:block>
 
     <tal:block condition="hide_pictures">
-      <table class="table table-striped">
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#comm-memberlist").DataTable({
+                paging: true,
+                lengthChange: false,
+                responsive: true,
+                deferRender: true,
+                scroller: true,
+                searching: true,
+            });
+
+        });
+        //]]>
+      </script>
+
+      <table class="table table-striped" id="comm-memberlist">
         <thead>
           <tr>
             <th class="clname">Name</th>

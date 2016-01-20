@@ -22,19 +22,42 @@
       <p class="fieldHelp">
           Categories help to organize the calendar events within a community. 
       </p>
+      
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#calendars").DataTable({
+                columnDefs: [ 
+                  { targets: 1, orderable: false } 
+                ]
+                paging: true,
+                lengthChange: false,
+                responsive: true,
+                deferRender: true,
+                scroller: true,
+                searching: true,
+            });
+
+        });
+        //]]>
+      </script>
+
       <table id="calendars" class="table table-striped" cellspacing="0" tal:condition="editable_categories">
-        <tr>
+        <thead>
           <th>Name</th>
           <th>&nbsp;</th>
-        </tr>
-        <tr tal:repeat="category editable_categories">
-          <td class="name">${category.title}</td>
-          <td class="actions">
-            <a class="edit_action" id="edit_${category.__name__}_category" href="#">edit</a> 
-            <span class="separator">|</span> 
-            <a class="delete_category_action" id="delete_category_${category.__name__}" href="#">delete</a>
-          </td>
-        </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="category editable_categories">
+            <td class="name">${category.title}</td>
+            <td class="actions text-right">
+              <a class="edit_action" id="edit_${category.__name__}_category" href="#">edit</a> 
+              <span class="separator">|</span> 
+              <a class="delete_category_action" id="delete_category_${category.__name__}" href="#">delete</a>
+            </td>
+          </tr>
+        </tbody>
       </table>
 
       <!-- Add a new category button -->
@@ -123,7 +146,7 @@
             </tal:block>
             &nbsp;
           </td>
-          <td class="actions">
+          <td class="actions text-right">
             <a class="edit_action" id="edit_${layer.__name__}_layer" href="#">edit</a>
             <span class="separator">|</span> 
             <a class="delete_layer_action" id="delete_layer_${layer.__name__}" href="#">delete</a>

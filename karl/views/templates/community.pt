@@ -12,19 +12,10 @@
   <div metal:fill-slot="content">
 
     <div metal:use-macro="api.snippets.macros['status_message']"/>
+    
+    <h1 class="title">Overview</h1>
     <div metal:use-macro="api.snippets.macros['actions_box']"/>
 
-    <h1 class="title">Overview</h1>
-    
-    <form class="clearfix md-hide form-inline" id="kcommunitysearch" action="${api.community_info.url}searchresults.html">
-      <div class="input-group">
-        <input type="text" class="form-control input-sm med_input" name="body" />
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-default btn-sm">Search This Community</button>
-          </span>
-      </div>
-
-    </form>
 
     <div metal:use-macro="api.snippets.macros['list_tags']"/>    
     <div class="koverview_body" 
@@ -34,19 +25,34 @@
     <metal:script metal:use-macro="api.snippets.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper" tal:define="default_batch_size string:10">
       <h3>Recent Activity</h3>
-      <metal:script metal:use-macro="api.snippets.macros['batch_size_selector']"/>
-      <table class="table table-striped">
+
+
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#communitygrid").DataTable({
+                paging: true,
+                lengthChange: false,
+                responsive: true,
+                scrollY: 100,
+                deferRender: true,
+                scroller: true,
+                searching: true,
+            });
+
+        });
+        //]]>
+      </script>
+            
+
+      <table id="communitygrid" class="table table-striped">
         <thead>
-          <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 100px;">
-              <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
           <tr>
-            <th class="cldate">Date</th>
-            <th class="cltitle">Title</th>
-            <th class="cltype">Type</th>
-            <th class="clauthor">Modified By</th>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Modified By</th>
           </tr>
         </thead>
         <tbody>
@@ -61,13 +67,6 @@
             </td>
           </tr>
         </tbody>
-        <tfoot tal:condition="batch_info.batching_required">
-          <tr class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
-              <div metal:use-macro="api.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
-	      </tfoot>
       </table>
     </div>
 

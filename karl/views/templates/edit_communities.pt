@@ -14,16 +14,17 @@
   <strong>Note:</strong> Keep in mind that any communities added after you check this list will NOT
   show up here until expressly selected.
   </p>
-  <div class="portlet-item" tal:repeat="my_community my_communities">
-    <input type="checkbox" name="preferred" id="preferred"
-           value="${my_community.title}"
-           checked="${preferred is not None and my_community.title in preferred}"
-           class="set_preferred_ui" />
-    <label tal:omit-tag="not my_community.moderator">
-      <span>${my_community.title}</span>
-    </label>
-  </div>
-  <div class="portlet-buttons">
+  <div id="setcomm-checkbox">
+    <div class="text-left" tal:repeat="my_community my_communities">
+      <input type="checkbox" name="preferred" id="preferred"
+             value="${my_community.title}"
+             checked="${preferred is not None and my_community.title in preferred}" />
+      <label tal:omit-tag="not my_community.moderator">
+        <span>${my_community.title}</span>
+      </label>
+    </div>
+</div>
+  <div id="setcomm-actions" class="btn-group">
     <a class="btn btn-default btn-xs"
        title="Set the personalized list of communities"
        href="${api.app_url}/jquery_set_preferred.html">

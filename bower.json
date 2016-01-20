@@ -14,9 +14,9 @@
     "datatables.net-bs": "~1.10.10",
     "datatables.net-responsive-bs": "~2.0.0",
     "datatables.net-scroller-bs": "~1.4.0",
-    "datatables.net-buttons-bs": "~1.1.0"
+    "datatables.net-buttons-bs": "~1.1.0",
     "bootstrap": "3.3.4",
-    "mockup": "v2.0.4",
+    "mockup": "v2.0.4"
   },
   "resolutions": {
     "select2": "3.5.1",

@@ -11,7 +11,25 @@
         by <a href="${api.here_url}">${api.context.title}</a></h1>
 
     <div class="recentItemsWrapper">
-      <table class="table table-striped">
+      
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function(){
+            
+            $("#recent-content").DataTable({
+                paging: true,
+                lengthChange: false,
+                responsive: true,
+                deferRender: true,
+                scroller: true,
+                searching: true,
+            });
+
+        });
+        //]]>
+      </script>
+
+      <table id="recent-content" class="table table-striped">
         <thead>
           <tr>
             <th class="cldate">Created</th>

@@ -11,15 +11,9 @@
     <h1>${api.page_title}</h1>
     <p tal:content="page_description|''"/>
     <div class="btn-group" role="group" aria-label="...">
-      <button type="button" class="btn btn-default btn-sm">
-        <a href="${api.here_url}manage.html?type=moderators">Moderators</a>
-      </button>
-      <button type="button" class="btn btn-default btn-sm">
-        <a href="${api.here_url}manage.html?type=members">Members</a>
-      </button>
-      <button type="button" class="btn btn-default btn-sm">
-        <a href="${api.here_url}manage.html?type=invitations">Invitations</a>
-      </button>
+      <a class="btn btn-default btn-sm" type="button" href="${api.here_url}manage.html?type=moderators">Moderators</a>
+      <a class="btn btn-default btn-sm" type="button" href="${api.here_url}manage.html?type=members">Members</a>
+      <a class="btn btn-default btn-sm" type="button" href="${api.here_url}manage.html?type=invitations">Invitations</a>
     </div>
 
     <div tal:condition="batch_info" style="clear:both">

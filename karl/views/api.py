@@ -226,7 +226,7 @@ class TemplateAPI(object):
                 principals = effective_principals(self.request)
                 self._recent_items = []
                 num, docids, resolver = search(
-                    limit=10,
+                    limit=2147483647,
                     path={'query': community_path},
                     allowed={'query': principals, 'operator': 'or'},
                     sort_index='modified_date',
