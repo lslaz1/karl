@@ -10,22 +10,17 @@
        Attempting automatic login...
     </div>
 
-    <div class="col col-lg-4 col-lg-offset-4 col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+    <div id="login" >
     <div metal:use-macro="api.snippets.macros['karl_status_message']" />
     <form name="formLogin" method="post" action="${app_url}/login.html"
           id="formLogin"
           tal:define="two_factor python: api.site.settings.get('two_factor_enabled', False)">
       <input type="hidden" name="came_from" value="${came_from}" />
-        <div class="form-group">
-          <span class="loginLabelWrapper">
-            <label for="username">Username</label>
-          </span>
-            <input class="form-control input-sm" name="login" type="text" id="username" value=""
-               tal:attributes="value username|None"
-               placeholder="or email address" />
-            <div class="send-auth-code" tal:condition="two_factor">
-              <button type="btn btn-default btn-sm">Send Authentication Code</button>
-        </div>
+      <input class="form-control input-lg" name="login" type="text" id="username" value=""
+         tal:attributes="value username|None"
+         placeholder="Username or email address" />
+      <div class="send-auth-code" tal:condition="two_factor">
+        <button type="btn btn-default btn-sm">Send Authentication Code</button>
         <div class="loginLeftPadding discreet" id="usernameMessage">
         </div>
 
@@ -44,11 +39,9 @@
 
 
         <div>
-          <span class="loginLabelWrapper">
-            <label for="password">Password</label>
-          </span>
-          <input class="form-control input-sm" type="password" name="password" id="password" value=""
-             tal:attributes="value password|None" />
+          <input class="form-control input-lg" type="password" name="password" id="password" value=""
+             tal:attributes="value password|None" 
+             placeholder="Password"/>
         <a href="${api.app_url}/reset_request.html" class="pull-right">I forgot my password</a>
         </div><br/>
         
@@ -156,7 +149,7 @@
         <input type="hidden" name="form.submitted" value="1" />
 
         <div class="buttons clearafter">
-          <button name="image" type="submit" id="signin" class="btn btn-default"><span>Sign In</span></button>
+          <button class="btn btn-lg btn-default btn-block" name="image" type="submit" id="signin"><span>Sign In</span></button>
         </div>
       </div>
     </form>
