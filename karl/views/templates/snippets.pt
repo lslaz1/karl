@@ -76,6 +76,7 @@
 
     <!-- Css resource composition -->
     <metal:resources define-macro="css_resources">
+      <link rel="stylesheet" href="${api.request.application_url}/theme.css" type="text/css"/>
       <tal:resources tal:repeat="resource python: api.get_css()">
         <link rel="stylesheet" href="" type="text/css" tal:replace="structure python: resource.render(request)" />
       </tal:resources>
@@ -208,7 +209,7 @@
             <a type="button" class="btn btn-link btn-sm" href="${api.here_url}${action[1]}"
                tal:condition="not action[1].startswith('http')">
                <span>${action[0]}</span></a>
-            <a type="button" class="btn btn-default btn-sm" href="${action[1]}"
+            <a type="button" class="btn btn-link btn-sm" href="${action[1]}"
                  tal:condition="action[1].startswith('http')"
                  ><span>${action[0]}</span></a>
               <tal:submenu condition="action[2]">
@@ -385,7 +386,7 @@
     </div>
 
 <!-- Tag Box -->
-    <div class="tagbox" metal:define-macro="list_tags">
+    <div class="tagbox" metal:define-macro="list_tags" id="tag-box">
       <form class="form-group" action="javascript://return false;">
         <label><strong>Tags:</strong></label>
         <input name="taglist" class="form-control" id="tagsearch-input" value=""/>

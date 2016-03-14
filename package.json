@@ -26,7 +26,6 @@
     "gulp-protractor": "*",
     "chai": "*",
     "chai-as-promised": "*",
-    "chromedriver": "*",
     "selenium-standalone": "~2.44.0",
     "multi-glob": "*",
     "selenium-html-js-converter": "*",

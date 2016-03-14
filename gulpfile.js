@@ -64,7 +64,7 @@ var tocopy = ['jquery', 'jquery-migrate', 'jquery-ui', 'tinymce-builded', 'lodas
               'datatables.net', 'datatables.net-bs',
               'datatables.net-responsive', 'datatables.net-responsive-bs',
               'datatables.net-buttons', 'datatables.net-buttons-bs',
-              'datatables.net-scroller', 'datatables.net-scroller-bs'];
+              'datatables.net-scroller', 'datatables.net-scroller-bs', 'bootswatch'];
 
 gulp.task('copy', function() {
   for(var i=0; i<tocopy.length; i++){

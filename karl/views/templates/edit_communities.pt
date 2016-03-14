@@ -24,18 +24,18 @@
       </label>
     </div>
 </div>
-  <div id="setcomm-actions" class="btn-group">
-    <a class="btn btn-default btn-xs"
+  <div id="setcomm-actions" class="btn-group portlet-buttons">
+    <a class="btn btn-default btn-sm"
        title="Set the personalized list of communities"
        href="${api.app_url}/jquery_set_preferred.html">
        <span>Update</span>
     </a>
-    <a class="btn btn-default btn-xs"
+    <a class="btn btn-default btn-sm"
        title="Reset portlet to show all communities"
        href="${api.app_url}/jquery_clear_preferred.html">
        <span>Clear preferred</span>
     </a>
-    <a class="btn btn-default btn-xs"
+    <a class="btn btn-default btn-sm"
        title="Cancel and return to list of communities"
        href="${api.app_url}/jquery_list_preferred.html">
        <span>Cancel</span>

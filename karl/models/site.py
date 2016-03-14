@@ -64,6 +64,7 @@ from karl.models.interfaces import IUserRemoved
 from karl.models.interfaces import IUserRemovedGroup
 from karl.models.interfaces import IVirtualData
 from karl.models.interfaces import DEFAULT_HOME_BEHAVIOR_OPTIONS
+from karl.models.interfaces import BOOTSWATCH_THEME_OPTIONS
 from karl.models.profile import Profile
 from karl.tagging import Tags
 from karl.tagging.index import TagIndex
@@ -441,6 +442,7 @@ class Site(Folder):
         privacy_statement=None,
         member_fields=list(Profile.additional_fields),
         default_home_behavior=DEFAULT_HOME_BEHAVIOR_OPTIONS[-1][0],
+        bootswatch_theme=BOOTSWATCH_THEME_OPTIONS[0][0],
         failed_login_attempt_window=3600,
         max_failed_login_attempts=15,
         site_override_css="""/* provide custom override css here */""",

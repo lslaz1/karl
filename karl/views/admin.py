@@ -1,6 +1,8 @@
 from __future__ import with_statement
 
 import codecs
+import subprocess
+import lesscpy
 from cStringIO import StringIO
 import csv
 from _csv import Error
@@ -43,6 +45,7 @@ from karl.models.interfaces import IInvitation
 from karl.models.interfaces import ISiteInvitation
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import DEFAULT_HOME_BEHAVIOR_OPTIONS
+from karl.models.interfaces import BOOTSWATCH_THEME_OPTIONS
 from karl.models.adapters import TIMEAGO_FORMAT
 from karl.models.profile import Profile
 from karl.security.policy import ADMINISTER
@@ -2096,7 +2099,8 @@ class SiteSettingsFormController(BaseSiteFormController):
         'google_analytics_id',
         'navigation_list',
         'show_all_users',
-        )
+        'bootswatch_theme',
+    )
     labels = {
         'title': 'Site title',
         'min_pw_length': 'Minimum Password Length',
@@ -2148,15 +2152,29 @@ class SiteSettingsFormController(BaseSiteFormController):
             widgets[field] = formish.widgets.Input()
         widgets['default_home_behavior'] = formish.widgets.SelectChoice(
             DEFAULT_HOME_BEHAVIOR_OPTIONS)
+        widgets['bootswatch_theme'] = formish.widgets.SelectChoice(BOOTSWATCH_THEME_OPTIONS)
         widgets['site_override_css'] = formish.widgets.TextArea()
         widgets['navigation_list'] = formish.widgets.TextArea()
         for bfield in self.bools:
             widgets[bfield] = formish.widgets.Checkbox()
         return widgets
 
+    def bootswatch_setting(self):
+        theme = self.context.settings['bootswatch_theme']
+        with open('/opt/karl_dsac/src/src/karl/karl/views/static/karl-ui.less') as f:
+            ui = f.read()
+        ui += '@import (less) "dist/bootswatch/' + theme + '/bootswatch.less";\n'
+        less_process = subprocess.Popen(['lessc', '-'], 
+            cwd='/opt/karl_dsac/src/src/karl/karl/views/static/', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ui_css = less_process.communicate(ui)
+        self.context.settings['bootswatch_theme_css'] = ui_css
+
     def handle_submit(self, converted):
+        
         for field in self.fields:
             self.context.settings[field] = converted[field]
+            if field == 'bootswatch_theme':
+                self.bootswatch_setting()
         location = resource_url(self.context, self.request, 'admin.html')
         return HTTPFound(location=location)
 

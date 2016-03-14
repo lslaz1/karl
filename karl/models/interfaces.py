@@ -734,3 +734,22 @@ DEFAULT_HOME_BEHAVIOR_OPTIONS = (
     ('communities', 'Communities Area'),
     ('one_community', 'If part of one community, go directly to it')
 )
+
+BOOTSWATCH_THEME_OPTIONS = (
+    ('cerulean', "Cerulean"),
+    ('cosmo', "Cosmo"),
+    ('cyborg', "Cyborg"),
+    ('darkly', "Darkly"),
+    ('flatly', "Flatly"),
+    ('journal', "Journal"),
+    ('lumen', "Lumen"),
+    ('paper', "Paper"),
+    ('readable', "Readable"),
+    ('sandstone', "Sandstone"),
+    ('simplex', "Simplex"),
+    ('slate', "Slate"),
+    ('spacelab', "Spacelab"),
+    ('superhero', "Superhero"),
+    ('united', "United"),
+    ('yeti', "Yeti"),
+)

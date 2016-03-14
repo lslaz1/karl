@@ -295,6 +295,10 @@
 // Bootstrap Retheme Changes
 // --------------------------------------------------
 
+//
+// Media Queries
+// --------------------------------------------------
+
 @media only screen and (max-width: 767px) {
   #nav-search {
     margin: 0;
@@ -315,9 +319,12 @@
   h2 #blog-title {
     font-size: 22px
   }
+  #actions {
+    padding-left: 0;
+    float: left;
+    margin-bottom: 15px;
+  }
 }
-
-
 
 @media only screen and (min-width: 768px) and (max-width: 954px) {
   .container-fluid {
@@ -327,6 +334,10 @@
     margin-right: 15px;
   }
 }
+
+//
+// Alpha Filter
+// --------------------------------------------------
 
 .list-inline {
   margin: auto;
@@ -346,6 +357,10 @@ span .notcurrent {
   font-style: italic;
 }
 
+//
+// Icons
+// --------------------------------------------------
+
 .icons {
   padding: 5px;
 }
@@ -356,22 +371,6 @@ span .notcurrent {
 
 .req_asterisk {
   color: red;
-}
-
-input.sm-input {
-  width: 150px;
-}
-
-input.med-input {
-  width: 300px;
-}
-
-.btn-group-left {
-  margin-top: 5px;
-}
-
-kscreentitle {
-  margin-top: 50px;
 }
 
 .caret {
@@ -386,9 +385,22 @@ kscreentitle {
   margin-top: 1px;
 }
 
-.feed-img {
-  min-width: 100%;
+//
+// Inputs
+// --------------------------------------------------
+
+input.sm-input {
+  width: 150px;
 }
+
+input.med-input {
+  width: 300px;
+}
+
+
+//
+// Header Nav
+// --------------------------------------------------
 
 .header-nav {
   padding-top: 13px;
@@ -396,33 +408,6 @@ kscreentitle {
 
 #nav-search {
   padding-top: 15px;
-}
-
-#profile-thumbnail {
-  height: 340px; 
-}
-
-#profile-img {
-  width: 150px;
-}
-
-div.rightcol {
-  padding-bottom: 25px;
-}
-
-ul.nav-menu {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0;
-}
-
-#alpha-filter {
-  width: 82%;
-  margin: 15px 0 15px 0;
-}
-
-#filter-btn {
-  margin: 15px 0 15px 0;
 }
 
 #header-navbar {
@@ -446,9 +431,42 @@ ul.nav-menu {
   padding: 5px 30px 5px 5px;
 }
 
-#communities-list {
-  padding: 0;
+//
+// Rightcol Portals
+// --------------------------------------------------
+
+div.rightcol {
+  padding-bottom: 25px;
 }
+
+#community-rightcol {
+  padding-left: 0;
+}
+
+#setcomm-actions {
+  clear: both;
+  margin-top: 10px;
+}
+
+//
+// Images
+// --------------------------------------------------
+
+.feed-img {
+  min-width: 100%;
+}
+
+#profile-thumbnail {
+  height: 340px; 
+}
+
+#profile-img {
+  width: 150px;
+}
+
+//
+// Collapsible Menus
+// --------------------------------------------------
 
 #actions-btn {
   padding: 0;
@@ -471,30 +489,8 @@ ul.nav-menu {
   margin-bottom: 20px;
 }
 
-#login-status {
-  margin-top: 25px;
-}
-
-#preferred_form p {
-  padding: 0 15px;
-}
-
-div #setcomm-checkbox {
-  margin-left: 15px;
-  clear: both;
-}
-
-#setcomm-actions {
-  clear: both;
-  margin-top: 10px;
-}
-
-#community-rightcol {
-  padding-left: 0;
-}
-
-#profile-panel {
-  width: 280px;
+#comm-menu {
+  padding-top: 0;
 }
 
 //
@@ -514,12 +510,13 @@ body {
   bottom: 0;
   width: 100%;
   height: 60px;
+  margin-left: -10px;
   background-color: #f5f5f5;
 }
 
 #footer-container {
   width: auto;
-  padding: 0 15px;
+  margin: 0 15px;
 }
 
 #footer-container p {
@@ -536,6 +533,10 @@ body {
   margin: 0 auto;
 }
 
+#login-status {
+  margin-top: 25px;
+}
+
 #username {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
@@ -548,13 +549,59 @@ body {
   border-top-right-radius: 0;
 }
 
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+
+
+
+.btn-group-left {
+  margin-top: 5px;
 }
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+
+kscreentitle {
+  margin-top: 50px;
+}
+
+ul.nav-menu {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+#alpha-filter {
+  width: 82%;
+  margin: 15px 0 15px 0;
+}
+
+#filter-btn {
+  margin: 15px 0 15px 0;
+}
+
+#communities-list {
+  padding: 0;
+}
+
+#preferred_form p {
+  padding: 0 15px;
+}
+
+div #setcomm-checkbox {
+  margin-left: 15px;
+  clear: both;
+}
+
+
+#profile-panel {
+  width: 280px;
+}
+
+#tag-box {
+  clear: left;
+}
+
+#reportgrid_filter {
+  clear: left;
+  text-align: left;
+}
+
+div.dt-buttons {
+  text-align: left;
 }

@@ -46,6 +46,14 @@
     permission="administer"
   />
 
+  <!-- Displays the bootswatch theme in site settings -->
+  <view
+    for="karl.models.interfaces.ISite"
+    view=".bootswatch.show_bootswatch_theme"
+    permission="view"
+    name="theme.css"
+  />
+
   <!-- Redirect requests to site root, to correct URL -->
   <view
     for="karl.models.interfaces.ISite"

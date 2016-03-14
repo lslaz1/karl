@@ -20,13 +20,20 @@
          tal:attributes="value username|None"
          placeholder="Username or email address" />
       <div class="send-auth-code" tal:condition="two_factor">
-        <button type="btn btn-default btn-sm">Send Authentication Code</button>
+        <button type="btn btn-default btn-lg">Send Authentication Code</button>
         <div class="loginLeftPadding discreet" id="usernameMessage">
         </div>
 
       </div>
 
+        <div>
+          <input class="form-control input-lg" type="password" name="password" id="password" value=""
+             tal:attributes="value password|None" 
+             placeholder="Password"/>
+        <a href="${api.app_url}/reset_request.html" class="pull-right">I forgot my password</a>
+        </div><br/>
 
+        
         <div tal:condition="two_factor">
           <span class="loginLabelWrapper">
             <label for="code">Code</label>
@@ -37,13 +44,6 @@
           </div>
         </div>
 
-
-        <div>
-          <input class="form-control input-lg" type="password" name="password" id="password" value=""
-             tal:attributes="value password|None" 
-             placeholder="Password"/>
-        <a href="${api.app_url}/reset_request.html" class="pull-right">I forgot my password</a>
-        </div><br/>
         
         <div class="field loginLeftPadding discreet">
           <input type="checkbox" name="max_age" id="remember"
