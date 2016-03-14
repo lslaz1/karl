@@ -2,7 +2,6 @@ from __future__ import with_statement
 
 import codecs
 import subprocess
-import lesscpy
 from cStringIO import StringIO
 import csv
 from _csv import Error
