@@ -22,6 +22,7 @@
   "resolutions": {
     "select2": "3.5.1",
     "patternslib": "2.0.9",
-    "jquery": "1.9.1"
+    "jquery": "1.9.1",
+    "bootstrap": "3.3.6"
   }
 }
